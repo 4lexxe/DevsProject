@@ -1,0 +1,33 @@
+# Ignorar dependencias de Node.js en las carpetas app y server
+/app/node_modules/
+/server/node_modules/
+
+# Ignorar archivos de build de TypeScript en las carpetas app y server
+/app/dist/
+/server/dist/
+
+/app/build/
+/server/build/
+
+# Ignorar archivos generados por Vite en app
+/app/vite-dist/
+
+# Ignorar configuraciones del IDE
+/.idea/
+/.vscode/
+
+# Archivos de logs
+*.log
+
+# Archivos específicos de OS
+.DS_Store    # macOS
+Thumbs.db    # Windows
+
+# Archivos de variables de entorno
+.env
+
+# Ignorar npm lockfile en la raíz
+/package-lock.json
+
+# Ignorar los errores de instalación de npm
+npm-debug.log
