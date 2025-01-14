@@ -1,5 +1,8 @@
 import express from 'express';
 import UserService from '../services/UserService';
+import { createUser, getUsers, updateUser, deleteUser } from '../controllers/userController'; // Importar los controladores
+
+
 
 const router = express.Router();
 
@@ -38,5 +41,16 @@ router.delete('/users/:id', async (req, res) => {
   }
 });
 
+// Ruta para crear un usuario
+router.post('/users', createUser);
+
+// Ruta para obtener todos los usuarios
+router.get('/users', getUsers);
+
+// Ruta para actualizar un usuario
+router.put('/users/:id', updateUser);
+
+// Ruta para eliminar un usuario
+router.delete('/users/:id', deleteUser);
 
 export default router;

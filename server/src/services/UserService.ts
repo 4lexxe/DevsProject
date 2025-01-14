@@ -27,6 +27,7 @@ class UserService {
     }
   }
 
+ // Eliminar un usuario
   static async deleteUser(id: number) {
     try {
       const user = await User.findByPk(id);
@@ -40,6 +41,31 @@ class UserService {
         throw new Error("Error al eliminar el usuario: " + error.message);
       } else {
         throw new Error("Error al eliminar el usuario: " + String(error));
+      }
+    }
+  }
+
+  static async updateUser(id: number, name: string, email: string, password: string, phone: string, roleId: number) {
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        return null; // Si no existe el usuario
+      }
+      
+      await user.update({ 
+        name, 
+        email, 
+        password, 
+        phone, 
+        roleId 
+      });
+      
+      return user;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error("Error al actualizar el usuario: " + error.message);
+      } else {
+        throw new Error("Error al actualizar el usuario: " + String(error));
       }
     }
   }

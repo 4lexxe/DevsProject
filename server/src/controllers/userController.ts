@@ -16,6 +16,16 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
+// Obtener todos los usuarios
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await UserService.getUsers();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: (error as any).message });
+  }
+};
+
 // Eliminar un usuario
 export const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -28,5 +38,22 @@ export const deleteUser = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).json({ message: (error as any).message });
+  }
+};
+
+// Actualizar un usuario por ID
+export const updateUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, email, password, phone, roleId } = req.body;
+
+  try {
+    const user = await UserService.updateUser(Number(id), name, email, password, phone, roleId);
+    if (user) {
+      res.status(200).json({ message: "Usuario actualizado correctamente", user });
+    } else {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: (error as any).message });
   }
 };
