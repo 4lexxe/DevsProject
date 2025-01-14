@@ -1,8 +1,12 @@
-import express from 'express';
-import { createAdmin } from '../controllers/adminController';
+import express from "express";
+import { createAdminController, getAllAdminsController } from "../controllers/adminController";
 
 const router = express.Router();
 
-router.post('/admins', createAdmin);
+// Ruta para crear un administrador
+router.post("/admins", createAdminController);
+
+// Ruta para obtener todos los administradores
+router.get("/admins", getAllAdminsController);
 
 export default router;

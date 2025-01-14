@@ -9,4 +9,4 @@ sequelize.sync({ force: true })  // Eliminar las tablas existentes
   })
   .catch((error) => {
     console.error('Error al sincronizar las tablas:', error);
-  });
+  }); 

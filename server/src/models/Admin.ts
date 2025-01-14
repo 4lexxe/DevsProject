@@ -1,48 +1,56 @@
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/db';
-import User from './User';  // Importar el modelo User
+import User from './User';
 
 class Admin extends Model {
+  public id!: number;
   public admin_since!: Date;
   public permissions!: string[];
   public isSuperAdmin!: boolean;
-  public admin_notes!: string;
+  public admin_notes?: string;
   public userId!: number;
 }
 
-Admin.init({
-  admin_since: {
-    type: DataTypes.DATE,
-    allowNull: true,
-  },
-  permissions: {
-    type: DataTypes.JSONB,
-    allowNull: true,
-  },
-  isSuperAdmin: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  admin_notes: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  userId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: User, // Relación con el modelo User
-      key: 'id',
+Admin.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    allowNull: false,
+    admin_since: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    permissions: {
+      type: DataTypes.JSONB,  // Usar JSONB en lugar de ARRAY al trabajar con objetos o arrays JSON
+      allowNull: false,
+    },    
+    isSuperAdmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    admin_notes: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: User,
+        key: 'id',
+      },
+    },
   },
-}, {
-  sequelize,
-  modelName: 'Admin',
-  tableName: 'Admins',
-  timestamps: true,
-});
+  {
+    sequelize,
+    modelName: 'Admin',
+  }
+);
 
-User.hasOne(Admin, { foreignKey: 'userId' });
-Admin.belongsTo(User, { foreignKey: 'userId' });
+// Definir las asociaciones
+User.hasOne(Admin, { foreignKey: 'userId', as: 'admin' });
+Admin.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 export default Admin;

@@ -12,7 +12,7 @@ const sequelize = new Sequelize(
     host: process.env.DB_HOST, // Host
     port: Number(process.env.DB_PORT), // Puerto
     dialect: process.env.DB_DIALECT as any, // Dialecto
-    logging: false,
+    logging: console.log,
   }
 );
 
