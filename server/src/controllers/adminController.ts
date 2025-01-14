@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { createAdmin, getAllAdmins, deleteAdmin } from "../services/adminService";
+import * as AdminService from "../services/adminService";
 
 interface UserData {
   userId: number;
@@ -85,4 +86,27 @@ export const deleteAdminController = (req: ParamsWithAdminId, res: Response, nex
       console.error("Error detallado:", error);
       res.status(500).json({ error: "Ha ocurrido un error al eliminar el administrador" });
     });
+};
+
+export const updateAdminController = async (req: Request, res: Response) => {
+  const adminId = req.params.id;  // ID del administrador
+  const { admin_since, permissions, isSuperAdmin, admin_notes } = req.body;
+
+  try {
+    const updatedAdmin = await AdminService.updateAdmin(Number(adminId), {
+      admin_since,
+      permissions,
+      isSuperAdmin,
+      admin_notes,
+    });
+
+    if (updatedAdmin) {
+      res.status(200).json({ message: "Administrador actualizado correctamente", admin: updatedAdmin });
+    } else {
+      res.status(404).json({ message: `Administrador con id ${adminId} no encontrado` });
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+    res.status(500).json({ message: "Error al actualizar el administrador", error: errorMessage });
+  }
 };

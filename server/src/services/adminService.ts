@@ -60,3 +60,25 @@ export const deleteAdmin = async (adminId: number): Promise<void> => {
 
   await admin.destroy(); // Esto elimina el administrador de la base de datos
 };
+
+export const updateAdmin = async (adminId: number, adminData: AdminData): Promise<Admin | null> => {
+  try {
+    // Buscar el administrador por su ID
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) {
+      throw new Error("Administrador no encontrado");
+    }
+
+    // Actualizar los datos del administrador
+    await admin.update(adminData);
+
+    return admin; // Devuelve el administrador actualizado
+  } catch (error) {
+    console.error("Error detallado:", error);
+    throw new Error(
+      `Error al actualizar el administrador: ${
+        error instanceof Error ? error.message : "error desconocido"
+      }`
+    );
+  }
+};
