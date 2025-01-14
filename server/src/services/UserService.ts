@@ -26,6 +26,23 @@ class UserService {
       }
     }
   }
+
+  static async deleteUser(id: number) {
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        return null; // Si no existe el usuario
+      }
+      await user.destroy(); // Eliminar el usuario
+      return user;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error("Error al eliminar el usuario: " + error.message);
+      } else {
+        throw new Error("Error al eliminar el usuario: " + String(error));
+      }
+    }
+  }
 }
 
 export default UserService;
