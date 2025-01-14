@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createAdmin, getAllAdmins } from "../services/adminService";
+import { createAdmin, getAllAdmins, deleteAdmin } from "../services/adminService";
 
 interface UserData {
   userId: number;
@@ -57,5 +57,32 @@ export const getAllAdminsController = (req: Request, res: Response, next: NextFu
     .catch((error) => {
       console.error("Error detallado:", error);
       next(error);
+    });
+};
+
+// Controlador para eliminar un administrador
+interface ParamsWithAdminId extends Request {
+  params: {
+    adminId: string;
+  };
+}
+
+export const deleteAdminController = (req: ParamsWithAdminId, res: Response, next: NextFunction): void => {
+  const { adminId } = req.params; // O puedes usar userId si es necesario
+
+  console.log("Eliminando admin con el id:", adminId);
+
+  if (!adminId || isNaN(Number(adminId))) {
+    res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
+    return;
+  }
+
+  deleteAdmin(Number(adminId))
+    .then(() => {
+      res.status(200).json({ message: `Administrador con id ${adminId} eliminado exitosamente` });
+    })
+    .catch((error) => {
+      console.error("Error detallado:", error);
+      res.status(500).json({ error: "Ha ocurrido un error al eliminar el administrador" });
     });
 };

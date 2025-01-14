@@ -50,3 +50,13 @@ export const getAllAdmins = async () => {
     );
   }
 };
+
+export const deleteAdmin = async (adminId: number): Promise<void> => {
+  const admin = await Admin.findByPk(adminId);
+
+  if (!admin) {
+    throw new Error("Administrador no encontrado");
+  }
+
+  await admin.destroy(); // Esto elimina el administrador de la base de datos
+};

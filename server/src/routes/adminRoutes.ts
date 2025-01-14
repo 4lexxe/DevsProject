@@ -1,5 +1,5 @@
 import express from "express";
-import { createAdminController, getAllAdminsController } from "../controllers/adminController";
+import { createAdminController, getAllAdminsController, deleteAdminController } from "../controllers/adminController";
 
 const router = express.Router();
 
@@ -8,5 +8,8 @@ router.post("/admins", createAdminController);
 
 // Ruta para obtener todos los administradores
 router.get("/admins", getAllAdminsController);
+
+// Ruta para eliminar un administrador
+router.delete("/admins/:adminId", deleteAdminController); // Ruta para eliminar un administrador
 
 export default router;
