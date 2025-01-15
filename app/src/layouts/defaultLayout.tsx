@@ -5,6 +5,7 @@ import Features from '../views/components/features/Features';
 import CourseCategories from '../views/components/categories/CourseCategories';
 import LatestCourses from '../views/components/courses/LatestCourses';
 import { ComingSoon } from '../views/components/coming-soon/ComingSoon';
+import Footer from '../views/components/navigation/Footer';
 
 // Define la interfaz de las props para DefaultLayout
 interface DefaultLayoutProps {
@@ -25,6 +26,7 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
         <LatestCourses />
         <ComingSoon />
       </main>
+      <Footer />
     </div>
   );
 }
