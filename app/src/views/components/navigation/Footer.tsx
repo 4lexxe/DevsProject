@@ -24,12 +24,12 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-[#CCF7FF] py-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
+    <footer className="bg-[#CCF7FF] py-8 sm:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
           {/* Logo */}
           <div>
-            <h2 className="text-2xl font-bold text-black">Devs Project</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-black">Devs Project</h2>
           </div>
 
           {/* Menu Column 1 */}
@@ -39,7 +39,7 @@ export default function Footer() {
                 <li key={item.label}>
                   <a 
                     href={item.href}
-                    className="text-black/70 hover:text-[#00D7FF] transition-colors"
+                    className="text-sm sm:text-base text-black/70 hover:text-[#00D7FF] transition-colors"
                   >
                     {item.label}
                   </a>
@@ -55,7 +55,7 @@ export default function Footer() {
                 <li key={item.label}>
                   <a 
                     href={item.href}
-                    className="text-black/70 hover:text-[#00D7FF] transition-colors"
+                    className="text-sm sm:text-base text-black/70 hover:text-[#00D7FF] transition-colors"
                   >
                     {item.label}
                   </a>
@@ -65,7 +65,7 @@ export default function Footer() {
           </div>
 
           {/* Social Links */}
-          <div className="flex space-x-4 md:justify-end">
+          <div className="flex space-x-4 justify-start sm:justify-end">
             {socialLinks.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -80,8 +80,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright */}
-        <div className="mt-12 pt-8 border-t border-black/10">
-          <p className="text-center text-sm text-black/60">
+        <div className="mt-8 sm:mt-12 pt-8 border-t border-black/10">
+          <p className="text-center text-xs sm:text-sm text-black/60">
             © {new Date().getFullYear()} Devs Project. Todos los derechos reservados.
           </p>
         </div>

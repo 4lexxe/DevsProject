@@ -1,6 +1,5 @@
 import FeatureCard from './FeatureCard';
 
-// Datos de las características principales
 const features = [
   {
     id: 1,
@@ -21,17 +20,17 @@ const features = [
 
 export default function Features() {
   return (
-    <section className="px-6 py-16 bg-[D1D1D1]">
+    <section className="px-4 sm:px-6 py-12 sm:py-16 bg-[D1D1D1]">
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="mb-4 text-3xl font-bold text-black">
+        <h2 className="mb-4 text-2xl sm:text-3xl font-bold text-black">
           Diseñado Para Estudiantes Como Tú
         </h2>
-        <p className="mb-12 text-black/80">
+        <p className="mb-8 sm:mb-12 text-sm sm:text-base text-black/80">
           Desde organizar tus materias hasta conectarte con otros estudiantes, 
           nuestra plataforma tiene todo lo que necesitas para avanzar en tu aprendizaje.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature) => (
             <FeatureCard key={feature.id} {...feature} />
           ))}
@@ -40,3 +39,4 @@ export default function Features() {
     </section>
   );
 }
+

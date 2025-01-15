@@ -7,19 +7,16 @@ import LatestCourses from '../views/components/courses/LatestCourses';
 import { ComingSoon } from '../views/components/coming-soon/ComingSoon';
 import Footer from '../views/components/navigation/Footer';
 
-// Define la interfaz de las props para DefaultLayout
 interface DefaultLayoutProps {
-  children?: React.ReactNode; // El prop `children` es opcional
+  children?: React.ReactNode;
 }
 
 export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <main className="flex-1">
-        {/* Renderiza el contenido adicional que se pasa como children */}
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {children}
-        {/* Renderiza los componentes principales */}
         <Hero />
         <Features />
         <CourseCategories />
