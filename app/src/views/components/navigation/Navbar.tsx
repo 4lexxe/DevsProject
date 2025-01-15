@@ -14,7 +14,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-gradient-to-r from-slate-100 to-neutral-100 text-black shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo de la plataforma */}
@@ -30,10 +30,10 @@ export default function Navbar() {
                 placeholder="Buscar cursos, recursos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00D7FF] focus:border-transparent"
+                className="w-full px-4 py-2 rounded-full border border-blue-300 bg-white/10 text-black placeholder-black focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
               />
               <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-black" />
               </button>
             </form>
           </div>
@@ -48,22 +48,20 @@ export default function Navbar() {
           </div>
           
           {/* Botones de autenticación (desktop) */}
-          <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
-              <AuthButton variant="primary">
-                Registrarse
-              </AuthButton>
-              <AuthButton variant="outline">
-                Iniciar Sesión
-              </AuthButton>
-            </div>
+          <div className="hidden md:flex items-center space-x-2">
+            <AuthButton variant="secondary">
+              Iniciar Sesión
+            </AuthButton>
+            <AuthButton variant="primary">
+              Registrarse
+            </AuthButton>
           </div>
           
           {/* Botón de menú móvil */}
-          <div className="flex md:hidden">
+          <div className="flex items-center md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
             >
               <span className="sr-only">Abrir menú principal</span>
               {isMenuOpen ? (
@@ -78,7 +76,7 @@ export default function Navbar() {
 
       {/* Menú móvil */}
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden border-gray-50">
           {/* Search bar (mobile) */}
           <div className="px-2 pt-2 pb-3 space-y-1">
             <form onSubmit={handleSearch} className="relative">
@@ -87,25 +85,25 @@ export default function Navbar() {
                 placeholder="Buscar cursos, recursos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#00D7FF] focus:border-transparent"
+                className="w-full px-4 py-2 rounded-full border border-blue-300 bg-white/10 text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
               />
               <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-black" />
               </button>
             </form>
           </div>
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="px-2 pt-2 pb-3 space-y-1">
             <NavLink href="/cursos">Cursos</NavLink>
             <NavLink href="/ruta-aprendizaje">Ruta de Aprendizaje</NavLink>
             <NavLink href="/recursos">Recursos</NavLink>
           </div>
-          <div className="pt-4 pb-3 border-t border-gray-200">
-            <div className="flex items-center px-5">
-              <AuthButton variant="primary">
-                Registrarse
-              </AuthButton>
-              <AuthButton variant="outline">
+          <div className="pt-4 pb-3 border-t border-blue-800">
+            <div className="flex items-center justify-center space-x-2 px-5">
+              <AuthButton variant="secondary" fullWidth>
                 Iniciar Sesión
+              </AuthButton>
+              <AuthButton variant="primary" fullWidth>
+                Registrarse
               </AuthButton>
             </div>
           </div>
@@ -114,3 +112,4 @@ export default function Navbar() {
     </nav>
   )
 }
+
