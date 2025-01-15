@@ -3,6 +3,7 @@ import Navbar from '../views/components/navigation/Navbar';
 import Hero from '../views/components/hero/Hero';
 import Features from '../views/components/features/Features';
 import CourseCategories from '../views/components/categories/CourseCategories';
+import LatestCourses from '../views/components/courses/LatestCourses';
 
 // Define la interfaz de las props para DefaultLayout
 interface DefaultLayoutProps {
@@ -20,6 +21,7 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
         <Hero />
         <Features />
         <CourseCategories />
+        <LatestCourses />
       </main>
     </div>
   );
