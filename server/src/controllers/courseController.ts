@@ -3,8 +3,13 @@ import Course from '../models/Course';
 import Admin from '../models/Admin';  // Relación con el admin
 
 // Crear un curso
-export const createCourse: RequestHandler = async (req, res) => {
+export const createCourse: RequestHandler = async (req, res): Promise<void> => {
   const { title, image, summary, adminId } = req.body;
+
+  if (!adminId || typeof adminId !== 'number') {
+    res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
+    return;
+  }
 
   try {
     const admin = await Admin.findByPk(adminId);
@@ -20,20 +25,32 @@ export const createCourse: RequestHandler = async (req, res) => {
       adminId,
     });
 
-    res.status(201).json(course);
+    const courseWithAdmin = await Course.findByPk(course.id, {
+      include: { model: Admin, as: 'admin' },
+    });
+
+    res.status(201).json(courseWithAdmin);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creando el curso' });
   }
 };
 
+
 // Obtener todos los cursos
 export const getCourses: RequestHandler = async (req, res) => {
   try {
-    const courses = await Course.findAll();
+    const courses = await Course.findAll({
+      include: {
+        model: Admin,
+        as: 'admin',
+        attributes: ['id', 'name'],
+      },
+    });
+
     res.status(200).json(courses);
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener los cursos:", error); // Log detallado
     res.status(500).json({ message: 'Error obteniendo los cursos' });
   }
 };
@@ -41,9 +58,21 @@ export const getCourses: RequestHandler = async (req, res) => {
 // Obtener un curso por ID
 export const getCourseById: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  
+
+  if (!id || isNaN(Number(id))) {
+    res.status(400).json({ error: "El 'id' debe ser un número válido" });
+    return;
+  }
+
   try {
-    const course = await Course.findByPk(id);
+    const course = await Course.findByPk(id, {
+      include: {
+        model: Admin,
+        as: 'admin',
+        attributes: ['id', 'name', 'email'], // Selecciona sólo campos necesarios
+      },
+    });
+
     if (!course) {
       res.status(404).json({ message: 'Curso no encontrado' });
       return;
@@ -51,15 +80,20 @@ export const getCourseById: RequestHandler = async (req, res) => {
 
     res.status(200).json(course);
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener el curso por ID:", error); // Log detallado
     res.status(500).json({ message: 'Error obteniendo el curso' });
   }
 };
 
 // Actualizar un curso
-export const updateCourse: RequestHandler = async (req, res) => {
+export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
   const { id } = req.params;
   const { title, image, summary, adminId } = req.body;
+
+  if (!id || isNaN(Number(id))) {
+    res.status(400).json({ error: "El 'id' debe ser un número válido" });
+    return;
+  }
 
   try {
     const course = await Course.findByPk(id);
@@ -68,14 +102,18 @@ export const updateCourse: RequestHandler = async (req, res) => {
       return;
     }
 
-    course.title = title;
-    course.image = image;
-    course.summary = summary;
-    course.adminId = adminId;
+    course.title = title || course.title;
+    course.image = image || course.image;
+    course.summary = summary || course.summary;
+    course.adminId = adminId || course.adminId;
 
     await course.save();
-    
-    res.status(200).json(course);
+
+    const updatedCourse = await Course.findByPk(course.id, {
+      include: { model: Admin, as: 'admin' },
+    });
+
+    res.status(200).json(updatedCourse);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error actualizando el curso' });
@@ -83,8 +121,13 @@ export const updateCourse: RequestHandler = async (req, res) => {
 };
 
 // Eliminar un curso
-export const deleteCourse: RequestHandler = async (req, res) => {
+export const deleteCourse: RequestHandler = async (req, res): Promise<void> => {
   const { id } = req.params;
+
+  if (!id || isNaN(Number(id))) {
+    res.status(400).json({ error: "El 'id' debe ser un número válido" });
+    return;
+  }
 
   try {
     const course = await Course.findByPk(id);

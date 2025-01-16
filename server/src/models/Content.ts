@@ -4,15 +4,15 @@ import Section from './Section'; // Relación con la sección
 
 class Content extends Model {
   public id!: number;
-  public type!: string; // Tipo de contenido (texto, video, imagen, archivo, etc.)
-  public contentText?: string; // Texto, markdown, etc.
-  public contentVideo?: string; // URL de video
-  public contentImage?: string; // URL de imagen
-  public contentFile?: string; // URL de archivo (PDF, DOC, etc.)
-  public externalLink?: string; // URL externa (enlace opcional)
-  public duration?: number; // Duración en minutos (para videos o lecciones)
-  public position?: number; // Orden del contenido dentro de la sección
-  public sectionId!: number; // Relación con la sección
+  public type!: string;
+  public contentText?: string;
+  public contentVideo?: string;
+  public contentImage?: string;
+  public contentFile?: string;
+  public externalLink?: string;
+  public duration?: number;
+  public position?: number;
+  public sectionId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -29,31 +29,31 @@ Content.init(
       allowNull: false,
     },
     contentText: {
-      type: DataTypes.TEXT, // Para contenido de texto o markdown
+      type: DataTypes.TEXT,
       allowNull: true,
     },
     contentVideo: {
-      type: DataTypes.STRING, // Para almacenar la URL del video
+      type: DataTypes.STRING,
       allowNull: true,
     },
     contentImage: {
-      type: DataTypes.STRING, // Para almacenar la URL de la imagen
+      type: DataTypes.STRING,
       allowNull: true,
     },
     contentFile: {
-      type: DataTypes.STRING, // Para almacenar la URL del archivo
+      type: DataTypes.STRING,
       allowNull: true,
     },
     externalLink: {
-      type: DataTypes.STRING, // Enlace externo opcional
+      type: DataTypes.STRING,
       allowNull: true,
     },
     duration: {
-      type: DataTypes.INTEGER, // Duración en minutos
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     position: {
-      type: DataTypes.INTEGER, // Para definir el orden dentro de la sección
+      type: DataTypes.INTEGER,
       allowNull: true,
     },
     sectionId: {
@@ -66,13 +66,13 @@ Content.init(
   },
   {
     sequelize,
-    tableName: 'contents',
+    tableName: 'Contents',
     modelName: 'Content',
     timestamps: true,
   }
 );
 
-// Relación con la sección
+// Relación con Section
 Content.belongsTo(Section, { foreignKey: 'sectionId' });
 
 export default Content;

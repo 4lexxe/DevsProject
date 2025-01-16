@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/db';
-import Admin from './Admin';  // Relación con el administrador
+import Admin from './Admin'; // Relación con Admin
 
 class Course extends Model {
   public id!: number;
@@ -17,19 +17,19 @@ Course.init(
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
-      autoIncrement: true
+      autoIncrement: true,
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     summary: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     adminId: {
       type: DataTypes.INTEGER,
@@ -37,17 +37,18 @@ Course.init(
         model: 'Admins',
         key: 'id',
       },
-    }
+      allowNull: false,
+    },
   },
   {
     sequelize,
-    tableName: 'courses',
+    tableName: 'Courses',
     modelName: 'Course',
-    timestamps: true
+    timestamps: true,
   }
 );
 
 // Relación con Admin
-Course.belongsTo(Admin, { foreignKey: 'adminId' });
+Course.belongsTo(Admin, { foreignKey: 'adminId', as: 'admin' });
 
 export default Course;

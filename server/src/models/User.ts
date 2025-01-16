@@ -50,6 +50,12 @@ User.init({
 }, {
   sequelize,
   modelName: 'User',
+  indexes: [
+    {
+      unique: false,
+      fields: ['roleId'], // Índice adicional para `roleId`
+    },
+  ],
 });
 
 export default User;

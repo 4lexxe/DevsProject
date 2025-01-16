@@ -1,100 +1,116 @@
-import { Request, Response, NextFunction } from "express";
-import { createAdmin, getAllAdmins, deleteAdmin } from "../services/adminService";
-import * as AdminService from "../services/adminService";
-
-interface UserData {
-  userId: number;
-}
+import { Request, Response, NextFunction } from 'express';
+import * as AdminService from '../services/adminService';
+import User from '../models/User';
+import Admin from '../models/Admin';
 
 interface AdminData {
+  name: string;
   admin_since: string;
   permissions: string[];
   isSuperAdmin: boolean;
   admin_notes?: string;
 }
 
-export const createAdminController = (req: Request, res: Response, next: NextFunction): void => {
-  const { user, admin }: { user: UserData; admin: AdminData } = req.body;
+export const createAdminController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  console.log(req.body);
+  const { userId, admin }: { userId: number; admin: AdminData } = req.body;
 
-  console.log("userData:", user);
-  console.log("adminData:", admin);
-
-  if (!user || typeof user.userId !== 'number') {
-    res.status(400).json({ error: "El 'user' debe contener un 'userId' válido" });
+  if (!userId || typeof userId !== 'number') {
+    res.status(400).json({ error: "El 'userId' debe ser un número válido" });
     return;
   }
 
-  if (!admin || !admin.admin_since || !Array.isArray(admin.permissions) || typeof admin.isSuperAdmin !== "boolean") {
-    res.status(400).json({ error: "El 'admin' debe contener los campos 'admin_since', 'permissions' e 'isSuperAdmin' válidos" });
+  if (!admin || !admin.name || !admin.admin_since || !Array.isArray(admin.permissions) || typeof admin.isSuperAdmin !== "boolean") {
+    res.status(400).json({ error: "El 'admin' debe contener los campos 'name', 'admin_since', 'permissions' e 'isSuperAdmin' válidos" });
     return;
   }
 
-  createAdmin(user.userId, {
-    ...admin,
-    admin_since: new Date(admin.admin_since),
-  })
-    .then((createdAdmin) => {
-      res.status(201).json(createdAdmin);
-    })
-    .catch((error) => {
-      console.error("Error detallado:", error);
-      if (error instanceof Error) {
-        if (error.message === "Usuario no encontrado") {
-          res.status(404).json({ error: error.message });
-        } else {
-          res.status(500).json({ error: error.message });
-        }
-      } else {
-        res.status(500).json({ error: "Ha ocurrido un problema inesperado" });
-      }
+  try {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      res.status(404).json({ error: "Usuario no encontrado" });
+      return;
+    }
+
+    const adminCreated = await AdminService.createAdmin(userId, {
+      name: admin.name,
+      admin_since: new Date(admin.admin_since),
+      permissions: admin.permissions,
+      isSuperAdmin: admin.isSuperAdmin,
+      admin_notes: admin.admin_notes,
     });
+
+    res.status(201).json({
+      id: adminCreated.id,
+      userId: adminCreated.userId,
+      name: adminCreated.name,
+      email: user.email,
+      phone: user.phone,
+      roleId: user.roleId,
+      createdAt: adminCreated.createdAt,
+      updatedAt: adminCreated.updatedAt,
+      admin_since: adminCreated.admin_since,
+      permissions: adminCreated.permissions,
+      isSuperAdmin: adminCreated.isSuperAdmin,
+      admin_notes: adminCreated.admin_notes,
+    });
+  } catch (error) {
+    console.error("Error detallado:", error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Ha ocurrido un problema inesperado" });
+    }
+  }
 };
 
-export const getAllAdminsController = (req: Request, res: Response, next: NextFunction): void => {
-  getAllAdmins()
-    .then((admins) => {
-      res.status(200).json(admins);
-    })
-    .catch((error) => {
-      console.error("Error detallado:", error);
-      next(error);
-    });
+// GET ALL
+export const getAllAdminsController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const admins = await AdminService.getAllAdmins();
+    res.status(200).json(admins);
+  } catch (error) {
+    console.error("Error detallado:", error);
+    next(error);
+  }
 };
 
-// Controlador para eliminar un administrador
-interface ParamsWithAdminId extends Request {
-  params: {
-    adminId: string;
-  };
-}
-
-export const deleteAdminController = (req: ParamsWithAdminId, res: Response, next: NextFunction): void => {
-  const { adminId } = req.params; // O puedes usar userId si es necesario
-
-  console.log("Eliminando admin con el id:", adminId);
+// GET ONE
+export const getAdminController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { adminId } = req.params;
 
   if (!adminId || isNaN(Number(adminId))) {
     res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
     return;
   }
 
-  deleteAdmin(Number(adminId))
-    .then(() => {
-      res.status(200).json({ message: `Administrador con id ${adminId} eliminado exitosamente` });
-    })
-    .catch((error) => {
-      console.error("Error detallado:", error);
-      res.status(500).json({ error: "Ha ocurrido un error al eliminar el administrador" });
-    });
+  try {
+    const admin = await AdminService.getAdminById(Number(adminId));
+    if (admin !== null && admin !== undefined) {
+      res.status(200).json(admin);
+    } else {
+      res.status(404).json({ error: `Administrador con id ${adminId} no encontrado` });
+    }
+  } catch (error) {
+    console.error("Error detallado:", error);
+    next(error);
+  }
 };
 
-export const updateAdminController = async (req: Request, res: Response) => {
-  const adminId = req.params.id;  // ID del administrador
-  const { admin_since, permissions, isSuperAdmin, admin_notes } = req.body;
+// UPDATE
+export const updateAdminController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { adminId } = req.params;
+  const { admin_since, permissions, isSuperAdmin, admin_notes }: { admin_since: string; permissions: string[]; isSuperAdmin: boolean; admin_notes?: string } = req.body;
+
+  if (!adminId || isNaN(Number(adminId))) {
+    res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
+    return;
+  }
 
   try {
     const updatedAdmin = await AdminService.updateAdmin(Number(adminId), {
-      admin_since,
+      admin_since: new Date(admin_since),
       permissions,
       isSuperAdmin,
       admin_notes,
@@ -106,7 +122,37 @@ export const updateAdminController = async (req: Request, res: Response) => {
       res.status(404).json({ message: `Administrador con id ${adminId} no encontrado` });
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
-    res.status(500).json({ message: "Error al actualizar el administrador", error: errorMessage });
+    console.error("Error detallado:", error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Ha ocurrido un problema inesperado al actualizar el administrador" });
+    }
+  }
+};
+
+// DELETE
+export const deleteAdminController = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { adminId } = req.params;
+
+  if (!adminId || isNaN(Number(adminId))) {
+    res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
+    return;
+  }
+
+  try {
+    const deletedAdmin = await AdminService.deleteAdmin(Number(adminId));
+    if (deletedAdmin === true) {
+      res.status(200).json({ message: `Administrador con id ${adminId} eliminado exitosamente` });
+    } else {
+      res.status(404).json({ error: `Administrador con id ${adminId} no encontrado` });
+    }
+  } catch (error) {
+    console.error("Error detallado:", error);
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Ha ocurrido un error al eliminar el administrador" });
+    }
   }
 };

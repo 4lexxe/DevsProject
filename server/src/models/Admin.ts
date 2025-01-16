@@ -4,11 +4,14 @@ import User from './User';
 
 class Admin extends Model {
   public id!: number;
+  public name!: string;
   public admin_since!: Date;
   public permissions!: string[];
   public isSuperAdmin!: boolean;
   public admin_notes?: string;
   public userId!: number;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 Admin.init(
@@ -18,14 +21,18 @@ Admin.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    name: { // Add this field
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     admin_since: {
       type: DataTypes.DATE,
       allowNull: false,
     },
     permissions: {
-      type: DataTypes.JSONB,  // Usar JSONB en lugar de ARRAY al trabajar con objetos o arrays JSON
+      type: DataTypes.JSONB,
       allowNull: false,
-    },    
+    },
     isSuperAdmin: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -38,7 +45,7 @@ Admin.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: User,
+        model: 'Users',
         key: 'id',
       },
     },
@@ -46,10 +53,11 @@ Admin.init(
   {
     sequelize,
     modelName: 'Admin',
+    tableName: 'Admins',
+    timestamps: true,
   }
 );
 
-// Definir las asociaciones
 User.hasOne(Admin, { foreignKey: 'userId', as: 'admin' });
 Admin.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 

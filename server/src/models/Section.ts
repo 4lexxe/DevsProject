@@ -1,12 +1,12 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/db';
-import Course from './Course';  // Relación con el curso
+import Course from './Course'; // Relación con el curso
 
 class Section extends Model {
   public id!: number;
   public title!: string;
   public description!: string;
-  public courseId!: number;  // Relación con el curso
+  public courseId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -29,20 +29,20 @@ Section.init(
     courseId: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'courses',  // Asegúrate de que el nombre de la tabla sea en minúsculas ('courses')
+        model: 'Courses',
         key: 'id',
       },
     }
   },
   {
     sequelize,
-    tableName: 'sections',
+    tableName: 'Sections',
     modelName: 'Section',
     timestamps: true
   }
 );
 
-// Relación con el curso
+// Relación con Course
 Section.belongsTo(Course, { foreignKey: 'courseId' });
 
 export default Section;

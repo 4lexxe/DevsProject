@@ -2,24 +2,27 @@ import Admin from "../models/Admin";
 import User from "../models/User";
 
 interface AdminData {
+  name: string;
   admin_since: Date;
   permissions: string[];
   isSuperAdmin: boolean;
   admin_notes?: string;
 }
 
-export const createAdmin = async (userId: number, adminData: AdminData) => {
+export const createAdmin = async (userId: number, adminData: AdminData): Promise<Admin> => {
   try {
-    // Verificar que el usuario existe
     const user = await User.findByPk(userId);
     if (!user) {
       throw new Error("Usuario no encontrado");
     }
 
-    // Crear el administrador
+    const roleId = adminData.isSuperAdmin ? 3 : 2;
+    await user.update({ roleId });
+
     const admin = await Admin.create({
       ...adminData,
       userId: userId,
+      name: adminData.name,
     });
 
     return admin;
@@ -29,13 +32,13 @@ export const createAdmin = async (userId: number, adminData: AdminData) => {
   }
 };
 
-export const getAllAdmins = async () => {
+export const getAllAdmins = async (): Promise<Admin[]> => {
   try {
     const admins = await Admin.findAll({
       include: [
         {
           model: User,
-          as: 'user', // Asegúrate de usar el alias definido en la asociación
+          as: 'user',
         },
       ],
     });
@@ -43,42 +46,55 @@ export const getAllAdmins = async () => {
     return admins;
   } catch (error) {
     console.error("Error detallado:", error);
-    throw new Error(
-      `Error al obtener los administradores: ${
-        error instanceof Error ? error.message : "error desconocido"
-      }`
-    );
+    throw new Error(`Error al obtener los administradores: ${error instanceof Error ? error.message : "error desconocido"}`);
   }
 };
 
-export const deleteAdmin = async (adminId: number): Promise<void> => {
-  const admin = await Admin.findByPk(adminId);
-
-  if (!admin) {
-    throw new Error("Administrador no encontrado");
-  }
-
-  await admin.destroy(); // Esto elimina el administrador de la base de datos
-};
-
-export const updateAdmin = async (adminId: number, adminData: AdminData): Promise<Admin | null> => {
+export const getAdminById = async (adminId: number): Promise<Admin | null> => {
   try {
-    // Buscar el administrador por su ID
-    const admin = await Admin.findByPk(adminId);
-    if (!admin) {
-      throw new Error("Administrador no encontrado");
-    }
+    const admin = await Admin.findByPk(adminId, {
+      include: [
+        {
+          model: User,
+          as: 'user',
+        },
+      ],
+    });
 
-    // Actualizar los datos del administrador
-    await admin.update(adminData);
-
-    return admin; // Devuelve el administrador actualizado
+    return admin;
   } catch (error) {
     console.error("Error detallado:", error);
-    throw new Error(
-      `Error al actualizar el administrador: ${
-        error instanceof Error ? error.message : "error desconocido"
-      }`
-    );
+    throw new Error(`Error al obtener el administrador: ${error instanceof Error ? error.message : "error desconocido"}`);
+  }
+};
+
+export const updateAdmin = async (adminId: number, adminData: Partial<AdminData>): Promise<Admin | null> => {
+  try {
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) {
+      return null;
+    }
+
+    await admin.update(adminData);
+
+    return admin;
+  } catch (error) {
+    console.error("Error detallado:", error);
+    throw new Error(`Error al actualizar el administrador: ${error instanceof Error ? error.message : "error desconocido"}`);
+  }
+};
+
+export const deleteAdmin = async (adminId: number): Promise<boolean> => {
+  try {
+    const admin = await Admin.findByPk(adminId);
+    if (!admin) {
+      return false;
+    }
+
+    await admin.destroy();
+    return true;
+  } catch (error) {
+    console.error("Error detallado:", error);
+    throw new Error(`Error al eliminar el administrador: ${error instanceof Error ? error.message : "error desconocido"}`);
   }
 };

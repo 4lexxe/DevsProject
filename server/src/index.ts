@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import roleRoutes from './routes/roleRoutes';
 import userRoutes from './routes/userRoutes';
 import adminRoutes from './routes/adminRoutes';
 import courseRoutes from './routes/courseRoutes';
@@ -8,6 +9,9 @@ import sectionRoutes from './routes/sectionRoutes';
 
 const app = express();
 app.use(express.json());
+
+// Conectar las rutas de Roles
+app.use('/api', roleRoutes);
 
 app.use(userRoutes);
 // Conectar las rutas de Admin
