@@ -1,44 +1,39 @@
-import { useEffect, useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { getCourses } from '../../../services/courseServices';
 import CourseCard from './CourseCard';
-import { getCourses } from '../../../services/courseServices'; // Asegúrate de que este servicio esté configurado correctamente
+import { ArrowRight } from 'react-feather';
 
 interface Course {
   id: number;
   title: string;
-  summary: string;
+  summary: string; // Cambié 'description' a 'summary'
   admin: {
-    name: string;
+    name: string; // Nombre del administrador (antes 'instructor')
   };
   image: string;
-  createdAt: string; // Asegúrate de que la API retorne este campo
 }
 
-export default function LatestCourses() {
+const CoursesList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
         const data = await getCourses(); // Llamada a la API para obtener los cursos
-        // Ordenar los cursos por fecha de creación, de más reciente a más antiguo
-        const sortedCourses = data
-          .sort((a: Course, b: Course) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-          .slice(0, 3); // Obtener solo los tres más recientes
-        setCourses(sortedCourses); // Establecer los cursos en el estado
+        setCourses(data); // Establece los cursos en el estado
       } catch (error) {
         console.error('No se pudieron cargar los cursos', error);
       }
     };
 
     fetchCourses();
-  }, []);
+  }, []); // Se ejecuta solo una vez cuando el componente se monta
 
   return (
     <section className="py-16 px-6 bg-[#CCF7FF]">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-black">Últimos Cursos</h2>
+          <h2 className="text-3xl font-bold text-black">Cursos Disponibles</h2>
           <a
             href="/cursos"
             className="flex items-center text-[#00D7FF] hover:text-[#66E7FF] transition-colors"
@@ -54,7 +49,7 @@ export default function LatestCourses() {
               key={course.id}
               title={course.title}
               summary={course.summary}
-              courseName={course.admin.name}
+              courseName={course.admin.name} // El nombre del curso (de 'admin.name')
               image={course.image}
             />
           ))}
@@ -62,4 +57,6 @@ export default function LatestCourses() {
       </div>
     </section>
   );
-}
+};
+
+export default CoursesList;
