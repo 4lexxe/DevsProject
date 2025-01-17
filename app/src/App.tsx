@@ -1,15 +1,20 @@
-import { BrowserRouter as Router } from 'react-router-dom';
-import DefaultLayout from './layouts/defaultLayout';
-import './assets/css/main.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import DefaultLayout from './layouts/defaultLayout'
+import Home from './views/home'
+import CoursesPage from './views/courses'
 
-export default function App() {
+function App() {
   return (
     <Router>
-      <DefaultLayout>
-        <>
-          {/*  */}
-        </>
-      </DefaultLayout>
+      <Routes>
+        <Route path="/" element={<DefaultLayout />}>
+          <Route index element={<Home />} />
+          <Route path="cursos" element={<CoursesPage />} />
+        </Route>
+      </Routes>
     </Router>
-  );
+  )
 }
+
+export default App
+

@@ -20,13 +20,15 @@
     "react-dom": "^18.3.1",
     "react-feather": "^2.0.10",
     "react-image": "^4.1.0",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.2",
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@tailwindcss/typography": "^0.5.16",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@types/sequelize": "^4.28.20",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "css-loader": "^7.1.2",
