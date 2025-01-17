@@ -7,6 +7,9 @@ class Course extends Model {
   public title!: string;
   public image!: string;
   public summary!: string;
+  public category!: string;
+  public about!: string;
+  public relatedCareerType!: string;
   public adminId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -30,6 +33,18 @@ Course.init(
     summary: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    category: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    about: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    relatedCareerType: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     adminId: {
       type: DataTypes.INTEGER,

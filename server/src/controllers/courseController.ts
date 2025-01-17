@@ -4,7 +4,7 @@ import Admin from '../models/Admin';  // Relación con el admin
 
 // Crear un curso
 export const createCourse: RequestHandler = async (req, res): Promise<void> => {
-  const { title, image, summary, adminId } = req.body;
+  const { title, image, summary, category, about, relatedCareerType, adminId } = req.body;
 
   if (!adminId || typeof adminId !== 'number') {
     res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
@@ -22,6 +22,9 @@ export const createCourse: RequestHandler = async (req, res): Promise<void> => {
       title,
       image,
       summary,
+      category,
+      about,
+      relatedCareerType,
       adminId,
     });
 
@@ -35,7 +38,6 @@ export const createCourse: RequestHandler = async (req, res): Promise<void> => {
     res.status(500).json({ message: 'Error creando el curso' });
   }
 };
-
 
 // Obtener todos los cursos
 export const getCourses: RequestHandler = async (req, res) => {
@@ -88,7 +90,7 @@ export const getCourseById: RequestHandler = async (req, res) => {
 // Actualizar un curso
 export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
   const { id } = req.params;
-  const { title, image, summary, adminId } = req.body;
+  const { title, image, summary, category, about, relatedCareerType, adminId } = req.body;
 
   if (!id || isNaN(Number(id))) {
     res.status(400).json({ error: "El 'id' debe ser un número válido" });
@@ -105,6 +107,9 @@ export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
     course.title = title || course.title;
     course.image = image || course.image;
     course.summary = summary || course.summary;
+    course.category = category || course.category;
+    course.about = about || course.about;
+    course.relatedCareerType = relatedCareerType || course.relatedCareerType;
     course.adminId = adminId || course.adminId;
 
     await course.save();
