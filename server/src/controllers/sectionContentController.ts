@@ -28,20 +28,32 @@ export const createSection: RequestHandler = async (req, res) => {
   }
 };
 
-// Obtener todas las secciones de un curso
+// Obtener todas las secciones de un curso, junto con el número de módulos
 export const getSectionsByCourse: RequestHandler = async (req, res) => {
   const { courseId } = req.params;
 
-  try {
+  try { 
+    const course = await Course.findByPk(courseId);
+    if (!course) {
+      res.status(404).json({ message: 'Curso no encontrado' });
+      return;
+    }
+
+    // Contamos las secciones (módulos) para el curso
+    const sectionCount = await Section.count({ where: { courseId } });
+
+    // Obtenemos las secciones del curso
     const sections = await Section.findAll({ where: { courseId } });
-    if (!sections || sections.length === 0) {
+
+    if (sections.length === 0) {
       res.status(404).json({ message: 'No se encontraron secciones' });
       return;
     }
 
-    res.status(200).json(sections);
+    // Respondemos con las secciones y el número total de secciones
+    res.status(200).json({ sectionCount, sections });
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener las secciones:", error);
     res.status(500).json({ message: 'Error obteniendo las secciones' });
   }
 };

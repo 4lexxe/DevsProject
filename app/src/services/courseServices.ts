@@ -42,3 +42,26 @@ export const deleteCourse = async (id: string) => {
     throw error;
   }
 };
+
+
+// Asegúrate de tener este servicio
+
+interface Course {
+  id: number;
+  name: string;
+}
+
+// Servicio para obtener el conteo de módulos
+export const getModulesCount = async (courseId: number): Promise<number> => {
+  try {
+    const response = await api.get(`/courses/${courseId}/modules/count`);
+    if (!response || !response.data) {
+      throw new Error('Respuesta vacía del servidor');
+    }
+    return response.data.sectionCount; // Asegúrate de usar el nombre correcto
+  } catch (error: any) {
+    console.error(`Error al obtener el conteo de módulos para el curso ${courseId}:`, error.message);
+    throw error;
+  }
+};
+

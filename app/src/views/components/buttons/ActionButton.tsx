@@ -3,6 +3,7 @@ import React from 'react';
 interface ActionButtonProps {
   href: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({ href, children }) => {

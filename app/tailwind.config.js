@@ -3,9 +3,13 @@ module.exports = {
     "./src/**/*.{html,js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['Rubik', 'sans-serif'], // Configurar Rubik como la fuente predeterminada
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),  // Para las clases 'prose'
   ],
-}
+};

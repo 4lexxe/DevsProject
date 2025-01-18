@@ -1,3 +1,4 @@
+import { AcademicCapIcon, UsersIcon, ShoppingCartIcon } from '@heroicons/react/outline';
 import FeatureCard from './FeatureCard';
 
 const features = [
@@ -5,16 +6,19 @@ const features = [
     id: 1,
     title: 'Organiza Tus Materias',
     description: 'Accede a tus cursos, materiales y recursos en un solo lugar.',
+    icon: <AcademicCapIcon className="h-8 w-8 text-blue-500 mx-auto" />,
   },
   {
     id: 2,
     title: 'Comunidad Activa',
     description: 'Encuentra apuntes compartidos por estudiantes de todo el país.',
+    icon: <UsersIcon className="h-8 w-8 text-blue-500 mx-auto" />,
   },
   {
     id: 3,
     title: 'Compra y Venta de Materiales',
     description: 'Vende o compra libros, apuntes y herramientas que necesitas.',
+    icon: <ShoppingCartIcon className="h-8 w-8 text-blue-500 mx-auto" />,
   },
 ];
 
@@ -32,11 +36,14 @@ export default function Features() {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature) => (
-            <FeatureCard key={feature.id} {...feature} />
+            <div key={feature.id} className="bg-white p-6 rounded-lg shadow-lg">
+              {feature.icon}
+              <h3 className="mt-4 text-xl font-semibold text-black">{feature.title}</h3>
+              <p className="mt-2 text-sm text-black/80">{feature.description}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
 }
-

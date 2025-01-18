@@ -1,59 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getSectionsByCourse } from '../../services/sectionServices';
-import { getContentBySection } from '../../services/contentServices';
+import { getCourses } from '../../services/courseServices'; // Asegúrate de tener este servicio
+import { getModulesCount as fetchModulesCount } from '../../services/courseServices'; // Importamos el servicio para obtener el conteo de módulos
+import HeroCourse from '../components/courses/HeroCourse'; // Importamos el HeroCourse
+import CourseOverview from '../components/courses/CourseOverview'; // Importamos el CourseOverview
 
-interface Section {
-  id: string;
+interface Course {
+  id: number;
   title: string;
-  description: string;
-  moduleType: string; // Nuevo campo para el tipo de módulo
-  coverImage: string; // Nuevo campo para la URL de la portada
+  image: string;
+  summary: string;
+  category: string;
+  about: string; // Descripción
+  relatedCareerType: string; // Tipo de carrera
+  createdAt: string; // Fecha de creación
+  modules: Array<any>; // Aquí se puede definir como una lista de módulos o algo más específico
 }
 
-interface Content {
-  id: string;
-  type: string;
-  contentText?: string;
-  contentVideo?: string;
-  contentImage?: string;
-  contentFile?: string;
-  externalLink?: string;
-  duration?: number;
-  position?: number;
-}
-
-const CourseDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const [sections, setSections] = useState<Section[]>([]);
-  const [content, setContent] = useState<{ [key: string]: Content[] }>({});
+const CourseDetails: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // Obtenemos el id de los parámetros de la URL
+  const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [moduleCount, setModuleCount] = useState<number>(0); // Para el conteo de módulos
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
         setLoading(true);
-        // Obtener las secciones
-        const fetchedSections = await getSectionsByCourse(id!);
-        setSections(fetchedSections);
 
-        // Obtener el contenido de cada sección
-        const contentPromises = fetchedSections.map((section: Section) =>
-          getContentBySection(section.id).then((content) => ({
-            sectionId: section.id,
-            content,
-          }))
+        // Obtener todos los cursos
+        const courses = await getCourses();
+        const fetchedCourse: Course | undefined = courses.find(
+          (course: Course) => course.id === Number(id)
         );
 
-        const contentResults = await Promise.all(contentPromises);
-        const contentBySection: { [key: string]: Content[] } = {};
-        contentResults.forEach(({ sectionId, content }) => {
-          contentBySection[sectionId] = content;
-        });
-        setContent(contentBySection);
+        if (fetchedCourse) {
+          setCourse(fetchedCourse);
+
+          // Obtener el número de módulos asociados al curso
+          const count = await fetchModulesCount(Number(id));
+          setModuleCount(count);
+        } else {
+          setError('Curso no encontrado.');
+        }
       } catch (err) {
-        console.error('Error al cargar datos del curso:', err);
+        console.error('Error al cargar el curso:', err);
         setError('Hubo un error al cargar los datos del curso.');
       } finally {
         setLoading(false);
@@ -71,60 +63,46 @@ const CourseDetail: React.FC = () => {
     return <p className="p-6 text-red-500">{error}</p>;
   }
 
+  if (!course) {
+    return <p className="p-6 text-red-500">Curso no encontrado.</p>;
+  }
+
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Detalles del Curso</h1>
-      <div className="bg-gray-100 p-4 rounded">
-        <h2 className="text-2xl font-semibold mb-4">Secciones y Contenido</h2>
-        {sections.map((section) => (
-          <div key={section.id} className="mb-6">
-            <h3 className="text-xl font-bold">{section.title}</h3>
-            <p className="text-gray-700 mb-4">{section.description}</p>
-            {/* Mostrar el tipo de módulo */}
-            <p className="font-semibold text-gray-500">Tipo de módulo: {section.moduleType}</p>
-            {/* Mostrar la portada de la sección */}
-            {section.coverImage && (
-              <img
-                src={section.coverImage}
-                alt="Portada de la sección"
-                className="my-4 max-w-full"
-              />
-            )}
-            {content[section.id] ? (
-              <ul>
-                {content[section.id].map((item) => (
-                  <li key={item.id} className="mb-2">
-                    <strong>Tipo:</strong> {item.type}
-                    {item.contentText && <p>{item.contentText}</p>}
-                    {item.contentVideo && (
-                      <a href={item.contentVideo} target="_blank" rel="noopener noreferrer">
-                        Ver video
-                      </a>
-                    )}
-                    {item.contentImage && (
-                      <img src={item.contentImage} alt="Contenido visual" className="my-2 max-w-full" />
-                    )}
-                    {item.contentFile && (
-                      <a href={item.contentFile} target="_blank" rel="noopener noreferrer">
-                        Descargar archivo
-                      </a>
-                    )}
-                    {item.externalLink && (
-                      <a href={item.externalLink} target="_blank" rel="noopener noreferrer">
-                        Enlace externo
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">Sin contenido disponible.</p>
-            )}
-          </div>
-        ))}
+      {/* Pasamos los datos del curso al HeroCourse */}
+      <HeroCourse
+        title={course.title}
+        description={course.summary}
+        image={course.image}
+        category={course.category}
+      />
+      <div className="mt-8">
+        {/* Pasamos los datos del curso al CourseOverview */}
+        <CourseOverview
+          about={course.about}
+          relatedCareerType={course.relatedCareerType}
+          numberOfModules={moduleCount}
+          createdAt={course.createdAt}
+        />
       </div>
     </div>
   );
 };
 
-export default CourseDetail;
+export default CourseDetails;
+
+// Servicio para obtener el conteo de módulos
+export const getModulesCount = async (courseId: number): Promise<number> => {
+  try {
+    const response = await fetch(`/api/courses/${courseId}/modules/count`);
+    if (!response.ok) {
+      throw new Error('Error al obtener el conteo de módulos');
+    }
+
+    const data = await response.json();
+    return data.count;
+  } catch (error) {
+    console.error('Error al obtener el conteo de módulos:', error);
+    throw error;
+  }
+};

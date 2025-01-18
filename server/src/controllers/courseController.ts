@@ -1,6 +1,7 @@
-import { Request, Response, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import Course from '../models/Course';
 import Admin from '../models/Admin';  // Relación con el admin
+import Section from '../models/Section';  // Importar el modelo Section
 
 // Crear un curso
 export const createCourse: RequestHandler = async (req, res): Promise<void> => {
@@ -40,7 +41,7 @@ export const createCourse: RequestHandler = async (req, res): Promise<void> => {
 };
 
 // Obtener todos los cursos
-export const getCourses: RequestHandler = async (req, res) => {
+export const getCourses: RequestHandler = async (_, res) => {
   try {
     const courses = await Course.findAll({
       include: {
@@ -50,9 +51,19 @@ export const getCourses: RequestHandler = async (req, res) => {
       },
     });
 
-    res.status(200).json(courses);
+    // Añadir el conteo de secciones para cada curso
+    const coursesWithSectionCount = await Promise.all(courses.map(async (course) => {
+      // Contar las secciones asociadas al curso
+      const sectionCount = await Section.count({ where: { courseId: course.getDataValue('id') } });
+      return {
+        ...course.toJSON(),  // Convertimos el objeto del curso a JSON para agregar propiedades
+        sectionCount,         // Añadimos el número de secciones
+      };
+    }));
+
+    res.status(200).json(coursesWithSectionCount);
   } catch (error) {
-    console.error("Error al obtener los cursos:", error); // Log detallado
+    console.error("Error al obtener los cursos:", error);
     res.status(500).json({ message: 'Error obteniendo los cursos' });
   }
 };

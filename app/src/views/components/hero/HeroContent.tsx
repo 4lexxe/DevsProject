@@ -16,26 +16,39 @@ interface HeroContentProps {
 }
 
 export default function HeroContent({ headerSection }: HeroContentProps) {
-  const props = useSpring({
+  const fadeIn = useSpring({
     opacity: 1,
     transform: 'translateY(0)',
     from: { opacity: 0, transform: 'translateY(50px)' },
   });
 
   return (
-    <animated.div style={props} className="relative z-10 w-full max-w-4xl mx-auto text-center">
-      <h1 className="mb-2 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white">
+    <animated.div 
+      style={fadeIn} 
+      className="relative z-10 w-full max-w-4xl mx-auto text-center px-4"
+    >
+      <h1 className="mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white">
         {headerSection.title}
       </h1>
-      <h2 className="mb-4 text-xl px-5 py-1 bg-black/10 rounded-lg sm:text-2xl md:text-3xl text-[#00D7FF]">
-        {headerSection.slogan}
-      </h2>
-      <p className="mb-8 text-sm sm:text-base md:text-lg text-white max-w-2xl mx-auto">
+      
+      {/* Slogan with green accent line */}
+      <div className="relative inline-block mb-6">
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#FFFF]" />
+        <h2 className="pl-4 text-xl sm:text-2xl md:text-3xl text-[#00D7FF] text-left">
+          {headerSection.slogan}
+        </h2>
+      </div>
+
+      <p className="mb-8 text-sm sm:text-base md:text-lg text-white/90 max-w-2xl mx-auto">
         {headerSection.about}
       </p>
-      <ActionButton href={headerSection.buttonLink}>
-        {headerSection.buttonName}
-      </ActionButton>
+
+      <div className="space-y-8">
+        <ActionButton 
+          href={headerSection.buttonLink}>
+          {headerSection.buttonName}
+        </ActionButton>
+      </div>
     </animated.div>
   );
 }
