@@ -5,6 +5,7 @@ import Admin from './models/Admin';
 import Course from './models/Course';
 import Section from './models/Section';
 import Content from './models/Content';
+import HeaderSection from './models/HeaderSection';
 
 async function syncDb() {
   try {
@@ -18,6 +19,7 @@ async function syncDb() {
     await Course.sync({ alter: true });
     await Section.sync({ alter: true });
     await Content.sync({ alter: true });
+    await HeaderSection.sync({ alter: true });
 
     console.log('Tablas sincronizadas correctamente');
   } catch (error) {
