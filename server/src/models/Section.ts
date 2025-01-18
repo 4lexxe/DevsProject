@@ -7,6 +7,8 @@ class Section extends Model {
   public title!: string;
   public description!: string;
   public courseId!: number;
+  public moduleType!: string;  // Nuevo atributo: tipo de módulo
+  public coverImage!: string; // Nuevo atributo: portada de la sección
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -32,6 +34,15 @@ Section.init(
         model: 'Courses',
         key: 'id',
       },
+    },
+    moduleType: {  // Atributo agregado para el tipo de módulo
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'Módulo Fundamental', // Valor por defecto, pero puedes cambiarlo según la lógica de tu aplicación
+    },
+    coverImage: {  // Atributo agregado para la portada de la sección
+      type: DataTypes.STRING,
+      allowNull: true, // Este atributo puede ser opcional, dependiendo de si siempre habrá una portada
     }
   },
   {

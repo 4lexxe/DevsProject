@@ -4,7 +4,7 @@ import Course from '../models/Course';  // Relación con el curso
 
 // Crear una sección
 export const createSection: RequestHandler = async (req, res) => {
-  const { title, description, courseId } = req.body;
+  const { title, description, courseId, moduleType, coverImage } = req.body;
 
   try {
     const course = await Course.findByPk(courseId);
@@ -17,6 +17,8 @@ export const createSection: RequestHandler = async (req, res) => {
       title,
       description,
       courseId,
+      moduleType,  // Nuevo atributo: tipo de módulo
+      coverImage,  // Nuevo atributo: portada de la sección
     });
 
     res.status(201).json(section);
@@ -32,7 +34,7 @@ export const getSectionsByCourse: RequestHandler = async (req, res) => {
 
   try {
     const sections = await Section.findAll({ where: { courseId } });
-    if (!sections) {
+    if (!sections || sections.length === 0) {
       res.status(404).json({ message: 'No se encontraron secciones' });
       return;
     }
@@ -65,7 +67,7 @@ export const getSectionById: RequestHandler = async (req, res) => {
 // Actualizar una sección
 export const updateSection: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const { title, description, courseId } = req.body;
+  const { title, description, courseId, moduleType, coverImage } = req.body;
 
   try {
     const section = await Section.findByPk(id);
@@ -77,6 +79,8 @@ export const updateSection: RequestHandler = async (req, res) => {
     section.title = title;
     section.description = description;
     section.courseId = courseId;
+    section.moduleType = moduleType;  // Nuevo atributo: tipo de módulo
+    section.coverImage = coverImage;  // Nuevo atributo: portada de la sección
 
     await section.save();
     

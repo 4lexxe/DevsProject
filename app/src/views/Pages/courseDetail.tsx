@@ -7,6 +7,8 @@ interface Section {
   id: string;
   title: string;
   description: string;
+  moduleType: string; // Nuevo campo para el tipo de módulo
+  coverImage: string; // Nuevo campo para la URL de la portada
 }
 
 interface Content {
@@ -78,6 +80,16 @@ const CourseDetail: React.FC = () => {
           <div key={section.id} className="mb-6">
             <h3 className="text-xl font-bold">{section.title}</h3>
             <p className="text-gray-700 mb-4">{section.description}</p>
+            {/* Mostrar el tipo de módulo */}
+            <p className="font-semibold text-gray-500">Tipo de módulo: {section.moduleType}</p>
+            {/* Mostrar la portada de la sección */}
+            {section.coverImage && (
+              <img
+                src={section.coverImage}
+                alt="Portada de la sección"
+                className="my-4 max-w-full"
+              />
+            )}
             {content[section.id] ? (
               <ul>
                 {content[section.id].map((item) => (
