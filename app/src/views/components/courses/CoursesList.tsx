@@ -3,14 +3,14 @@ import { getCourses } from '../../../services/courseServices';
 import CourseCard from './CourseCard';
 import { ArrowRight } from 'react-feather';
 
+// Interfaz ajustada para reflejar los datos correctos
 interface Course {
   id: number;
   title: string;
-  summary: string; // Cambié 'description' a 'summary'
-  admin: {
-    name: string; // Nombre del administrador (antes 'instructor')
-  };
-  image: string;
+  summary: string; // Resumen del curso
+  category: string; // Categoría del curso
+  image: string; // URL de la imagen
+  relatedCareerType: string; // Tipo de carrera relacionada
 }
 
 const CoursesList: React.FC = () => {
@@ -38,7 +38,7 @@ const CoursesList: React.FC = () => {
             href="/cursos"
             className="flex items-center text-[#00D7FF] hover:text-[#66E7FF] transition-colors"
           >
-            Ver todos
+            Ver todos 
             <ArrowRight className="ml-2 w-5 h-5" />
           </a>
         </div>
@@ -47,10 +47,12 @@ const CoursesList: React.FC = () => {
           {courses.map((course) => (
             <CourseCard
               key={course.id}
+              id={course.id}
               title={course.title}
               summary={course.summary}
-              courseName={course.admin.name} // El nombre del curso (de 'admin.name')
+              courseName={course.category} // Ahora muestra la categoría
               image={course.image}
+              relatedCareerType={course.relatedCareerType} // Muestra el tipo de carrera relacionada
             />
           ))}
         </div>

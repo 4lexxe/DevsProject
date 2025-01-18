@@ -12,6 +12,8 @@ interface Course {
   };
   image: string;
   createdAt: string; // Asegúrate de que la API retorne este campo
+  category: string; // Añadir la categoría
+  relatedCareerType: string; // Añadir el tipo de carrera relacionada
 }
 
 export default function LatestCourses() {
@@ -51,12 +53,14 @@ export default function LatestCourses() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course) => (
             <CourseCard
-              key={course.id}
-              title={course.title}
-              summary={course.summary}
-              courseName={course.admin.name}
-              image={course.image}
-            />
+            key={course.id}
+            id={course.id}
+            title={course.title}
+            summary={course.summary}
+            courseName={course.category} // Muestra la categoría
+            image={course.image}
+            relatedCareerType={course.relatedCareerType} // Muestra el tipo de carrera relacionada
+          />          
           ))}
         </div>
       </div>
