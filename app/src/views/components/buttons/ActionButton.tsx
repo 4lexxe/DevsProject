@@ -1,17 +1,19 @@
-// Botón principal para llamadas a la acción
+import React from 'react';
+
 interface ActionButtonProps {
-  children: React.ReactNode
-  onClick?: () => void
+  href: string;
+  children: React.ReactNode;
 }
 
-export default function ActionButton({ children, onClick }: ActionButtonProps) {
+const ActionButton: React.FC<ActionButtonProps> = ({ href, children }) => {
   return (
-    <button
-      onClick={onClick}
-      className="px-6 py-3 bg-[#00D7FF] text-black rounded-md hover:bg-[#66E7FF] 
-                transition-colors duration-200 font-medium"
+    <a
+      href={href}
+      className="inline-block px-8 py-4 mt-4 text-lg font-semibold text-black bg-[#00D7FF] rounded-full hover:bg-[#00b3cc] transition"
     >
       {children}
-    </button>
-  )
-}
+    </a>
+  );
+};
+
+export default ActionButton;

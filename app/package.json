@@ -21,6 +21,7 @@
     "react-feather": "^2.0.10",
     "react-image": "^4.1.0",
     "react-router-dom": "^7.1.2",
+    "react-spring": "^9.7.5",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {

@@ -16,14 +16,22 @@ export default function Navbar() {
   return (
     <nav className="bg-gradient-to-r from-slate-100 to-neutral-100 text-black shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-17">
           {/* Logo de la plataforma */}
           <div className="flex-shrink-0">
-            <span className="text-xl font-bold">Devs Project</span>
+            <a href="/">
+              <div className="h-20 w-20 mx-auto p-1"> {/* Contenedor más pequeño */}
+                <img
+                  src="https://i.ibb.co/dQ09SsH/logoDev2.png"
+                  alt="Devs Project Logo"
+                  className="h-full w-full object-contain" 
+                />
+              </div>
+            </a>
           </div>
           
           {/* Search bar (desktop) */}
-          <div className="hidden md:block flex-grow max-w-md mx-4">
+          <div className="hidden md:block flex-grow max-w-md mx-1">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
@@ -112,4 +120,3 @@ export default function Navbar() {
     </nav>
   )
 }
-

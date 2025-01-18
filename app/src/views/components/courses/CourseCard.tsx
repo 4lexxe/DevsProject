@@ -1,7 +1,6 @@
 import { Clock, BarChart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-// Definimos las propiedades que recibirá el componente 'CourseCard'
 interface CourseCardProps {
   id: number; // ID del curso
   title: string;
@@ -17,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   summary,
   courseName,
   image,
-  relatedCareerType,
+  relatedCareerType
 }) => {
   const navigate = useNavigate();
 
@@ -26,30 +25,46 @@ const CourseCard: React.FC<CourseCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <img src={image} alt={title} className="w-full h-48 object-cover" />
-      <div className="p-6">
-        <h3 className="text-xl font-semibold mb-2 text-black">{title}</h3>
-        <p className="text-black/70 mb-4 line-clamp-2">{summary}</p>
-        <div className="flex items-center mb-4 text-sm text-black/60">
-          {courseName} {/* Muestra la categoría */}
-        </div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center text-sm text-black/60">
-            <BarChart className="w-4 h-4 mr-1" />
-            {relatedCareerType} {/* Muestra el tipo de carrera */}
+    <div className="relative w-full max-w-sm">
+      {/* Borde continuo */}
+      <div
+        className="absolute inset-0 border-2 border-solid border-gray-300 rounded-3xl"
+        style={{ top: '-8px', left: '-8px', right: '-8px', bottom: '-8px' }}
+      />
+
+      {/* Contenido de la tarjeta */}
+      <div className="relative bg-white rounded-2xl shadow-sm overflow-hidden m-2">
+        <img
+          src={image || '/placeholder.svg'}
+          alt={title}
+          className="w-full h-48 object-cover rounded-t-2xl"
+        />
+        <div className="p-4">
+          <h3 className="text-xl font-semibold mb-2 text-gray-900">{title}</h3>
+          <p className="text-gray-600 mb-4 line-clamp-2">{summary}</p>
+
+          <div className="flex items-center mb-4 text-sm text-gray-500">
+            {courseName}
           </div>
-          <div className="flex items-center text-sm text-black/60">
-            <Clock className="w-4 h-4 mr-1" />
-            Duración {/* Pendiente agregar si aplica */}
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center text-sm text-gray-500">
+              <BarChart className="w-4 h-4 mr-1" />
+              {relatedCareerType}
+            </div>
+            <div className="flex items-center text-sm text-gray-500">
+              <Clock className="w-4 h-4 mr-1" />
+              Duración {/* Pendiente agregar si aplica */}
+            </div>
           </div>
+
+          <button
+            onClick={handleViewCourse}
+            className="w-full px-4 py-2 bg-[#00D7FF] text-black rounded-md hover:bg-[#66E7FF] transition-colors duration-200"
+          >
+            Ver Curso
+          </button>
         </div>
-        <button
-          onClick={handleViewCourse}
-          className="px-4 py-2 bg-[#00D7FF] text-black rounded-md hover:bg-[#66E7FF] transition-colors duration-200"
-        >
-          Ver Curso
-        </button>
       </div>
     </div>
   );
