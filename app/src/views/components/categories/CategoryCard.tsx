@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 interface CategoryCardProps {
   name: string
   icon: string
@@ -8,17 +10,17 @@ interface CategoryCardProps {
 export default function CategoryCard({ name, icon, count, color }: CategoryCardProps) {
   return (
     <div 
-      className="group relative aspect-square rounded-lg overflow-hidden transition-transform hover:scale-105"
+      className="group relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg"
       style={{ backgroundColor: color }}
     >
-      <a 
-        href={`/cursos/${name.toLowerCase()}`} 
-        className="absolute inset-0 p-4 flex flex-col items-center justify-center text-center"
+      <Link 
+        to={`/cursos/${name.toLowerCase()}`} 
+        className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center"
       >
-        <span className="text-4xl mb-2">{icon}</span>
-        <h3 className="font-semibold text-black mb-1">{name}</h3>
+        <span className="text-5xl mb-3 transform transition-transform group-hover:scale-110 duration-300">{icon}</span>
+        <h3 className="font-semibold text-black/90 mb-1 text-lg">{name}</h3>
         <span className="text-sm text-black/70">{count} cursos</span>
-      </a>
+      </Link>
     </div>
   )
 }

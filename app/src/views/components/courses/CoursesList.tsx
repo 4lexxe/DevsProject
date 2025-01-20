@@ -29,7 +29,7 @@ const CoursesList: React.FC = () => {
   }, [])
 
   return (
-    <section className="py-16 px-6 bg-[#CCF7FF]">
+    <section className="py-16 px-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {courses.map((course) => (
