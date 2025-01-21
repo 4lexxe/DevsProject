@@ -4,8 +4,9 @@ import Section from '../models/Section'; // Relación con la tabla "Sections"
 
 // Interfaz para la creación de contenido
 interface CreateContentRequest {
-  type: string; // Tipo de contenido (texto, video, imagen, archivo, enlace externo)
+  type: string; // Tipo de contenido (texto, video, imagen, archivo, enlace externo, encuesta)
   contentText?: string; // Contenido de texto
+  contentTextTitle?: string; // Título asociado al texto
   contentVideo?: string; // URL del video
   contentVideoTitle?: string; // Título del video
   contentImage?: string; // URL de la imagen
@@ -14,6 +15,15 @@ interface CreateContentRequest {
   contentFileTitle?: string; // Título del archivo
   externalLink?: string; // URL de un enlace externo
   externalLinkTitle?: string; // Título del enlace externo
+  quizTitle?: string; // Título de la encuesta/cuestionario
+  quizContent?: string; // Contenido adicional en Markdown o texto normal
+  questions?: Array<{
+    question: string;
+    answers: Array<{
+      answer: string;
+      isCorrect: boolean;
+    }>;
+  }>;
   duration?: number; // Duración en segundos (para videos o audios)
   position?: number; // Posición del contenido dentro de su sección
   sectionId: number; // ID de la sección a la que pertenece el contenido
@@ -24,6 +34,7 @@ export const createContent: RequestHandler = async (req: Request<{}, {}, CreateC
   const {
     type,
     contentText,
+    contentTextTitle,
     contentVideo,
     contentVideoTitle,
     contentImage,
@@ -32,6 +43,9 @@ export const createContent: RequestHandler = async (req: Request<{}, {}, CreateC
     contentFileTitle,
     externalLink,
     externalLinkTitle,
+    quizTitle,
+    quizContent,
+    questions,
     duration,
     position,
     sectionId,
@@ -49,6 +63,7 @@ export const createContent: RequestHandler = async (req: Request<{}, {}, CreateC
     const newContent = await Content.create({
       type,
       contentText,
+      contentTextTitle,
       contentVideo,
       contentVideoTitle,
       contentImage,
@@ -57,6 +72,9 @@ export const createContent: RequestHandler = async (req: Request<{}, {}, CreateC
       contentFileTitle,
       externalLink,
       externalLinkTitle,
+      quizTitle,
+      quizContent,
+      questions,
       duration,
       position,
       sectionId,
@@ -112,6 +130,7 @@ export const updateContent: RequestHandler = async (req, res): Promise<void> => 
   const {
     type,
     contentText,
+    contentTextTitle,
     contentVideo,
     contentVideoTitle,
     contentImage,
@@ -120,6 +139,9 @@ export const updateContent: RequestHandler = async (req, res): Promise<void> => 
     contentFileTitle,
     externalLink,
     externalLinkTitle,
+    quizTitle,
+    quizContent,
+    questions,
     duration,
     position,
     sectionId,
@@ -145,6 +167,7 @@ export const updateContent: RequestHandler = async (req, res): Promise<void> => 
     // Actualizar valores del contenido
     contentItem.type = type || contentItem.type;
     contentItem.contentText = contentText || contentItem.contentText;
+    contentItem.contentTextTitle = contentTextTitle || contentItem.contentTextTitle;
     contentItem.contentVideo = contentVideo || contentItem.contentVideo;
     contentItem.contentVideoTitle = contentVideoTitle || contentItem.contentVideoTitle;
     contentItem.contentImage = contentImage || contentItem.contentImage;
@@ -153,6 +176,9 @@ export const updateContent: RequestHandler = async (req, res): Promise<void> => 
     contentItem.contentFileTitle = contentFileTitle || contentItem.contentFileTitle;
     contentItem.externalLink = externalLink || contentItem.externalLink;
     contentItem.externalLinkTitle = externalLinkTitle || contentItem.externalLinkTitle;
+    contentItem.quizTitle = quizTitle || contentItem.quizTitle;
+    contentItem.quizContent = quizContent || contentItem.quizContent;
+    contentItem.questions = questions || contentItem.questions;
     contentItem.duration = duration || contentItem.duration;
     contentItem.position = position || contentItem.position;
     contentItem.sectionId = sectionId || contentItem.sectionId;

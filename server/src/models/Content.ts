@@ -4,10 +4,11 @@ import Section from './Section'; // Relación con la tabla "Sections"
 
 class Content extends Model {
   public id!: number; // Identificador único del contenido
-  public type!: string; // Tipo de contenido (e.g., texto, video, imagen, archivo, enlace externo)
+  public type!: string; // Tipo de contenido (e.g., texto, video, imagen, archivo, enlace externo, encuesta)
 
   // Contenido de texto
   public contentText?: string; // Texto asociado al contenido, si aplica
+  public contentTextTitle?: string; // Título asociado al texto
 
   // Contenido de video
   public contentVideo?: string; // URL del video asociado al contenido
@@ -24,6 +25,17 @@ class Content extends Model {
   // Enlace externo
   public externalLink?: string; // URL de un enlace externo asociado al contenido
   public externalLinkTitle?: string; // Título o descripción del enlace externo
+
+  // Encuestas o cuestionarios
+  public quizTitle?: string; // Título de la encuesta/cuestionario
+  public quizContent?: string; // Contenido adicional en Markdown o texto normal
+  public questions?: Array<{
+    question: string; // Pregunta
+    answers: Array<{
+      answer: string; // Respuesta
+      isCorrect: boolean; // Indica si es una respuesta correcta
+    }>;
+  }>;
 
   // Metadatos adicionales
   public duration?: number; // Duración del contenido (en segundos), útil para videos o audios
@@ -47,8 +59,12 @@ Content.init(
       allowNull: false, // Este campo es obligatorio
     },
     contentText: {
-      type: DataTypes.TEXT, // Soporta grandes cantidades de texto
+      type: DataTypes.TEXT, // Soporta grandes cantidades de texto o Markdown
       allowNull: true, // Opcional: solo se usa si el contenido es de tipo texto
+    },
+    contentTextTitle: {
+      type: DataTypes.STRING, // Título asociado al texto
+      allowNull: true, // Opcional
     },
     contentVideo: {
       type: DataTypes.STRING, // URL del video
@@ -80,6 +96,18 @@ Content.init(
     },
     externalLinkTitle: {
       type: DataTypes.STRING, // Título del enlace externo
+      allowNull: true, // Opcional
+    },
+    quizTitle: {
+      type: DataTypes.STRING, // Título de la encuesta/cuestionario
+      allowNull: true, // Opcional
+    },
+    quizContent: {
+      type: DataTypes.TEXT, // Contenido adicional en Markdown o texto normal
+      allowNull: true, // Opcional
+    },
+    questions: {
+      type: DataTypes.JSONB, // Preguntas y respuestas en formato JSON
       allowNull: true, // Opcional
     },
     duration: {

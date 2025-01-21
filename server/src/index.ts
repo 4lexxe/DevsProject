@@ -13,6 +13,9 @@ import headerSectionRoutes from './routes/headerSectionRoutes';
 const app = express();
 const PORT = 3000;
 
+// Middleware para parsear JSON
+app.use(bodyParser.json());
+
 // Habilitar CORS
 app.use(cors()); // Permite que el frontend haga solicitudes
 
