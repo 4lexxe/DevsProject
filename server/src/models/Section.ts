@@ -55,5 +55,6 @@ Section.init(
 
 // Relación con Course
 Section.belongsTo(Course, { foreignKey: 'courseId' });
+Course.hasMany(Section, { foreignKey: 'courseId' });
 
 export default Section;

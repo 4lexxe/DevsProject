@@ -85,7 +85,7 @@ export const getCourseById: RequestHandler = async (req, res) => {
       include: {
         model: Admin,
         as: 'admin',
-        attributes: ['id', 'name', 'email'], // Selecciona sólo campos necesarios
+        attributes: ['id', 'name'], // Eliminar 'email' de aquí
       },
     });
 
@@ -96,7 +96,7 @@ export const getCourseById: RequestHandler = async (req, res) => {
 
     res.status(200).json(course);
   } catch (error) {
-    console.error("Error al obtener el curso por ID:", error); // Log detallado
+    console.error("Error al obtener el curso por ID:", error);
     res.status(500).json({ message: 'Error obteniendo el curso' });
   }
 };
@@ -104,7 +104,7 @@ export const getCourseById: RequestHandler = async (req, res) => {
 // Actualizar un curso
 export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
   const { id } = req.params;
-  const { title, image, summary, category, about, relatedCareerType, adminId, learningOutcomes, isActive, isInDevelopment } = req.body;
+  const updateData = req.body;
 
   if (!id || isNaN(Number(id))) {
     res.status(400).json({ error: "El 'id' debe ser un número válido" });
@@ -112,33 +112,60 @@ export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
   }
 
   try {
+    // Primero verifica si el curso existe
     const course = await Course.findByPk(id);
     if (!course) {
       res.status(404).json({ message: 'Curso no encontrado' });
       return;
     }
 
-    course.title = title || course.title;
-    course.image = image || course.image;
-    course.summary = summary || course.summary;
-    course.category = category || course.category;
-    course.about = about || course.about;
-    course.relatedCareerType = relatedCareerType || course.relatedCareerType;
-    course.adminId = adminId || course.adminId;
-    course.learningOutcomes = learningOutcomes || course.learningOutcomes;  // Actualizar temas de aprendizaje
-    course.isActive = isActive !== undefined ? isActive : course.isActive;  // Actualizar estado activo
-    course.isInDevelopment = isInDevelopment !== undefined ? isInDevelopment : course.isInDevelopment;  // Actualizar desarrollo
+    // Si se proporciona adminId, verifica que el admin exista
+    if (updateData.adminId) {
+      const admin = await Admin.findByPk(updateData.adminId);
+      if (!admin) {
+        res.status(404).json({ message: 'Administrador no encontrado' });
+        return;
+      }
+    }
 
-    await course.save();
-
-    const updatedCourse = await Course.findByPk(course.id, {
-      include: { model: Admin, as: 'admin' },
+    // Actualiza el curso usando el método update
+    await Course.update(updateData, {
+      where: { id },
+      returning: true
     });
 
-    res.status(200).json(updatedCourse);
+    // Obtén el curso actualizado con la información del admin
+    const updatedCourse = await Course.findByPk(id, {
+      include: [{ 
+        model: Admin, 
+        as: 'admin',
+        attributes: ['id', 'name']
+      }]
+    });
+
+    if (!updatedCourse) {
+      res.status(404).json({ message: 'No se pudo obtener el curso actualizado' });
+      return;
+    }
+
+    // Obtén el conteo de secciones
+    const sectionCount = await Section.count({ 
+      where: { courseId: id }
+    });
+
+    // Combina el curso actualizado con el conteo de secciones
+    const responseData = {
+      ...updatedCourse.toJSON(),
+      sectionCount
+    };
+
+    res.status(200).json(responseData);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error actualizando el curso' });
+    console.error('Error actualizando el curso:', error);
+    res.status(500).json({ 
+      message: 'Error actualizando el curso',
+      error: error instanceof Error ? error.message : 'Error desconocido'
+    });
   }
 };
 
