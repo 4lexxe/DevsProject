@@ -5,6 +5,7 @@ import { getModulesCount as fetchModulesCount } from '../../services/courseServi
 import HeroCourse from '../components/courses/HeroCourse';
 import CourseOverview from '../components/courses/CourseOverview';
 import LearningOutcomes from '../components/courses/LearningOutcomes';
+import SectionList from '../components/courses/SectionList';
 
 interface Course {
   id: number;
@@ -90,6 +91,11 @@ const CourseDetails: React.FC = () => {
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />
+            
+            {/* Sections List */}
+            <div className="mt-12">
+              <SectionList courseId={id || ''} />
+            </div>
           </div>
           <div className="lg:col-span-1">
             <LearningOutcomes outcomes={course.learningOutcomes} />
