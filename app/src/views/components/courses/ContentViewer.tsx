@@ -1,11 +1,13 @@
 import type React from "react"
 import { useState } from "react"
-import { FileText, Video, ImageIcon, File, LinkIcon, ExternalLink, ChevronDown, ChevronUp } from "lucide-react"
+import { FileText, Video, ImageIcon, File, LinkIcon, ExternalLink, ChevronDown, ChevronUp, ClipboardList } from "lucide-react"
+import { Link } from 'react-router-dom'
 
 interface Content {
   id: number
   type: string
   contentText?: string
+  contentTextTitle?: string
   contentVideo?: string
   contentVideoTitle?: string
   contentImage?: string
@@ -14,6 +16,15 @@ interface Content {
   contentFileTitle?: string
   externalLink?: string
   externalLinkTitle?: string
+  quizTitle?: string
+  quizContent?: string
+  questions?: Array<{
+    question: string
+    answers: Array<{
+      answer: string
+      isCorrect: boolean
+    }>
+  }>
   duration?: number
   position?: number
   sectionId: number
@@ -69,10 +80,15 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
             className="w-full px-4 py-3 text-left bg-white hover:bg-gray-50 transition-colors"
             onClick={() => toggleSection("text")}
           >
-            {renderSectionHeader(<FileText className="w-5 h-5 text-blue-600 flex-shrink-0" />, "Content Description")}
+            {renderSectionHeader(
+              <FileText className="w-5 h-5 text-blue-600 flex-shrink-0" />, 
+              content.contentTextTitle || "Content Description"
+            )}
           </button>
           {expandedSection === "text" && (
-            <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50">{content.contentText}</div>
+            <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50">
+              {content.contentText}
+            </div>
           )}
         </div>
       )}
@@ -118,7 +134,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
           {expandedSection === "image" && (
             <div className="relative">
               <img
-                src={content.contentImage || "/placeholder.svg"}
+                src={content.contentImage}
                 alt={content.contentImageTitle || "Content image"}
                 className="w-full h-auto object-cover"
                 loading="lazy"
@@ -182,9 +198,34 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
           )}
         </div>
       )}
+
+      {/* Quiz Link */}
+      {content.quizTitle && content.questions && (
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            className="w-full px-4 py-3 text-left bg-white hover:bg-gray-50 transition-colors"
+            onClick={() => toggleSection("quiz")}
+          >
+            {renderSectionHeader(
+              <ClipboardList className="w-5 h-5 text-blue-600 flex-shrink-0" />,
+              content.quizTitle
+            )}
+          </button>
+          {expandedSection === "quiz" && (
+            <div className="p-4 bg-gray-50">
+              <Link
+                to={`/quiz/${content.id}`}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span>Take Quiz</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
 export default ContentViewer
-

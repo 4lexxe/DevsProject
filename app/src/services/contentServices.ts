@@ -14,3 +14,18 @@ export const getContentBySection = async (sectionId: string) => {
     throw error;
   }
 };
+
+// Obtiene un contenido específico por ID
+export const getContentById = async (contentId: string) => {
+  try {
+    console.log(`Obteniendo contenido con ID: ${contentId}`);
+    const response = await api.get(`/content/${contentId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `Error al obtener el contenido (ID: ${contentId}):`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
