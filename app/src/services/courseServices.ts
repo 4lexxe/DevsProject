@@ -1,5 +1,10 @@
 import api from '../api/axios';
 
+interface Course {
+  id: number;
+  name: string;
+}
+
 const COURSES_ENDPOINT = '/courses';
 
 export const getCourses = async () => {
@@ -12,7 +17,7 @@ export const getCourses = async () => {
   }
 };
 
-// Agrega más servicios relacionados con cursos aquí
+// Agregar más servicios relacionados con cursos aquí
 export const createCourse = async (courseData: any) => {
   try {
     const response = await api.post(COURSES_ENDPOINT, courseData);
@@ -23,6 +28,7 @@ export const createCourse = async (courseData: any) => {
   }
 };
 
+// Servicio para Eliminar
 export const updateCourse = async (id: string, courseData: any) => {
   try {
     const response = await api.put(`${COURSES_ENDPOINT}/${id}`, courseData);
@@ -33,6 +39,7 @@ export const updateCourse = async (id: string, courseData: any) => {
   }
 };
 
+// Servicio para 
 export const deleteCourse = async (id: string) => {
   try {
     const response = await api.delete(`${COURSES_ENDPOINT}/${id}`);
@@ -42,14 +49,6 @@ export const deleteCourse = async (id: string) => {
     throw error;
   }
 };
-
-
-// Asegúrate de tener este servicio
-
-interface Course {
-  id: number;
-  name: string;
-}
 
 // Servicio para obtener el conteo de módulos
 export const getModulesCount = async (courseId: number): Promise<number> => {
@@ -64,4 +63,3 @@ export const getModulesCount = async (courseId: number): Promise<number> => {
     throw error;
   }
 };
-

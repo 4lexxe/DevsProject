@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCourses } from '../../services/courseServices'; // Asegúrate de tener este servicio
-import { getModulesCount as fetchModulesCount } from '../../services/courseServices'; // Importamos el servicio para obtener el conteo de módulos
-import HeroCourse from '../components/courses/HeroCourse'; // Importamos el HeroCourse
-import CourseOverview from '../components/courses/CourseOverview'; // Importamos el CourseOverview
+import { getCourses } from '../../services/courseServices';
+import { getModulesCount as fetchModulesCount } from '../../services/courseServices';
+import HeroCourse from '../components/courses/HeroCourse';
+import CourseOverview from '../components/courses/CourseOverview';
+import LearningOutcomes from '../components/courses/LearningOutcomes';
 
 interface Course {
   id: number;
@@ -11,25 +12,27 @@ interface Course {
   image: string;
   summary: string;
   category: string;
-  about: string; // Descripción
-  relatedCareerType: string; // Tipo de carrera
-  createdAt: string; // Fecha de creación
-  modules: Array<any>; // Aquí se puede definir como una lista de módulos o algo más específico
+  about: string;
+  relatedCareerType: string;
+  learningOutcomes: string[];
+  isActive: boolean;
+  isInDevelopment: boolean;
+  adminId: number;
+  createdAt: string;
+  modules: Array<any>;
 }
 
 const CourseDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Obtenemos el id de los parámetros de la URL
+  const { id } = useParams<{ id: string }>();
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [moduleCount, setModuleCount] = useState<number>(0); // Para el conteo de módulos
+  const [moduleCount, setModuleCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
         setLoading(true);
-
-        // Obtener todos los cursos
         const courses = await getCourses();
         const fetchedCourse: Course | undefined = courses.find(
           (course: Course) => course.id === Number(id)
@@ -37,8 +40,6 @@ const CourseDetails: React.FC = () => {
 
         if (fetchedCourse) {
           setCourse(fetchedCourse);
-
-          // Obtener el número de módulos asociados al curso
           const count = await fetchModulesCount(Number(id));
           setModuleCount(count);
         } else {
@@ -68,41 +69,35 @@ const CourseDetails: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
-      {/* Pasamos los datos del curso al HeroCourse */}
-      <HeroCourse
-        title={course.title}
-        description={course.summary}
-        image={course.image}
-        category={course.category}
-      />
-      <div className="mt-8">
-        {/* Pasamos los datos del curso al CourseOverview */}
-        <CourseOverview
-          about={course.about}
-          relatedCareerType={course.relatedCareerType}
-          numberOfModules={moduleCount}
-          createdAt={course.createdAt}
+    <div>
+      {/* Hero section with full width */}
+      <div className="w-full">
+        <HeroCourse
+          title={course.title}
+          description={course.summary}
+          image={course.image}
+          category={course.category}
         />
+      </div>
+      
+      {/* Content section with constrained width */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <CourseOverview
+              about={course.about}
+              relatedCareerType={course.relatedCareerType}
+              numberOfModules={moduleCount}
+              createdAt={course.createdAt}
+            />
+          </div>
+          <div className="lg:col-span-1">
+            <LearningOutcomes outcomes={course.learningOutcomes} />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
 export default CourseDetails;
-
-// Servicio para obtener el conteo de módulos
-export const getModulesCount = async (courseId: number): Promise<number> => {
-  try {
-    const response = await fetch(`/api/courses/${courseId}/modules/count`);
-    if (!response.ok) {
-      throw new Error('Error al obtener el conteo de módulos');
-    }
-
-    const data = await response.json();
-    return data.count;
-  } catch (error) {
-    console.error('Error al obtener el conteo de módulos:', error);
-    throw error;
-  }
-};
