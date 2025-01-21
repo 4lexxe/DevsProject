@@ -83,18 +83,19 @@ export const updateHeaderSection: RequestHandler = async (req, res): Promise<voi
       return;
     }
 
-    // Actualizar la sección de encabezado
-    headerSection.image = image;
-    headerSection.title = title;
-    headerSection.slogan = slogan;
-    headerSection.about = about;
-    headerSection.buttonName = buttonName;
-    headerSection.buttonLink = buttonLink;
-    headerSection.adminId = adminId;
+    // Actualizar la sección de encabezado solo si hay cambios
+    const updatedSection = await headerSection.update({
+      image,
+      title,
+      slogan,
+      about,
+      buttonName,
+      buttonLink,
+      adminId
+    });
 
-    await headerSection.save();
-
-    res.status(200).json(headerSection);
+    // Si se actualiza correctamente, devolver la sección actualizada
+    res.status(200).json(updatedSection);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error actualizando la sección de encabezado' });

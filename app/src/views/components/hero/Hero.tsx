@@ -30,14 +30,12 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    // Create the interval
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % headerSections.length);
     }, 5000);
 
-    // Clear interval on cleanup
     return () => clearInterval(interval);
-  }, [currentIndex, headerSections.length]); // Reset interval when currentIndex changes
+  }, [currentIndex, headerSections.length]);
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + headerSections.length) % headerSections.length);
@@ -49,13 +47,11 @@ export default function Hero() {
 
   if (headerSections.length === 0) {
     return (
-      <div className="relative flex items-center justify-center px-6 py-16">
-        {/* Background with grain effect for loading state */}
+      <div className="relative h-[450px] sm:h-[525px] md:h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 bg-gray-800" />
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
         <div className="absolute inset-0 grain-overlay" />
         
-        {/* Loading text with animation */}
         <div className="relative z-10">
           <div className="loading-text">Cargando...</div>
         </div>
@@ -64,29 +60,44 @@ export default function Hero() {
   }
 
   return (
-    <div className="relative flex items-center justify-center px-6 py-16">
-      {/* Imagen de fondo con transición suave */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
-        style={{ backgroundImage: `url(${headerSections[currentIndex].image})` }}
-      />
-      
-      {/* Superposición oscura con desenfoque */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      
-      {/* Superposición de grano con animación de opacidad */}
-      <div className="absolute inset-0 grain-overlay" />
+    <div className="relative h-[450px] sm:h-[525px] md:h-[600px] w-full overflow-hidden">
+      {/* Contenedor principal con altura fija */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* Imagen de fondo con transición suave */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-in-out"
+          style={{ backgroundImage: `url(${headerSections[currentIndex].image})` }}
+        />
+        
+        {/* Superposición oscura con desenfoque */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        
+        {/* Superposición de grano con animación de opacidad */}
+        <div className="absolute inset-0 grain-overlay" />
 
-      {/* Botón de navegación izquierda */}
-      <CarouselButton direction="left" onClick={handlePrev} className="absolute left-4 z-10" />
+        {/* Contenedor del contenido con padding consistente */}
+        <div className="relative z-10 w-full px-6 py-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Botones de navegación */}
+            <CarouselButton 
+              direction="left" 
+              onClick={handlePrev} 
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10" 
+            />
+            
+            {/* Contenido principal del hero */}
+            <div className="relative z-10">
+              <HeroContent headerSection={headerSections[currentIndex]} />
+            </div>
 
-      {/* Contenido principal del hero */}
-      <div className="relative z-10 hero-section">
-        <HeroContent headerSection={headerSections[currentIndex]} />
+            <CarouselButton 
+              direction="right" 
+              onClick={handleNext} 
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10" 
+            />
+          </div>
+        </div>
       </div>
-
-      {/* Botón de navegación derecha */}
-      <CarouselButton direction="right" onClick={handleNext} className="absolute right-4 z-10" />
     </div>
   );
 }
