@@ -27,15 +27,17 @@ export default function Hero() {
     };
 
     fetchHeaderSections();
+  }, []);
 
-    // Intervalo para cambiar la sección cada 5 segundos
+  useEffect(() => {
+    // Create the interval
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % headerSections.length);
     }, 5000);
 
-    // Limpiar el intervalo cuando el componente se desmonte
+    // Clear interval on cleanup
     return () => clearInterval(interval);
-  }, [headerSections.length]);
+  }, [currentIndex, headerSections.length]); // Reset interval when currentIndex changes
 
   const handlePrev = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + headerSections.length) % headerSections.length);
