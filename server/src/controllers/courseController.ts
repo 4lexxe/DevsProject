@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express';
 import Course from '../models/Course';
-import Admin from '../models/Admin';  // Relación con el admin
-import Section from '../models/Section';  // Importar el modelo Section
+import Admin from '../models/Admin'; // Relación con el admin
+import Section from '../models/Section'; // Importar el modelo Section
 
 // Crear un curso
 export const createCourse: RequestHandler = async (req, res): Promise<void> => {
-  const { title, image, summary, category, about, relatedCareerType, adminId } = req.body;
+  const { title, image, summary, category, about, relatedCareerType, adminId, learningOutcomes, isActive, isInDevelopment } = req.body;
 
   if (!adminId || typeof adminId !== 'number') {
     res.status(400).json({ error: "El 'adminId' debe ser un número válido" });
@@ -27,6 +27,9 @@ export const createCourse: RequestHandler = async (req, res): Promise<void> => {
       about,
       relatedCareerType,
       adminId,
+      learningOutcomes: learningOutcomes || [],  // Definir valor por defecto
+      isActive: isActive !== undefined ? isActive : true,  // Valor por defecto: true
+      isInDevelopment: isInDevelopment !== undefined ? isInDevelopment : false,  // Valor por defecto: false
     });
 
     const courseWithAdmin = await Course.findByPk(course.id, {
@@ -101,7 +104,7 @@ export const getCourseById: RequestHandler = async (req, res) => {
 // Actualizar un curso
 export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
   const { id } = req.params;
-  const { title, image, summary, category, about, relatedCareerType, adminId } = req.body;
+  const { title, image, summary, category, about, relatedCareerType, adminId, learningOutcomes, isActive, isInDevelopment } = req.body;
 
   if (!id || isNaN(Number(id))) {
     res.status(400).json({ error: "El 'id' debe ser un número válido" });
@@ -122,6 +125,9 @@ export const updateCourse: RequestHandler = async (req, res): Promise<void> => {
     course.about = about || course.about;
     course.relatedCareerType = relatedCareerType || course.relatedCareerType;
     course.adminId = adminId || course.adminId;
+    course.learningOutcomes = learningOutcomes || course.learningOutcomes;  // Actualizar temas de aprendizaje
+    course.isActive = isActive !== undefined ? isActive : course.isActive;  // Actualizar estado activo
+    course.isInDevelopment = isInDevelopment !== undefined ? isInDevelopment : course.isInDevelopment;  // Actualizar desarrollo
 
     await course.save();
 

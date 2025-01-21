@@ -10,6 +10,9 @@ class Course extends Model {
   public category!: string;
   public about!: string;
   public relatedCareerType!: string;
+  public learningOutcomes!: string[];
+  public isActive!: boolean;
+  public isInDevelopment!: boolean;
   public adminId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -45,6 +48,21 @@ Course.init(
     relatedCareerType: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    learningOutcomes: {
+      type: DataTypes.JSONB, // Usamos JSONB para almacenar los temas de aprendizaje
+      allowNull: true,
+      defaultValue: [], // Valor por defecto es un array vacío
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true, // Valor por defecto es true (activo)
+    },
+    isInDevelopment: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false, // Valor por defecto es false (no está en desarrollo)
     },
     adminId: {
       type: DataTypes.INTEGER,
