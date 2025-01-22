@@ -1,40 +1,38 @@
-import React from 'react'
+import React from 'react';
+import clsx from 'clsx';
 
 interface AuthButtonProps {
-  variant: 'primary' | 'secondary' | 'outline'
-  children: React.ReactNode
-  onClick?: () => void
-  type?: 'button' | 'submit'
-  fullWidth?: boolean
+  variant: 'primary' | 'secondary' | 'outline';
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: 'button' | 'submit';
+  fullWidth?: boolean;
 }
 
 export default function AuthButton({
   variant,
   children,
-  onClick,
+  onClick = () => {},
   type = 'button',
-  fullWidth = false
+  fullWidth = false,
 }: AuthButtonProps) {
-  // Estilos base para todos los botones
-  const baseStyles = "px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+  const baseStyles = 'px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200';
 
-  // Estilos específicos según la variante
-  const styles = {
-    primary: `${baseStyles} bg-[#00D7FF] text-black hover:bg-[#66E7FF]`,
-    secondary: `${baseStyles} bg-blue-700 text-white hover:bg-blue-800`,
-    outline: `${baseStyles} border-2 border-[#00D7FF] text-[#00D7FF] hover:bg-[#CCF7FF]`
-  }
-
-  // Clase adicional para ancho completo
-  const widthClass = fullWidth ? "w-full" : ""
+  const buttonClass = clsx(baseStyles, {
+    'bg-[#00D7FF] text-black hover:bg-[#66E7FF]': variant === 'primary',
+    'bg-blue-700 text-white hover:bg-blue-800': variant === 'secondary',
+    'border-2 border-[#00D7FF] text-[#00D7FF] hover:bg-[#CCF7FF]': variant === 'outline',
+    'w-full': fullWidth,
+  });
 
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${styles[variant]} ${widthClass}`}
+      className={buttonClass}
+      aria-label={children?.toString()}
     >
       {children}
     </button>
-  )
+  );
 }
