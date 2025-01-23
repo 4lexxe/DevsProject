@@ -1,0 +1,14 @@
+import { Outlet } from 'react-router-dom'
+
+import Navbar from '../components/navigation/Navbar'
+import Footer from '../components/navigation/Footer'
+
+export default function DefaultLayout() {
+  return (
+    <div className="min-h-screen flex flex-col bg-white pt-20">
+      <Navbar />
+      <Outlet />
+      <Footer />
+    </div>
+  )
+}
