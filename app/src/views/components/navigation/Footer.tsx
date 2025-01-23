@@ -26,11 +26,11 @@ const menuItems = {
   ],
 }
 
-const socialLinks: SocialLink[] = [
-  { icon: faDiscord, href: "#", label: "Discord", isFontAwesome: true },
-  { icon: faWhatsapp, href: "#", label: "WhatsApp", isFontAwesome: true },
-  { icon: Github, href: "#", label: "GitHub", isFontAwesome: false },
-  { icon: Youtube, href: "#", label: "YouTube", isFontAwesome: false },
+const socialLinks: (SocialLink & { color: string })[] = [
+  { icon: faDiscord, href: "#", label: "Discord", isFontAwesome: true, color: "#5865F2" },
+  { icon: faWhatsapp, href: "#", label: "WhatsApp", isFontAwesome: true, color: "#25D366" },
+  { icon: Github, href: "#", label: "GitHub", isFontAwesome: false, color: "#171515" },
+  { icon: Youtube, href: "#", label: "YouTube", isFontAwesome: false, color: "#FF0000" },
 ]
 
 export default function Footer() {
@@ -38,10 +38,10 @@ export default function Footer() {
     <footer className="bg-gray-50 py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
-            {/* Logo */}
-            <div className="flex justify-center md:justify-start">
+          {/* Logo */}
+          <div className="flex justify-center md:justify-start">
             <img src="https://i.ibb.co/p1SH5jQ/logo-Devs-Vertical.png" alt="Devs Project Logo" className="h-12 w-auto" />
-            </div>
+          </div>
 
           {/* Menu Column 1 */}
           <div className="hidden md:block">
@@ -70,18 +70,19 @@ export default function Footer() {
           </div>
 
           {/* Social Links */}
-          <div className="flex space-x-4 justify-center md:justify-end">
-            {socialLinks.map(({ icon, href, label, isFontAwesome }) => (
+          <div className="flex space-x-6 justify-center md:justify-end">
+            {socialLinks.map(({ icon, href, label, isFontAwesome, color }) => (
               <a
                 key={label}
                 href={href}
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className=""
                 aria-label={label}
+                style={{ color }}
               >
                 {isFontAwesome ? (
-                  <FontAwesomeIcon icon={icon} className="w-6 h-6" />
+                  <FontAwesomeIcon icon={icon} className="w-8 h-8" />
                 ) : (
-                  React.createElement(icon, { className: "w-6 h-6" })
+                  React.createElement(icon, { className: "w-8 h-8" })
                 )}
               </a>
             ))}
