@@ -40,7 +40,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-start">
             {/* Logo */}
             <div className="flex justify-center md:justify-start">
-            <img src="https://i.ibb.co/dQ09SsH/logoDev2.png" alt="Devs Project Logo" className="h-16 w-auto" />
+            <img src="https://i.ibb.co/p1SH5jQ/logo-Devs-Vertical.png" alt="Devs Project Logo" className="h-12 w-auto" />
             </div>
 
           {/* Menu Column 1 */}
