@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import CourseCard from './CourseCard';
-import { getCourses } from '../../../course/services/courseServices'; // Asegúrate de que este servicio esté configurado correctamente
+import { getCourses } from '@/course/services/courseServices'; // Asegúrate de que este servicio esté configurado correctamente
 
 interface Course {
   id: number;

@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 //Importacion de todos los estilos
-import './styles/main.css'
+import '@/styles/main.css'
 
+//Importacion de los componentes
 import DefaultLayout from './shared/layouts/defaultLayout'
 import Home from './home/home'
 
