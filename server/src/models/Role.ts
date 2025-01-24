@@ -1,5 +1,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import sequelize from '../config/db';
+import Permission from './Permission';
+import RolePermission from './RolePermission';
 
 class Role extends Model {
   public id!: number;
@@ -11,9 +13,21 @@ class Role extends Model {
 
 // Definimos los roles iniciales
 const rolesIniciales = [
-  { name: 'usuario', description: 'Usuario normal del sistema' },
-  { name: 'admin', description: 'Administrador del sistema' },
-  { name: 'super admin', description: 'Super administrador con acceso completo' }
+  { 
+    name: 'user', 
+    description: 'Usuario normal del sistema',
+    permissions: ['read:users']
+  },
+  { 
+    name: 'admin', 
+    description: 'Administrador del sistema',
+    permissions: ['read:users', 'write:users', 'delete:users', 'manage:roles']
+  },
+  { 
+    name: 'superadmin', 
+    description: 'Super administrador con acceso completo',
+    permissions: ['read:users', 'write:users', 'delete:users', 'manage:roles', 'manage:permissions']
+  }
 ];
 
 Role.init({
@@ -35,17 +49,51 @@ Role.init({
   sequelize,
   modelName: 'Role',
   hooks: {
-    // Este hook se ejecuta después de sincronizar la base de datos
     async afterSync() {
-      for (const role of rolesIniciales) {
-        // Verifica si el rol ya existe y si no, lo crea
-        await Role.findOrCreate({
-          where: { name: role.name },
-          defaults: { description: role.description },
-        });
+      try {
+        for (const roleData of rolesIniciales) {
+          // Crear o encontrar el rol
+          const [role] = await Role.findOrCreate({
+            where: { name: roleData.name },
+            defaults: { description: roleData.description },
+          });
+
+          // Buscar los permisos correspondientes
+          const permissions = await Permission.findAll({
+            where: { name: roleData.permissions }
+          });
+
+          // Crear las relaciones en la tabla intermedia
+          if (permissions.length > 0) {
+            const rolePermissions = permissions.map(permission => ({
+              roleId: role.id,
+              permissionId: permission.id
+            }));
+
+            // Usar bulkCreate con updateOnDuplicate para evitar errores de duplicados
+            await RolePermission.bulkCreate(rolePermissions, {
+              updateOnDuplicate: ['roleId', 'permissionId']
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error en afterSync de Role:', error);
       }
     }
   }
+});
+
+// Definir relación many-to-many con Permission
+Role.belongsToMany(Permission, { 
+  through: RolePermission,
+  foreignKey: 'roleId',
+  otherKey: 'permissionId'
+});
+
+Permission.belongsToMany(Role, {
+  through: RolePermission,
+  foreignKey: 'permissionId',
+  otherKey: 'roleId'
 });
 
 export default Role;

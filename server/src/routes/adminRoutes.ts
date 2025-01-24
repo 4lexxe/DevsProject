@@ -1,18 +1,20 @@
-import express from "express";
-import { createAdminController, getAllAdminsController, deleteAdminController, updateAdminController } from "../controllers/adminController";
+import { Router } from "express"
+import { AdminController } from "../controllers/adminController"
+import { authMiddleware } from "../middleware/authMiddleware"
+import { checkRole } from "../middleware/checkRole"
 
-const router = express.Router();
+const router = Router()
 
-// Ruta para crear un administrador
-router.post("/admins", createAdminController);
+// Todas las rutas de admin requieren autenticación
+router.use(authMiddleware)
 
-// Ruta para obtener todos los administradores
-router.get("/admins", getAllAdminsController);
+// Todas las rutas de admin requieren rol de superadmin
+router.use(checkRole(["superadmin"]))
 
-// Ruta para eliminar un administrador
-router.delete("/admins/:adminId", deleteAdminController); // Ruta para eliminar un administrador
+router.post("/", AdminController.createAdminValidations, AdminController.createAdmin)
+router.get("/", AdminController.getAllAdmins)
+router.get("/:adminId", AdminController.getAdminById)
+router.put("/:adminId", AdminController.updateAdminValidations, AdminController.updateAdmin)
+router.delete("/:adminId", AdminController.deleteAdmin)
 
-// Ruta para actualizar un administrador
-router.put('/admins/:id', updateAdminController);
-
-export default router;
+export default router

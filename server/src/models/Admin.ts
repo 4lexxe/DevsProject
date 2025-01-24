@@ -12,6 +12,11 @@ class Admin extends Model {
   public userId!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // Agregar un método para verificar permisos
+  public hasPermission(permission: string): boolean {
+    return this.permissions.includes(permission);
+  }
 }
 
 Admin.init(
@@ -21,7 +26,7 @@ Admin.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    name: { // Add this field
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
