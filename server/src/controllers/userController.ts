@@ -7,13 +7,11 @@ export class UserController {
   // Validaciones para crear/actualizar usuario
   static userValidations = [
     body('email').optional().isEmail().withMessage('Email inválido'),
-    body('name').optional().trim().notEmpty().withMessage('El nombre es requerido'),
-    body('phone').optional().trim(),
     body('roleId').optional().isInt().withMessage('El roleId debe ser un número entero')
   ];
 
   // Obtener todos los usuarios
-  static async getUsers(req: Request, res: Response): Promise<void> {
+  static async getUsers(_req: Request, res: Response): Promise<void> {
     try {
       const users = await User.findAll({
         attributes: { exclude: ['password'] },

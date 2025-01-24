@@ -12,7 +12,7 @@ router.use(authMiddleware)
 router.use(checkRole(["superadmin"]))
 
 router.post("/", AdminController.createAdminValidations, AdminController.createAdmin)
-router.get("/", AdminController.getAllAdmins)
+router.get("/admins", AdminController.getAllAdmins)
 router.get("/:adminId", AdminController.getAdminById)
 router.put("/:adminId", AdminController.updateAdminValidations, AdminController.updateAdmin)
 router.delete("/:adminId", AdminController.deleteAdmin)

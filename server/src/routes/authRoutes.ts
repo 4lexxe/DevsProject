@@ -27,7 +27,7 @@ router.get('/github/register', AuthController.githubAuth);
 
 // Otras rutas existentes
 router.get('/verify', (req: Request, res: Response) => AuthController.verifyAuth(req, res));
-router.get('/me', (req: Request, res: Response) => AuthController.getCurrentUser(req, res));
+
 router.delete('/logout', (req: Request, res: Response) => AuthController.logout(req, res));
 
 export default router;

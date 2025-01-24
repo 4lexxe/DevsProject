@@ -10,9 +10,6 @@ import userRoutes from './routes/userRoutes'; // Importamos las rutas de usuario
 import adminRoutes from './routes/adminRoutes'; // Importamos las rutas de admin
 import roleRoutes from './routes/roleRoutes';
 
-import { authMiddleware } from './middleware/authMiddleware';
-import { checkRole } from './middleware/checkRole';
-
 const app = express();
 const PORT = 3000;
 
@@ -61,7 +58,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api', userRoutes); // Agregamos las rutas de usuario
 
 // Rutas de admin
-app.use('/api/admin', adminRoutes); // Agregamos las rutas de admin
+app.use('/api/', adminRoutes); // Agregamos las rutas de admin
 
 // Rutas de roles
 app.use('/api', roleRoutes);
