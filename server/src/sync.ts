@@ -1,13 +1,13 @@
 // Sincronización (sync.ts)
-import Role from './models/Role';
-import Permission from './models/Permission';
-import RolePermission from './models/RolePermission';
-import User from './models/User';
-import Admin from './models/Admin';
-import Course from './models/Course';
-import Section from './models/Section';
-import Content from './models/Content';
-import HeaderSection from './models/HeaderSection';
+import Role from './modules/role/Role';
+import Permission from './modules/role/Permission'
+import RolePermission from './modules/role/RolePermission';
+import User from './modules/user/User';
+import Admin from './modules/admin/Admin';
+import Course from './modules/course/Course';
+import Section from './modules/section/Section';
+import Content from './modules/content/Content';
+import HeaderSection from './modules/headerSection/HeaderSection';
 
 async function syncDb() {
   try {

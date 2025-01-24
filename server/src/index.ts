@@ -1,14 +1,13 @@
-import './lib/env';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import passport from 'passport';
 import session from 'express-session';
-import './config/passport'; // Importa la configuración de Passport
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes'; // Importamos las rutas de usuario
-import adminRoutes from './routes/adminRoutes'; // Importamos las rutas de admin
-import roleRoutes from './routes/roleRoutes';
+import './infrastructure/passport/passport'; // Importa la configuración de Passport
+import authRoutes from './modules/auth/authRoutes';
+import userRoutes from './modules/user/userRoutes'; // Importamos las rutas de usuario
+import adminRoutes from './modules/admin/adminRoutes'; // Importamos las rutas de admin
+import roleRoutes from './modules/role/roleRoutes';
 
 const app = express();
 const PORT = 3000;
