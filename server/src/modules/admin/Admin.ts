@@ -3,15 +3,16 @@ import sequelize from '../../infrastructure/database/db';
 import User from '../user/User';
 
 class Admin extends Model {
-  public id!: number;
-  public name!: string;
-  public admin_since!: Date;
-  public permissions!: string[];
-  public isSuperAdmin!: boolean;
-  public admin_notes?: string;
-  public userId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare id: number;
+  declare userId: number;
+  declare name: string;
+  declare isSuperAdmin: boolean;
+  declare permissions: string[];
+  declare admin_since: Date;
+  declare admin_notes?: string;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
+  declare adminUser?: User;
 
   // Agregar un método para verificar permisos
   public hasPermission(permission: string): boolean {
@@ -64,6 +65,6 @@ Admin.init(
 );
 
 User.hasOne(Admin, { foreignKey: 'userId', as: 'admin' });
-Admin.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+Admin.belongsTo(User, { foreignKey: 'userId', as: 'adminUser' });
 
 export default Admin;

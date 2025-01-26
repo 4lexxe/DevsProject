@@ -1,40 +1,40 @@
-import { DataTypes, Model } from 'sequelize';
+import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../infrastructure/database/db';
 
 class RolePermission extends Model {
-  public roleId!: number;
-  public permissionId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  declare roleId: number;
+  declare permissionId: number;
 }
 
-RolePermission.init({
-  roleId: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: 'Roles',
-      key: 'id'
+RolePermission.init(
+  {
+    roleId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: 'roles',
+        key: 'id'
+      },
+      onDelete: 'CASCADE'
+    },
+    permissionId: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      references: {
+        model: 'permissions',
+        key: 'id'
+      },
+      onDelete: 'CASCADE'
     }
   },
-  permissionId: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    references: {
-      model: 'Permissions',
-      key: 'id'
-    }
+  {
+    sequelize,
+    modelName: 'RolePermission',
+    tableName: 'role_permissions',
+    timestamps: false
   }
-}, {
-  sequelize,
-  modelName: 'RolePermission',
-  tableName: 'Roles_Permissions',
-  indexes: [
-    {
-      unique: true,
-      fields: ['roleId', 'permissionId']
-    }
-  ]
-});
+);
+
+// Quitar TODAS las relaciones de este archivo
 
 export default RolePermission;

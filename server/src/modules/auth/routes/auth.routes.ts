@@ -1,5 +1,9 @@
+// auth.route.ts
+
+// Descripción: En este archivo se definen las rutas relacionadas con la autenticación y autorización de usuarios. Estas rutas se utilizan para manejar las operaciones de registro, inicio de sesión, verificación de autenticación, autenticación OAuth, gestión de sesiones y tokens, entre otras funcionalidades relacionadas con la autenticación y autorización de usuarios en la aplicación.
+
 import { Router } from 'express';
-import { AuthController } from '../auth/authController';
+import { AuthController } from '../controllers/auth.controller';
 import { Request, Response } from 'express';
 
 const router = Router();

@@ -1,90 +1,171 @@
 import { Request, Response, RequestHandler } from 'express';
-import Role from '../role/Role';
+import Role, { IRoleAttributes, IRoleInstance } from '../role/Role';
+import Permission from '../role/Permission';
 
 interface RoleRequestBody {
   name: string;
   description: string;
 }
 
-// CREAR
-export const createRole: RequestHandler = async (req: Request<{}, {}, RoleRequestBody>, res) => {
+interface RoleResponse<T = unknown> {
+  status: number;
+  message: string;
+  data?: T;
+  error?: unknown;
+}
+
+// Utilidad para manejar errores
+const handleError = (res: Response, status: number, message: string, error?: unknown): void => {
+  console.error(message, error);
+  const response: RoleResponse = { status, message };
+  if (process.env.NODE_ENV === 'development' && error) {
+    response.error = error;
+  }
+  res.status(status).json(response);
+};
+
+// CREAR ROL
+export const createRole: RequestHandler<unknown, RoleResponse<IRoleAttributes>, RoleRequestBody> = async (req, res) => {
   try {
     const { name, description } = req.body;
-    
-    // Verifica si el rol ya existe
+
     const existingRole = await Role.findOne({ where: { name } });
     if (existingRole) {
-      res.status(400).json({ message: 'El rol ya existe' });
-      return;
+      return handleError(res, 400, 'El nombre del rol ya está en uso');
     }
 
-    const role = await Role.create({ name, description });
-    res.status(201).json(role);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al crear el rol', error });
-  }
-};
-
-// OBTENER todos los roles
-export const getRoles: RequestHandler = async (req, res) => {
-  try {
-    const roles = await Role.findAll();
-    res.status(200).json(roles);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los roles', error });
-  }
-};
-
-// OBTENER un rol por ID
-export const getRoleById: RequestHandler<{ id: string }> = async (req, res) => {
-  try {
-    const role = await Role.findByPk(req.params.id);
+    const newRole = await Role.create({ name, description });
     
-    if (!role) {
-      res.status(404).json({ message: 'Rol no encontrado' });
-      return;
-    }
+    const response: RoleResponse<IRoleAttributes> = {
+      status: 201,
+      message: 'Rol creado exitosamente',
+      data: {
+        id: newRole.id,
+        name: newRole.name,
+        description: newRole.description,
+        createdAt: newRole.createdAt,
+        updatedAt: newRole.updatedAt
+      }
+    };
 
-    res.status(200).json(role);
+    res.status(201).json(response);
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener el rol', error });
+    handleError(res, 500, 'Error al crear el rol', error);
   }
 };
 
-// ACTUALIZAR
-export const updateRole: RequestHandler<{ id: string }, any, RoleRequestBody> = async (req, res) => {
+// OBTENER TODOS LOS ROLES
+export const getRoles: RequestHandler<unknown, RoleResponse<IRoleInstance[]>> = async (req, res) => {
   try {
+    const roles = await Role.findAll({
+      include: [{
+        model: Permission,
+        as: 'Permissions',
+        attributes: ['id', 'name'],
+        through: { attributes: [] }
+      }]
+    });
+
+    const response: RoleResponse<IRoleInstance[]> = {
+      status: 200,
+      message: 'Roles obtenidos exitosamente',
+      data: roles
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    handleError(res, 500, 'Error al obtener los roles', error);
+  }
+};
+
+// OBTENER ROL POR ID
+export const getRoleById: RequestHandler<{ id: string }, RoleResponse<IRoleInstance>> = async (req, res) => {
+  try {
+    const role = await Role.findByPk(req.params.id, {
+      include: [{
+        model: Permission,
+        as: 'Permissions',
+        attributes: ['id', 'name'],
+        through: { attributes: [] }
+      }]
+    });
+
+    if (!role) {
+      return handleError(res, 404, 'Rol no encontrado');
+    }
+
+    const response: RoleResponse<IRoleInstance> = {
+      status: 200,
+      message: 'Rol obtenido exitosamente',
+      data: role
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    handleError(res, 500, 'Error al obtener el rol', error);
+  }
+};
+
+// ACTUALIZAR ROL
+export const updateRole: RequestHandler<{ id: string }, RoleResponse<IRoleAttributes>, RoleRequestBody> = async (req, res) => {
+  try {
+    const { id } = req.params;
     const { name, description } = req.body;
-    const role = await Role.findByPk(req.params.id);
 
+    const role = await Role.findByPk(id);
     if (!role) {
-      res.status(404).json({ message: 'Rol no encontrado' });
-      return;
+      return handleError(res, 404, 'Rol no encontrado');
     }
 
-    role.name = name || role.name;
-    role.description = description || role.description;
+    if (name) {
+      const existingRole = await Role.findOne({ where: { name } });
+      if (existingRole && existingRole.id !== role.id) {
+        return handleError(res, 400, 'El nombre del rol ya está en uso');
+      }
+      role.name = name;
+    }
 
-    await role.save();
-    res.status(200).json(role);
+    if (description) {
+      role.description = description;
+    }
+
+    const updatedRole = await role.save();
+    
+    const response: RoleResponse<IRoleAttributes> = {
+      status: 200,
+      message: 'Rol actualizado exitosamente',
+      data: {
+        id: updatedRole.id,
+        name: updatedRole.name,
+        description: updatedRole.description,
+        createdAt: updatedRole.createdAt,
+        updatedAt: updatedRole.updatedAt
+      }
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el rol', error });
+    handleError(res, 500, 'Error al actualizar el rol', error);
   }
 };
 
-// ELIMINAR
-export const deleteRole: RequestHandler<{ id: string }> = async (req, res) => {
+// ELIMINAR ROL
+export const deleteRole: RequestHandler<{ id: string }, RoleResponse> = async (req, res) => {
   try {
     const role = await Role.findByPk(req.params.id);
-
     if (!role) {
-      res.status(404).json({ message: 'Rol no encontrado' });
-      return;
+      return handleError(res, 404, 'Rol no encontrado');
     }
 
     await role.destroy();
-    res.status(200).json({ message: 'Rol eliminado correctamente' });
+    
+    const response: RoleResponse = {
+      status: 200,
+      message: 'Rol eliminado exitosamente'
+    };
+
+    res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ message: 'Error al eliminar el rol', error });
+    handleError(res, 500, 'Error al eliminar el rol', error);
   }
 };

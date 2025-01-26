@@ -1,40 +1,103 @@
-// Sincronización (sync.ts)
+import sequelize from './infrastructure/database/db';
+import Permission from './modules/role/Permission';
 import Role from './modules/role/Role';
-import Permission from './modules/role/Permission'
-import RolePermission from './modules/role/RolePermission';
 import User from './modules/user/User';
 import Admin from './modules/admin/Admin';
-import Course from './modules/course/Course';
-import Section from './modules/section/Section';
-import Content from './modules/content/Content';
-import HeaderSection from './modules/headerSection/HeaderSection';
+import { setupAssociations } from './modules/role/associations';
+
+const colors = {
+  green: '\x1b[32m',
+  cyan: '\x1b[36m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  reset: '\x1b[0m'
+};
 
 async function syncDb() {
   try {
-    // Sincroniza la tabla Permissions sin borrar
-    await Permission.sync({ alter: true });
-    console.log('Tabla Permissions sincronizada');
+    console.log(`${colors.cyan}🛠  Iniciando sincronización...${colors.reset}`);
 
-    // Sincroniza la tabla Roles sin borrar
-    await Role.sync({ alter: true });
-    console.log('Tabla Roles sincronizada');
+    // 1. Configurar relaciones primero
+    console.log(`${colors.cyan}🔗 Estableciendo relaciones...${colors.reset}`);
+    setupAssociations();
 
-    // Sincroniza la tabla RolePermission sin borrar
-    await RolePermission.sync({ alter: true });
-    console.log('Tabla RolePermission sincronizada');
+    // 2. Sincronizar estructura de BD
+    console.log(`${colors.cyan}🔨 Creando estructura...${colors.reset}`);
+    await sequelize.sync({
+      force: true,
+      logging: (sql) => console.log(`${colors.cyan}⚡ ${sql}${colors.reset}`),
+      hooks: true
+    });
 
-    // Sincroniza las demás tablas sin borrar
-    await User.sync({ alter: true });
-    console.log('Tabla Users sincronizada');
+    // 3. Poblar datos iniciales
+    console.log(`${colors.cyan}🌱 Sembrando datos base...${colors.reset}`);
+    await seedCoreData();
 
-    // Sincroniza la tabla Admin sin borrar
-    await Admin.sync({ alter: true });
-    console.log('Tabla Admin sincronizada');
+    console.log(`${colors.green}✅ Sistema listo!${colors.reset}`);
+    console.log(`${colors.cyan}📦 Tablas creadas:
+      ├─ ${Permission.permisosIniciales.length} Permisos
+      ├─ ${Role.initialRoles.length} Roles
+      ├─ Usuarios
+      └─ Administradores${colors.reset}`);
 
-    console.log('Tablas sincronizadas correctamente');
   } catch (error) {
-    console.error('Error sincronizando la base de datos:', error);
+    handleSyncError(error);
   }
+}
+
+async function seedCoreData() {
+  // 1. Crear permisos
+  await Permission.bulkCreate(Permission.permisosIniciales, {
+    updateOnDuplicate: ['description']
+  });
+
+  // 2. Crear roles y asignar permisos
+  const createdRoles = await Promise.all(
+    Role.initialRoles.map(async (roleData) => {
+      const role = await Role.create(roleData);
+      const permissions = await Permission.findAll({
+        where: { name: roleData.permissions }
+      });
+      for (const permission of permissions) {
+          await role.addPermission(permission);
+      }
+      return role;
+    })
+  );
+
+  // 3. Crear superadmin
+  const superadmin = createdRoles.find(r => r.name === 'superadmin');
+  if (!superadmin) throw new Error('Rol superadmin no existe');
+
+  const [adminUser] = await User.upsert({
+    email: 'admin@devsproject.com',
+    name: 'Administrador Principal',
+    password: 'Temporal123!',
+    roleId: superadmin.id,
+    registrationIp: '127.0.0.1',
+    lastLoginIp: '127.0.0.1'
+  });
+
+  await Admin.upsert({
+    userId: adminUser.id,
+    name: adminUser.name,
+    isSuperAdmin: true,
+    permissions: ['*'],
+    admin_since: new Date()
+  });
+}
+
+function handleSyncError(error: unknown) {
+  console.error(`\n${colors.red}⛔ Error durante la sincronización:${colors.reset}`);
+  
+  if (error instanceof Error) {
+    console.error(`${colors.yellow}📄 ${error.message}${colors.reset}`);
+    console.error(`${colors.red}🔍 Stack: ${error.stack}${colors.reset}`);
+  } else {
+    console.error(`${colors.red}⚠️  Error desconocido:`, error);
+  }
+  
+  process.exit(1);
 }
 
 syncDb();

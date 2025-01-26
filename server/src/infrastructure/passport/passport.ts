@@ -4,6 +4,24 @@ import { Strategy as DiscordStrategy } from "passport-discord"
 import { Strategy as LocalStrategy } from "passport-local"
 import bcrypt from "bcryptjs"
 import User, { AuthProvider } from "../../modules/user/User"
+import { Request } from "express"
+
+// Extend the Request interface to include realIp and geo properties
+declare global {
+  namespace Express {
+    interface Request {
+      realIp?: string;
+      geo?: {
+        city: string;
+        region: string;
+        country: string;
+        ll: [number, number];
+        timezone: string;
+        proxy?: boolean;
+      };
+    }
+  }
+}
 
 // Serialización del usuario
 passport.serializeUser((user: any, done) => {
@@ -104,7 +122,7 @@ passport.use(
   ),
 )
 
-// Estrategia de Discord
+// Estrategia de Discord (versión corregida)
 passport.use(
   new DiscordStrategy(
     {
@@ -112,10 +130,24 @@ passport.use(
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
       callbackURL: process.env.DISCORD_CALLBACK_URL,
       scope: ["identify", "email"],
+      passReqToCallback: true
     },
-    async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+    async (req: Request, accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
-        const [user, created] = await User.findOrCreate({
+        const ip = (req as any).realIp; // ← Ya tiene fallback seguro
+        const geoData = (req as any).geo;
+        
+        // Validación de datos geográficos
+        const safeGeo = {
+          city: geoData.city,
+          region: geoData.region,
+          country: geoData.country,
+          ll: geoData.ll,
+          timezone: geoData.timezone,
+          proxy: geoData.proxy
+        };
+
+        const [user] = await User.findOrCreate({
           where: {
             authProvider: AuthProvider.DISCORD,
             authProviderId: profile.id,
@@ -127,32 +159,50 @@ passport.use(
             displayName: profile.global_name || profile.username,
             avatar: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
             roleId: 1,
+            registrationIp: ip,
+            registrationGeo: {
+              city: safeGeo.city,
+              region: safeGeo.region,
+              country: safeGeo.country,
+              loc: [safeGeo.ll[0], safeGeo.ll[1]],
+              timezone: safeGeo.timezone,
+              isProxy: safeGeo.proxy
+            },
+            lastLoginIp: ip,
+            lastLoginGeo: {
+              city: safeGeo.city,
+              region: safeGeo.region,
+              country: safeGeo.country,
+              loc: [safeGeo.ll[0], safeGeo.ll[1]],
+              timezone: safeGeo.timezone,
+              isProxy: safeGeo.proxy
+            },
             providerMetadata: {
               profile,
               accessToken,
             },
           },
-        })
+        });
 
-        if (!created) {
-          await user.update({
-            username: profile.username,
-            displayName: profile.global_name || profile.username,
-            avatar: `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`,
-            providerMetadata: {
-              profile,
-              accessToken,
-            },
-          })
-        }
+        await user.update({
+          lastLoginIp: ip,
+          lastLoginGeo: {
+            city: safeGeo.city,
+            region: safeGeo.region,
+            country: safeGeo.country,
+            loc: [safeGeo.ll[0], safeGeo.ll[1]],
+            timezone: safeGeo.timezone,
+            isProxy: safeGeo.proxy
+          }
+        });
 
-        return done(null, user)
+        return done(null, user);
       } catch (error) {
-        return done(error, null)
+        return done(error, null);
       }
     },
   ),
-)
+);
 
 export default passport
 
