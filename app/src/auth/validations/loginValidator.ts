@@ -11,12 +11,14 @@ export const loginSchema = z.object({
         "Por favor, introduce una dirección de correo electrónico válida.",
     }),
 
-  password: z.string().min(1, {
-    message: "Este campo no puede estar vacío",
-  }).
-  min(8, {
-    message: "La contraseña debe tener al menos 8 caracteres",
-  })
+  password: z
+    .string()
+    .min(1, {
+      message: "Este campo no puede estar vacío",
+    })
+    .min(8, {
+      message: "La contraseña debe tener al menos 8 caracteres",
+    }),
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
