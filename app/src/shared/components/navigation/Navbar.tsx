@@ -57,12 +57,12 @@ export default function Navbar() {
           
           {/* Botones de autenticación (desktop) */}
           <div className="hidden md:flex items-center space-x-2">
-            <AuthButton variant="secondary">
-              Iniciar Sesión
-            </AuthButton>
-            <AuthButton variant="primary">
-              Registrarse
-            </AuthButton>
+            <AuthButton variant="secondary" href='/login'> 
+                Iniciar Sesión
+              </AuthButton>
+              <AuthButton variant="primary" href='/register'>
+                Registrarse
+              </AuthButton>
           </div>
           
           {/* Botón de menú móvil */}
@@ -107,10 +107,10 @@ export default function Navbar() {
           </div>
           <div className="pt-4 pb-3 border-t border-blue-800">
             <div className="flex items-center justify-center space-x-2 px-5">
-              <AuthButton variant="secondary" fullWidth>
+              <AuthButton variant="secondary" fullWidth href='/login'> 
                 Iniciar Sesión
               </AuthButton>
-              <AuthButton variant="primary" fullWidth>
+              <AuthButton variant="primary" fullWidth href='/register'>
                 Registrarse
               </AuthButton>
             </div>
