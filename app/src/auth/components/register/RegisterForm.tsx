@@ -1,11 +1,10 @@
 import React from "react";
-import { useState } from "react";
-
+import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../validations/registerValidator";
+import { useAuth } from '../../contexts/AuthContext';
 
-/* Importaciones de los inputs */
 import CustomInput from "../inputs/CustomInput";
 import TelInput from "../inputs/TelInput";
 import PasswordInput from "../inputs/PasswordInputs";
@@ -21,21 +20,43 @@ type Inputs = {
 };
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
+  const { register: registerUser } = useAuth();
+
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(registerSchema),
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data: Inputs) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
+    try {
+      await registerUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        username: data.name.toLowerCase().replace(/\s+/g, '_'), // Crear username a partir del nombre
+      });
+      navigate('/'); // Redirigir al inicio después del registro exitoso
+    } catch (err: any) {
+      setError('root', {
+        type: 'manual',
+        message: err.response?.data?.message || 'Error al registrarse'
+      });
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {errors.root && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+          {errors.root.message}
+        </div>
+      )}
+
       <CustomInput
         name="name"
         type="text"

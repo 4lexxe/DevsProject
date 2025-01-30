@@ -27,10 +27,10 @@ const menuItems = {
 }
 
 const socialLinks: (SocialLink & { color: string })[] = [
-  { icon: faDiscord, href: "#", label: "Discord", isFontAwesome: true, color: "#5865F2" },
-  { icon: faWhatsapp, href: "#", label: "WhatsApp", isFontAwesome: true, color: "#25D366" },
+  { icon: faDiscord, href: "#", label: "Discord", isFontAwesome: true, color: "#171515" },
+  { icon: faWhatsapp, href: "#", label: "WhatsApp", isFontAwesome: true, color: "#171515" },
   { icon: Github, href: "#", label: "GitHub", isFontAwesome: false, color: "#171515" },
-  { icon: Youtube, href: "#", label: "YouTube", isFontAwesome: false, color: "#FF0000" },
+  { icon: Youtube, href: "#", label: "YouTube", isFontAwesome: false, color: "#171515" },
 ]
 
 export default function Footer() {

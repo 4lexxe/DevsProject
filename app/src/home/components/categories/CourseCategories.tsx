@@ -1,50 +1,50 @@
-import { GraduationCap } from 'lucide-react'
-import CategoryCard from './CategoryCard'
+import { GraduationCap, Globe, Smartphone, Settings, RefreshCw, Database, Cpu } from 'lucide-react';
+import CategoryCard from './CategoryCard';
 
 const categories = [
   {
     id: 1,
     name: 'Desarrollo Web',
-    icon: '🌐',
+    icon: <Globe className="w-6 h-6 text-blue-600" />, // Ícono de globo
     count: 24,
     color: '#E5F6FF'
   },
   {
     id: 2,
     name: 'Móvil',
-    icon: '📱',
+    icon: <Smartphone className="w-6 h-6 text-blue-600" />, // Ícono de smartphone
     count: 18,
     color: '#F0F7FF'
   },
   {
     id: 3,
     name: 'Backend',
-    icon: '⚙️',
+    icon: <Settings className="w-6 h-6 text-blue-600" />, // Ícono de ajustes
     count: 16,
     color: '#F5F8FF'
   },
   {
     id: 4,
     name: 'DevOps',
-    icon: '🔄',
+    icon: <RefreshCw className="w-6 h-6 text-blue-600" />, // Ícono de recargar
     count: 12,
     color: '#F8F9FF'
   },
   {
     id: 5,
     name: 'Bases de Datos',
-    icon: '💾',
+    icon: <Database className="w-6 h-6 text-blue-600" />, // Ícono de base de datos
     count: 10,
     color: '#E5F6FF'
   },
   {
     id: 6,
     name: 'IA & ML',
-    icon: '🤖',
+    icon: <Cpu className="w-6 h-6 text-blue-600" />, // Ícono de CPU
     count: 8,
     color: '#F0F7FF'
   }
-]
+];
 
 export default function CourseCategories() {
   return (
@@ -64,5 +64,5 @@ export default function CourseCategories() {
         </div>
       </div>
     </section>
-  )
+  );
 }
