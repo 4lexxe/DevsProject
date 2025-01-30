@@ -12,7 +12,7 @@ RolePermission.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
-        model: 'roles',
+        model: 'Roles',
         key: 'id'
       },
       onDelete: 'CASCADE'
@@ -21,7 +21,7 @@ RolePermission.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       references: {
-        model: 'permissions',
+        model: 'Permissions',
         key: 'id'
       },
       onDelete: 'CASCADE'
@@ -30,11 +30,15 @@ RolePermission.init(
   {
     sequelize,
     modelName: 'RolePermission',
-    tableName: 'role_permissions',
-    timestamps: false
+    tableName: 'RolePermissions',
+    timestamps: false,
+    indexes: [
+      {
+        unique: true,
+        fields: ['roleId', 'permissionId']
+      }
+    ]
   }
 );
-
-// Quitar TODAS las relaciones de este archivo
 
 export default RolePermission;

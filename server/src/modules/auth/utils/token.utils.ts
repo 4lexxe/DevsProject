@@ -3,7 +3,7 @@ import { Request } from "express";
 import User from "../../user/User";
 import { registerToken, userTokens } from "../../../shared/middleware/authMiddleware";
 import { GeoUtils } from "./geo.utils";
-import { TokenSession } from "../../../shared/types/auth.types"; // Importar la interfaz
+import { TokenSession } from "../../../shared/types/auth.types";
 
 export class TokenUtils {
   static generateToken(user: User): string {

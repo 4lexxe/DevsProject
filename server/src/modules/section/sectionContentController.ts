@@ -1,34 +1,38 @@
 import { Request, Response, RequestHandler } from 'express';
 import Section from '../section/Section';  // Modelo de sección
 import Course from '../course/Course';  // Relación con el curso
+import { authMiddleware } from '../../shared/middleware/authMiddleware';
 
-// Crear una sección
-export const createSection: RequestHandler = async (req, res) => {
-  const { title, description, courseId, moduleType, coverImage } = req.body;
+// Crear una sección (requiere autenticación)
+export const createSection: RequestHandler[] = [
+  authMiddleware,
+  async (req, res) => {
+    const { title, description, courseId, moduleType, coverImage } = req.body;
 
-  try {
-    const course = await Course.findByPk(courseId);
-    if (!course) {
-      res.status(404).json({ message: 'Curso no encontrado' });
-      return;
+    try {
+      const course = await Course.findByPk(courseId);
+      if (!course) {
+        res.status(404).json({ message: 'Curso no encontrado' });
+        return;
+      }
+
+      const section = await Section.create({
+        title,
+        description,
+        courseId,
+        moduleType,
+        coverImage,
+      });
+
+      res.status(201).json(section);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error creando la sección' });
     }
-
-    const section = await Section.create({
-      title,
-      description,
-      courseId,
-      moduleType,  // Nuevo atributo: tipo de módulo
-      coverImage,  // Nuevo atributo: portada de la sección
-    });
-
-    res.status(201).json(section);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error creando la sección' });
   }
-};
+];
 
-// Obtener todas las secciones de un curso, junto con el número de módulos
+// Obtener todas las secciones de un curso (SIN autenticación)
 export const getSectionsByCourse: RequestHandler = async (req, res) => {
   const { courseId } = req.params;
 
@@ -58,7 +62,7 @@ export const getSectionsByCourse: RequestHandler = async (req, res) => {
   }
 };
 
-// Obtener una sección por ID
+// Obtener una sección por ID (SIN autenticación)
 export const getSectionById: RequestHandler = async (req, res) => {
   const { id } = req.params;
 
@@ -76,48 +80,54 @@ export const getSectionById: RequestHandler = async (req, res) => {
   }
 };
 
-// Actualizar una sección
-export const updateSection: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const { title, description, courseId, moduleType, coverImage } = req.body;
+// Actualizar una sección (requiere autenticación)
+export const updateSection: RequestHandler[] = [
+  authMiddleware,
+  async (req, res) => {
+    const { id } = req.params;
+    const { title, description, courseId, moduleType, coverImage } = req.body;
 
-  try {
-    const section = await Section.findByPk(id);
-    if (!section) {
-      res.status(404).json({ message: 'Sección no encontrada' });
-      return;
+    try {
+      const section = await Section.findByPk(id);
+      if (!section) {
+        res.status(404).json({ message: 'Sección no encontrada' });
+        return;
+      }
+
+      section.title = title;
+      section.description = description;
+      section.courseId = courseId;
+      section.moduleType = moduleType;
+      section.coverImage = coverImage;
+
+      await section.save();
+      
+      res.status(200).json(section);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error actualizando la sección' });
     }
-
-    section.title = title;
-    section.description = description;
-    section.courseId = courseId;
-    section.moduleType = moduleType;  // Nuevo atributo: tipo de módulo
-    section.coverImage = coverImage;  // Nuevo atributo: portada de la sección
-
-    await section.save();
-    
-    res.status(200).json(section);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error actualizando la sección' });
   }
-};
+];
 
-// Eliminar una sección
-export const deleteSection: RequestHandler = async (req, res) => {
-  const { id } = req.params;
+// Eliminar una sección (requiere autenticación)
+export const deleteSection: RequestHandler[] = [
+  authMiddleware,
+  async (req, res) => {
+    const { id } = req.params;
 
-  try {
-    const section = await Section.findByPk(id);
-    if (!section) {
-      res.status(404).json({ message: 'Sección no encontrada' });
-      return;
+    try {
+      const section = await Section.findByPk(id);
+      if (!section) {
+        res.status(404).json({ message: 'Sección no encontrada' });
+        return;
+      }
+
+      await section.destroy();
+      res.status(200).json({ message: 'Sección eliminada' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error eliminando la sección' });
     }
-
-    await section.destroy();
-    res.status(200).json({ message: 'Sección eliminada' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error eliminando la sección' });
   }
-};
+];

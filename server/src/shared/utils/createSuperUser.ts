@@ -21,6 +21,7 @@ export async function createSuperUser(
     const [superAdminRole] = await Role.findOrCreate({
       where: { name: "superadmin" },
       defaults: {
+        name: "superadmin",
         description: "Super administrador con acceso completo",
       },
       transaction: t,

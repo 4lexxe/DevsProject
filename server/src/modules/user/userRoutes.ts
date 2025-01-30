@@ -3,40 +3,39 @@ import { Router } from 'express';
 import { UserController } from '../user/userController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
-import { RequestHandler } from 'express';
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware'; // Importa el middleware de permisos
 
 const router = Router();
 
-// Middlewares
+// Middleware de autenticación
 router.use(authMiddleware);
 router.use(geoMiddleware);
 
 // Configuración de rutas
+
+// Obtener la lista de usuarios (requiere permisos de 'read:users')
 router.get('/users', 
-  UserController.getUsers as RequestHandler
+  permissionsMiddleware(['read:users']),  // Verificar permisos
+  UserController.getUsers
 );
 
+// Obtener los detalles de seguridad de un usuario (requiere permisos de 'view:security_details')
 router.get('/users/:id/security',
-  ((
-    req: import('express').Request,
-    res: import('express').Response,
-    next: import('express').NextFunction
-  ) => {
-    if (!req.user?.hasPermission('VIEW_SECURITY_DETAILS')) {
-      return res.status(403).json({ error: 'No autorizado' });
-    }
-    next();
-  }) as RequestHandler,
-  UserController.getUserSecurityDetails as RequestHandler
+  permissionsMiddleware(['view:security_details']),  // Verificar permisos
+  UserController.getUserSecurityDetails
 );
 
-router.put('/users/:id',
-  ...(UserController.userValidations as RequestHandler[]),
-  UserController.updateUser as RequestHandler
+// Actualizar un usuario (requiere permisos de 'manage:users')
+router.put('/users/:id', 
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  ...UserController.userValidations, 
+  UserController.updateUser
 );
 
-router.delete('/users/:id',
-  UserController.deleteUser as RequestHandler
+// Eliminar un usuario (requiere permisos de 'manage:users')
+router.delete('/users/:id', 
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  UserController.deleteUser
 );
 
 export default router;

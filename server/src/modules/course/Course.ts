@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../../infrastructure/database/db';
 import Admin from '../admin/Admin'; // Relación con Admin
 
+// Modelo de Course
 class Course extends Model {
   public id!: number;
   public title!: string;
@@ -10,7 +11,7 @@ class Course extends Model {
   public category!: string;
   public about!: string;
   public relatedCareerType!: string;
-  public learningOutcomes!: string[];
+  public learningOutcomes!: string[]; // Array de string para los resultados de aprendizaje
   public isActive!: boolean;
   public isInDevelopment!: boolean;
   public adminId!: number;

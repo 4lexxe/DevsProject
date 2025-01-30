@@ -11,6 +11,11 @@ import userRoutes from './modules/user/userRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
 import roleRoutes from './modules/role/roleRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
+import courseRoutes from './modules/course/courseRoutes';
+import sectionRoutes from './modules/section/sectionRoutes';
+import contentRoutes from './modules/content/contentRoutes';
+import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
+
 import geoip from 'geoip-lite';
 import { Request } from 'express';
 
@@ -27,14 +32,13 @@ const PORT = process.env.PORT || 3000;
 
 // Configuración inicial de seguridad y middleware
 app.set('trust proxy', true);
-app.use(helmet());
+app.use(helmet()); // Seguridad de cabeceras HTTP
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For']
 }));
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -129,10 +133,17 @@ app.use((req, res, next) => {
 });
 
 // Sistema de rutas
+// Rutas protegidas por autenticación
 app.use('/api/auth', apiLimiter, authRoutes);
-app.use('/api', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
+
+// Rutas públicas
+app.use('/api', courseRoutes);
+app.use('/api', sectionRoutes);
+app.use('/api', contentRoutes);
+app.use('/api', HeaderSectionRoutes);
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {
@@ -179,6 +190,8 @@ app.listen(PORT, () => {
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Configuración de geolocalización:', GeoUtils.checkServiceStatus());
 });
+
+// Función para obtener la IP válida del request
 function getValidIP(req: Request): string | undefined {
   const forwardedFor = req.headers['x-forwarded-for'];
   if (typeof forwardedFor === 'string') {

@@ -1,6 +1,6 @@
 import { Sequelize, DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
-import Role from "./../role/Role";
+import Role from "../role/Role";
 import Permission from "../role/Permission";
 
 export enum AuthProvider {
@@ -22,6 +22,7 @@ class User extends Model {
   public email!: string | null;
   public password!: string | null;
   public phone!: string | null;
+  
   public roleId!: number;
   public authProvider!: AuthProvider;
   public authProviderId!: string | null;
@@ -113,7 +114,7 @@ User.init(
     roleId: {
       type: DataTypes.INTEGER,
       references: {
-        model: "roles",
+        model: "Roles",
         key: "id",
       },
       allowNull: false,
@@ -178,6 +179,7 @@ User.init(
   {
     sequelize,
     modelName: "User",
+    tableName: "Users",
     indexes: [
       { fields: ["roleId"] },
       { unique: true, fields: ["authProvider", "authProviderId"] },
@@ -203,14 +205,5 @@ Role.hasMany(User, {
   foreignKey: "roleId",
   as: 'Users'
 });
-
-// Extensión de tipos para Express
-declare global {
-  namespace Express {
-    interface User {
-      hasPermission(permissionName: string): Promise<boolean>;
-    }
-  }
-}
 
 export default User;

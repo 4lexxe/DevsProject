@@ -1,8 +1,11 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../modules/user/User";
 import Role from "../../modules/role/Role";
 import { GeoUtils } from "../../modules/auth/utils/geo.utils"; // Importar GeoUtils
+import Course from "../../modules/course/Course"; // Importar Course
+import Admin from "../../modules/admin/Admin"; // Importar Admin
+import Section from "../../modules/section/Section"; // Importar Section
 
 declare global {
   namespace Express {

@@ -1,8 +1,12 @@
 import User from '../user/User';
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware'; // Importar el middleware de permisos
 
 class UserService {
-  static async createUser(name: string, email: string, password: string, phone: string, roleId: number) {
+  static async createUser(name: string, email: string, password: string, phone: string, roleId: number, requiredPermissions: string[]) {
     try {
+      // Verificar permisos antes de proceder
+      await permissionsMiddleware(requiredPermissions);
+
       const user = await User.create({ name, email, password, phone, roleId });
       return user;
     } catch (error) {
@@ -14,8 +18,11 @@ class UserService {
     }
   }
 
-  static async getUsers() {
+  static async getUsers(requiredPermissions: string[]) {
     try {
+      // Verificar permisos antes de proceder
+      await permissionsMiddleware(requiredPermissions);
+
       const users = await User.findAll();
       return users;
     } catch (error) {
@@ -27,9 +34,11 @@ class UserService {
     }
   }
 
- // Eliminar un usuario
-  static async deleteUser(id: number) {
+  static async deleteUser(id: number, requiredPermissions: string[]) {
     try {
+      // Verificar permisos antes de proceder
+      await permissionsMiddleware(requiredPermissions);
+
       const user = await User.findByPk(id);
       if (!user) {
         return null; // Si no existe el usuario
@@ -45,8 +54,11 @@ class UserService {
     }
   }
 
-  static async updateUser(id: number, name: string, email: string, password: string, phone: string, roleId: number) {
+  static async updateUser(id: number, name: string, email: string, password: string, phone: string, roleId: number, requiredPermissions: string[]) {
     try {
+      // Verificar permisos antes de proceder
+      await permissionsMiddleware(requiredPermissions);
+
       const user = await User.findByPk(id);
       if (!user) {
         return null; // Si no existe el usuario

@@ -1,103 +1,70 @@
-import sequelize from './infrastructure/database/db';
-import Permission from './modules/role/Permission';
 import Role from './modules/role/Role';
+import { rolesIniciales } from './modules/role/Role';
+import Permission from './modules/role/Permission';
+import RolePermission from './modules/role/RolePermission';
 import User from './modules/user/User';
 import Admin from './modules/admin/Admin';
-import { setupAssociations } from './modules/role/associations';
+import Course from './modules/course/Course';
+import Section from './modules/section/Section';
+import Content from './modules/content/Content';
+import SectionHeader from './modules/headerSection/HeaderSection';
 
-const colors = {
-  green: '\x1b[32m',
-  cyan: '\x1b[36m',
-  red: '\x1b[31m',
-  yellow: '\x1b[33m',
-  reset: '\x1b[0m'
-};
+import sequelize from './infrastructure/database/db';
 
-async function syncDb() {
+// sync.ts
+async function syncDatabase() {
   try {
-    console.log(`${colors.cyan}🛠  Iniciando sincronización...${colors.reset}`);
+    await sequelize.authenticate();
 
-    // 1. Configurar relaciones primero
-    console.log(`${colors.cyan}🔗 Estableciendo relaciones...${colors.reset}`);
-    setupAssociations();
+    // Orden CORREGIDO
+    await Permission.sync({ force: true });
+    await Role.sync({ force: true });
+    await RolePermission.sync({ force: true }); // ¡Primero debe existir esta tabla!
 
-    // 2. Sincronizar estructura de BD
-    console.log(`${colors.cyan}🔨 Creando estructura...${colors.reset}`);
-    await sequelize.sync({
-      force: true,
-      logging: (sql) => console.log(`${colors.cyan}⚡ ${sql}${colors.reset}`),
-      hooks: true
+    // Poblar datos DESPUÉS de crear todas las tablas
+    await seedInitialData();
+
+    await User.sync({ force: true });
+
+    await Admin.sync({ force: true });
+
+    await Course.sync({ force: true });
+
+    await Section.sync({ force: true });
+
+    await Content.sync({ force: true });
+
+    await SectionHeader.sync({ force: true });
+    
+    console.log('¡Sincronización exitosa!');
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    await sequelize.close();
+  }
+}
+
+async function seedInitialData() {
+  for (const roleData of rolesIniciales) {
+    const [role] = await Role.findOrCreate({
+      where: { name: roleData.name },
+      defaults: { 
+        name: roleData.name, 
+        description: roleData.description 
+      },
     });
 
-    // 3. Poblar datos iniciales
-    console.log(`${colors.cyan}🌱 Sembrando datos base...${colors.reset}`);
-    await seedCoreData();
+    const permissions = await Permission.findAll({
+      where: { name: roleData.permissions }
+    });
 
-    console.log(`${colors.green}✅ Sistema listo!${colors.reset}`);
-    console.log(`${colors.cyan}📦 Tablas creadas:
-      ├─ ${Permission.permisosIniciales.length} Permisos
-      ├─ ${Role.initialRoles.length} Roles
-      ├─ Usuarios
-      └─ Administradores${colors.reset}`);
-
-  } catch (error) {
-    handleSyncError(error);
+    // Modificar esta parte
+    if (permissions.length > 0) {
+      await Promise.all(permissions.map(async (permission) => {
+        await role.addPermission(permission);
+      }));
+    }
   }
 }
 
-async function seedCoreData() {
-  // 1. Crear permisos
-  await Permission.bulkCreate(Permission.permisosIniciales, {
-    updateOnDuplicate: ['description']
-  });
-
-  // 2. Crear roles y asignar permisos
-  const createdRoles = await Promise.all(
-    Role.initialRoles.map(async (roleData) => {
-      const role = await Role.create(roleData);
-      const permissions = await Permission.findAll({
-        where: { name: roleData.permissions }
-      });
-      for (const permission of permissions) {
-          await role.addPermission(permission);
-      }
-      return role;
-    })
-  );
-
-  // 3. Crear superadmin
-  const superadmin = createdRoles.find(r => r.name === 'superadmin');
-  if (!superadmin) throw new Error('Rol superadmin no existe');
-
-  const [adminUser] = await User.upsert({
-    email: 'admin@devsproject.com',
-    name: 'Administrador Principal',
-    password: 'Temporal123!',
-    roleId: superadmin.id,
-    registrationIp: '127.0.0.1',
-    lastLoginIp: '127.0.0.1'
-  });
-
-  await Admin.upsert({
-    userId: adminUser.id,
-    name: adminUser.name,
-    isSuperAdmin: true,
-    permissions: ['*'],
-    admin_since: new Date()
-  });
-}
-
-function handleSyncError(error: unknown) {
-  console.error(`\n${colors.red}⛔ Error durante la sincronización:${colors.reset}`);
-  
-  if (error instanceof Error) {
-    console.error(`${colors.yellow}📄 ${error.message}${colors.reset}`);
-    console.error(`${colors.red}🔍 Stack: ${error.stack}${colors.reset}`);
-  } else {
-    console.error(`${colors.red}⚠️  Error desconocido:`, error);
-  }
-  
-  process.exit(1);
-}
-
-syncDb();
+syncDatabase();
