@@ -4,6 +4,8 @@ import CourseCategories from './components/categories/CourseCategories';
 import { ComingSoon } from './components/coming-soon/ComingSoon'; 
 
 import LatestCourses from './components/courses/LatestCourses'; 
+import DevsSection from './components/developers/CollaboratorsSection';
+import CollaboratorsSection from './components/developers/CollaboratorsSection';
 
 export default function Home() {
   return (
@@ -19,6 +21,7 @@ export default function Home() {
         <CourseCategories />
         <LatestCourses />
         <ComingSoon />
+        <CollaboratorsSection />
       </section>
     </main>
   );
