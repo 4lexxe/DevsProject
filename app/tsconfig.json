@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
 
     /* Configuracion de alias */
     "baseUrl": "./",
