@@ -27,12 +27,17 @@ export class AuthController {
     DiscordController.auth(req, res, next);
   };
 
-static discordCallback = (req: Request, res: Response, next: NextFunction) => {
-  DiscordController.callback(req, res);
-};
+  static discordCallback = (req: Request, res: Response, next: NextFunction) => {
+    DiscordController.callback(req, res);
+  };
 
-  static githubAuth = GitHubController.auth;
-  static githubCallback = GitHubController.callback;
+  static githubAuth = (req: Request, res: Response, next: NextFunction) => {
+    GitHubController.auth(req, res, next);
+  };
+
+  static githubCallback = (req: Request, res: Response, next: NextFunction) => {
+    GitHubController.callback(req, res);
+  };
 
   // Session management
   static getActiveSessions = SessionController.getActiveSessions;
