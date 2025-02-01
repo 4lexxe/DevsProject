@@ -12,14 +12,17 @@ import { TokenUtils } from "../utils/token.utils";
 export class RegisterController {
   static async handle(req: Request, res: Response): Promise<void> {
     try {
+      // Verificar si hay errores de validación
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
         return;
       }
 
-      const { email, password, name, username, roleId } = req.body;
+      // Obtener los datos del cuerpo de la solicitud
+      const { email, password, name, username } = req.body;
 
+      // Verificar si el correo ya está registrado
       const existingUser = await User.findOne({
         where: {
           email,
@@ -32,6 +35,7 @@ export class RegisterController {
         return;
       }
 
+      // Hashear la contraseña
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -41,17 +45,19 @@ export class RegisterController {
         name,
         username,
         authProvider: AuthProvider.LOCAL,
-        roleId: roleId || 1,
+        roleId: 1,
       });
 
+      // Generar la respuesta de autenticación con un token
       const authResponse = TokenUtils.getAuthResponse(user, req);
 
+      // Responder con el mensaje de éxito y los tokens de autenticación
       res.status(201).json({
         message: "Usuario registrado correctamente",
         ...authResponse,
       });
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Error de registro:", error);
       res.status(500).json({ error: "Error en el registro" });
     }
   }

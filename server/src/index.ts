@@ -43,56 +43,24 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Middleware para detectar velocidad de solicitudes
-interface RequestTimes {
-  [key: string]: number[];
-}
-
-declare global {
-  var requestTimes: RequestTimes;
-}
-
-interface TooManyRequestsResponse {
-  error: string;
-  ip: string;
-  timestamp: string;
-}
-
-const requestSpeedLimiter = (
-  req: express.Request,
-  res: express.Response<TooManyRequestsResponse>,
-  next: express.NextFunction
-): void | express.Response<TooManyRequestsResponse> => {
-  const ip: string = GeoUtils.getValidIP(req) || '127.0.0.1';
-  const now: number = Date.now();
-
-  if (!global.requestTimes) {
-    global.requestTimes = {};
-  }
-
-  if (!global.requestTimes[ip]) {
-    global.requestTimes[ip] = [];
-  }
-
-  // Registrar la hora de la solicitud actual
-  global.requestTimes[ip].push(now);
-
-  // Mantener solo las solicitudes dentro de la ventana de tiempo (por ejemplo, 1 minuto)
-  global.requestTimes[ip] = global.requestTimes[ip].filter(time => now - time < 60 * 1000);
-
-  // Verificar la velocidad de las solicitudes (por ejemplo, más de 10 solicitudes en 1 segundo)
-  const recentRequests: number[] = global.requestTimes[ip].filter(time => now - time < 1000);
-  if (recentRequests.length > 10) {
-    return res.status(429).json({
+// Rate limiting con validación reforzada
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    const ip = GeoUtils.getValidIP(req);
+    return ip || '127.0.0.1';
+  },
+  handler: (req, res) => {
+    res.status(429).json({
       error: 'Too many requests',
-      ip,
+      ip: getValidIP(req),
       timestamp: new Date().toISOString()
     });
   }
-  next();
-};
-
-app.use('*', requestSpeedLimiter as express.RequestHandler);
+});
 
 // Configuración de sesión segura
 app.use(session({
@@ -166,7 +134,7 @@ app.use((req, res, next) => {
 
 // Sistema de rutas
 // Rutas protegidas por autenticación
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', apiLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
