@@ -4,6 +4,7 @@
 
 import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
+import { VerifyController } from '../controllers/verify.controller';  // Importamos el controlador de verificación
 import { Request, Response } from 'express';
 
 const router = Router();
@@ -30,7 +31,7 @@ router.get('/github/callback', AuthController.githubCallback);
 router.get('/github/register', AuthController.githubAuth);
 
 // Otras rutas existentes
-router.get('/verify', (req: Request, res: Response) => AuthController.verifyAuth(req, res));
+router.get('/verify', (req: Request, res: Response) => VerifyController.handle(req, res));
 
 router.delete('/logout', (req: Request, res: Response) => AuthController.logout(req, res));
 

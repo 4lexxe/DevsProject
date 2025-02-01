@@ -10,9 +10,9 @@ import { userTokens } from "../../../shared/middleware/authMiddleware";
 export class VerifyController {
   static async handle(req: Request, res: Response): Promise<void> {
     if (!req.isAuthenticated()) {
-      res.status(401).json({
+      res.status(200).json({
         authenticated: false,
-        error: "No autenticado",
+        message: "Usuario no autenticado",
       });
       return;
     }
@@ -37,7 +37,7 @@ export class VerifyController {
           }
         : null;
 
-      res.json({
+      res.status(200).json({
         authenticated: true,
         user: {
           id: user.id,
@@ -65,10 +65,10 @@ export class VerifyController {
         activeSessions: sessions.length,
       });
     } catch (error) {
-      console.error("Error verifying authentication:", error);
-      res.status(500).json({
+      console.error("Error verificando autenticación:", error);
+      res.status(200).json({
         authenticated: false,
-        error: "Error verificando autenticación",
+        message: "Error verificando autenticación",
       });
     }
   }

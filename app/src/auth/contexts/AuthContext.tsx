@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import authService, { User, AuthResponse } from '../services/auth.service';
+import authService, { User } from '../services/auth.service';
 
 interface AuthContextType {
   user: User | null;
@@ -16,21 +16,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasCheckedAuth, setHasCheckedAuth] = useState(false); // Flag para verificar autenticación
 
   useEffect(() => {
-    verifyAuth();
-  }, []);
+    if (!hasCheckedAuth) {
+      verifyAuth();
+    }
+  }, [hasCheckedAuth]);
 
   const verifyAuth = async () => {
     try {
       const response = await authService.verify();
       if (response.authenticated && response.user) {
         setUser(response.user);
+      } else {
+        console.warn("Usuario no autenticado.");
       }
     } catch (err) {
-      console.error('Auth verification failed:', err);
+      console.error('Error al verificar autenticación:', err);
     } finally {
       setLoading(false);
+      setHasCheckedAuth(true); // Marcar que ya se verificó la autenticación
     }
   };
 
@@ -39,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       const response = await authService.login({ email, password });
       setUser(response.user);
+      setHasCheckedAuth(false); // Resetear el flag para verificar la autenticación después del login
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al iniciar sesión');
       throw err;
@@ -50,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
       const response = await authService.register(data);
       setUser(response.user);
+      setHasCheckedAuth(false); // Resetear el flag para verificar la autenticación después del registro
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse');
       throw err;
@@ -60,6 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await authService.logout();
       setUser(null);
+      setHasCheckedAuth(false); // Resetear el flag para verificar la autenticación después del logout
     } catch (err: any) {
       console.error('Logout error:', err);
     }
