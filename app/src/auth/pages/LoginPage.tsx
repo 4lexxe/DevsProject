@@ -1,9 +1,8 @@
-import type React from "react"
-import LoginForm from "../components/login/LoginForm"
+import type React from "react";
+import LoginForm from "../components/login/LoginForm";
+import withAuthCheck from "../hoc/WithAuthCheck";
 
-
-
-export default function LoginPage() {
+function LoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
@@ -19,6 +18,7 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
+export default withAuthCheck(LoginPage); // Envuelve la página con el HOC

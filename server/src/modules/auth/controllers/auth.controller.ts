@@ -2,7 +2,7 @@
 
 // Descripción: En este archivo se definen los controladores de autenticación y autorización, así como las rutas relacionadas con la autenticación y autorización de usuarios. Estos controladores y rutas se utilizan para manejar las operaciones de registro, inicio de sesión, verificación de autenticación, autenticación OAuth, gestión de sesiones y tokens, entre otras funcionalidades relacionadas con la autenticación y autorización de usuarios en la aplicación.
 
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import { RegisterController } from "./register.controller";
 import { LoginController } from "./login.controller";
 import { DiscordController } from "./discord.controller";
@@ -23,8 +23,14 @@ export class AuthController {
   static verifyAuth = VerifyController.handle;
 
   // OAuth methods
-  static discordAuth = DiscordController.auth;
-  static discordCallback = DiscordController.callback;
+  static discordAuth = (req: Request, res: Response, next: NextFunction) => {
+    DiscordController.auth(req, res, next);
+  };
+
+static discordCallback = (req: Request, res: Response, next: NextFunction) => {
+  DiscordController.callback(req, res);
+};
+
   static githubAuth = GitHubController.auth;
   static githubCallback = GitHubController.callback;
 
