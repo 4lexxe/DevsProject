@@ -101,7 +101,7 @@ class AuthService {
   async verify(): Promise<{ authenticated: boolean; user?: User; session?: any }> {
     try {
       const response = await axios.get(`${API_URL}/auth/verify`, {
-        withCredentials: true
+        withCredentials: true,
       });
       return response.data;
     } catch (error) {
@@ -120,7 +120,7 @@ class AuthService {
     }
   }
 
-  private setToken(token: string): void {
+  public setToken(token: string): void {
     this.token = token;
     localStorage.setItem('token', token);
     this.setAuthHeader(token);

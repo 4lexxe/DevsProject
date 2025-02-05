@@ -1,13 +1,12 @@
-import { EyeIcon, EyeOffIcon, Github } from "lucide-react"; // Importa los íconos de lucide-react
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Importa FontAwesomeIcon
-import { faDiscord } from "@fortawesome/free-brands-svg-icons"; // Importa el ícono de Discord
+import { EyeIcon, EyeOffIcon, Github } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validations/loginValidator";
-import AuthService from "../../services/auth.service"; // Importa el servicio de autenticación
-
-import CustomInput from "@/shared/components/inputs/CustomInput";
-import PasswordInput from "@/shared/components/inputs/PasswordInput";
+import AuthService from "../../services/auth.service";
+import CustomInput from "../inputs/CustomInput";
+import PasswordInput from "../inputs/PasswordInputs";
 
 type Inputs = {
   email: string;
@@ -27,18 +26,26 @@ export default function LForm() {
     try {
       const response = await AuthService.login(data);
       console.log("Login successful:", response);
-      // Redirige al usuario o maneja el estado de autenticación
+
+      // Guarda el token en el localStorage después de un inicio de sesión exitoso
+      if (response.token) {
+        AuthService.setToken(response.token); // Guarda el token
+        window.location.href = "/"; // Redirige al usuario a la página de inicio
+      }
     } catch (error) {
       console.error("Login failed:", error);
     }
   };
 
-  const handleGithubLogin = () => {
-    window.location.href = AuthService.getGithubAuthUrl();
-  };
+  const handleOAuthLogin = (url: string) => {
+    // Obtener la URL actual (desde donde se solicitó la autenticación)
+    const redirectUrl = window.location.href;
 
-  const handleDiscordLogin = () => {
-    window.location.href = AuthService.getDiscordAuthUrl();
+    // Agregar la URL de origen como parámetro en la solicitud de autenticación
+    const authUrl = `${url}?redirect=${encodeURIComponent(redirectUrl)}`;
+
+    // Redirigir al usuario a la página de autenticación
+    window.location.href = authUrl;
   };
 
   return (
@@ -68,7 +75,7 @@ export default function LForm() {
         {/* Botón de Discord */}
         <button
           type="button"
-          onClick={handleDiscordLogin}
+          onClick={() => handleOAuthLogin(AuthService.getDiscordAuthUrl())}
           className="flex items-center justify-center w-full bg-[#5865F2] text-white py-2 px-4 rounded-md hover:bg-[#4752C4] focus:outline-none focus:ring-2 focus:ring-[#5865F2] focus:ring-offset-2"
         >
           <FontAwesomeIcon icon={faDiscord} className="w-5 h-5 mr-2" />
@@ -78,7 +85,7 @@ export default function LForm() {
         {/* Botón de GitHub */}
         <button
           type="button"
-          onClick={handleGithubLogin}
+          onClick={() => handleOAuthLogin(AuthService.getGithubAuthUrl())}
           className="flex items-center justify-center w-full bg-[#171515] text-white py-2 px-4 rounded-md hover:bg-[#0D0C0C] focus:outline-none focus:ring-2 focus:ring-[#171515] focus:ring-offset-2"
         >
           <Github className="w-5 h-5 mr-2" />

@@ -21,7 +21,7 @@ type Inputs = {
 
 export default function RegisterForm() {
   const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
+  const { register: registerUser, login } = useAuth(); // Añadir la función login
 
   const {
     register,
@@ -34,13 +34,19 @@ export default function RegisterForm() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     try {
+      // Registrar al usuario
       await registerUser({
         email: data.email,
         password: data.password,
         name: data.name,
         username: data.name.toLowerCase().replace(/\s+/g, '_'), // Crear username a partir del nombre
       });
-      navigate('/'); // Redirigir al inicio después del registro exitoso
+
+      // Iniciar sesión automáticamente después del registro
+      await login(data.email, data.password);
+
+      // Redirigir al inicio después del registro y autenticación exitosos
+      navigate('/');
     } catch (err: any) {
       setError('root', {
         type: 'manual',

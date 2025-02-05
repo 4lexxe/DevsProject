@@ -2,9 +2,9 @@ import type React from "react";
 import { Link } from "react-router-dom";
 import RegisterForm from "../components/register/RegisterForm";
 import AnotherWay from "../components/register/AnotherWay";
+import withAuthCheck from "../hoc/WithAuthCheck";
 
-export default function RegisterPage() {
-  
+function RegisterPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8 mt-8 mb-8">
@@ -12,7 +12,7 @@ export default function RegisterPage() {
         
         <RegisterForm />
 
-        <AnotherWay/>
+        <AnotherWay />
 
         <p className="mt-6 text-center text-sm text-gray-600">
           ¿Ya tienes una cuenta?{" "}
@@ -27,3 +27,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+export default withAuthCheck(RegisterPage); // Envuelve la página con el HOC

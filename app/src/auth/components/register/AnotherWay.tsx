@@ -1,48 +1,17 @@
 import React from 'react';
 import { Github, Disc as Discord } from 'lucide-react';
 import authService from '../../services/auth.service';
-import { useAuth } from '../../contexts/AuthContext';
 
 function AnotherWay() {
-  const { login } = useAuth();
+  const handleOAuthLogin = (url: string) => {
+    // Obtener la URL actual (desde donde se solicitó la autenticación)
+    const redirectUrl = window.location.href;
 
-  const handleOpenPopup = (url: string) => {
-    const width = 600;
-    const height = 600;
-    const left = (window.screen.width - width) / 2;
-    const top = (window.screen.height - height) / 2;
-    
-    const popup = window.open(
-      url,
-      'OAuthPopup',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
+    // Agregar la URL de origen como parámetro en la solicitud de autenticación
+    const authUrl = `${url}?redirect=${encodeURIComponent(redirectUrl)}`;
 
-    const checkPopup = setInterval(() => {
-      if (popup?.closed) {
-        clearInterval(checkPopup);
-        // Verificar estado de autenticación y actualizar el contexto
-        interface AuthResponse {
-          authenticated: boolean;
-          user?: User | undefined;
-          session?: any;
-        }
-
-        interface User {
-          id: number;
-        }
-
-                authService.verify()
-                  .then((response: AuthResponse) => {
-                    if (response.authenticated && response.user) {
-                      window.location.href = '/';
-                    }
-                  })
-                  .catch((error: Error) => {
-                    console.error('Error verificando autenticación:', error);
-                  });
-      }
-    }, 500);
+    // Redirigir al usuario a la página de autenticación
+    window.location.href = authUrl;
   };
 
   return (
@@ -58,14 +27,14 @@ function AnotherWay() {
 
       <div className="mt-6 grid grid-cols-2 gap-4">
         <button
-          onClick={() => handleOpenPopup(authService.getGithubAuthUrl())}
+          onClick={() => handleOAuthLogin(authService.getGithubAuthUrl())}
           className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
         >
           <Github className="h-5 w-5 mr-2" />
           GitHub
         </button>
         <button
-          onClick={() => handleOpenPopup(authService.getDiscordAuthUrl())}
+          onClick={() => handleOAuthLogin(authService.getDiscordAuthUrl())}
           className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
         >
           <Discord className="h-5 w-5 mr-2" />
