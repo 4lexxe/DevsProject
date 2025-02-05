@@ -1,12 +1,12 @@
-import { EyeIcon, EyeOffIcon, Github } from "lucide-react";
+import {Github} from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validations/loginValidator";
 import AuthService from "../../services/auth.service";
-import CustomInput from "../inputs/CustomInput";
-import PasswordInput from "../inputs/PasswordInputs";
+import CustomInput from "@/shared/components/inputs/CustomInput";
+import PasswordInput from "@/shared/components/inputs/PasswordInput";
 
 type Inputs = {
   email: string;
