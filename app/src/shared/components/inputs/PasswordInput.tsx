@@ -1,45 +1,42 @@
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import type { UseFormRegister, FieldError } from "react-hook-form";
-import { useEffect } from "react";
+import type { UseFormRegister } from "react-hook-form";
 
 interface PasswordInputProps {
   name: string;
-  label?: string;
+  labelText?: string;
   placeholder?: string;
   error?: string | undefined;
   register: UseFormRegister<any>;
 }
 
-const changeStyle = (campo: string | undefined): string => {
-  return campo
-    ? "focus:ring-red-500 focus:border-red-500"
-    : "focus:ring-blue-500 focus:border-blue-500";
-};
-
 const PasswordInput: React.FC<PasswordInputProps> = ({
   name,
-  label = name,
+  labelText = "Contraseña",
   register,
   error,
+  placeholder
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div>
       <label
-        htmlFor={label}
+        htmlFor={name}
         className="block text-sm font-medium text-gray-700 mb-1"
       >
-        Contraseña
+        {labelText}
       </label>
       <div className="relative">
         <input
           id={name}
           type={showPassword ? "text" : "password"}
-          className=
-          {`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 ${changeStyle(error)}
-          `}
+          placeholder={placeholder}
+          className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+              error
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-gray-300'
+          }`}
           {...register(name)}
         />
         <button

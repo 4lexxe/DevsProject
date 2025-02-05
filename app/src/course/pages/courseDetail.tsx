@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getCourses } from '../services/courseServices';
 import { getModulesCount as fetchModulesCount } from '../services/courseServices';
-import HeroCourse from './courses/HeroCourse';
-import CourseOverview from './courses/CourseOverview';
-import LearningOutcomes from './courses/LearningOutcomes';
-import SectionList from './courses/SectionList';
+import HeroCourse from '../components/courses/HeroCourse';
+import CourseOverview from '../components/courses/CourseOverview';
+import LearningOutcomes from '../components/courses/LearningOutcomes';
+import SectionList from '../components/courses/SectionList';
 
 interface Course {
   id: number;
@@ -18,7 +18,7 @@ interface Course {
   learningOutcomes: string[];
   isActive: boolean;
   isInDevelopment: boolean;
-  adminId: number;
+  adminId: number; 
   createdAt: string;
   modules: Array<any>;
 }

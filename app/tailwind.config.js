@@ -11,5 +11,14 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/typography'),  // Para las clases 'prose'
+
+    function({ addUtilities }) {
+      const newUtilities = {
+          '.resize-none': {
+              resize: 'none',
+          },
+      }
+      addUtilities(newUtilities, ['responsive', 'hover'])
+    },
   ],
 };

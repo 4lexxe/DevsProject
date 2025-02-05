@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { EyeIcon, EyeOffIcon, Github } from "lucide-react"; // Importa los íconos de lucide-react
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Importa FontAwesomeIcon
 import { faDiscord } from "@fortawesome/free-brands-svg-icons"; // Importa el ícono de Discord
@@ -7,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validations/loginValidator";
 import AuthService from "../../services/auth.service"; // Importa el servicio de autenticación
 
-import CustomInput from "../inputs/CustomInput";
-import PasswordInput from "../inputs/PasswordInputs";
+import CustomInput from "@/shared/components/inputs/CustomInput";
+import PasswordInput from "@/shared/components/inputs/PasswordInput";
 
 type Inputs = {
   email: string;

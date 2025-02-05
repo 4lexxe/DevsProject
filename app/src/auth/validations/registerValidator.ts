@@ -15,7 +15,7 @@ export const registerSchema = z
         message:
           "Por favor, introduce una dirección de correo electrónico válida.",
       }),
-    phone: z
+    phone: z 
       .string()
       .refine((value) => {
         const phone = parsePhoneNumberFromString(value, "AR");
@@ -38,7 +38,7 @@ export const registerSchema = z
       message: "Este campo no puede estar vacío",
     }),
     acceptTerms: z.boolean().refine((val) => val === true, {
-      message: "Debes aceptar los términos y condiciones",
+      message: "Debes aceptar los términos y condiciones", 
     }),
   })
   .refine((data) => data.password === data.confirmPassword, {

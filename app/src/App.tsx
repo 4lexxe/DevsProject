@@ -8,9 +8,10 @@ import '@/styles/main.css';
 import DefaultLayout from './shared/layouts/defaultLayout';
 import Home from './home/home';
 
-import CoursesPage from './course/course';
-import CourseDetail from './course/components/courseDetail';
-import QuizPage from './course/components/QuizPage';
+import QuizPage from './course/pages/QuizPage';
+import { CoursesPage }from '@/course/index';
+import { CourseFormPage } from '@/course/index';
+import {CourseDetail} from './course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
 
@@ -27,6 +28,10 @@ function App() {
             <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+
+            <Route path='course/form' element = {<CourseFormPage/>} />
+
+            
           </Route>
         </Routes>
       </AuthProvider>

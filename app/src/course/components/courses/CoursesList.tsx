@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { getCourses } from './services/courseServices'
-import CourseListItem from './components/courses/CourseListItem'
+import { getCourses } from '../../services/courseServices'
+import CourseListItem from './CourseListItem'
 /* import { ArrowRight } from 'lucide-react' */
 
 interface Course {

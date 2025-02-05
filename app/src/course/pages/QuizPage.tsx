@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Quiz from './courses/Quiz';
-import { getContentById } from '../../course/services/contentServices';
+import Quiz from '../components/courses/Quiz';
+import { getContentById } from '../services/contentServices';
 
 interface Content {
   id: number; 

@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validations/loginValidator";
 import { useAuth } from '../../contexts/AuthContext';
 
-import CustomInput from "../inputs/CustomInput";
-import PasswordInput from "../inputs/PasswordInputs";
+import CustomInput from "@/shared/components/inputs/CustomInput";
+import PasswordInput from "@/shared/components/inputs/PasswordInput";
 
 type Inputs = {
   email: string;

@@ -12,4 +12,4 @@ export { useAuthStatus } from './hooks/useAuthStatus'; */
 /* export * from './services/authService'; */
 
 // Re-exportar tipos
-/* export * from './types/auth'; */
+/* export * from './types/auth'; */ 

@@ -5,10 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "../../validations/registerValidator";
 import { useAuth } from '../../contexts/AuthContext';
 
-import CustomInput from "../inputs/CustomInput";
-import TelInput from "../inputs/TelInput";
-import PasswordInput from "../inputs/PasswordInputs";
-import CheckInput from "../inputs/CheckInput";
+import CustomInput from "@/shared/components/inputs/CustomInput";
+import TelInput from "@/auth/components/inputs/TelInput";
+import PasswordInput from "@/shared/components/inputs/PasswordInput";
+import CheckInput from "@/shared/components/inputs/CheckInput";
 
 type Inputs = {
   name: string;
@@ -91,6 +91,7 @@ export default function RegisterForm() {
 
       <CheckInput
         name="acceptTerms"
+        labelText="Acepto los términos y condiciones"
         register={register}
         error={errors["acceptTerms"]?.message}
       />
