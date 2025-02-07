@@ -1,0 +1,7 @@
+.cursor-grab {
+    cursor: url('../imgs/cursor-grab.svg') 10 10, grab !important;
+}
+
+.cursor-grabbing {
+    cursor: url('../imgs/cursor-grab.svg') 10 10, grabbing !important;
+}

@@ -7,6 +7,7 @@ interface BaseInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     labelText?: string;
     error?: string;
     register: UseFormRegister<any>;
+    disabled?: boolean;
 }
 
 // Versión específica para los inputs de tipo "number"
@@ -31,6 +32,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     labelText = name,
     error,
     register,
+    disabled,
     ...rest
     }: CustomInputProps) => {
     return (
@@ -58,6 +60,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
                 })}
                 // Pasamos el resto de las props específicas según el tipo
                 {...(type === "number" ? (rest as NumberInputProps) : (rest as DefaultInputProps))}
+
+                disabled={disabled}
             />
 
             {error && <p className="mt-1 text-xs text-red-500">{error}</p>}

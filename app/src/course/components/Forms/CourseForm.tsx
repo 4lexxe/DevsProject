@@ -36,18 +36,13 @@ export default function CourseForm() {
   const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
     const dataSections = sessionStorage.getItem("section-form-data");
     const dataContens = sessionStorage.getItem("content-form-data");
-    let sections = []
-    let contents = []
 
-    if(dataSections) {
-      sections = JSON.parse(dataSections).sections;
-    }
-
-    if(dataContens) {
-       contents = JSON.parse(dataContens).contents;
-    }
+    const sections = dataSections ? JSON.parse(dataSections).sections : [];
+    const contents = dataContens ? JSON.parse(dataContens).contents : [];
 
     console.log({...data, sections, contents});
+
+    sessionStorage.clear();
   };
 
 

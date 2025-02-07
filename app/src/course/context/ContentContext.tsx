@@ -8,6 +8,7 @@ interface ContentContextType {
   deleteContent: (id: string) => void;
   saveContent: (contentData: IContentInput) => void;
   cancelEdit: () => void;
+  updateContentPosition: (sectionId: string, newPosition: number) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -103,6 +104,17 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
+  const updateContentPosition = (contentId: string, newPosition: number) => {
+    setState(prev => ({
+      ...prev,
+      contents: prev.contents.map(content =>
+          content.id === contentId
+              ? { ...content, position: newPosition }
+              : content
+      ),
+    }));
+  };
+
   return (
     <ContentContext.Provider
       value={{
@@ -112,6 +124,7 @@ export function ContentProvider({ children }: { children: React.ReactNode }) {
         deleteContent,
         saveContent,
         cancelEdit,
+        updateContentPosition,
       }}
     >
       {children}

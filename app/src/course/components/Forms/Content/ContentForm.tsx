@@ -18,6 +18,7 @@ export default function ContentForm() {
   const { state, saveContent, cancelEdit } = useContentContext();
   const initialData = state.editingContent;
 
+  console.log(initialData)
   const {
     register,
     handleSubmit,
@@ -27,8 +28,29 @@ export default function ContentForm() {
     resolver: zodResolver(contentSchema),
     defaultValues: {
       type: initialData?.type || "",
+
       contentText: initialData?.contentText || "",
       contentTextTitle: initialData?.contentTextTitle || "",
+
+      contentVideo: initialData?.contentVideo || "",
+      contentVideoTitle: initialData?.contentVideoTitle || "",
+
+      contentImage: initialData?.contentImage || "",
+      contentImageTitle: initialData?.contentImageTitle || "",
+
+      contentFile: initialData?.contentFile || "",
+      contentFileTitle: initialData?.contentFileTitle || "",
+
+      externalLink: initialData?.externalLink || "",
+      externalLinkTitle: initialData?.externalLinkTitle || "",
+
+      quizTitle: initialData?.quizTitle || "",
+      quizContent: initialData?.quizContent || "",
+
+      questions:  initialData?.questions?.join("\n") || undefined,
+      duration: initialData?.duration || undefined,
+
+      position: initialData?.position || undefined,
     },
   });
 
@@ -44,7 +66,6 @@ export default function ContentForm() {
 
   const onSubmit: SubmitHandler<IContentInput> = async (data) => {
     saveContent(data)
-    console.log(data);
   };
 
   return  (
@@ -225,7 +246,7 @@ export default function ContentForm() {
             labelText="Posición"
             register={register}
             error={errors.position?.message}
-            min={1}
+            disabled={true}
           />
         </div>
 

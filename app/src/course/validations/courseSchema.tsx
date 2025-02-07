@@ -62,7 +62,10 @@ export const courseSchema = z.object({
     // Validamos que el curso tenga al menos una sección
     /*Sections: z
         .array(sectionSchema, { message: "Se requiere secciones" })
-        .min(1, { message: "El curso debe tener al menos una sección" }),*/
+        .nonempty({ message: "Debe tener almenos una sección "})
+        .min(1, { message: "El curso debe tener al menos una sección" }),
+
+     */
 });
 
 export type CourseType = z.infer<typeof courseSchema>;

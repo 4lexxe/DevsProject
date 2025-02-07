@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './auth/contexts/AuthContext';
 
 // Importación de todos los estilos
-import '@/styles/main.css';
+import '@/shared/assets/styles/main.css';
 
 // Importación de los componentes
 import DefaultLayout from './shared/layouts/defaultLayout';

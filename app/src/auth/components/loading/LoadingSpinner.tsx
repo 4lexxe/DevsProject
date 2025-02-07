@@ -1,4 +1,4 @@
-import "../../../styles/main.css"
+import "@/shared/assets/styles/main.css"
 
 const LoadingSpinner = () => {
   return (

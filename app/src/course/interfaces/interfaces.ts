@@ -55,7 +55,7 @@ export interface IContentInput {
   externalLinkTitle?: string;
   quizTitle?: string;
   quizContent?: string;
-  questions?: string[];
+  questions?: string[] | "";
   duration?: number;
   position?: number;
 }

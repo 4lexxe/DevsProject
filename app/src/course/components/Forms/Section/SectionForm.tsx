@@ -31,8 +31,6 @@ export default function SectionForm() {
 
   const onSubmit: SubmitHandler<ISectionInput> = (data: ISectionInput): void => {
     saveSection(data)
-    
-    console.log(data);
   };
 
   return (

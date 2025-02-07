@@ -28,7 +28,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         quizContent: z.string().optional(),
         questions: z.array(z.string()).optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 
     // Tipo "Video"
@@ -48,7 +48,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         quizContent: z.string().optional(),
         questions: z.array(z.string()).optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 
     // Tipo "Imagen"
@@ -70,7 +70,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         quizContent: z.string().optional(),
         questions: z.array(z.string()).optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 
     // Tipo "Archivo"
@@ -90,7 +90,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         quizContent: z.string().optional(),
         questions: z.array(z.string()).optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 
     // Tipo "Link Externo"
@@ -112,7 +112,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         quizContent: z.string().optional(),
         questions: z.array(z.string()).optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 
     // Tipo "Cuestionario"
@@ -136,7 +136,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         externalLink: z.string().optional(),
         externalLinkTitle: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().min(1, "Debe ser mayor a 0").optional(),
+        position: z.number().optional(),
     }),
 ]);
 
