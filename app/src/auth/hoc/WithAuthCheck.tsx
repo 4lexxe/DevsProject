@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
 import LoadingSpinner from '../components/loading/LoadingSpinner';
+import { useAuth } from '../../auth/contexts/AuthContext'; // Importa el contexto de autenticación
 
 const withAuthCheck = (WrappedComponent: React.ComponentType) => {
   return function WithAuthCheckWrapper(props: any) {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true); // Estado para manejar la carga
+    const { user } = useAuth();
 
     // Verifica si el usuario está autenticado al cargar el componente
     useEffect(() => {

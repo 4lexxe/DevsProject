@@ -1,4 +1,3 @@
-// user.controller.ts
 import { Request, Response } from 'express';
 import User from '../user/User';
 import { body, validationResult } from 'express-validator';
@@ -14,6 +13,8 @@ interface UpdatableUserFields {
   username?: string | null;
   displayName?: string | null;
   password?: string;
+  isActiveSession?: boolean; // Nuevo campo para actualizar sesión activa
+  lastActiveAt?: Date; // Campo para la última actividad
 }
 
 // Extensión del tipo Request de Express
@@ -42,6 +43,7 @@ export class UserController {
     body('lastLoginIp').optional().isIP().withMessage('IP inválida')
   ];
 
+  // Obtener todos los usuarios
   static async getUsers(_req: Request, res: Response): Promise<void> {
     try {
       const users = await User.findAll({
@@ -68,17 +70,27 @@ export class UserController {
     }
   }
 
+  // Obtener detalles de seguridad de un usuario
   static async getUserSecurityDetails(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      
+
       if (!(req.user as User)?.hasPermission('VIEW_SECURITY_DETAILS')) {
         res.status(403).json({ error: 'No autorizado' });
         return;
       }
 
       const user = await User.findByPk(id, {
-        attributes: ['id', 'registrationIp', 'lastLoginIp', 'registrationGeo', 'lastLoginGeo', 'suspiciousActivities'],
+        attributes: [
+          'id',
+          'registrationIp',
+          'lastLoginIp',
+          'registrationGeo',
+          'lastLoginGeo',
+          'suspiciousActivities',
+          'isActiveSession', // Incluir isActiveSession
+          'lastActiveAt',    // Incluir lastActiveAt
+        ],
         include: [{
           model: Role,
           attributes: ['name']
@@ -105,7 +117,9 @@ export class UserController {
           country: user.lastLoginGeo.country,
           coordinates: user.lastLoginGeo.loc
         } : null,
-        suspiciousActivities: user.suspiciousActivities.length
+        suspiciousActivities: user.suspiciousActivities.length,
+        isActiveSession: user.isActiveSession, // Incluir isActiveSession
+        lastActiveAt: user.lastActiveAt,       // Incluir lastActiveAt
       });
     } catch (error) {
       console.error('Error fetching security details:', error);
@@ -113,6 +127,7 @@ export class UserController {
     }
   }
 
+  // Actualizar un usuario
   static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req);
@@ -129,7 +144,8 @@ export class UserController {
         roleId, 
         password,
         username,
-        displayName
+        displayName,
+        isActiveSession, // Permitir actualizar isActiveSession
       } = req.body;
 
       const user = await User.findByPk(id);
@@ -144,12 +160,18 @@ export class UserController {
         phone,
         roleId,
         username,
-        displayName
+        displayName,
+        isActiveSession, // Actualizar isActiveSession si está presente
       };
 
       if (password) {
         const salt = await bcrypt.genSalt(10);
         updatableFields.password = await bcrypt.hash(password, salt);
+      }
+
+      // Si se proporciona isActiveSession, actualizar lastActiveAt también
+      if (isActiveSession !== undefined) {
+        updatableFields.lastActiveAt = new Date();
       }
 
       await user.update(updatableFields);
@@ -178,15 +200,20 @@ export class UserController {
     }
   }
 
+  // Eliminar un usuario
   static async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const user = await User.findByPk(id);
-
       if (!user) {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
+
+      // Marcar la sesión como inactiva antes de eliminar el usuario
+      user.isActiveSession = false;
+      user.lastActiveAt = new Date();
+      await user.save();
 
       await user.update({
         suspiciousActivities: [

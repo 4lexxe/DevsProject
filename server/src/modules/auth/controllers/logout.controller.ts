@@ -14,6 +14,14 @@ export class LogoutController {
 
       if (userId && token) {
         revokeToken(userId, token);
+
+        // Actualizar campos de sesión
+        const user = await User.findByPk(userId);
+        if (user) {
+          user.isActiveSession = false;
+          user.lastActiveAt = new Date();
+          await user.save();
+        }
       }
 
       req.session.destroy((err) => {

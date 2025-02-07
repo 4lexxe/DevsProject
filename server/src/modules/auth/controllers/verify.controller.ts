@@ -21,22 +21,11 @@ export class VerifyController {
       const user = req.user as User;
       const token = req.headers.authorization?.split(" ")[1];
       const sessions = userTokens.get(user.id) || [];
-
       const currentSession = token 
         ? sessions.find((s: TokenSession) => s.token === token) ?? null 
         : null;
 
-      const safeProviderMetadata = user.dataValues.providerMetadata?.profile
-        ? {
-            id: user.dataValues.providerMetadata.profile.id,
-            username: user.dataValues.providerMetadata.profile.username,
-            global_name: user.dataValues.providerMetadata.profile.global_name,
-            avatar: user.dataValues.providerMetadata.profile.avatar,
-            locale: user.dataValues.providerMetadata.profile.locale,
-            verified: user.dataValues.providerMetadata.profile.verified,
-          }
-        : null;
-
+      // Si el usuario ya está autenticado, no emitir eventos adicionales
       res.status(200).json({
         authenticated: true,
         user: {
@@ -54,7 +43,7 @@ export class VerifyController {
           } : null,
           authProvider: user.authProvider,
           authProviderId: user.dataValues.authProviderId,
-          providerMetadata: safeProviderMetadata,
+          providerMetadata: user.dataValues.providerMetadata?.profile || null,
         },
         session: currentSession ? {
           createdAt: currentSession.createdAt,

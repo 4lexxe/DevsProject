@@ -15,6 +15,8 @@ export class LoginController {
       }
 
       const { email, password } = req.body;
+
+      // Buscar al usuario por correo electrónico
       const user = await User.findOne({
         where: { email, authProvider: AuthProvider.LOCAL },
         include: ["Role"],
@@ -25,13 +27,19 @@ export class LoginController {
         return;
       }
 
+      // Verificar la contraseña
       const isPasswordValid = await bcrypt.compare(password, user.password);
-
       if (!isPasswordValid) {
         res.status(401).json({ error: "Credenciales inválidas" });
         return;
       }
 
+      // Actualizar campos de sesión
+      user.isActiveSession = true;
+      user.lastActiveAt = new Date();
+      await user.save();
+
+      // Generar token JWT
       const authResponse = await TokenUtils.getAuthResponse(user, req);
 
       req.logIn(user, (loginErr) => {
@@ -46,11 +54,15 @@ export class LoginController {
           ...authResponse,
           user: {
             ...authResponse.user,
-            role: user.dataValues.Role ? {
-              id: user.dataValues.Role.id,
-              name: user.dataValues.Role.name,
-              description: user.dataValues.Role.description,
-            } : null,
+            role: user.dataValues.Role
+              ? {
+                  id: user.dataValues.Role.id,
+                  name: user.dataValues.Role.name,
+                  description: user.dataValues.Role.description,
+                }
+              : null,
+            isActiveSession: user.isActiveSession,
+            lastActiveAt: user.lastActiveAt,
           },
         });
       });

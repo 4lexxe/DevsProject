@@ -31,12 +31,10 @@ export class SessionController {
     try {
       const userId = (req.user as User)?.id;
       const { token } = req.body;
-
       if (!userId) {
         res.status(401).json({ error: "Usuario no autenticado" });
         return;
       }
-
       if (!token) {
         res.status(400).json({ error: "Token no proporcionado" });
         return;
@@ -44,7 +42,6 @@ export class SessionController {
 
       revokeToken(userId, token);
       const remainingSessions = userTokens.get(userId) || [];
-
       res.json({ 
         message: "Sesión revocada correctamente",
         remainingSessions: SessionUtils.formatSessions(remainingSessions)
@@ -59,7 +56,6 @@ export class SessionController {
     try {
       const userId = (req.user as User)?.id;
       const currentToken = req.headers.authorization?.split(" ")[1];
-
       if (!userId || !currentToken) {
         res.status(401).json({ error: "Usuario no autenticado" });
         return;
