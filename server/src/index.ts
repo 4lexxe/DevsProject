@@ -15,9 +15,16 @@ import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-
 import geoip from 'geoip-lite';
 import { Request } from 'express';
+import { Server, Socket } from 'socket.io';
+
+// Extender tipos para Socket.IO
+declare module 'socket.io' {
+  interface Socket {
+    userId?: string;
+  }
+}
 
 // Extender tipos para geoip-lite
 declare module 'geoip-lite' {
@@ -39,7 +46,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For']
 }));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -89,7 +95,6 @@ app.use((req: Request, res, next) => {
     } else {
       req.realIp = ip || undefined;
     }
-
     // Obtener datos geográficos
     const geo: geoip.Lookup = req.realIp ? geoip.lookup(req.realIp) || {} as geoip.Lookup : {} as geoip.Lookup;
     
@@ -102,7 +107,6 @@ app.use((req: Request, res, next) => {
       timezone: geo.timezone || 'UTC',
       proxy: geo.proxy || false
     };
-
     // Logging para debugging
     console.log('Datos de conexión:', {
       ip: req.realIp,
@@ -110,7 +114,6 @@ app.use((req: Request, res, next) => {
       method: req.method,
       endpoint: req.originalUrl
     });
-
     next();
   } catch (error) {
     console.error('Error en middleware de geolocalización:', error);
@@ -138,7 +141,6 @@ app.use('/api/auth', apiLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
-
 // Rutas públicas
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
@@ -174,9 +176,7 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
       details: err.errors
     }
   };
-
   console.error('Error global:', errorData);
-
   res.status(err.status || 500).json({
     error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
     referenceId: errorData.timestamp,
@@ -185,10 +185,45 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
 });
 
 // Inicialización del servidor
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Configuración de geolocalización:', GeoUtils.checkServiceStatus());
+});
+
+// Configuración de WebSockets con Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ['GET', 'POST'],
+  },
+});
+
+// Almacenamiento temporal para el estado del mensaje de bienvenida
+const welcomeMessageStatus: Record<string, boolean> = {};
+
+io.on('connection', (socket) => {
+  console.log('Cliente conectado');
+
+  // Identificar al usuario (si es necesario)
+  socket.on('identify', ({ userId }) => {
+    console.log(`Usuario ${userId} identificado`);
+    socket.userId = userId; // Asignar ID al socket
+
+    // Emitir el estado actual del mensaje de bienvenida
+    const status = welcomeMessageStatus[userId] || false;
+    socket.emit('welcomeMessageStatus', { shown: status });
+  });
+
+  // Manejar evento de mensaje de bienvenida mostrado
+  socket.on('welcomeMessageShown', ({ userId }) => {
+    console.log(`Mensaje de bienvenida mostrado para el usuario ${userId}`);
+    welcomeMessageStatus[userId] = true; // Marcar como mostrado
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Cliente desconectado (ID: ${socket.userId})`);
+  });
 });
 
 // Función para obtener la IP válida del request

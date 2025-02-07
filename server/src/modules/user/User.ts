@@ -22,7 +22,7 @@ class User extends Model {
   public email!: string | null;
   public password!: string | null;
   public phone!: string | null;
-  
+
   public roleId!: number;
   public authProvider!: AuthProvider;
   public authProviderId!: string | null;
@@ -65,6 +65,9 @@ class User extends Model {
     timestamp: Date;
   }>;
 
+  public isActiveSession!: boolean;
+  public lastActiveAt!: Date | null;
+
   // Relación con Role
   public Role?: Role;
 
@@ -74,13 +77,15 @@ class User extends Model {
 
   async hasPermission(permissionName: string): Promise<boolean> {
     const role = await Role.findByPk(this.roleId, {
-      include: [{
-        association: 'Permissions',
-        attributes: ['name']
-      }]
+      include: [
+        {
+          association: "Permissions",
+          attributes: ["name"],
+        },
+      ],
     });
 
-    return !!role?.Permissions?.some(p => p.name === permissionName);
+    return !!role?.Permissions?.some((p) => p.name === permissionName);
   }
 }
 
@@ -149,22 +154,22 @@ User.init(
       type: DataTypes.STRING(45),
       allowNull: false,
       validate: {
-        isIP: true
+        isIP: true,
       },
-      defaultValue: '127.0.0.1'
+      defaultValue: "127.0.0.1",
     },
     registrationGeo: {
       type: DataTypes.JSONB,
       allowNull: true,
-      defaultValue: null
+      defaultValue: null,
     },
     lastLoginIp: {
       type: DataTypes.STRING(45),
       allowNull: false,
       validate: {
-        isIP: true
+        isIP: true,
       },
-      defaultValue: '127.0.0.1'
+      defaultValue: "127.0.0.1",
     },
     lastLoginGeo: {
       type: DataTypes.JSONB,
@@ -173,8 +178,17 @@ User.init(
     suspiciousActivities: {
       type: DataTypes.JSONB,
       allowNull: false,
-      defaultValue: []
-    }
+      defaultValue: [],
+    },
+    isActiveSession: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    lastActiveAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   },
   {
     sequelize,
@@ -183,27 +197,27 @@ User.init(
     indexes: [
       { fields: ["roleId"] },
       { unique: true, fields: ["authProvider", "authProviderId"] },
-      { 
-        unique: true, 
+      {
+        unique: true,
         fields: ["email"],
-        where: { email: { [Op.ne]: null } }
+        where: { email: { [Op.ne]: null } },
       },
       { fields: ["registrationIp"] },
       { fields: ["lastLoginIp"] },
-      { fields: ["suspiciousActivities"] }
+      { fields: ["suspiciousActivities"] },
     ],
   }
 );
 
 // Definir relaciones
-User.belongsTo(Role, { 
+User.belongsTo(Role, {
   foreignKey: "roleId",
-  as: 'Role'
+  as: "Role",
 });
 
-Role.hasMany(User, { 
+Role.hasMany(User, {
   foreignKey: "roleId",
-  as: 'Users'
+  as: "Users",
 });
 
 export default User;
