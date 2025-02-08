@@ -23,21 +23,40 @@ declare global {
   }
 }
 
-// Serialización del usuario
+// Serialización del usuario - Guardar más información en la sesión
 passport.serializeUser((user: any, done) => {
-  done(null, user.id)
-})
+  // Guardar información relevante del usuario en la sesión
+  const sessionUser = {
+    id: user.id,
+    authProvider: user.authProvider,
+    username: user.username,
+    displayName: user.displayName
+  };
+  done(null, sessionUser);
+});
 
-passport.deserializeUser(async (id: number, done) => {
+// Deserialización del usuario - Recuperar usuario completo
+passport.deserializeUser(async (sessionUser: any, done) => {
   try {
-    const user = await User.findByPk(id, {
-      include: ["Role"],
-    })
-    done(null, user)
+    const user = await User.findByPk(sessionUser.id, {
+      include: [{
+        association: "Role",
+        attributes: ["id", "name", "description"]
+      }]
+    });
+
+    if (!user) {
+      return done(null, false);
+    }
+
+    // Asegurarse de que la información de autenticación persista
+    user.authProvider = sessionUser.authProvider;
+    
+    done(null, user);
   } catch (error) {
-    done(error, null)
+    done(error, null);
   }
-})
+});
 
 // Estrategia Local (email y contraseña)
 passport.use(
@@ -80,9 +99,23 @@ passport.use(
       clientID: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       callbackURL: process.env.GITHUB_CALLBACK_URL!,
+      passReqToCallback: true
     },
-    async (accessToken: string, refreshToken: string, profile: any, done: any) => {
+    async (req: Request, accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
+        const ip = (req as any).realIp;
+        const geoData = (req as any).geo;
+        
+        // Validación de datos geográficos
+        const safeGeo = {
+          city: geoData?.city,
+          region: geoData?.region,
+          country: geoData?.country,
+          ll: geoData?.ll,
+          timezone: geoData?.timezone,
+          proxy: geoData?.proxy
+        };
+
         const [user, created] = await User.findOrCreate({
           where: {
             authProvider: AuthProvider.GITHUB,
@@ -95,6 +128,24 @@ passport.use(
             displayName: profile.displayName,
             avatar: profile.photos?.[0]?.value,
             roleId: 1,
+            registrationIp: ip,
+            registrationGeo: {
+              city: safeGeo.city,
+              region: safeGeo.region,
+              country: safeGeo.country,
+              loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
+              timezone: safeGeo.timezone,
+              isProxy: safeGeo.proxy
+            },
+            lastLoginIp: ip,
+            lastLoginGeo: {
+              city: safeGeo.city,
+              region: safeGeo.region,
+              country: safeGeo.country,
+              loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
+              timezone: safeGeo.timezone,
+              isProxy: safeGeo.proxy
+            },
             providerMetadata: {
               profile,
               accessToken,
@@ -107,12 +158,26 @@ passport.use(
             username: profile.username,
             displayName: profile.displayName,
             avatar: profile.photos?.[0]?.value,
+            lastLoginIp: ip,
+            lastLoginGeo: {
+              city: safeGeo.city,
+              region: safeGeo.region,
+              country: safeGeo.country,
+              loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
+              timezone: safeGeo.timezone,
+              isProxy: safeGeo.proxy
+            },
             providerMetadata: {
               profile,
               accessToken,
             },
+            isActiveSession: true,
+            lastActiveAt: new Date()
           })
         }
+
+        // Actualizar explícitamente el authProvider
+        user.authProvider = AuthProvider.GITHUB;
 
         return done(null, user)
       } catch (error) {
@@ -134,17 +199,17 @@ passport.use(
     },
     async (req: Request, accessToken: string, refreshToken: string, profile: any, done: any) => {
       try {
-        const ip = (req as any).realIp; // ← Ya tiene fallback seguro
+        const ip = (req as any).realIp;
         const geoData = (req as any).geo;
         
         // Validación de datos geográficos
         const safeGeo = {
-          city: geoData.city,
-          region: geoData.region,
-          country: geoData.country,
-          ll: geoData.ll,
-          timezone: geoData.timezone,
-          proxy: geoData.proxy
+          city: geoData?.city,
+          region: geoData?.region,
+          country: geoData?.country,
+          ll: geoData?.ll,
+          timezone: geoData?.timezone,
+          proxy: geoData?.proxy
         };
 
         const [user] = await User.findOrCreate({
@@ -164,7 +229,7 @@ passport.use(
               city: safeGeo.city,
               region: safeGeo.region,
               country: safeGeo.country,
-              loc: [safeGeo.ll[0], safeGeo.ll[1]],
+              loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
               timezone: safeGeo.timezone,
               isProxy: safeGeo.proxy
             },
@@ -173,7 +238,7 @@ passport.use(
               city: safeGeo.city,
               region: safeGeo.region,
               country: safeGeo.country,
-              loc: [safeGeo.ll[0], safeGeo.ll[1]],
+              loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
               timezone: safeGeo.timezone,
               isProxy: safeGeo.proxy
             },
@@ -184,16 +249,21 @@ passport.use(
           },
         });
 
+        // Actualizar explícitamente el authProvider
+        user.authProvider = AuthProvider.DISCORD;
+
         await user.update({
           lastLoginIp: ip,
           lastLoginGeo: {
             city: safeGeo.city,
             region: safeGeo.region,
             country: safeGeo.country,
-            loc: [safeGeo.ll[0], safeGeo.ll[1]],
+            loc: safeGeo.ll ? [safeGeo.ll[0], safeGeo.ll[1]] : undefined,
             timezone: safeGeo.timezone,
             isProxy: safeGeo.proxy
-          }
+          },
+          isActiveSession: true,
+          lastActiveAt: new Date()
         });
 
         return done(null, user);
@@ -204,5 +274,4 @@ passport.use(
   ),
 );
 
-export default passport
-
+export default passport;

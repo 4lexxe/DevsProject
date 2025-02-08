@@ -88,8 +88,8 @@ export class UserController {
           'registrationGeo',
           'lastLoginGeo',
           'suspiciousActivities',
-          'isActiveSession', // Incluir isActiveSession
-          'lastActiveAt',    // Incluir lastActiveAt
+          'isActiveSession',
+          'lastActiveAt',
         ],
         include: [{
           model: Role,
