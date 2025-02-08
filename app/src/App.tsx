@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './auth/contexts/AuthContext';
 
 // Importación de todos los estilos
@@ -15,6 +15,8 @@ import {CourseDetail} from './course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
 
+import Profile from './course/pages/Profile';
+
 function App() {
   return (
     <Router>
@@ -22,7 +24,8 @@ function App() {
         <Routes>
           <Route path="/" element={<DefaultLayout />}>
             <Route index element={<Home />} />
-
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/" element={<Navigate to="/profile" replace />} />
             <Route path="cursos" element={<CoursesPage />} />
             <Route path="/course/:id" element={<CourseDetail />} />
             <Route path="/quiz/:contentId" element={<QuizPage />} />

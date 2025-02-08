@@ -4,11 +4,18 @@
 
 import { Request, Response } from "express";
 import User from "../../user/User";
+import Role from "../../role/Role";
+import Permission from "../../role/Permission";
+
+export interface AuthRequest extends Request {
+  user?: User & { id: string | number };
+}
+
 import { TokenSession } from "../types/auth.types";
 import { userTokens } from "../../../shared/middleware/authMiddleware";
 
 export class VerifyController {
-  static async handle(req: Request, res: Response): Promise<void> {
+  static async handle(req: AuthRequest, res: Response): Promise<void> {
     if (!req.isAuthenticated()) {
       res.status(200).json({
         authenticated: false,
@@ -18,32 +25,52 @@ export class VerifyController {
     }
 
     try {
-      const user = req.user as User;
+      const user = await User.findByPk(req.user?.id, {
+        include: [
+          {
+            model: Role,
+            as: 'Role',
+            include: [
+              {
+                model: Permission,
+                as: 'Permissions',
+                attributes: ['name'],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!user) {
+        res.status(401).json({ authenticated: false });
+        return;
+      }
+
       const token = req.headers.authorization?.split(" ")[1];
       const sessions = userTokens.get(user.id) || [];
       const currentSession = token 
         ? sessions.find((s: TokenSession) => s.token === token) ?? null 
         : null;
 
-      // Si el usuario ya está autenticado, no emitir eventos adicionales
       res.status(200).json({
         authenticated: true,
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
-          avatar: user.dataValues.avatar,
+          avatar: user.avatar,
           username: user.username,
-          displayName: user.dataValues.displayName,
+          displayName: user.displayName,
           roleId: user.roleId,
-          role: user.dataValues.Role ? {
-            id: user.dataValues.Role.id,
-            name: user.dataValues.Role.name,
-            description: user.dataValues.Role.description,
+          role: user.Role ? {
+            id: user.Role.id,
+            name: user.Role.name,
+            description: user.Role.description,
+            permissions: user.Role.Permissions?.map((p: Permission) => p.name) || [],
           } : null,
           authProvider: user.authProvider,
-          authProviderId: user.dataValues.authProviderId,
-          providerMetadata: user.dataValues.providerMetadata?.profile || null,
+          authProviderId: user.authProviderId,
+          providerMetadata: (user.providerMetadata as any)?.profile || null,
         },
         session: currentSession ? {
           createdAt: currentSession.createdAt,

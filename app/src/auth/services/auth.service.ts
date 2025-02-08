@@ -44,6 +44,7 @@ export interface User {
     id: number;
     name: string;
     description: string;
+    permissions?: string[]; // Agregar la propiedad permissions
   };
   isActiveSession: boolean;
   lastActiveAt: string;

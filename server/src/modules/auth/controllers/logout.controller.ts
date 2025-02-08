@@ -1,3 +1,7 @@
+// logout.controller.ts
+
+// Descripción: En este archivo se define el controlador para cerrar la sesión de un usuario. Este controlador se utiliza para manejar la revocación de tokens de autenticación, destruir la sesión del usuario y devolver una respuesta de cierre de sesión al cliente.
+
 import { Request, Response } from "express";
 import User from "../../user/User";
 import { revokeToken } from "../../../shared/middleware/authMiddleware";
