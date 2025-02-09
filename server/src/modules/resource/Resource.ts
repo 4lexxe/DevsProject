@@ -17,6 +17,8 @@ interface ResourceAttributes {
   url: string;
   type: ResourceType;
   userId: number;
+  isVisible: boolean;
+  coverImage?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -30,6 +32,8 @@ class Resource extends Model<ResourceAttributes, ResourceCreationAttributes> imp
   public url!: string;
   public type!: ResourceType;
   public userId!: number;
+  public isVisible!: boolean;
+  public coverImage?: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -69,6 +73,18 @@ Resource.init(
         key: "id",
       },
       allowNull: false,
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    coverImage: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      validate: {
+        isUrl: true,
+      },
     },
   },
   {
