@@ -10,12 +10,18 @@ export class ResourceController {
       }
 
       const { title, description, url, type, coverImage } = req.body;
+
+      // Asignar un valor por defecto si userAvatar es null o una cadena vacía
+      const userAvatar = req.user.avatar || "https://default-avatar-url.com/avatar.png";
+
       const resource = await Resource.create({
         title,
         description,
         url,
         type,
         userId: req.user.id,
+        userName: req.user.name,
+        userAvatar, // Usar el avatar del usuario o una URL por defecto
         isVisible: true, // Los recursos creados por usuarios normales son visibles por defecto
         coverImage,
       });
