@@ -6,6 +6,7 @@ import CustomInput from "@/shared/components/inputs/CustomInput";
 import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
+import ImagePreview from "./Previews/ImagePreview";
 
 import { ICourseInput } from "@/course/interfaces/interfaces";
 import { courseSchema, categories } from "@/course/validations/courseSchema";
@@ -13,11 +14,11 @@ import { courseSchema, categories } from "@/course/validations/courseSchema";
 import { useCourseContext } from "@/course/context/CourseContext";
 
 export default function CourseForm() {
-
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ICourseInput>({
     resolver: zodResolver(courseSchema),
@@ -35,16 +36,13 @@ export default function CourseForm() {
     },
   });
 
-  const { state: courseState } = useCourseContext()
+  const { state: courseState } = useCourseContext();
 
-  useEffect(() => { 
-
+  useEffect(() => {
     setValue("Sections", courseState.sections);
   }, [courseState.sections]);
 
-
   const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
-
     console.log(data);
 
     sessionStorage.clear();
@@ -72,6 +70,8 @@ export default function CourseForm() {
           />
         </div>
 
+        <ImagePreview watchContentImage={watch("image")} />
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SelectInput
             name="category"
@@ -96,6 +96,7 @@ export default function CourseForm() {
         <TextAreaInput
           name="summary"
           labelText="Resumen"
+          rows={2}
           register={register}
           error={errors["summary"]?.message}
         />
@@ -104,7 +105,7 @@ export default function CourseForm() {
           labelText="Acerca del Curso"
           register={register}
           error={errors["about"]?.message}
-          rows={4}
+          rows={2}
         />
 
         <TextAreaInput
@@ -146,8 +147,13 @@ export default function CourseForm() {
             ) : null
           )}
 
-        <div className="flex justify-end space-x-3 pt-4">
-          <button type="submit">Enviar</button>
+        <div className="flex justify-end space-x-3 pt-8">
+          <button
+            type="submit"
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105"
+          >
+            Enviar datos del curso
+          </button>
         </div>
       </form>
     </div>

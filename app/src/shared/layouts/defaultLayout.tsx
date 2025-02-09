@@ -11,7 +11,7 @@ export default function DefaultLayout() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <NotificationBubble />
-      <main className="flex-grow w-full px-4 sm:px-6 lg:px-8 pt-20">
+      <main className="flex-grow w-full pt-20">
         {backendOnline ? (
           <Outlet />
         ) : (

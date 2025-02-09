@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { ISectionInput } from "@/course/interfaces/interfaces";
 
@@ -10,13 +9,10 @@ import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { X, Save } from "lucide-react";
 import { sectionSchema, moduleTypes } from "@/course/validations/sectionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCourseContext } from "@/course/context/CourseContext";
+import { useCourseContext } from "@/course/context/CourseContext"; 
 
 export default function SectionForm() {
   const { state: sectionState, saveSection, cancelEdit } = useCourseContext();
-
-
-
   const initialData = sectionState.editingSection;
 
   const {
@@ -49,8 +45,6 @@ export default function SectionForm() {
             error={errors["title"]?.message}
             register={register}
           />
-
-          {/* <CustomInput name="courseId" type="text" labelText="ID del Curso" error={errors["courseId"]?.message} register={register} /> */}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

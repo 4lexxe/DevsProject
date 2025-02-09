@@ -1,24 +1,26 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { IContentInput } from "@/course/interfaces/interfaces";
 
+import VideoPreview from "../Previews/VideoPreview";
+import ImagePreview from "../Previews/ImagePreview";
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { Save, X } from "lucide-react";
 
-
 import { zodResolver } from "@hookform/resolvers/zod";
-import { contentSchema, contentTypes } from "@/course/validations/contentSchema";
+import {
+  contentSchema,
+  contentTypes,
+} from "@/course/validations/contentSchema";
 import { useCourseContext } from "@/course/context/CourseContext";
 
-interface propsContentForm{
+interface propsContentForm {
   sectionId: string;
 }
 
-export default function ContentForm({sectionId}: propsContentForm) {
+export default function ContentForm({ sectionId }: propsContentForm) {
   const { state: courseState, saveContent, cancelEdit } = useCourseContext();
   const initialData = courseState.editingContent;
 
@@ -50,7 +52,9 @@ export default function ContentForm({sectionId}: propsContentForm) {
       quizTitle: initialData?.quizTitle || "",
       quizContent: initialData?.quizContent || "",
 
-      questions:  Array.isArray(initialData?.questions)? initialData.questions.join("\n") :  "",
+      questions: Array.isArray(initialData?.questions)
+        ? initialData.questions.join("\n")
+        : "",
       duration: initialData?.duration || undefined,
 
       position: initialData?.position || 0,
@@ -60,20 +64,16 @@ export default function ContentForm({sectionId}: propsContentForm) {
   const [contentType, setContentType] = useState("");
 
   const watchContentType = watch("type");
-  const watchContentImage = watch("contentImage");
-  const watchContentVideo = watch("contentVideo");
 
   useEffect(() => {
     setContentType(watchContentType);
   }, [watchContentType]);
 
   const onSubmit: SubmitHandler<IContentInput> = async (data) => {
-    
-    
-    saveContent(sectionId, data)
+    saveContent(sectionId, data);
   };
 
-  return  ( 
+  return (
     <div className="w-full max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-6">Añadir Nuevo Contenido</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -83,11 +83,10 @@ export default function ContentForm({sectionId}: propsContentForm) {
             labelText="Tipo de Contenido"
             register={register}
             error={errors["type"]?.message}
-            options={ contentTypes.map(contentType => ({
+            options={contentTypes.map((contentType) => ({
               value: contentType,
               label: contentType,
             }))}
-
           />
         </div>
 
@@ -126,17 +125,8 @@ export default function ContentForm({sectionId}: propsContentForm) {
               register={register}
               error={errors.contentVideo?.message}
             />
-            {watchContentVideo && (
-              <div className="mt-2">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">
-                  Previsualización del Video:
-                </h3>
-                <video controls className="w-full max-w-md mx-auto">
-                  <source src={watchContentVideo} type="video/mp4" />
-                  Tu navegador no soporta el tag de video.
-                </video>
-              </div>
-            )}
+
+            <VideoPreview watchContentVideo= { watch("contentVideo") || ""} />
           </div>
         )}
 
@@ -156,18 +146,8 @@ export default function ContentForm({sectionId}: propsContentForm) {
               register={register}
               error={errors.contentImage?.message}
             />
-            {watchContentImage && (
-              <div className="mt-2">
-                <h3 className="text-sm font-medium text-gray-700 mb-2">
-                  Previsualización de la Imagen:
-                </h3>
-                <img
-                  src={watchContentImage || "/placeholder.svg"}
-                  alt="Preview"
-                  className="max-w-md mx-auto"
-                />
-              </div>
-            )}
+
+            <ImagePreview watchContentImage={watch("contentImage") || ""} />
           </div>
         )}
 

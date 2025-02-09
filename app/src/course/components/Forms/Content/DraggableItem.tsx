@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Edit, Trash2, GripVertical } from "lucide-react";
