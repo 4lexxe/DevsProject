@@ -17,6 +17,8 @@ import { LoginPage, RegisterPage } from './auth/auth';
 
 import Profile from './course/pages/Profile';
 
+import LearnRoute from './learnroute/pages/LearnRoute';
+
 function App() {
   return (
     <Router>
@@ -31,8 +33,7 @@ function App() {
             <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-
-            <Route path='course/form' element = {<CourseFormPage/>} />
+            <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            <Route path='course/form' element = {<CourseFormPage/>} />
 
             
           </Route>

@@ -8,6 +8,7 @@ import Course from './modules/course/Course';
 import Section from './modules/section/Section';
 import Content from './modules/content/Content';
 import SectionHeader from './modules/headerSection/HeaderSection';
+import Recourse from './modules/resource/Resource';
 
 import sequelize from './infrastructure/database/db';
 
@@ -35,6 +36,8 @@ async function syncDatabase() {
     await Content.sync({ force: true });
 
     await SectionHeader.sync({ force: true });
+
+    await Recourse.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {

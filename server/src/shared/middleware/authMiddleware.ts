@@ -1,11 +1,8 @@
-import type { Request, Response, NextFunction, RequestHandler } from "express";
+import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../modules/user/User";
 import Role from "../../modules/role/Role";
 import { GeoUtils } from "../../modules/auth/utils/geo.utils"; // Importar GeoUtils
-import Course from "../../modules/course/Course"; // Importar Course
-import Admin from "../../modules/admin/Admin"; // Importar Admin
-import Section from "../../modules/section/Section"; // Importar Section
 
 declare global {
   namespace Express {
@@ -141,13 +138,16 @@ export const authMiddleware = async (
 
     cleanupExpiredTokens(user.id);
 
-    const isAuthorized = user.Role?.name === 'superadmin' || user.roleId === 2;
-    if (!isAuthorized) {
-      res.status(403).json({ 
-        message: "Acceso denegado",
-        details: "Se requieren privilegios de administrador"
-      });
-      return;
+    // Verificar permisos de administrador solo si no es una ruta de recursos
+    if (!req.path.startsWith('/resources')) {
+      const isAuthorized = user.Role?.name === 'superadmin' || user.roleId === 2;
+      if (!isAuthorized) {
+        res.status(403).json({ 
+          message: "Acceso denegado",
+          details: "Se requieren privilegios de administrador"
+        });
+        return;
+      }
     }
 
     req.tokenInfo = {

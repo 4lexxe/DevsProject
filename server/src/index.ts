@@ -15,6 +15,8 @@ import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
+import recourseRoutes from './modules/resource/resourceRoutes';
+
 import geoip from 'geoip-lite';
 import { Request } from 'express';
 import { Server, Socket } from 'socket.io';
@@ -48,6 +50,8 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 // Rate limiting con validación reforzada
 const apiLimiter = rateLimit({
@@ -141,6 +145,8 @@ app.use('/api/auth', apiLimiter, authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api', recourseRoutes);
+
 // Rutas públicas
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
