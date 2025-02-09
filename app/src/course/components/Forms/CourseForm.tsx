@@ -1,6 +1,4 @@
-"use client";
-
-import React from "react";
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -12,10 +10,14 @@ import SelectInput from "@/shared/components/inputs/SelectInput";
 import { ICourseInput } from "@/course/interfaces/interfaces";
 import { courseSchema, categories } from "@/course/validations/courseSchema";
 
+import { useCourseContext } from "@/course/context/CourseContext";
+
 export default function CourseForm() {
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ICourseInput>({
     resolver: zodResolver(courseSchema),
@@ -26,25 +28,27 @@ export default function CourseForm() {
       relatedCareerType: "",
       summary: "",
       about: "",
-      learningOutcomes: "" ,
+      learningOutcomes: "",
       isActive: false,
       isInDevelopment: false,
       Sections: [],
-    }
+    },
   });
 
+  const { state: courseState } = useCourseContext()
+
+  useEffect(() => { 
+
+    setValue("Sections", courseState.sections);
+  }, [courseState.sections]);
+
+
   const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
-    const dataSections = sessionStorage.getItem("section-form-data");
-    const dataContens = sessionStorage.getItem("content-form-data");
 
-    const sections = dataSections ? JSON.parse(dataSections).sections : [];
-    const contents = dataContens ? JSON.parse(dataContens).contents : [];
-
-    console.log({...data, sections, contents});
+    console.log(data);
 
     sessionStorage.clear();
   };
-
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -128,13 +132,22 @@ export default function CourseForm() {
           </div>
         </div>
 
-        {errors.Sections?.message && <p className="mt-1 text-xs text-red-500">{errors.Sections.message}</p>}
-        <div className="flex justify-end space-x-3 pt-4">
+        {errors.Sections?.message && (
+          <p className="mt-1 text-xs text-red-500">{errors.Sections.message}</p>
+        )}
 
-          <button 
-            type="submit">
-              Enviar
-          </button>
+        {errors.Sections &&
+          Array.isArray(errors.Sections) &&
+          errors.Sections.map((sectionError, index) =>
+            sectionError?.contents ? (
+              <p key={index} className="text-red-500 text-sm">
+                {`La sección ${index + 1} debe tener al menos un contenido`}
+              </p>
+            ) : null
+          )}
+
+        <div className="flex justify-end space-x-3 pt-4">
+          <button type="submit">Enviar</button>
         </div>
       </form>
     </div>

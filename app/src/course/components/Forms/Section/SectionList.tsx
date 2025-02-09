@@ -1,14 +1,13 @@
 import React from 'react';
 import { Edit, Plus, Trash2 } from 'lucide-react';
-import { useSectionContext } from '@/course/context/SectionContext';
-import { useContentContext } from '@/course/context/ContentContext';
+
 import ContentForm from "@/course/components/Forms/Content/ContentForm";
 
 import DraggableContentList from '@/course/components/Forms/Content/DraggableContentList'
+import { useCourseContext } from '@/course/context/CourseContext';
 
 export default function SectionList() {
-  const { state: sectionState, addSection, editSection, deleteSection } = useSectionContext();
-  const { state: contentState} = useContentContext();
+  const { state: courseState, addSection, editSection, deleteSection } = useCourseContext();
 
   return (
       <div className="space-y-4">
@@ -23,11 +22,11 @@ export default function SectionList() {
           </button>
         </div>
 
-        {sectionState.sections.length === 0 ? (
+        {courseState.sections.length === 0 ? (
             <p className="text-gray-500 text-center py-8">Sin secciones añadidas</p>
         ) : (
             <div className="grid gap-6">
-              {sectionState.sections.map((section) => {
+              {courseState.sections.map((section) => {
 
                 return (
                     <div key={section.id} className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -65,8 +64,8 @@ export default function SectionList() {
                       </div>
 
                         {/* Si se esta agregando o editando un nuevo contenido se renderiza su form o sino muestra el contentList */}
-                        {contentState.isAddingContent || contentState.editingContent  ? (
-                                <ContentForm />
+                        {courseState.isAddingContent || courseState.editingContent  ? (
+                                <ContentForm sectionId={section.id}/>
                             ) :
 
                           (<DraggableContentList

@@ -1,3 +1,39 @@
+export interface ICourseInput {
+  title: string;
+  image: string;
+  summary: string;
+  category: string;
+  about: string;
+  relatedCareerType: string;
+  learningOutcomes: string[] | "";
+  isActive: boolean;
+  isInDevelopment: boolean;
+  Sections: ISection[];
+}
+
+export interface ICourse {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  relatedCareerType?: string;
+  summary: string;
+  about: string;
+  learningOutcomes: string[];
+  isActive: boolean;
+  isInDevelopment: boolean;
+}
+
+
+export interface ICourseState {
+  sections: ISection[];
+  editingSection: ISection | null;
+  isAddingSection: boolean;
+  editingContent: IContent | null;
+  isAddingContent: boolean;
+  currentSectionId: string | null;
+}
+
 export interface ISection {
   id: string;
   title: string;
@@ -36,9 +72,9 @@ export interface IContent {
   externalLinkTitle?: string;
   quizTitle?: string;
   quizContent?: string;
-  questions?: string;
+  questions?: string[] | string;
   duration?: number;
-  position?: number;
+  position: number;
 }
 
 export interface IContentInput {
@@ -55,9 +91,9 @@ export interface IContentInput {
   externalLinkTitle?: string;
   quizTitle?: string;
   quizContent?: string;
-  questions?: string[] | "";
+  questions?: string[] | string;
   duration?: number;
-  position?: number;
+  position: number | 0;
 }
 
 export interface IContentState {
@@ -67,36 +103,7 @@ export interface IContentState {
   currentSectionId: string | null;
 }
 
-export interface ICourseInput {
-  title: string;
-  image: string;
-  summary: string;
-  category: string;
-  about: string;
-  relatedCareerType: string;
-  learningOutcomes: string[] | "";
-  isActive: boolean;
-  isInDevelopment: boolean;
-  Sections: ISectionInput[];
-}
 
-export interface ICourse {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  relatedCareerType?: string;
-  summary: string;
-  about: string;
-  learningOutcomes: string[];
-  isActive: boolean;
-  isInDevelopment: boolean;
-}
-
-
-export interface ICourseState {
-  course: ICourse | null;
-}
 
 export interface SectionListProps {
   sections: ISectionInput[];

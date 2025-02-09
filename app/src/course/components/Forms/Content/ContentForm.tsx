@@ -9,16 +9,19 @@ import SelectInput from "@/shared/components/inputs/SelectInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { Save, X } from "lucide-react";
 
-import { useContentContext } from "@/course/context/ContentContext";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contentSchema, contentTypes } from "@/course/validations/contentSchema";
+import { useCourseContext } from "@/course/context/CourseContext";
 
-export default function ContentForm() {
-  const { state, saveContent, cancelEdit } = useContentContext();
-  const initialData = state.editingContent;
+interface propsContentForm{
+  sectionId: string;
+}
 
-  console.log(initialData)
+export default function ContentForm({sectionId}: propsContentForm) {
+  const { state: courseState, saveContent, cancelEdit } = useCourseContext();
+  const initialData = courseState.editingContent;
+
   const {
     register,
     handleSubmit,
@@ -47,10 +50,10 @@ export default function ContentForm() {
       quizTitle: initialData?.quizTitle || "",
       quizContent: initialData?.quizContent || "",
 
-      questions:  initialData?.questions?.join("\n") || undefined,
+      questions:  Array.isArray(initialData?.questions)? initialData.questions.join("\n") :  "",
       duration: initialData?.duration || undefined,
 
-      position: initialData?.position || undefined,
+      position: initialData?.position || 0,
     },
   });
 
@@ -65,10 +68,12 @@ export default function ContentForm() {
   }, [watchContentType]);
 
   const onSubmit: SubmitHandler<IContentInput> = async (data) => {
-    saveContent(data)
+    
+    
+    saveContent(sectionId, data)
   };
 
-  return  (
+  return  ( 
     <div className="w-full max-w-4xl mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-6">Añadir Nuevo Contenido</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

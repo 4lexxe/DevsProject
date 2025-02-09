@@ -26,7 +26,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         externalLinkTitle: z.string().optional(),
         quizTitle: z.string().optional(),
         quizContent: z.string().optional(),
-        questions: z.array(z.string()).optional(),
+        questions: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
         position: z.number().optional(),
     }),
@@ -46,7 +46,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         externalLinkTitle: z.string().optional(),
         quizTitle: z.string().optional(),
         quizContent: z.string().optional(),
-        questions: z.array(z.string()).optional(),
+        questions: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
         position: z.number().optional(),
     }),
@@ -68,7 +68,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         externalLinkTitle: z.string().optional(),
         quizTitle: z.string().optional(),
         quizContent: z.string().optional(),
-        questions: z.array(z.string()).optional(),
+        questions: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
         position: z.number().optional(),
     }),
@@ -88,7 +88,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         externalLinkTitle: z.string().optional(),
         quizTitle: z.string().optional(),
         quizContent: z.string().optional(),
-        questions: z.array(z.string()).optional(),
+        questions: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
         position: z.number().optional(),
     }),
@@ -110,7 +110,7 @@ export const contentSchema = z.discriminatedUnion("type", [
         contentFileTitle: z.string().optional(),
         quizTitle: z.string().optional(),
         quizContent: z.string().optional(),
-        questions: z.array(z.string()).optional(),
+        questions: z.string().optional(),
         duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
         position: z.number().optional(),
     }),
@@ -123,8 +123,9 @@ export const contentSchema = z.discriminatedUnion("type", [
             .string()
             .nonempty("El contenido del cuestionario es obligatorio"),
         questions: z
-            .array(z.string())
-            .min(1, { message: "Debe haber al menos una pregunta" }),
+        .array(z.string()).min(1, { message: "Debe haber al menos una pregunta" })
+        ,
+        
         contentText: z.string().optional(),
         contentTextTitle: z.string().optional(),
         contentVideo: z.string().optional(),

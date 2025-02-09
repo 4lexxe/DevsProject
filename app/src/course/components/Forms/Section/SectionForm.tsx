@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useSectionContext } from "@/course/context/SectionContext";
 import { ISectionInput } from "@/course/interfaces/interfaces";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
@@ -10,10 +10,14 @@ import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { X, Save } from "lucide-react";
 import { sectionSchema, moduleTypes } from "@/course/validations/sectionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useCourseContext } from "@/course/context/CourseContext";
 
 export default function SectionForm() {
-  const { state, saveSection, cancelEdit } = useSectionContext();
-  const initialData = state.editingSection;
+  const { state: sectionState, saveSection, cancelEdit } = useCourseContext();
+
+
+
+  const initialData = sectionState.editingSection;
 
   const {
     register,
@@ -97,6 +101,7 @@ export default function SectionForm() {
           </button>
         </div>
       </form>
+
     </div>
   );
 }

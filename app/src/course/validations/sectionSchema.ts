@@ -23,9 +23,4 @@ export const sectionSchema = z.object({
 });
 
 
-export const sectionWithContentSchema = sectionSchema.extend({
-  contents: z.array(contentSchema).min(1, "La sección debe tener al menos un contenido"),
-});
-
 export type SectionType = z.infer<typeof sectionSchema>;
-export type SectionWithContentType = z.infer<typeof sectionWithContentSchema>;

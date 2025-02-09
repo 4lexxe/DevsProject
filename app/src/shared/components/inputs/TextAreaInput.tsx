@@ -33,7 +33,7 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({
         id={name}
 
         {...register(name, {
-            ...(arrayValue === true && {
+            ...(arrayValue === true &&  {
                 setValueAs: (value:string): string[] => (value === "" ? [] : value.split("\n")),
             })
 

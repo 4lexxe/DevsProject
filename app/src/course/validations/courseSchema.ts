@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { sectionSchema } from "./sectionSchema";
+import { contentSchema } from "./contentSchema";
 
 export const categories = [
     "Programación",
@@ -60,12 +61,15 @@ export const courseSchema = z.object({
     isInDevelopment: z.boolean().default(true),
 
     // Validamos que el curso tenga al menos una sección
-    /*Sections: z
-        .array(sectionSchema, { message: "Se requiere secciones" })
-        .nonempty({ message: "Debe tener almenos una sección "})
+    Sections: z
+        .array(
+            sectionSchema.extend({ 
+                contents: z
+                    .array(contentSchema)
+                    .min(1, { message: "La sección debe tener al menos un contenido" }),
+            })
+        )
         .min(1, { message: "El curso debe tener al menos una sección" }),
-
-     */
 });
 
 export type CourseType = z.infer<typeof courseSchema>;

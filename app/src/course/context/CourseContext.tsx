@@ -1,88 +1,251 @@
-import React, { createContext, useContext, useEffect } from "react";
-import { ICourse, ICourseInput, ICourseState } from "../interfaces/interfaces";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  ISection,
+  ISectionInput,
+  IContent,
+  IContentInput,
+  ICourseState,
+} from "../interfaces/interfaces";
 
-// Definimos el tipo de datos que manejará el contexto del curso
 interface CourseContextType {
-    course: ICourse | null; // El único curso que estamos manejando
-    editCourse: (courseData: ICourseInput) => void;
-    clearCourse: () => void;
-    updateCourseAttribute: (attributeName: keyof ICourse, value: any) => void;
+  state: ICourseState;
+  addSection: () => void;
+  editSection: (section: ISection) => void;
+  deleteSection: (id: string) => void;
+  saveSection: (sectionData: ISectionInput) => void;
+  addContent: (sectionId: string) => void;
+  editContent: (sectionId: string, content: IContent) => void;
+  deleteContent: (sectionId: string, contentId: string) => void;
+  saveContent: (sectionId: string, contentData: IContentInput) => void;
+  cancelEdit: () => void;
+  updateContentPosition: (
+    sectionId: string,
+    contentId: string,
+    newPosition: number
+  ) => void;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
+const STORAGE_KEY = "course-form-data";
 
-const STORAGE_KEY = "course-data";
-
-const getInitialCourse = (): ICourse | null => {
-    const storedData = sessionStorage.getItem(STORAGE_KEY);
-    if (storedData) {
-        try {
-            return JSON.parse(storedData);
-        } catch (error) {
-            console.error("Error parsing stored course data:", error);
-        }
+const getInitialState = (): ICourseState => {
+  const storedData = sessionStorage.getItem(STORAGE_KEY);
+  if (storedData) {
+    try {
+      return JSON.parse(storedData);
+    } catch (error) {
+      console.error("Error parsing stored course data:", error);
     }
-    return null; // Si no hay datos almacenados, no hay curso inicialmente
+  }
+  return {
+    sections: [],
+    editingSection: null,
+    isAddingSection: false,
+    editingContent: null,
+    isAddingContent: false,
+    currentSectionId: null,
+  };
 };
 
 export function CourseProvider({ children }: { children: React.ReactNode }) {
-    const [course, setCourse] = React.useState<ICourse | null>(getInitialCourse);
+  const [state, setState] = useState<ICourseState>(getInitialState);
 
-    // Guardamos en sessionStorage el curso cada vez que cambia
-    useEffect(() => {
-        if (course) {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(course));
-        }
-    }, [course]);
+  useEffect(() => {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
 
-    const editCourse = (courseData: ICourseInput) => {
-        setCourse((prev) => ({
-            ...prev,
-            ...courseData,
-            id: prev?.id || crypto.randomUUID(), // Mantenemos el ID existente o generamos uno nuevo
-        }));
-    };
+  /*** 🔹 MÉTODOS PARA SECCIONES ***/
+  const addSection = () =>
+    setState((prev) => ({ ...prev, isAddingSection: true }));
 
-    const clearCourse = () => {
-        setCourse(null); // Restablecemos el curso a null
-        sessionStorage.removeItem(STORAGE_KEY); // Removemos los datos almacenados
-    };
+  const editSection = (section: ISection) =>
+    setState((prev) => ({ ...prev, editingSection: section }));
 
-    // Nueva función para actualizar un atributo específico de `course`
-    const updateCourseAttribute = (attributeName: keyof ICourse, value: any) => {
-        setCourse((prev) => {
-            if (!prev) {
-                console.warn("No hay un curso disponible para actualizar.");
-                return null; // Si no hay curso, retornar null
+  const deleteSection = (id: string) =>
+    setState((prev) => ({
+      ...prev,
+      sections: prev.sections.filter((section) => section.id !== id),
+    }));
+
+  const saveSection = (sectionData: ISectionInput) => {
+    setState((prev) => {
+      if (prev.editingSection) {
+        return {
+          ...prev,
+          sections: prev.sections.map((section) =>
+            section.id === prev.editingSection?.id
+              ? { ...section, ...sectionData }
+              : section
+          ),
+          editingSection: null,
+          isAddingSection: false,
+        };
+      } else {
+        const newSection = {
+          ...sectionData,
+          id: crypto.randomUUID(),
+          contents: [],
+        };
+        return {
+          ...prev,
+          sections: [...prev.sections, newSection],
+          isAddingSection: false,
+        };
+      }
+    });
+  };
+
+  /*** 🔹 MÉTODOS PARA CONTENIDOS ***/
+  const addContent = (sectionId: string) => {
+    setState((prev) => ({
+      ...prev,
+      isAddingContent: true,
+      currentSectionId: sectionId,
+    }));
+  };
+
+  const editContent = (sectionId: string, content: IContent) =>
+    setState((prev) => ({
+      ...prev,
+      editingContent: content,
+      currentSectionId: sectionId, // ✅ Se guarda la sección a la que pertenece el contenido
+    }));
+
+  const deleteContent = (sectionId: string, contentId: string) => {
+    setState((prev) => {
+      const updatedSections = prev.sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              contents: section.contents
+                .filter((content) => content.id !== contentId)
+                .map((content, index) => ({ ...content, position: index })), // ✅ Reajusta posiciones después de eliminar
             }
-            return {
-                ...prev,
-                [attributeName]: value, // Actualiza dinámicamente el atributo
-            };
-        });
-    };
+          : section
+      );
 
-    return (
-        <CourseContext.Provider
-            value={{
-                course,
-                editCourse,
-                clearCourse,
-                updateCourseAttribute, // Exponer la nueva función
-            }}
-        >
-            {children}
-        </CourseContext.Provider>
-    );
+      return { ...prev, sections: updatedSections };
+    });
+  };
+
+  const saveContent = (sectionId: string, contentData: IContentInput): void => {
+    setState((prev) => {
+      // 🔹 Buscar la sección donde se debe guardar el contenido
+      const sectionIndex = prev.sections.findIndex(
+        (section) => section.id === sectionId
+      );
+  
+      if (sectionIndex === -1) {
+        console.error(`Sección con ID ${sectionId} no encontrada.`);
+        return prev; // 🚨 Evita romper el estado si la sección no existe
+      }
+  
+      const updatedSections = [...prev.sections]; // Clonamos el array de secciones
+      const sectionContents = updatedSections[sectionIndex].contents;
+  
+      if (prev.editingContent) {
+        // ✅ Editar contenido existente
+        updatedSections[sectionIndex] = {
+          ...updatedSections[sectionIndex],
+          contents: sectionContents.map((content) =>
+            content.id === prev.editingContent?.id
+              ? { ...content, ...contentData }
+              : content
+          ),
+        };
+      } else {
+        // ✅ Agregar nuevo contenido al final con `position` correcto
+        const lastPosition = sectionContents.length > 0 
+          ? Math.max(...sectionContents.map((c) => c.position)) 
+          : 0; // Si no hay contenidos, empieza en 1
+  
+        const newContent: IContent = {
+          id: crypto.randomUUID(),
+          sectionId: sectionId,
+          ...contentData, // Ahora `contentData` no sobrescribe `position`
+          position: lastPosition + 1, // 🔥 Asignamos `position` antes del spread
+        };
+  
+        updatedSections[sectionIndex] = {
+          ...updatedSections[sectionIndex],
+          contents: [...sectionContents, newContent], // Se añade al final
+        };
+      }
+  
+      return {
+        ...prev,
+        sections: updatedSections,
+        editingContent: null,
+        isAddingContent: false,
+        currentSectionId: null,
+      };
+    });
+  };
+
+  const updateContentPosition = (
+    sectionId: string,
+    contentId: string,
+    newPosition: number
+  ) => {
+    setState((prev) => {
+      return {
+        ...prev,
+        sections: prev.sections.map((section) => {
+          if (section.id === sectionId) {
+            let updatedContents = section.contents.map((content) =>
+              content.id === contentId
+                ? { ...content, position: newPosition }
+                : content
+            );
+
+            // 🔥 Siempre ordenamos los contenidos por `position`
+            updatedContents = updatedContents.sort(
+              (a, b) => a.position - b.position
+            );
+
+            return { ...section, contents: updatedContents };
+          }
+          return section;
+        }),
+      };
+    });
+  };
+
+  const cancelEdit = () =>
+    setState((prev) => ({
+      ...prev,
+      editingSection: null,
+      isAddingSection: false,
+      editingContent: null,
+      isAddingContent: false,
+      currentSectionId: null,
+    }));
+
+  return (
+    <CourseContext.Provider
+      value={{
+        state,
+        addSection,
+        editSection,
+        deleteSection,
+        saveSection,
+        addContent,
+        editContent,
+        deleteContent,
+        saveContent,
+        cancelEdit,
+        updateContentPosition,
+      }}
+    >
+      {children}
+    </CourseContext.Provider>
+  );
 }
-
-
 
 export function useCourseContext() {
-    const context = useContext(CourseContext);
-    if (context === undefined) {
-        throw new Error("useCourseContext must be used within a CourseProvider");
-    }
-    return context;
+  const context = useContext(CourseContext);
+  if (context === undefined) {
+    throw new Error("useCourseContext must be used within a CourseProvider");
+  }
+  return context;
 }
-
