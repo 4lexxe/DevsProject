@@ -1,30 +1,34 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
-import Admin from '../admin/Admin'; // Relación con Admin
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from "../../infrastructure/database/db";
+import CareerType from "../careerType/CareerType";
+import Category from "../category/Category";
+import Admin from "../admin/Admin";
 
-// Modelo de Course
+class CourseCategory extends Model {}
+
 class Course extends Model {
-  public id!: number;
+  public id!: bigint;
   public title!: string;
   public image!: string;
   public summary!: string;
-  public category!: string;
+  public categoryId!: bigint;
   public about!: string;
-  public relatedCareerType!: string;
-  public learningOutcomes!: string[]; // Array de string para los resultados de aprendizaje
+  public relatedCareerTypeId!: bigint;
+  public learningOutcomes!: string[];
   public isActive!: boolean;
   public isInDevelopment!: boolean;
-  public adminId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public adminId!: bigint;
+
+  public readonly createdAt!: Date; 
+  public readonly updatedAt!: Date; 
 }
 
 Course.init(
   {
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
+      type: DataTypes.BIGINT,
       autoIncrement: true,
+      primaryKey: true,
     },
     title: {
       type: DataTypes.STRING,
@@ -32,57 +36,51 @@ Course.init(
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     summary: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    category: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
+    },
+    categoryId: {
+      type: DataTypes.BIGINT,
+      references: { model: CourseCategory, key: "id" },
     },
     about: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    relatedCareerType: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    relatedCareerTypeId: {
+      type: DataTypes.BIGINT,
+      references: { model: CareerType, key: "id" },
     },
     learningOutcomes: {
-      type: DataTypes.JSONB, // Usamos JSONB para almacenar los temas de aprendizaje
-      allowNull: true,
-      defaultValue: [], // Valor por defecto es un array vacío
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, // Valor por defecto es true (activo)
     },
     isInDevelopment: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // Valor por defecto es false (no está en desarrollo)
     },
     adminId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Admins',
-        key: 'id',
-      },
-      allowNull: false,
+      type: DataTypes.BIGINT,
+      references: { model: Admin, key:"id"},      
     },
   },
   {
     sequelize,
-    tableName: 'Courses',
-    modelName: 'Course',
+    modelName: "Course",
     timestamps: true,
   }
 );
 
-// Relación con Admin
-Course.belongsTo(Admin, { foreignKey: 'adminId', as: 'admin' });
+CourseCategory.init({}, { sequelize, modelName: "course_course_category" });
+CourseCategory.belongsToMany(Course, { through: CourseCategory });
+Course.belongsTo(CareerType, { foreignKey: "relatedCareerTypeId" });
+Course.belongsToMany(Category, { through: CourseCategory });
 
 export default Course;
