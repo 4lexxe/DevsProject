@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-// Ruta para crear una nueva sección (requiere autenticación)
+/* // Ruta para crear una nueva sección (requiere autenticación)
 router.post('/sections', createSection);
 
 // Ruta para obtener todas las secciones de un curso (sin autenticación)
@@ -22,6 +22,6 @@ router.get('/sections/:id', getSectionById);
 router.put('/sections/:id', updateSection);
 
 // Ruta para eliminar una sección por ID (requiere autenticación)
-router.delete('/sections/:id', deleteSection);
+router.delete('/sections/:id', deleteSection); */
 
 export default router;

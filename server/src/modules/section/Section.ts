@@ -1,60 +1,51 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
-import Course from '../course/Course'; // Relación con el curso
+import { DataTypes, Model, Optional } from "sequelize";
+import sequelize from "../../infrastructure/database/db";
+import Course from "../course/Course";
 
 class Section extends Model {
-  public id!: number;
+  public id!: bigint;
   public title!: string;
   public description!: string;
-  public courseId!: number;
-  public moduleType!: string;  // Nuevo atributo: tipo de módulo
-  public coverImage!: string; // Nuevo atributo: portada de la sección
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public courseId!: bigint;
+  public coverImage!: string;
+  
+  public readonly createdAt!: Date; 
+  public readonly updatedAt!: Date; 
 }
 
 Section.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
+      autoIncrement: true,
       primaryKey: true,
-      autoIncrement: true
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     description: {
-      type: DataTypes.STRING,
-      allowNull: true
+      type: DataTypes.TEXT,
+      allowNull: false,
     },
     courseId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Courses',
-        key: 'id',
-      },
+      type: DataTypes.BIGINT,
+      references: { model: Course, key: "id" },
     },
-    moduleType: {  // Atributo agregado para el tipo de módulo
-      type: DataTypes.STRING,
+    coverImage: {
+      type: DataTypes.TEXT,
       allowNull: false,
-      defaultValue: 'Módulo Fundamental', // Valor por defecto, pero puedes cambiarlo según la lógica de tu aplicación
     },
-    coverImage: {  // Atributo agregado para la portada de la sección
-      type: DataTypes.STRING,
-      allowNull: true, // Este atributo puede ser opcional, dependiendo de si siempre habrá una portada
-    }
   },
   {
     sequelize,
-    tableName: 'Sections',
-    modelName: 'Section',
-    timestamps: true
+    modelName: "Section",
+    tableName: "Sections",
+    timestamps: true,
   }
 );
 
-// Relación con Course
-Section.belongsTo(Course, { foreignKey: 'courseId' });
-Course.hasMany(Section, { foreignKey: 'courseId' });
+Section.belongsTo(Course, { foreignKey: "courseId", as: "course" });
+Course.hasMany(Section, { foreignKey: "courseId", as: "sections" });
 
 export default Section;
