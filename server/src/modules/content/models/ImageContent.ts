@@ -4,8 +4,10 @@ import Section from "../../section/Section";
 
 class ImageContent extends Model {
   public id!: bigint;
-  public contentImage!: string;
-  public contentImageTitle!: string;
+  public content!: string;
+  public title!: string;
+  public duration!: number;
+  public position!: number;
   public sectionId!: bigint;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -18,12 +20,20 @@ ImageContent.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    contentImage: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    contentImageTitle: {
+    title: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    position: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     sectionId: {
@@ -34,9 +44,13 @@ ImageContent.init(
   },
   {
     sequelize,
-    modelName: "image_content",
-    timestamps: true
+    modelName: "ImageContent",
+    tableName: "ImageContents",
+    timestamps: true,
   }
 );
+
+ImageContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(ImageContent, { foreignKey: "sectionId", as: "imageContents" });
 
 export default ImageContent;

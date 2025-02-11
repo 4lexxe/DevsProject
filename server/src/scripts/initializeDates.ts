@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+/* import dotenv from "dotenv";
 import sequelize from "../infrastructure/database/db";
 import Course from "../modules/course/Course";
 import Section from "../modules/section/Section";
@@ -507,4 +507,4 @@ async function insertData() {
 }
 
 // Ejecutar la función principal
-insertData();
+insertData(); */

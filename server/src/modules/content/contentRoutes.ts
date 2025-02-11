@@ -3,7 +3,7 @@ import { createContent, getContentBySection, getContentById, updateContent, dele
 
 const router = express.Router();
 
-// Ruta para crear contenido (requiere autenticación)
+/* // Ruta para crear contenido (requiere autenticación)
 router.post('/content', createContent);
 
 // Ruta para obtener el contenido de una sección (pública)
@@ -16,6 +16,6 @@ router.get('/content/:id', getContentById);
 router.put('/content/:id', updateContent);
 
 // Ruta para eliminar contenido (requiere autenticación)
-router.delete('/content/:id', deleteContent);
+router.delete('/content/:id', deleteContent); */
 
 export default router;

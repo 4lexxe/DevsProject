@@ -4,11 +4,13 @@ import Section from "../../section/Section";
 
 class TextContent extends Model {
   public id!: bigint;
-  public contentText!: string;
-  public contentTextTitle!: string;
+  public content!: string;
+  public title!: string;
+  public duration!: number;
+  public position!: number;
   public sectionId!: bigint;
   public readonly createdAt!: Date;
-  public readonly updatedAt!: Date; 
+  public readonly updatedAt!: Date;
 }
 
 TextContent.init(
@@ -18,13 +20,21 @@ TextContent.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    contentText: {
+    content: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
     },
-    contentTextTitle: {
+    title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    position: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
     sectionId: {
       type: DataTypes.BIGINT,
@@ -34,9 +44,13 @@ TextContent.init(
   },
   {
     sequelize,
-    modelName: "text_content",
-    timestamps: true
+    modelName: "TextContent",
+    tableName: "TextContents",
+    timestamps: true,
   }
 );
+
+TextContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(TextContent, { foreignKey: "sectionId", as: "textContents" });
 
 export default TextContent;

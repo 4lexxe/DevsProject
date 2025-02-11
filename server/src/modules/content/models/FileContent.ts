@@ -4,8 +4,10 @@ import Section from "../../section/Section";
 
 class FileContent extends Model {
   public id!: bigint;
-  public contentFile!: string;
-  public contentFileTitle!: string;
+  public content!: string;
+  public title!: string;
+  public duration!: number;
+  public position!: number;
   public sectionId!: bigint;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -18,12 +20,20 @@ FileContent.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    contentFile: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    contentFileTitle: {
+    title: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    position: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     sectionId: {
@@ -33,9 +43,13 @@ FileContent.init(
   },
   {
     sequelize,
-    modelName: "file_content",
+    modelName: "FileContent",
+    tableName: "FileContents",
     timestamps: true,
   }
 );
+
+FileContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(FileContent, { foreignKey: "sectionId", as: "fileContents" });
 
 export default FileContent;

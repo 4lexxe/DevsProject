@@ -4,8 +4,10 @@ import Section from "../../section/Section";
 
 class VideoContent extends Model {
   public id!: bigint;
-  public contentVideo!: string;
-  public contentVideoTitle!: string;
+  public content!: string;
+  public title!: string;
+  public duration!: number;
+  public position!: number;
   public sectionId!: bigint;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -18,12 +20,20 @@ VideoContent.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    contentVideo: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    contentVideoTitle: {
+    title: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    position: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     sectionId: {
@@ -34,9 +44,13 @@ VideoContent.init(
   },
   {
     sequelize,
-    modelName: "video_content",
+    modelName: "VideoContent",
+    tableName: "VideoContents",
     timestamps: true,
   }
 );
+
+VideoContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(VideoContent, { foreignKey: "sectionId", as: "videoContents" });
 
 export default VideoContent;

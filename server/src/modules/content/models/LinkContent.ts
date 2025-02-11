@@ -5,7 +5,9 @@ import Section from "../../section/Section";
 class LinkContent extends Model {
   public id!: bigint;
   public externalLink!: string;
-  public externalLinkTitle!: string;
+  public title!: string;
+  public duration!: number;
+  public position!: number;
   public sectionId!: bigint;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -22,8 +24,16 @@ LinkContent.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    externalLinkTitle: {
-      type: DataTypes.TEXT,
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    duration: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    position: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     sectionId: {
@@ -34,9 +44,13 @@ LinkContent.init(
   },
   {
     sequelize,
-    modelName: "link_content",
+    modelName: "LinkContent",
+    tableName: "LinkContents",
     timestamps: true,
   }
 );
+
+LinkContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(LinkContent, { foreignKey: "sectionId", as: "linkContents" });
 
 export default LinkContent;

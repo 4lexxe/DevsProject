@@ -6,12 +6,15 @@ class CareerType extends Model {
   public name!: string;
   public description!: string;
   public isActive!: boolean;
+
+  public readonly createdAt!: Date; 
+  public readonly updatedAt!: Date;
 }
 
 CareerType.init(
   {
     id: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.BIGINT,
       autoIncrement: true,
       primaryKey: true,
     },
@@ -31,7 +34,9 @@ CareerType.init(
   },
   {
     sequelize,
-    modelName: "career_type",
+    modelName: "CareerType",
+    tableName: "CareerTypes",
+    timestamps: true,
   }
 );
 

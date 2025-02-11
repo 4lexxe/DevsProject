@@ -4,7 +4,7 @@ import { getSectionsByCourse } from '../section/sectionContentController';
 
 const router = express.Router();
 
-// Ruta para obtener todos los cursos (público)
+/* // Ruta para obtener todos los cursos (público)
 router.get('/courses', getCourses);
 
 // Ruta para obtener un curso por ID (público)
@@ -20,6 +20,6 @@ router.get('/courses/:courseId/modules/count', getSectionsByCourse);
 router.put('/courses/:id', updateCourse);
 
 // Ruta para eliminar un curso (solo Admin y SuperAdmin)
-router.delete('/courses/:id', deleteCourse);
+router.delete('/courses/:id', deleteCourse); */
 
 export default router;

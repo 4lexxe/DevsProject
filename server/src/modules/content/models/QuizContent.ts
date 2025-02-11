@@ -4,8 +4,8 @@ import Section from "../../section/Section";
 
 class QuizContent extends Model {
   public id!: bigint;
-  public quizTitle!: string;
-  public quizContent!: string;
+  public title!: string;
+  public content!: string;
   public questions!: object;
   public duration!: number;
   public position!: number;
@@ -21,11 +21,11 @@ QuizContent.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    quizTitle: {
+    title: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    quizContent: {
+    content: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
@@ -38,7 +38,7 @@ QuizContent.init(
       allowNull: false,
     },
     position: {
-      type: DataTypes.INTEGER.UNSIGNED,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     sectionId: {
@@ -49,9 +49,13 @@ QuizContent.init(
   },
   {
     sequelize,
-    modelName: "quiz_content",
+    modelName: "QuizContent",
+    tableName: "QuizContents",
     timestamps: true,
   }
 );
+
+QuizContent.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
+Section.hasMany(QuizContent, { foreignKey: "sectionId", as: "quizContents" });
 
 export default QuizContent;

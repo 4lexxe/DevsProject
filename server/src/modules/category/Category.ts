@@ -6,6 +6,9 @@ class Category extends Model {
   public name!: string;
   public description!: string;
   public isActive!: boolean;
+
+  public readonly createdAt!: Date; 
+  public readonly updatedAt!: Date;
 }
 
 Category.init(
@@ -31,7 +34,9 @@ Category.init(
   },
   {
     sequelize,
-    modelName: "category",
+    modelName: "Category",
+    tableName: "Categories",
+    timestamps: true
   }
 );
 
