@@ -53,10 +53,12 @@ Course.init(
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: false,
     },
     isInDevelopment: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: true,
     },
     adminId: {
       type: DataTypes.BIGINT,

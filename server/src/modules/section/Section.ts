@@ -36,12 +36,17 @@ Section.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    moduleType: { 
+      type: DataTypes.ENUM('Introductorio', 'Principiante', 'Intermedio', 'Avanzado', 'Experto', 'Insano Hardcore'), 
+      allowNull: false, 
+      defaultValue: 'Introductorio' 
+    }
   },
   {
     sequelize,
     modelName: "Section",
     tableName: "Sections",
-    timestamps: true,
+    timestamps: true, 
   }
 );
 
