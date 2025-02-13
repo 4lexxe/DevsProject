@@ -20,7 +20,7 @@ class Course extends Model {
 }
 
 Course.init(
-  {
+  { 
     id: {
       type: DataTypes.BIGINT,
       autoIncrement: true,
@@ -105,8 +105,9 @@ CourseCategory.init(
 // 📌 **Relaciones**
 
 // 🔹 Muchos a Muchos (Course ↔ Category)
-Course.belongsToMany(Category, { through: CourseCategory, as: "categories" });
-Category.belongsToMany(Course, { through: CourseCategory, as: "courses" });
+Course.belongsToMany(Category, { through: CourseCategory, as: "categories", foreignKey: "courseId" });
+Category.belongsToMany(Course, { through: CourseCategory, as: "courses", foreignKey: "categoryId" });
+
 
 // 🔹 Uno a Muchos (Course → CareerType)
 Course.belongsTo(CareerType, { foreignKey: "careerTypeId", as: "careerType" });

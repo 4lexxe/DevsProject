@@ -10,11 +10,16 @@ import authRoutes from './modules/auth/routes/auth.routes';
 import userRoutes from './modules/user/userRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
 import roleRoutes from './modules/role/roleRoutes';
+import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
+
+/* Rutas relacionadas con el area de cursos */
+import careerTypeRoutes from './modules/careerType/careerTypeRoutes'
+import categoryRoutes from './modules/category/categoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
-import contentRoutes from './modules/content/contentRoutes';
-import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
+
+
 import recourseRoutes from './modules/resource/resourceRoutes';
 
 import geoip from 'geoip-lite';
@@ -50,7 +55,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 
 // Rate limiting con validación reforzada
@@ -148,10 +152,13 @@ app.use('/api/roles', roleRoutes);
 app.use('/api', recourseRoutes);
 
 // Rutas públicas
+app.use('/api', HeaderSectionRoutes);
+
+/* Ruas relacionadas con el area de cursos */
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
-app.use('/api', contentRoutes);
-app.use('/api', HeaderSectionRoutes);
+app.use('/api', careerTypeRoutes);
+app.use('/api', categoryRoutes);
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {
