@@ -6,7 +6,13 @@ class QuizContent extends Model {
   public id!: bigint;
   public title!: string;
   public content!: string;
-  public questions!: object;
+  public questions?: Array<{
+    question: string; // Pregunta
+    answers: Array<{
+      answer: string; // Respuesta
+      isCorrect: boolean; // Indica si es una respuesta correcta
+    }>;
+  }>;
   public duration!: number;
   public position!: number;
   public sectionId!: bigint;
@@ -14,7 +20,7 @@ class QuizContent extends Model {
   public readonly updatedAt!: Date;
 }
 
-QuizContent.init(
+QuizContent.init( 
   {
     id: {
       type: DataTypes.BIGINT,

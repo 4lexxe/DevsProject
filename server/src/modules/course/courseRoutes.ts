@@ -1,8 +1,8 @@
-import express from 'express';
+import {Router} from 'express';
 
 import { CourseController } from './courseController';
 
-const router = express.Router();
+const router = Router();
 
 // Ruta para obtener todos los cursos (público)
 router.get('/course', CourseController.getAll);
