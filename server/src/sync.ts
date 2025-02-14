@@ -9,6 +9,8 @@ import Section from './modules/section/Section';
 import Content from './modules/content/Content';
 import SectionHeader from './modules/headerSection/HeaderSection';
 import Recourse from './modules/resource/Resource';
+import Rating from './modules/resource/rating/Rating';
+import Comment from './modules/resource/comment/Comment';
 
 import sequelize from './infrastructure/database/db';
 
@@ -38,6 +40,10 @@ async function syncDatabase() {
     await SectionHeader.sync({ force: true });
 
     await Recourse.sync({ force: true });
+
+    await Rating.sync({ force: true });
+
+    await Comment.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {

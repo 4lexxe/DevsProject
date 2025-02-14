@@ -32,6 +32,17 @@ export interface AuthResponse {
   };
 }
 
+export interface ProviderMetadata {
+  accessToken?: string;
+  refreshToken?: string;
+  profile?: {
+    id: string;
+    username?: string;
+    email?: string;
+    avatarUrl?: string;
+  };
+}
+
 export interface User {
   id: number;
   name: string;
@@ -50,7 +61,7 @@ export interface User {
   lastActiveAt: string;
   authProvider: string;
   authProviderId?: string;
-  providerMetadata?: any;
+  providerMetadata?: ProviderMetadata;
 }
 
 // Clase AuthService para manejar la autenticación
@@ -90,7 +101,7 @@ class AuthService {
       const { token } = response.data;
       this.setToken(token);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.clearToken();
       throw error;
     }
@@ -103,14 +114,14 @@ class AuthService {
       const { token } = response.data;
       this.setToken(token);
       return response.data;
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.clearToken();
       throw error;
     }
   }
 
   // Verificar la autenticación del usuario
-  async verify(): Promise<{ authenticated: boolean; user?: User; session?: any }> {
+  async verify(): Promise<{ authenticated: boolean; user?: User; session?: AuthResponse['session'] }> {
     try {
       const response = await axios.get(`${API_URL}/auth/verify`, {
         withCredentials: true,

@@ -15,11 +15,16 @@ import {CourseDetail} from './course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
 
-import Profile from './course/pages/Profile';
+import Profile from './profile/Profile';
 
 import LearnRoute from './learnroute/pages/LearnRoute';
 
 import ResourcePage from './recourse/pages/resourcePages';
+
+import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
+
+import ResourceDetailsPage from   './recourse/pages/resourceDetails/ResourceDetailsPage';
+
 
 function App() {
   return (
@@ -37,7 +42,9 @@ function App() {
             <Route path="register" element={<RegisterPage />} />
             <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            <Route path='course/form' element = {<CourseFormPage/>} />
             <Route path="/recursos" element={<ResourcePage />} />
+            <Route path="/resources/create" element={<CreateResourceForm />} />
 
+            <Route path="/resources/:id" element={<ResourceDetailsPage />} />
             
           </Route>
         </Routes>

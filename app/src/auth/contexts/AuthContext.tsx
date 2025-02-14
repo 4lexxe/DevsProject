@@ -57,8 +57,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.setItem('hasShownWelcome', 'true');
       setShowWelcomeMessage(true);
       
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    } catch (err: Error | unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al iniciar sesión');
       throw err;
     }
   };
@@ -73,8 +74,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.setItem('hasShownWelcome', 'true');
       setShowWelcomeMessage(true);
       
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+    } catch (err: Error | unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al registrarse');
       throw err;
     }
   };
@@ -89,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.removeItem('hasShownWelcome');
       
       socket?.emit('logout', { userId: user?.id });
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Logout error:', err);
     }
   };

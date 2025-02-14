@@ -15,7 +15,9 @@ import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import recourseRoutes from './modules/resource/resourceRoutes';
+import recourseRoutes from './modules/resource/resource.routes';
+import ratingRoutes from './modules/resource/rating/rating.routes';
+import commentRoutes from './modules/resource/comment/comment.routes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -142,16 +144,20 @@ app.use((req, res, next) => {
 // Sistema de rutas
 // Rutas protegidas por autenticación
 app.use('/api/auth', apiLimiter, authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
-app.use('/api', recourseRoutes);
+app.use('/api/resources', recourseRoutes);
 
 // Rutas públicas
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
 app.use('/api', contentRoutes);
 app.use('/api', HeaderSectionRoutes);
+
+// Rutas de comentarios y valoraciones
+app.use('/api/rating', ratingRoutes);
+app.use('/api/comment', commentRoutes);
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {

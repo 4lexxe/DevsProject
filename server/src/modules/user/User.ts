@@ -22,20 +22,13 @@ class User extends Model {
   public email!: string | null;
   public password!: string | null;
   public phone!: string | null;
-
   public roleId!: number;
   public authProvider!: AuthProvider;
   public authProviderId!: string | null;
-
-  // Información del proveedor
   public username!: string | null;
   public avatar!: string | null;
   public displayName!: string | null;
-
-  // Metadata del proveedor
   public providerMetadata!: object | null;
-
-  // Campos de seguridad geoespacial
   public registrationGeo!: {
     city: string | null;
     region: string | null;
@@ -44,7 +37,6 @@ class User extends Model {
     timezone: string | null;
     isProxy: boolean;
   } | null;
-
   public lastLoginGeo!: {
     city: string | null;
     region: string | null;
@@ -53,25 +45,17 @@ class User extends Model {
     timezone: string | null;
     isProxy: boolean;
   } | null;
-
-  registrationIp!: string;
-
-  lastLoginIp!: string;
-
+  public registrationIp!: string;
+  public lastLoginIp!: string;
   public suspiciousActivities!: Array<{
     type: string;
     ip: string;
     geo: object;
     timestamp: Date;
   }>;
-
   public isActiveSession!: boolean;
   public lastActiveAt!: Date | null;
-
-  // Relación con Role
   public Role?: Role;
-
-  // Timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -79,7 +63,8 @@ class User extends Model {
     const role = await Role.findByPk(this.roleId, {
       include: [
         {
-          association: "Permissions",
+          model: Permission,
+          as: "Permissions", // Asegurar que coincida con la asociación en Role
           attributes: ["name"],
         },
       ],
@@ -209,10 +194,10 @@ User.init(
   }
 );
 
-// Definir relaciones
+// Definir relaciones correctamente
 User.belongsTo(Role, {
   foreignKey: "roleId",
-  as: "Role",
+  as: "Role", // Asegurar que coincide con include en las consultas
 });
 
 Role.hasMany(User, {
