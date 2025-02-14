@@ -65,7 +65,7 @@ const currentLevel: Level = {
       completed: false,
       resources: [{ type: "Docs", title: "Route Parameters", url: "#" }],
     },
-    {
+    { 
       id: "5",
       title: "Route Naming",
       completed: false,
