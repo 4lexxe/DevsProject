@@ -1,26 +1,26 @@
 import React from 'react'
-import { Node, NodeProps } from "@xyflow/react"
-import { CustomComponentData, CustomComponentType } from '../types/CustomComponentType';
-import { MdCheckBoxOutlineBlank, MdOutlineTopic, MdTopic, MdNoteAlt   } from "react-icons/md";
-import { FaGripLinesVertical,FaLink } from "react-icons/fa";
-import { BsTypeH1,BsTextParagraph } from "react-icons/bs";
-import { LuListTodo, LuMousePointerClick  } from "react-icons/lu";
-import { TbSection } from "react-icons/tb";
+import { Node, NodeProps, Position } from "@xyflow/react"
+import { NodeButtonData } from '../types/CustomComponentType';
+import CustomHandle from '../components/CustomHandle';
 
 
-type CustomComponentNode = Node<CustomComponentData, 'string'>;
+type CustomComponentNode = Node<NodeButtonData, 'string'>;
 
 function NodeButton({
-    data: {value, type},
+    data: {label},
 }: NodeProps<CustomComponentNode>) {
   return (
-    <div  className='relative'>
-        {type === CustomComponentType.NodeButton && <MdCheckBoxOutlineBlank size={24}/>}
-        {type === CustomComponentType.H1 && <BsTypeH1 size={24}/>}
-        {type === CustomComponentType.Parrafo && <BsTextParagraph size={24}/>}
+    <div className='relative h-full'>
+    <div  className='flex items-center justify-center cursor-pointer bg-yellow-400 border border-black rounded-md px-4 py-2 shadow-md w-36 h-12'>
         <span className="text-sm absolute">
-            {value}
+            {label}
         </span>
+        <CustomHandle type='source' position={Position.Top}/>
+        <CustomHandle type='source' position={Position.Left}/>
+        <CustomHandle type='source' position={Position.Right}/>
+        <CustomHandle type='source' position={Position.Bottom}/>
+    </div>
+
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { AuthProvider } from './auth/contexts/AuthContext';
 
 // Importación de todos los estilos
 import '@/shared/assets/styles/main.css';
+import '@/shared/assets/styles/roadmap.css';
 
 // Importación de los componentes
 import DefaultLayout from './shared/layouts/defaultLayout';
@@ -20,6 +21,7 @@ import Profile from './course/pages/Profile';
 import LearnRoute from './learnroute/pages/LearnRoute';
 
 import ResourcePage from './recourse/pages/resourcePages';
+import RoadmapEditor from './learnroute/components/RoadmapEditor';
 
 function App() {
   return (
@@ -38,7 +40,7 @@ function App() {
             <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            <Route path='course/form' element = {<CourseFormPage/>} />
             <Route path="/recursos" element={<ResourcePage />} />
 
-            
+            <Route path="/editor-roadmap" element={<RoadmapEditor/>} />
           </Route>
         </Routes>
       </AuthProvider>

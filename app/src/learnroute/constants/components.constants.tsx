@@ -3,68 +3,69 @@ import { FaGripLinesVertical,FaLink } from "react-icons/fa";
 import { BsTypeH1,BsTextParagraph } from "react-icons/bs";
 import { LuListTodo, LuMousePointerClick  } from "react-icons/lu";
 import { TbSection } from "react-icons/tb";
+import { CustomComponentType } from "../types/CustomComponentType";
 
 export const COMPONENTS = [
     {
-        type: "nodeButton",
+        type: CustomComponentType.NodeButton,
         label: "Nodo",
         icon: <MdCheckBoxOutlineBlank/>,
         data: { content: "Nuevo Nodo" }
     },
     {
-        type: "line",
+        type: CustomComponentType.Line,
         label: "Linea",
         icon: <FaGripLinesVertical/>,
     },
     { 
-        type: "h1", 
+        type: CustomComponentType.H1, 
         label: "H1 Título", 
         icon: <BsTypeH1/>, 
         data: { content: "Título principal" } 
     },
     { 
-        type: "tema", 
+        type: CustomComponentType.Tema, 
         label: "Tema", 
         icon: <MdTopic/>, 
         data: { content: "Nuevo tema" } 
     },
     { 
-        type: "subtema",
+        type: CustomComponentType.Subtema,
         label: "Subtema", 
         icon:  <MdOutlineTopic />, 
         data: { content: "Subsección" } },
     { 
-        type: "parrafo", 
+        type: CustomComponentType.Parrafo, 
         label: "Párrafo", 
         icon: <BsTextParagraph/>, 
         data: { content: "Texto descriptivo..." } 
     },
     { 
-        type: "todo", 
+        type: CustomComponentType.ToDo, 
         label: "ToDo", 
         icon: <LuListTodo/>, 
         data: { tasks: [] } 
     },
     {
-        type: "etiqueta",
+        type: CustomComponentType.Etiqueta,
         label: "Etiqueta",
         icon: <MdNoteAlt/>,
         data: { content: "Nueva etiqueta..." },
     },
     {
-        type: "botonClick",
+        type: CustomComponentType.BotonClick,
         label: "Boton Click",
         icon: <LuMousePointerClick />,
         data: { content: "Nuevo Boton click..." },
     },
     { 
-        type: "link", 
+        type: CustomComponentType.Link, 
         label: "Link", 
         icon: <FaLink/>, 
         data: { url: "https://" } 
     },
     {
-        type: "seccion",
+        type: CustomComponentType.Seccion,
         label: "Seccion",
         icon: <TbSection/>,
     }

@@ -18,15 +18,64 @@ export enum CustomComponentType {
   }
   
   export type CustomComponentData = {
+    id?: string;
+    position?: {
+        x: number;
+        y: number;
+    };
+    measured?: {
+      width: number;
+      height: number;
+    };
     value?: number;
     type?: CustomComponentType;
+    color?: string;
     rotation?: number;
-    state?: CustomComponentState;
     isAttachedToGroup?: boolean;
     visible?: boolean;
     connectable?: boolean;
   };
+
+  export type TitleNodeData = CustomComponentData & {
+    label: string;
+  };
+
+  export type NodeButtonData = CustomComponentData & {
+    label: string;
+  };
+
+  export type TemaNodeData = CustomComponentData & {
+    label: string;
+    colorText: string;
+  };
   
+  export type SubtemaNodeData = CustomComponentData & {
+    label: string;
+    colorText: string;
+  }
+
+  export type ParrafoNodeData = CustomComponentData & {
+    label: string;
+    colorText: string;
+  }
+
+  export type TodoNodeData = CustomComponentData & {
+    label: string;
+    colorText: string;
+  }
+
+  export type LinkNodeData = CustomComponentData & {
+    label: string;
+    link: string;
+    colorText: string;
+  }
+
+  export type SeccionNodeData = CustomComponentData & {
+    borderColor: string;
+    bgColor: string;
+    borderRadius: string;
+  }
+
   /*export enum HistoryAction {
     AddNode = "addNode",
     RemoveNode = "removeNode",

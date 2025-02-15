@@ -14,7 +14,7 @@ export const initialNodes: Node[] = [
     id: "1",
     position: { x: 100, y: 100 },
     type: "nodeButton",
-    data: { type: CustomComponentType.NodeButton, value: 3 },
+    data: { type: CustomComponentType.NodeButton, value: "Nuevo NODO" },
   },
   {
     id: "2",
