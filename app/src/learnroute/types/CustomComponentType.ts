@@ -42,11 +42,26 @@ export enum CustomComponentType {
 
   export type NodeButtonData = CustomComponentData & {
     label: string;
+    colorText: string;
+    backgroundColor: string;
+    borderColor: string;
+    borderRadius: number;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   };
 
   export type TemaNodeData = CustomComponentData & {
     label: string;
     colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   };
   
   export type SubtemaNodeData = CustomComponentData & {

@@ -15,6 +15,13 @@
     min-width: 150px;
 }*/
 
+.react-flow__nodeButton {
+    @apply flex items-center justify-center cursor-pointer bg-yellow-400 border border-black rounded-md shadow-md;
+    padding: 12px 20px;
+    min-width: 150px;
+    min-height: 48px;
+}
+
 .react-flow__node-title {
     @apply rounded-lg bg-cyan-400 shadow-lg border border-gray-200 font-semibold text-lg;
     padding: 12px 20px;

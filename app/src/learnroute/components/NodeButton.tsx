@@ -7,11 +7,28 @@ import CustomHandle from '../components/CustomHandle';
 type CustomComponentNode = Node<NodeButtonData, 'string'>;
 
 function NodeButton({
-    data: {label},
+    data: {
+      label, 
+      colorText = '#000000', 
+      backgroundColor = '#facc15', 
+      fontSize = 16, 
+      layoutOrder = 0,
+      borderRadius=8,
+    },
 }: NodeProps<CustomComponentNode>) {
   return (
     <div className='relative h-full'>
-    <div  className='flex items-center justify-center cursor-pointer bg-yellow-400 border border-black rounded-md px-4 py-2 shadow-md w-36 h-12'>
+    <div  
+      className='react-flow__nodeButton'
+      style={{
+        color:colorText,
+        backgroundColor,
+        fontSize: `${fontSize}px`,
+        zIndex: layoutOrder, // Aplicar el orden del layout
+        padding: '12px 20px',
+        borderRadius: `${borderRadius}px`,
+        border: '1px solid #ccc',
+      }}>
         <span className="text-sm absolute">
             {label}
         </span>
@@ -22,7 +39,7 @@ function NodeButton({
     </div>
 
     </div>
-  )
+  );
 }
 
 export default NodeButton

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -84,22 +84,45 @@ const RoadmapEditor = () => {
     [setNodes],
   );
 
-  const handleNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
-    setSelectedNode(node);
-  }, []);
-  const handleUpdateNode = useCallback((nodeId: string, newData: any) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === nodeId) {
-          return {
-            ...node,
-            data: newData,
-          };
-        }
-        return node;
-      })
-    );
-  }, [setNodes]);
+  const handleNodeClick = useCallback((event: React.MouseEvent, clickedNode: Node) => {
+      // Busca el nodo actualizado en el estado `nodes`
+      const currentNode = nodes.find((n) => n.id === clickedNode.id);
+      setSelectedNode(currentNode || null);
+    },
+    [nodes] // Añade `nodes` como dependencia
+  );
+
+  const handleUpdateNode = useCallback((nodeId: string, updatedNode: any) => {
+  setNodes((nds) =>
+    nds.map((node) => {
+      if (node.id === nodeId) {
+        return {
+          ...node,
+          data: {
+            ...node.data,  // Mantener datos existentes
+            ...updatedNode.data  // Nuevos datos
+          },
+          position: updatedNode.position || node.position,
+          style: {
+            ...node.style,  // Mantener estilos existentes
+            ...updatedNode.style  // Nuevos estilos
+          }
+        };
+      }
+      return node;
+    })
+  );
+}, [setNodes]);
+
+//useEffect añadido para trackear la posicion en tiempo real de X e Y
+useEffect(() => {
+  if (selectedNode) {
+    const updatedNode = nodes.find((node) => node.id === selectedNode.id);
+    if (updatedNode) {
+      setSelectedNode(updatedNode);
+    }
+  }
+}, [nodes, selectedNode]);
 
 
   // Función para agregar un nuevo nodo
