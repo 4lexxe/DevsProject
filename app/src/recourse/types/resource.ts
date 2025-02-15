@@ -18,4 +18,11 @@ export interface Resource {
   userAvatar?: string;
   createdAt?: string;
   updatedAt?: string;
+  user: { id: number; name: string; avatar?: string; };
+}
+
+export interface UserInfo {
+  id: number;
+  name: string;
+  avatar?: string;
 }

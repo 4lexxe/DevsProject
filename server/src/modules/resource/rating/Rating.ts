@@ -50,8 +50,11 @@ Rating.init(
     star: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // Por defecto, sin estrella
-    },
+      defaultValue: false,
+      validate: {
+        isBoolean: true,
+      },
+     },
   },
   {
     sequelize,
@@ -83,25 +86,20 @@ Resource.hasMany(Rating, {
 });
 
 // Hooks para actualizar el contador de estrellas en el recurso
-Rating.afterCreate(async (rating, options) => {
-  if (rating.star) {
-    await Resource.increment("starCount", { by: 1, where: { id: rating.resourceId } });
-  }
+Rating.afterCreate(async (rating) => {
+  const totalStars = await Rating.count({ where: { resourceId: rating.resourceId, star: true } });
+  await Resource.update({ starCount: totalStars }, { where: { id: rating.resourceId } });
 });
 
-Rating.afterDestroy(async (rating, options) => {
-  if (rating.star) {
-    await Resource.decrement("starCount", { by: 1, where: { id: rating.resourceId } });
-  }
+Rating.afterDestroy(async (rating) => {
+  const totalStars = await Rating.count({ where: { resourceId: rating.resourceId, star: true } });
+  await Resource.update({ starCount: totalStars }, { where: { id: rating.resourceId } });
 });
 
-Rating.afterUpdate(async (rating, options) => {
+Rating.afterUpdate(async (rating) => {
   if (rating.changed("star")) {
-    if (rating.star) {
-      await Resource.increment("starCount", { by: 1, where: { id: rating.resourceId } });
-    } else {
-      await Resource.decrement("starCount", { by: 1, where: { id: rating.resourceId } });
-    }
+    const totalStars = await Rating.count({ where: { resourceId: rating.resourceId, star: true } });
+    await Resource.update({ starCount: totalStars }, { where: { id: rating.resourceId } });
   }
 });
 

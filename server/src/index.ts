@@ -15,9 +15,10 @@ import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import recourseRoutes from './modules/resource/resource.routes';
+import recourseRoutes from './modules/resource/routes/resource.routes';
 import ratingRoutes from './modules/resource/rating/rating.routes';
 import commentRoutes from './modules/resource/comment/comment.routes';
+import uploadRoutes from './modules/resource/routes/upload.routes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -148,6 +149,7 @@ app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/resources', recourseRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Rutas públicas
 app.use('/api', courseRoutes);

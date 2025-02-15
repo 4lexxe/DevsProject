@@ -37,13 +37,19 @@ export const RatingController: IRatingController = {
       const userId = req.user?.id;
       const { resourceId, star } = req.body;
       if (typeof star !== "boolean") {
-        res.status(400).json({ error: "El valor de 'star' debe ser booleano." });
+        res
+          .status(400)
+          .json({ error: "El valor de 'star' debe ser booleano." });
         return;
       }
-      const existingRating = await Rating.findOne({ where: { userId, resourceId } });
+      const existingRating = await Rating.findOne({
+        where: { userId, resourceId },
+      });
       if (existingRating) {
         if (existingRating.star === star) {
-          res.status(200).json({ message: "La calificación ya está registrada." });
+          res
+            .status(200)
+            .json({ message: "La calificación ya está registrada." });
           return;
         }
         await existingRating.update({ star });
@@ -83,14 +89,18 @@ export const RatingController: IRatingController = {
   async getStarCount(req: Request, res: Response) {
     try {
       const { resourceId } = req.params;
-      const resource = await Resource.findByPk(resourceId);
+      const resource = await Resource.findByPk(resourceId, {
+        attributes: ["starCount"],
+      });
       if (!resource) {
         res.status(404).json({ error: "Recurso no encontrado." });
         return;
       }
       res.json({ resourceId, starCount: resource.starCount });
     } catch (error) {
-      res.status(500).json({ error: "Error al obtener la cantidad de estrellas." });
+      res
+        .status(500)
+        .json({ error: "Error al obtener la cantidad de estrellas." });
     }
   },
 };

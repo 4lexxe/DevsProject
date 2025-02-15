@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import Resource from './Resource';
-import User from '../user/User';
+import Resource from '../Resource';
+import User from '../../user/User';
 import { body, validationResult } from 'express-validator';
 
 // Interface para los campos actualizables
-import { ResourceType } from './Resource';
+import { ResourceType } from '../Resource';
 
 interface UpdatableResourceFields {
   title?: string;

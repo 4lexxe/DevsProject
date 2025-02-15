@@ -1,45 +1,72 @@
-import api from '../../api/axios';
+import api from '../../api/axios'; // Importa la instancia de Axios configurada
 
-// Crear o actualizar un rating
-interface RatingResponse {
-  totalLikes: number;
-  totalDislikes: number;
-}
-
-export const createOrUpdateRating = async (ratingData: { resourceId: number; like: boolean }): Promise<RatingResponse> => {
-  try {
-    const response = await api.post('/api/rating', ratingData); // Envía los datos al backend
-    return response.data; // Devuelve el total de likes/dislikes
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
-    throw new Error(err.response?.data?.error || 'Error al procesar el rating');
-  }
-};
-
-// Eliminar un rating específico
-export const deleteRating = async (id: number): Promise<RatingResponse> => {
-  try {
-    const response = await api.delete(`/api/rating/${id}`); // Envía la solicitud DELETE al backend
-    return response.data; // Devuelve el total de likes/dislikes
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
-    throw new Error(err.response?.data?.error || 'Error al eliminar el rating');
-  }
-};
-
-// Obtener todos los ratings de un recurso
-interface Rating {
-  id: number;
+// Interfaz para los datos de una calificación
+interface RatingData {
   resourceId: number;
-  like: boolean;
+  star: boolean;
 }
 
-export const getRatingsByResource = async (resourceId: number): Promise<Rating[]> => {
-  try {
-    const response = await api.get(`/api/rating/resource/${resourceId}`); // Envía la solicitud GET al backend
-    return response.data; // Devuelve los ratings del recurso
-  } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
-    throw new Error(err.response?.data?.error || 'Error al obtener los ratings');
-  }
+// Servicio para manejar las operaciones relacionadas con las calificaciones
+const RatingService = {
+  /**
+   * Obtiene todas las calificaciones de un recurso específico.
+   * @param resourceId - ID del recurso.
+   * @returns Una promesa con la lista de calificaciones.
+   */
+  async getRatingsByResource(resourceId: number) {
+    try {
+      const response = await api.get(`/rating/${resourceId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener las calificaciones:', error);
+      throw new Error('Error al obtener las calificaciones.');
+    }
+  },
+
+  /**
+   * Agrega o actualiza una calificación de un usuario a un recurso.
+   * @param ratingData - Datos de la calificación (resourceId y star).
+   * @returns Una promesa con el mensaje de éxito.
+   */
+  async rateResource(ratingData: RatingData) {
+    try {
+      const response = await api.post('/rating/rate', ratingData);
+      return response.data;
+    } catch (error) {
+      console.error('Error al calificar el recurso:', error);
+      throw new Error('Error al calificar el recurso.');
+    }
+  },
+
+  /**
+   * Elimina una calificación de un usuario a un recurso.
+   * @param resourceId - ID del recurso.
+   * @returns Una promesa con el mensaje de éxito.
+   */
+  async deleteRating(resourceId: number) {
+    try {
+      const response = await api.delete('/rating', { data: { resourceId } });
+      return response.data;
+    } catch (error) {
+      console.error('Error al eliminar la calificación:', error);
+      throw new Error('Error al eliminar la calificación.');
+    }
+  },
+
+  /**
+   * Obtiene la cantidad total de estrellas de un recurso.
+   * @param resourceId - ID del recurso.
+   * @returns Una promesa con el recuento de estrellas.
+   */
+  async getStarCount(resourceId: number) {
+    try {
+      const response = await api.get(`/rating/star-count/${resourceId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener el recuento de estrellas:', error);
+      throw new Error('Error al obtener el recuento de estrellas.');
+    }
+  },
 };
+
+export default RatingService;
