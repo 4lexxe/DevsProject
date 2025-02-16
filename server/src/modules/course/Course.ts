@@ -1,30 +1,30 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
-import Admin from '../admin/Admin'; // Relación con Admin
+import { DataTypes, Model } from "sequelize";
+import sequelize from "../../infrastructure/database/db";
+import CareerType from "../careerType/CareerType";
+import Category from "../category/Category";
+import Admin from "../admin/Admin";
 
-// Modelo de Course
 class Course extends Model {
-  public id!: number;
+  public id!: bigint;
   public title!: string;
   public image!: string;
   public summary!: string;
-  public category!: string;
   public about!: string;
-  public relatedCareerType!: string;
-  public learningOutcomes!: string[]; // Array de string para los resultados de aprendizaje
+  public careerTypeId!: bigint;
+  public learningOutcomes!: string[];
   public isActive!: boolean;
   public isInDevelopment!: boolean;
-  public adminId!: number;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+  public adminId!: bigint;
+  public readonly createdAt!: Date; 
+  public readonly updatedAt!: Date; 
 }
 
 Course.init(
-  {
+  { 
     id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
+      type: DataTypes.BIGINT,
       autoIncrement: true,
+      primaryKey: true,
     },
     title: {
       type: DataTypes.STRING,
@@ -32,57 +32,90 @@ Course.init(
     },
     image: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     summary: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    category: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: false,
     },
     about: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    relatedCareerType: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    careerTypeId: {
+      type: DataTypes.BIGINT,
+      references: { model: CareerType, key: "id" },
     },
     learningOutcomes: {
-      type: DataTypes.JSONB, // Usamos JSONB para almacenar los temas de aprendizaje
-      allowNull: true,
-      defaultValue: [], // Valor por defecto es un array vacío
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, // Valor por defecto es true (activo)
+      defaultValue: false,
     },
     isInDevelopment: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: false, // Valor por defecto es false (no está en desarrollo)
+      defaultValue: true,
     },
     adminId: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Admins',
-        key: 'id',
-      },
-      allowNull: false,
+      type: DataTypes.BIGINT,
+      references: { model: Admin, key: "id" },
     },
   },
   {
     sequelize,
-    tableName: 'Courses',
-    modelName: 'Course',
+    modelName: "Course",
+    tableName: "Courses", // 🔹 Corrección del espacio extra
     timestamps: true,
   }
 );
 
-// Relación con Admin
-Course.belongsTo(Admin, { foreignKey: 'adminId', as: 'admin' });
+// 📌 Tabla intermedia para relación Muchos a Muchos (Course ↔ Category)
+class CourseCategory extends Model {
+  public courseId!: bigint;
+  public categoryId!: bigint;
+}
+
+CourseCategory.init(
+  {
+    courseId: {
+      type: DataTypes.BIGINT,
+      references: { model: Course, key: "id" },
+      allowNull: false,
+      primaryKey: true,
+    },
+    categoryId: {
+      type: DataTypes.BIGINT,
+      references: { model: Category, key: "id" },
+      allowNull: false,
+      primaryKey: true,
+    },
+  },
+  { 
+    sequelize, 
+    modelName: "CourseCategory" ,
+    tableName: "CourseCategories",
+    timestamps: false,
+  }
+);
+
+// 📌 **Relaciones**
+
+// 🔹 Muchos a Muchos (Course ↔ Category)
+Course.belongsToMany(Category, { through: CourseCategory, as: "categories", foreignKey: "courseId" });
+Category.belongsToMany(Course, { through: CourseCategory, as: "courses", foreignKey: "categoryId" });
+
+
+// 🔹 Uno a Muchos (Course → CareerType)
+Course.belongsTo(CareerType, { foreignKey: "careerTypeId", as: "careerType" });
+CareerType.hasMany(Course, { foreignKey: "careerTypeId", as: "courses" });
+
+// 🔹 Uno a Muchos (Course → Admin)
+Course.belongsTo(Admin, { foreignKey: "adminId", as: "admin" });
+Admin.hasMany(Course, { foreignKey: "adminId", as: "courses" });
 
 export default Course;
+export { CourseCategory };

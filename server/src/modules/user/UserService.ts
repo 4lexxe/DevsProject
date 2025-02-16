@@ -18,11 +18,8 @@ class UserService {
     }
   }
 
-  static async getUsers(requiredPermissions: string[]) {
+  static async getUsers() {
     try {
-      // Verificar permisos antes de proceder
-      await permissionsMiddleware(requiredPermissions);
-
       const users = await User.findAll();
       return users;
     } catch (error) {
@@ -30,6 +27,22 @@ class UserService {
         throw new Error("Error al obtener los usuarios: " + error.message);
       } else {
         throw new Error("Error al obtener los usuarios: " + String(error));
+      }
+    }
+  }
+
+  static async getUserById(id: number) {
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        return null; // Si no existe el usuario
+      }
+      return user;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error("Error al obtener el usuario: " + error.message);
+      } else {
+        throw new Error("Error al obtener el usuario: " + String(error));
       }
     }
   }

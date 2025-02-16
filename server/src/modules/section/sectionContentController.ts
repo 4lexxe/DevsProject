@@ -1,133 +1,186 @@
-import { Request, Response, RequestHandler } from 'express';
-import Section from '../section/Section';  // Modelo de sección
-import Course from '../course/Course';  // Relación con el curso
-import { authMiddleware } from '../../shared/middleware/authMiddleware';
+import { Request, Response, RequestHandler } from "express";
+import Section from "./Section";
+import Course from "../course/Course";
 
-// Crear una sección (requiere autenticación)
-export const createSection: RequestHandler[] = [
-  authMiddleware,
-  async (req, res) => {
-    const { title, description, courseId, moduleType, coverImage } = req.body;
+const metadata = (req: any, res: any) => {
+  return {
+    status: res.statusCode,
+    url: req.protocol + "://" + req.get("host") + req.originalUrl,
+  };
+};
 
+export default class SectionController {
+  // Obtener todas las secciones
+  static getAll: RequestHandler = async (req, res) => {
     try {
-      const course = await Course.findByPk(courseId);
-      if (!course) {
-        res.status(404).json({ message: 'Curso no encontrado' });
+      const sections = await Section.findAll({
+        include: [{ model: Course, as: "course" }],
+        order: [["id", "ASC"]],
+      });
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Secciones obtenidas correctamente",
+        length: sections.length,
+        data: sections,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener las secciones",
+        error,
+      });
+    }
+  };
+
+  // Obtener una sección por ID
+  static getById: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const section = await Section.findByPk(id, {
+        include: [{ model: Course, as: "course" }],
+      });
+      if (!section) {
+        res
+          .status(404)
+          .json({ status: "error", message: "Sección no encontrada" });
         return;
       }
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Sección obtenida correctamente",
+        data: section,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener la sección",
+        error,
+      });
+    }
+  };
 
-      const section = await Section.create({
+  // Obtener secciones por courseId
+  static getByCourseId: RequestHandler = async (req, res) => {
+    try {
+      const { courseId } = req.params;
+      const sections = await Section.findAll({ where: { courseId } });
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Secciones obtenidas correctamente para el curso especificado",
+        length: sections.length,
+        data: sections,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener las secciones del curso",
+        error,
+      });
+    }
+  };
+
+  // Obtener conteo total de secciones
+  static getSectionCount: RequestHandler = async (req, res) => {
+    try {
+      const count = await Section.count();
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Conteo de secciones obtenido correctamente",
+        count,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener el conteo de secciones",
+        error,
+      });
+    }
+  };
+
+  // Crear una nueva sección
+  static create: RequestHandler = async (req, res) => {
+    try {
+      const { title, description, courseId, coverImage, moduleType } = req.body;
+      const course = await Course.findByPk(courseId);
+      if (!course) {
+        res
+          .status(400)
+          .json({ status: "error", message: "Curso no encontrado" });
+        return;
+      }
+      const newSection = await Section.create({
         title,
         description,
         courseId,
-        moduleType,
         coverImage,
+        moduleType,
       });
-
-      res.status(201).json(section);
+      res.status(201).json({
+        ...metadata(req, res),
+        message: "Sección creada correctamente",
+        data: newSection,
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error creando la sección' });
+      res.status(500).json({
+        status: "error",
+        message: "Error al crear la sección",
+        error,
+      });
     }
-  }
-];
+  };
 
-// Obtener todas las secciones de un curso (SIN autenticación)
-export const getSectionsByCourse: RequestHandler = async (req, res) => {
-  const { courseId } = req.params;
-
-  try { 
-    const course = await Course.findByPk(courseId);
-    if (!course) {
-      res.status(404).json({ message: 'Curso no encontrado' });
-      return;
-    }
-
-    // Contamos las secciones (módulos) para el curso
-    const sectionCount = await Section.count({ where: { courseId } });
-
-    // Obtenemos las secciones del curso
-    const sections = await Section.findAll({ where: { courseId } });
-
-    if (sections.length === 0) {
-      res.status(404).json({ message: 'No se encontraron secciones' });
-      return;
-    }
-
-    // Respondemos con las secciones y el número total de secciones
-    res.status(200).json({ sectionCount, sections });
-  } catch (error) {
-    console.error("Error al obtener las secciones:", error);
-    res.status(500).json({ message: 'Error obteniendo las secciones' });
-  }
-};
-
-// Obtener una sección por ID (SIN autenticación)
-export const getSectionById: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const section = await Section.findByPk(id);
-    if (!section) {
-      res.status(404).json({ message: 'Sección no encontrada' });
-      return;
-    }
-
-    res.status(200).json(section);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error obteniendo la sección' });
-  }
-};
-
-// Actualizar una sección (requiere autenticación)
-export const updateSection: RequestHandler[] = [
-  authMiddleware,
-  async (req, res) => {
-    const { id } = req.params;
-    const { title, description, courseId, moduleType, coverImage } = req.body;
-
+  // Actualizar una sección por ID
+  static update: RequestHandler = async (req, res) => {
     try {
+      const { id } = req.params;
+      const { title, description, courseId, coverImage, moduleType } = req.body;
       const section = await Section.findByPk(id);
-      if (!section) {
-        res.status(404).json({ message: 'Sección no encontrada' });
-        return;
-      }
-
-      section.title = title;
-      section.description = description;
-      section.courseId = courseId;
-      section.moduleType = moduleType;
-      section.coverImage = coverImage;
-
-      await section.save();
       
-      res.status(200).json(section);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error actualizando la sección' });
-    }
-  }
-];
-
-// Eliminar una sección (requiere autenticación)
-export const deleteSection: RequestHandler[] = [
-  authMiddleware,
-  async (req, res) => {
-    const { id } = req.params;
-
-    try {
-      const section = await Section.findByPk(id);
       if (!section) {
-        res.status(404).json({ message: 'Sección no encontrada' });
+        res.status(404).json({
+          status: "error",
+          message: "Sección no encontrada",
+        });
         return;
       }
-
-      await section.destroy();
-      res.status(200).json({ message: 'Sección eliminada' });
+      
+      await section.update({ title, description, courseId, coverImage, moduleType });
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Sección actualizada correctamente",
+        data: section,
+      });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Error eliminando la sección' });
+      res.status(500).json({
+        status: "error",
+        message: "Error al actualizar la sección",
+        error,
+      });
     }
-  }
-];
+  };
+
+  // Eliminar una sección por ID
+  static delete: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const section = await Section.findByPk(id);
+      if (!section) {
+        res
+          .status(404)
+          .json({ status: "error", message: "Sección no encontrada" });
+        return;
+      }
+      await section.destroy();
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Sección eliminada correctamente",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al eliminar la sección",
+        error,
+      });
+    }
+  };
+}

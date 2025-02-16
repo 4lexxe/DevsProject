@@ -1,25 +1,43 @@
-import express from 'express';
-import { createCourse, getCourses, getCourseById, updateCourse, deleteCourse } from '../course/courseController';
-import { getSectionsByCourse } from '../section/sectionContentController';
+import {Router} from 'express';
 
-const router = express.Router();
+import { CourseController } from './courseController';
+
+const router = Router();
 
 // Ruta para obtener todos los cursos (público)
-router.get('/courses', getCourses);
+router.get('/course', CourseController.getAll);
+
+// Obtener todos los curso activos
+router.get('/course/actives', CourseController.getActiveCourses)
+
+// Obtener todos los cursos en desarrollo
+router.get('/course/development', CourseController.getInDevelopmentCourses)
+
+// Obtener conteo de todos los cursos
+router.get('/course/count', CourseController.getTotalCount)
+
+// Obtener todos los curso por categoria
+router.get('/courseByCategory', CourseController.getByCategory)
+
+// Obtener todos los cursos por tipo de carrera
+router.get('/courseByCareerType', CourseController.getByCareerType)
+
+// Obtener los cursos por admin
+router.get('/courseByAdmin', CourseController.getByAdminId)
 
 // Ruta para obtener un curso por ID (público)
-router.get('/courses/:id', getCourseById);
+router.get('/course/:id', CourseController.getById);
 
 // Ruta para crear un curso (solo Admin y SuperAdmin)
-router.post('/courses', createCourse);
+router.post('/course', CourseController.create);
 
 // Ruta para obtener el conteo de módulos de un curso (público)
-router.get('/courses/:courseId/modules/count', getSectionsByCourse);
+/* router.get('/course/:courseId/modules/count', getSectionsByCourse); */
 
 // Ruta para actualizar un curso (solo Admin y SuperAdmin)
-router.put('/courses/:id', updateCourse);
+router.put('/course/:id', CourseController.update);
 
 // Ruta para eliminar un curso (solo Admin y SuperAdmin)
-router.delete('/courses/:id', deleteCourse);
+router.delete('/course/:id', CourseController.delete);
 
 export default router;

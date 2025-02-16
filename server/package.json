@@ -16,6 +16,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google-cloud/vision": "^4.3.2",
+    "@tensorflow/tfjs-node": "^4.22.0",
     "@types/axios": "^0.9.36",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
@@ -37,6 +39,8 @@
     "geoip-lite": "^1.4.10",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "nsfwjs": "^4.2.1",
     "passport": "^0.7.0",
     "passport-discord": "^0.1.4",
     "passport-github2": "^0.1.12",
@@ -44,6 +48,7 @@
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5",
+    "sharp": "^0.33.5",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
@@ -52,6 +57,7 @@
     "@types/express-session": "^1.18.1",
     "@types/geoip-lite": "^1.4.4",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.10.5",
     "@types/passport": "^1.0.17",
     "@types/passport-discord": "^0.1.14",

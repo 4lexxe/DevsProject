@@ -2,7 +2,6 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
 import User from "../user/User";
 
-// Enumeración para los tipos de recursos
 export enum ResourceType {
   VIDEO = "video",
   DOCUMENT = "document",
@@ -17,15 +16,14 @@ interface ResourceAttributes {
   url: string;
   type: ResourceType;
   userId: number;
-  userName: string;
-  userAvatar: string;
   isVisible: boolean;
   coverImage?: string;
+  starCount: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface ResourceCreationAttributes extends Optional<ResourceAttributes, "id"> {}
+interface ResourceCreationAttributes extends Optional<ResourceAttributes, "id" | "starCount"> {}
 
 class Resource extends Model<ResourceAttributes, ResourceCreationAttributes> implements ResourceAttributes {
   public id!: number;
@@ -34,16 +32,13 @@ class Resource extends Model<ResourceAttributes, ResourceCreationAttributes> imp
   public url!: string;
   public type!: ResourceType;
   public userId!: number;
-  public userName!: string;
-  public userAvatar!: string;
   public isVisible!: boolean;
   public coverImage?: string;
-
+  public starCount!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-// Definir el modelo
 Resource.init(
   {
     id: {
@@ -78,17 +73,6 @@ Resource.init(
       },
       allowNull: false,
     },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    userAvatar: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isUrl: true,
-      },
-    },
     isVisible: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -101,6 +85,11 @@ Resource.init(
         isUrl: true,
       },
     },
+    starCount: { // contador de estrellas
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0, // Inicializa con 0 estrellas
+    },
   },
   {
     sequelize,
@@ -110,7 +99,7 @@ Resource.init(
   }
 );
 
-// Definir relaciones
+// Relaciones
 Resource.belongsTo(User, {
   foreignKey: "userId",
   as: "User",

@@ -10,12 +10,27 @@ import authRoutes from './modules/auth/routes/auth.routes';
 import userRoutes from './modules/user/userRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
 import roleRoutes from './modules/role/roleRoutes';
+import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
+
+/* Rutas relacionadas con el area de cursos */
+import careerTypeRoutes from './modules/careerType/CareerTypeRoutes'
+import categoryRoutes from './modules/category/CategoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
-import contentRoutes from './modules/content/contentRoutes';
-import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import recourseRoutes from './modules/resource/resourceRoutes';
+//Contenidos
+import fileContentRoutes from './modules/content/routes/fileContentRoutes'
+import imageContentRoutes from './modules/content/routes/imageContentRoutes'
+import linkConentRoutes from './modules/content/routes/linkContentRoutes'
+import quizContentRoutes from './modules/content/routes/quizContentRoutes'
+import textContentRoutes from './modules/content/routes/textContentRoutes'
+import videoContentRoutes from './modules/content/routes/videoContentRoutes'
+
+//import contentRoutes from './modules/content/contentRoutes';
+import recourseRoutes from './modules/resource/routes/resource.routes';
+import ratingRoutes from './modules/resource/rating/rating.routes';
+import commentRoutes from './modules/resource/comment/comment.routes';
+import uploadRoutes from './modules/resource/routes/upload.routes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -50,7 +65,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 
 // Rate limiting con validación reforzada
@@ -142,16 +156,31 @@ app.use((req, res, next) => {
 // Sistema de rutas
 // Rutas protegidas por autenticación
 app.use('/api/auth', apiLimiter, authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
-app.use('/api', recourseRoutes);
+app.use('/api/resources', recourseRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Rutas públicas
+app.use('/api', HeaderSectionRoutes);
+
+/* Ruas relacionadas con el area de cursos */
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
-app.use('/api', contentRoutes);
-app.use('/api', HeaderSectionRoutes);
+app.use('/api', careerTypeRoutes);
+app.use('/api', categoryRoutes);
+//Contenidos
+app.use('/api', fileContentRoutes);
+app.use('/api', imageContentRoutes);
+app.use('/api', linkConentRoutes);
+app.use('/api', quizContentRoutes);
+app.use('/api', textContentRoutes);
+app.use('/api', videoContentRoutes);
+
+// Rutas de comentarios y valoraciones
+app.use('/api/rating', ratingRoutes);
+app.use('/api/comment', commentRoutes);
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {
