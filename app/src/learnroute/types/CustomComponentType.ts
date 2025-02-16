@@ -67,28 +67,57 @@ export enum CustomComponentType {
   export type SubtemaNodeData = CustomComponentData & {
     label: string;
     colorText: string;
-  }
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
+  };
 
   export type ParrafoNodeData = CustomComponentData & {
     label: string;
     colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   }
 
   export type TodoNodeData = CustomComponentData & {
     label: string;
     colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   }
 
   export type LinkNodeData = CustomComponentData & {
     label: string;
-    link: string;
     colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   }
 
   export type SeccionNodeData = CustomComponentData & {
-    borderColor: string;
-    bgColor: string;
-    borderRadius: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    layoutOrder: number;
+    backgroundColor: string;
+    zIndex?: number;
   }
 
   export type ComponentPropertiesConfig = {

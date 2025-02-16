@@ -9,11 +9,11 @@
     @apply w-full p-3 flex items-center gap-2 rounded-lg hover:bg-gray-100 transition-colors cursor-grab;
 }
 /* Esta clase se añade automaticamente a cada nodo */
-/*.react-flow__node {
-    @apply rounded-lg bg-white shadow-lg border border-gray-200;
-    padding: 12px 20px;
-    min-width: 150px;
-}*/
+.react-flow__node {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
 
 .react-flow__nodeButton {
     @apply flex items-center justify-center cursor-pointer bg-yellow-400 border border-black rounded-md shadow-md;
@@ -58,10 +58,11 @@
     min-width: 150px;
 }
 
-.react-flow__node-seccion {
-    @apply font-normal text-base border;
-    padding: 12px 20px;
-    min-width: 150px;
+/*La clase react-flow__node-seccion se aplica a todos los nodos seccion.tsx, ahora entiendo*/
+.react-flow__node-seccion { 
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .react-flow__handle {

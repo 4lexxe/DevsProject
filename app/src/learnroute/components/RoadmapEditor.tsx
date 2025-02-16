@@ -10,7 +10,8 @@ import {
   useEdgesState,
   useNodesState,
   Node,
-  Panel
+  Panel,
+  ReactFlowProvider
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { initialNodes } from '../constants/InitialNodes.constants';
@@ -39,11 +40,12 @@ const nodeTypes = {
   seccion: Seccion,
 }
 
+
 const RoadmapEditor = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
-
+  
   // Manejar la conexión de nodos
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -114,6 +116,7 @@ const RoadmapEditor = () => {
   );
 }, [setNodes]);
 
+
 //useEffect añadido para trackear la posicion en tiempo real de X e Y
 useEffect(() => {
   if (selectedNode) {
@@ -137,6 +140,8 @@ useEffect(() => {
   };
 
   return (
+    <ReactFlowProvider>
+
     <div className="w-full h-screen border border-gray-300 relative overflow-auto">
       <button onClick={addNode}
         className="absolute z-10 top-2 left-2 bg-blue-500 text-white p-2 rounded">
@@ -152,12 +157,12 @@ useEffect(() => {
         onDrop={onDrop}
         onNodeClick={handleNodeClick}
         nodeTypes={nodeTypes}
-
-      >
+        
+        >
         <Panel
           position="top-left"
           className="flex h-[calc(100vh-61px)] w-64 shrink-0 flex-col overflow-y-auto p-5 rounded-lg bg-white border shadow"
-        >
+          >
           <p className="text-sm font-semibold text-gray-700 mb-3">
             COMPONENTS <span className="text-gray-400 text-xs">(DRAG & DROP)</span>
           </p>
@@ -165,9 +170,9 @@ useEffect(() => {
           <div className="flex flex-col gap-2">
             {COMPONENTS.map((component) => (
               <div
-                key={component.label}
-                className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-gray-100"
-                onDragStart={(event) => onDragStart(event, component.type)}
+              key={component.label}
+              className="flex items-center gap-2 p-2 border rounded-md cursor-pointer hover:bg-gray-100"
+              onDragStart={(event) => onDragStart(event, component.type)}
                 draggable
               >
                 {component.icon}
@@ -186,8 +191,9 @@ useEffect(() => {
         onClose={() => setSelectedNode(null)}
         node={selectedNode}
         onUpdateNode={handleUpdateNode}
-      />
+        />
     </div>
+        </ReactFlowProvider>
   );
 };
 
