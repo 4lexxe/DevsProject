@@ -6,7 +6,7 @@ const router = Router();
 router.get('/sections', SectionController.getAll)
 
 // Ruta para obtener todas las secciones de un curso (sin autenticación)
-router.get('/sections/course/:courseId', SectionController.getByCourseId);
+router.get('/sectionsByCourse/:courseId', SectionController.getByCourseId);
 
 router.get('/sections/count', SectionController.getSectionCount)
 

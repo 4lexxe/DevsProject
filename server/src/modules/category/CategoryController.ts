@@ -54,8 +54,8 @@ export default class CategoryController {
   // Crear una nueva categoría
   static create: RequestHandler = async (req, res) => {
     try {
-      const { name, description, isActive } = req.body;
-      const newCategory = await Category.create({ name, description, isActive });
+      const { name, image, description, isActive } = req.body;
+      const newCategory = await Category.create({ name, image, description, isActive });
       res.status(201).json({
         ...metadata(req, res),
         message: "Categoría creada correctamente",
@@ -74,13 +74,13 @@ export default class CategoryController {
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, description, isActive } = req.body;
+      const { name, image, description, isActive } = req.body;
       const category = await Category.findByPk(id);
       if (!category) {
         res.status(404).json({ status: "error", message: "Categoría no encontrada" });
         return;
       }
-      await category.update({ name, description, isActive });
+      await category.update({ name, image, description, isActive });
       res.status(200).json({
         ...metadata(req, res),
         message: "Categoría actualizada correctamente",

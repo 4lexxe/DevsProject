@@ -19,12 +19,7 @@ import categoryRoutes from './modules/category/categoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 //Contenidos
-import fileContentRoutes from './modules/content/routes/fileContentRoutes'
-import imageContentRoutes from './modules/content/routes/imageContentRoutes'
-import linkConentRoutes from './modules/content/routes/linkContentRoutes'
-import quizContentRoutes from './modules/content/routes/quizContentRoutes'
-import textContentRoutes from './modules/content/routes/textContentRoutes'
-import videoContentRoutes from './modules/content/routes/videoContentRoutes'
+import contentRoutes from './modules/content/contentRoutes'
 
 import recourseRoutes from './modules/resource/resourceRoutes';
 
@@ -165,13 +160,8 @@ app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
 app.use('/api', careerTypeRoutes);
 app.use('/api', categoryRoutes);
-//Contenidos
-app.use('/api', fileContentRoutes);
-app.use('/api', imageContentRoutes);
-app.use('/api', linkConentRoutes);
-app.use('/api', quizContentRoutes);
-app.use('/api', textContentRoutes);
-app.use('/api', videoContentRoutes);
+app.use('/api', contentRoutes);
+
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {

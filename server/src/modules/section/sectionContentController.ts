@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import Section from "./Section";
 import Course from "../course/Course";
+import Content from "../content/Content";
 
 const metadata = (req: any, res: any) => {
   return {
@@ -37,7 +38,7 @@ export default class SectionController {
     try {
       const { id } = req.params;
       const section = await Section.findByPk(id, {
-        include: [{ model: Course, as: "course" }],
+        include: ["course", "contents"],
       });
       if (!section) {
         res
@@ -63,7 +64,10 @@ export default class SectionController {
   static getByCourseId: RequestHandler = async (req, res) => {
     try {
       const { courseId } = req.params;
-      const sections = await Section.findAll({ where: { courseId } });
+      const sections = await Section.findAll({
+        where: { courseId },
+        include: ["course", "contents"],
+      });
       res.status(200).json({
         ...metadata(req, res),
         message: "Secciones obtenidas correctamente para el curso especificado",
@@ -135,7 +139,7 @@ export default class SectionController {
       const { id } = req.params;
       const { title, description, courseId, coverImage, moduleType } = req.body;
       const section = await Section.findByPk(id);
-      
+
       if (!section) {
         res.status(404).json({
           status: "error",
@@ -143,8 +147,14 @@ export default class SectionController {
         });
         return;
       }
-      
-      await section.update({ title, description, courseId, coverImage, moduleType });
+
+      await section.update({
+        title,
+        description,
+        courseId,
+        coverImage,
+        moduleType,
+      });
       res.status(200).json({
         ...metadata(req, res),
         message: "Sección actualizada correctamente",

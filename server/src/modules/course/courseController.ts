@@ -3,6 +3,7 @@ import Course, { CourseCategory } from "./Course";
 import Category from "../category/Category";
 import CareerType from "../careerType/CareerType";
 import Admin from "../admin/Admin";
+import Section from "../section/Section";
 
 const metadata = (req: any, res: any) => {
   return {
@@ -97,6 +98,7 @@ export class CourseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          { model: Section, as: "sections" }
         ],
       });
       if (!course) {
@@ -128,6 +130,7 @@ export class CourseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          { model: Section, as: "sections" }
         ],
       });
       res.status(200).json({

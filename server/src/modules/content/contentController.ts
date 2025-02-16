@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
-import TextContent from "../models/TextContent";
-import Section from "../../section/Section";
+import Content from "./Content";
+import Section from "../section/Section";
 
 const metadata = (req: any, res: any) => {
   return {
@@ -9,158 +9,168 @@ const metadata = (req: any, res: any) => {
   };
 };
 
-export default class TextContentController {
-  // Obtener todos los contenidos de texto
+export default class ContentController {
+  // Obtener todos los contenidos
   static getAll: RequestHandler = async (req, res) => {
     try {
-      const textContents = await TextContent.findAll({
+      const contents = await Content.findAll({
         include: [{ model: Section, as: "section" }],
         order: [["id", "ASC"]],
       });
       res.status(200).json({
         ...metadata(req, res),
-        message: "Contenidos de texto obtenidos correctamente",
-        length: textContents.length,
-        data: textContents,
+        message: "Contenidos obtenidos correctamente",
+        length: contents.length,
+        data: contents,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al obtener los contenidos de texto",
+        message: "Error al obtener los contenidos",
         error,
       });
     }
   };
 
-  // Obtener un contenido de texto por ID
+  // Obtener un contenido por ID
   static getById: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const textContent = await TextContent.findByPk(id, {
+      const content = await Content.findByPk(id, {
         include: [{ model: Section, as: "section" }],
       });
-      if (!textContent) {
-        res.status(404).json({ status: "error", message: "Contenido de texto no encontrado" });
+      if (!content) {
+        res.status(404).json({ status: "error", message: "Contenido no encontrado" });
         return;
       }
       res.status(200).json({
         ...metadata(req, res),
-        message: "Contenido de texto obtenido correctamente",
-        data: textContent,
+        message: "Contenido obtenido correctamente",
+        data: content,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al obtener el contenido de texto",
+        message: "Error al obtener el contenido",
         error,
       });
     }
   };
 
-  // Obtener contenidos de texto por sectionId
+  // Obtener contenidos por sectionId
   static getBySectionId: RequestHandler = async (req, res) => {
     try {
       const { sectionId } = req.params;
-      const textContents = await TextContent.findAll({ where: { sectionId } });
+      const contents = await Content.findAll({ where: { sectionId } });
       res.status(200).json({
         ...metadata(req, res),
-        message: "Contenidos de texto obtenidos correctamente para la sección especificada",
-        length: textContents.length,
-        data: textContents,
+        message: "Contenidos obtenidos correctamente para la sección especificada",
+        length: contents.length,
+        data: contents,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al obtener los contenidos de texto de la sección",
+        message: "Error al obtener los contenidos de la sección",
         error,
       });
     }
   };
 
-  // Crear un contenido de texto
+  // Crear un contenido
   static create: RequestHandler = async (req, res) => {
     try {
-      const { title, content, duration, position, sectionId } = req.body;
-      const textContent = await TextContent.create({
+      const { title, text, markdown, linkType, link, questions, resources, duration, position, sectionId } = req.body;
+      const content = await Content.create({
         title,
-        content,
+        text,
+        markdown,
+        linkType,
+        link,
+        questions: questions ? JSON.stringify(questions) : null,
+        resources: resources ? JSON.stringify(resources) : null,
         duration,
         position,
         sectionId,
       });
       res.status(201).json({
         ...metadata(req, res),
-        message: "Contenido de texto creado correctamente",
-        data: textContent,
+        message: "Contenido creado correctamente",
+        data: content,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al crear el contenido de texto",
+        message: "Error al crear el contenido",
         error,
       });
     }
   };
 
-  // Actualizar un contenido de texto por ID
+  // Actualizar un contenido por ID
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, content, duration, position, sectionId } = req.body;
-      const textContent = await TextContent.findByPk(id);
+      const { title, text, markdown, linkType, link, questions, resources, duration, position, sectionId } = req.body;
+      const content = await Content.findByPk(id);
       
-      if (!textContent) {
+      if (!content) {
         res.status(404).json({
           status: "error",
-          message: "Contenido de texto no encontrado",
+          message: "Contenido no encontrado",
         });
         return;
       }
       
-      await textContent.update({
+      await content.update({
         title,
-        content,
+        text,
+        markdown,
+        linkType,
+        link,
+        questions: questions ? JSON.stringify(questions) : null,
+        resources: resources ? JSON.stringify(resources) : null,
         duration,
         position,
         sectionId,
       });
       res.status(200).json({
         ...metadata(req, res),
-        message: "Contenido de texto actualizado correctamente",
-        data: textContent,
+        message: "Contenido actualizado correctamente",
+        data: content,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al actualizar el contenido de texto",
+        message: "Error al actualizar el contenido",
         error,
       });
     }
   };
 
-  // Eliminar un contenido de texto por ID
+  // Eliminar un contenido por ID
   static delete: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const textContent = await TextContent.findByPk(id);
+      const content = await Content.findByPk(id);
       
-      if (!textContent) {
+      if (!content) {
         res.status(404).json({
           status: "error",
-          message: "Contenido de texto no encontrado",
+          message: "Contenido no encontrado",
         });
         return;
       }
       
-      await textContent.destroy();
+      await content.destroy();
       res.status(200).json({
         ...metadata(req, res),
-        message: "Contenido de texto eliminado correctamente",
+        message: "Contenido eliminado correctamente",
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al eliminar el contenido de texto",
+        message: "Error al eliminar el contenido",
         error,
       });
     }

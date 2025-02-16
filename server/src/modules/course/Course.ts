@@ -12,6 +12,7 @@ class Course extends Model {
   public about!: string;
   public careerTypeId!: bigint;
   public learningOutcomes!: string[];
+  public prerequisites?: string[];
   public isActive!: boolean;
   public isInDevelopment!: boolean;
   public adminId!: bigint;
@@ -49,6 +50,10 @@ Course.init(
     learningOutcomes: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
+    },
+    prerequisites: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true
     },
     isActive: {
       type: DataTypes.BOOLEAN,
