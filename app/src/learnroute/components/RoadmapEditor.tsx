@@ -100,7 +100,7 @@ const RoadmapEditor = () => {
           ...node,
           data: {
             ...node.data,  // Mantener datos existentes
-            ...updatedNode.data  // Nuevos datos
+            ...updatedNode.data,  // Nuevos datos
           },
           position: updatedNode.position || node.position,
           style: {

@@ -91,6 +91,156 @@ export enum CustomComponentType {
     borderRadius: string;
   }
 
+  export type ComponentPropertiesConfig = {
+    [key in CustomComponentType]: {
+      showLabel: boolean;
+      showBorderColor: boolean;
+      showBackgroundColor: boolean;
+      showColorText: boolean;
+      showBorderRadius: boolean;
+      showFontSize: boolean;
+      showLayoutOrder: boolean;
+      showPosition: boolean;
+      showContent: boolean;
+      showMeasured: boolean;
+    };
+  };
+
+  export const componentPropertiesConfig: ComponentPropertiesConfig = {
+    [CustomComponentType.H1]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: false,
+      showMeasured: true,
+    },
+    [CustomComponentType.Tema]: {
+      showLabel: true,
+      showBorderColor: true,
+      showBackgroundColor: true,
+      showColorText: true,
+      showBorderRadius: true,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.Subtema]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: false,
+      showMeasured: true,
+    },
+    [CustomComponentType.NodeButton]: {
+      showLabel: true,
+      showBorderColor: true,
+      showBackgroundColor: true,
+      showColorText: true,
+      showBorderRadius: true,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.Line]: {
+      showLabel: false,
+      showBorderColor: true,
+      showBackgroundColor: false,
+      showColorText: false,
+      showBorderRadius: false,
+      showFontSize: false,
+      showLayoutOrder: false,
+      showPosition: true,
+      showContent: false,
+      showMeasured: true,
+    },
+    [CustomComponentType.Parrafo]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.ToDo]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.Etiqueta]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.BotonClick]: {
+      showLabel: true,
+      showBorderColor: true,
+      showBackgroundColor: true,
+      showColorText: true,
+      showBorderRadius: true,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.Link]: {
+      showLabel: true,
+      showBorderColor: false,
+      showBackgroundColor: false,
+      showColorText: true,
+      showBorderRadius: false,
+      showFontSize: true,
+      showLayoutOrder: true,
+      showPosition: true,
+      showContent: true,
+      showMeasured: true,
+    },
+    [CustomComponentType.Seccion]: {
+      showLabel: false,
+      showBorderColor: true,
+      showBackgroundColor: true,
+      showColorText: false,
+      showBorderRadius: true,
+      showFontSize: false,
+      showLayoutOrder: false,
+      showPosition: true,
+      showContent: false,
+      showMeasured: true,
+    }
+  };
+
   /*export enum HistoryAction {
     AddNode = "addNode",
     RemoveNode = "removeNode",
