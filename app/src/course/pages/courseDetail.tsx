@@ -7,6 +7,14 @@ import CourseOverview from '../components/courses/CourseOverview';
 import LearningOutcomes from '../components/courses/LearningOutcomes';
 import SectionList from '../components/courses/SectionList';
 
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  order: number;
+  courseId: number;
+}
+
 interface Course {
   id: number;
   title: string;
@@ -20,7 +28,7 @@ interface Course {
   isInDevelopment: boolean;
   adminId: number; 
   createdAt: string;
-  modules: Array<any>;
+  modules: Module[];
 }
 
 const CourseDetails: React.FC = () => {

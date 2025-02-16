@@ -14,8 +14,8 @@ import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
 
 /* Rutas relacionadas con el area de cursos */
-import careerTypeRoutes from './modules/careerType/careerTypeRoutes'
-import categoryRoutes from './modules/category/categoryRoutes'
+import careerTypeRoutes from './modules/careerType/CareerTypeRoutes'
+import categoryRoutes from './modules/category/CategoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 //Contenidos
@@ -26,7 +26,11 @@ import quizContentRoutes from './modules/content/routes/quizContentRoutes'
 import textContentRoutes from './modules/content/routes/textContentRoutes'
 import videoContentRoutes from './modules/content/routes/videoContentRoutes'
 
-import recourseRoutes from './modules/resource/resourceRoutes';
+//import contentRoutes from './modules/content/contentRoutes';
+import recourseRoutes from './modules/resource/routes/resource.routes';
+import ratingRoutes from './modules/resource/rating/rating.routes';
+import commentRoutes from './modules/resource/comment/comment.routes';
+import uploadRoutes from './modules/resource/routes/upload.routes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -152,10 +156,11 @@ app.use((req, res, next) => {
 // Sistema de rutas
 // Rutas protegidas por autenticación
 app.use('/api/auth', apiLimiter, authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
-app.use('/api', recourseRoutes);
+app.use('/api/resources', recourseRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // Rutas públicas
 app.use('/api', HeaderSectionRoutes);
@@ -172,6 +177,10 @@ app.use('/api', linkConentRoutes);
 app.use('/api', quizContentRoutes);
 app.use('/api', textContentRoutes);
 app.use('/api', videoContentRoutes);
+
+// Rutas de comentarios y valoraciones
+app.use('/api/rating', ratingRoutes);
+app.use('/api/comment', commentRoutes);
 
 // Endpoint de estado mejorado
 app.get('/api/status', (req: Request, res) => {

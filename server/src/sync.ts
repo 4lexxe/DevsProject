@@ -8,6 +8,8 @@ import User from './modules/user/User';
 import Admin from './modules/admin/Admin';
 import SectionHeader from './modules/headerSection/HeaderSection';
 import Recourse from './modules/resource/Resource';
+import Rating from './modules/resource/rating/Rating';
+import Comment from './modules/resource/comment/Comment';
 
 /* Modelos relacionados con el area de cursos */
 import Category from './modules/category/Category';
@@ -58,6 +60,9 @@ async function syncDatabase() {
     await VideoContent.sync({ force: true })
 
 
+    await Rating.sync({ force: true });
+
+    await Comment.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import User from '../user/User';
+import Role from '../role/Role';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
-import Role from '../role/Role';
 
 // Interface para los campos actualizables
 interface UpdatableUserFields {
@@ -43,7 +43,7 @@ export class UserController {
     body('lastLoginIp').optional().isIP().withMessage('IP inválida')
   ];
 
-  // Obtener todos los usuarios
+  // Obtener todos los usuarios (público)
   static async getUsers(_req: Request, res: Response): Promise<void> {
     try {
       const users = await User.findAll({
@@ -59,8 +59,9 @@ export class UserController {
         },
         include: [{
           model: Role,
+          as: 'Role', // Usa el alias definido en la relación
           attributes: ['id', 'name', 'description']
-        }]
+        }] 
       });
       
       res.json(users);
@@ -70,16 +71,46 @@ export class UserController {
     }
   }
 
-  // Obtener detalles de seguridad de un usuario
+  // Obtener un usuario por ID (público)
+  static async getUserById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await User.findByPk(id, {
+        attributes: { 
+          exclude: [
+            'password', 
+            'registrationIp',
+            'lastLoginIp',
+            'registrationGeo',
+            'lastLoginGeo',
+            'suspiciousActivities'
+          ]
+        },
+        include: [{
+          model: Role,
+          as: 'Role', // Usa el alias definido en la relación
+          attributes: ['id', 'name', 'description']
+        }]
+      });
+      if (!user) {
+        res.status(404).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+      res.json(user);
+    } catch (error) {
+      console.error('Error fetching user by ID:', error);
+      res.status(500).json({ error: 'Error al obtener usuario' });
+    }
+  }
+
+  // Obtener detalles de seguridad de un usuario (requiere autenticación y permisos)
   static async getUserSecurityDetails(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-
       if (!(req.user as User)?.hasPermission('VIEW_SECURITY_DETAILS')) {
         res.status(403).json({ error: 'No autorizado' });
         return;
       }
-
       const user = await User.findByPk(id, {
         attributes: [
           'id',
@@ -93,15 +124,14 @@ export class UserController {
         ],
         include: [{
           model: Role,
+          as: 'Role', // Usa el alias definido en la relación
           attributes: ['name']
         }]
       });
-
       if (!user) {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
-
       res.json({
         id: user.id,
         role: user.Role?.name,
@@ -127,7 +157,7 @@ export class UserController {
     }
   }
 
-  // Actualizar un usuario
+  // Actualizar un usuario (requiere autenticación y permisos)
   static async updateUser(req: Request, res: Response): Promise<void> {
     try {
       const errors = validationResult(req);
@@ -135,7 +165,6 @@ export class UserController {
         res.status(400).json({ errors: errors.array() });
         return;
       }
-
       const { id } = req.params;
       const { 
         name, 
@@ -147,13 +176,11 @@ export class UserController {
         displayName,
         isActiveSession, // Permitir actualizar isActiveSession
       } = req.body;
-
       const user = await User.findByPk(id);
       if (!user) {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
-
       const updatableFields: UpdatableUserFields = {
         name,
         email,
@@ -163,19 +190,15 @@ export class UserController {
         displayName,
         isActiveSession, // Actualizar isActiveSession si está presente
       };
-
       if (password) {
         const salt = await bcrypt.genSalt(10);
         updatableFields.password = await bcrypt.hash(password, salt);
       }
-
       // Si se proporciona isActiveSession, actualizar lastActiveAt también
       if (isActiveSession !== undefined) {
         updatableFields.lastActiveAt = new Date();
       }
-
       await user.update(updatableFields);
-
       const updatedUser = await User.findByPk(id, {
         attributes: { 
           exclude: [
@@ -189,10 +212,10 @@ export class UserController {
         },
         include: [{
           model: Role,
+          as: 'Role', // Usa el alias definido en la relación
           attributes: ['id', 'name', 'description']
         }]
       });
-
       res.json(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
@@ -200,7 +223,7 @@ export class UserController {
     }
   }
 
-  // Eliminar un usuario
+  // Eliminar un usuario (requiere autenticación y permisos)
   static async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -209,12 +232,10 @@ export class UserController {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
-
       // Marcar la sesión como inactiva antes de eliminar el usuario
       user.isActiveSession = false;
       user.lastActiveAt = new Date();
       await user.save();
-
       await user.update({
         suspiciousActivities: [
           ...user.suspiciousActivities,
@@ -226,7 +247,6 @@ export class UserController {
           }
         ]
       });
-
       await user.destroy();
       res.json({ message: 'Usuario eliminado correctamente' });
     } catch (error) {

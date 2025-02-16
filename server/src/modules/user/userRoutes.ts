@@ -1,39 +1,34 @@
-// src/routes/user.routes.ts
 import { Router } from 'express';
 import { UserController } from '../user/userController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
-import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware'; // Importa el middleware de permisos
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
-// Middleware de autenticación
-router.use(authMiddleware);
+// Middleware de geolocalización (opcional, aplica según necesidad)
 router.use(geoMiddleware);
 
-// Configuración de rutas
+// Rutas públicas
+router.get('/users', UserController.getUsers); // Obtener todos los usuarios (público)
+router.get('/users/:id', UserController.getUserById); // Obtener un usuario por ID (público)
 
-// Obtener la lista de usuarios (requiere permisos de 'read:users')
-router.get('/users', 
-  permissionsMiddleware(['read:users']),  // Verificar permisos
-  UserController.getUsers
-);
-
-// Obtener los detalles de seguridad de un usuario (requiere permisos de 'view:security_details')
+// Rutas que requieren autenticación y permisos
 router.get('/users/:id/security',
+  authMiddleware, // Requiere autenticación
   permissionsMiddleware(['view:security_details']),  // Verificar permisos
   UserController.getUserSecurityDetails
 );
 
-// Actualizar un usuario (requiere permisos de 'manage:users')
 router.put('/users/:id', 
+  authMiddleware, // Requiere autenticación
   permissionsMiddleware(['manage:users']),  // Verificar permisos
   ...UserController.userValidations, 
   UserController.updateUser
 );
 
-// Eliminar un usuario (requiere permisos de 'manage:users')
 router.delete('/users/:id', 
+  authMiddleware, // Requiere autenticación
   permissionsMiddleware(['manage:users']),  // Verificar permisos
   UserController.deleteUser
 );

@@ -1,28 +1,74 @@
-import api from '../../api/axios';
-import { Resource, CreateResourceDTO, UpdateResourceDTO } from '../types/resource';
+// resource.service.ts
+import api from '../../api/axios'; // Importa la instancia de axios configurada
 
-export const resourceService = {
-  getAllResources: async (): Promise<Resource[]> => {
-    const response = await api.get<Resource[]>('/resources');
-    return response.data;
+export const ResourceService = {
+  // Crear un nuevo recurso
+  async createResource(data: {
+    title: string;
+    description?: string;
+    url: string;
+    type: 'video' | 'document' | 'image' | 'link';
+    isVisible?: boolean;
+    coverImage?: string;
+    userId: number;
+  }) {
+    try {
+      const response = await api.post('/resources', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating resource:', error);
+      throw error;
+    }
   },
 
-  getResourceById: async (id: number): Promise<Resource> => {
-    const response = await api.get<Resource>(`/resources/${id}`);
-    return response.data;
+  // Obtener todos los recursos visibles
+  async getResources() {
+    try {
+      const response = await api.get('/resources');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      throw error;
+    }
   },
 
-  createResource: async (resource: CreateResourceDTO): Promise<Resource> => {
-    const response = await api.post<Resource>('/resources', resource);
-    return response.data;
+  // Obtener un recurso por ID
+  async getResourceById(id: number) {
+    try {
+      const response = await api.get(`/resources/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching resource by ID:', error);
+      throw error;
+    }
   },
 
-  updateResource: async (id: number, resource: UpdateResourceDTO): Promise<Resource> => {
-    const response = await api.put<Resource>(`/resources/${id}`, resource);
-    return response.data;
+  // Actualizar un recurso existente
+  async updateResource(id: number, data: {
+    title?: string;
+    description?: string;
+    url?: string;
+    type?: 'video' | 'document' | 'image' | 'link';
+    isVisible?: boolean;
+    coverImage?: string;
+  }) {
+    try {
+      const response = await api.put(`/resources/${id}`, data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      throw error;
+    }
   },
 
-  deleteResource: async (id: number): Promise<void> => {
-    await api.delete(`/resources/${id}`);
+  // Eliminar un recurso
+  async deleteResource(id: number) {
+    try {
+      const response = await api.delete(`/resources/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      throw error;
+    }
   },
 };
