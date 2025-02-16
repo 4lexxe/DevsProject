@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -6,12 +6,18 @@ import CustomInput from "@/shared/components/inputs/CustomInput";
 import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
-import ImagePreview from "./Previews/ImagePreview";
+import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
+import ImagePreview from "@/shared/components/previews/ImagePreview";
 
-import { ICourseInput } from "@/course/interfaces/interfaces";
-import { courseSchema, categories } from "@/course/validations/courseSchema";
+import { ICourseInput } from "@/course/interfaces/course";
+import { courseSchema } from "@/course/validations/courseSchema";
 
 import { useCourseContext } from "@/course/context/CourseContext";
+
+import {
+  getCategories,
+  getCareerTypes,
+} from "@/course/services/courseFormService";
 
 export default function CourseForm() {
   const {
@@ -19,13 +25,14 @@ export default function CourseForm() {
     handleSubmit,
     setValue,
     watch,
+    control,
     formState: { errors },
   } = useForm<ICourseInput>({
-    resolver: zodResolver(courseSchema),
+    /* resolver: zodResolver(courseSchema), */
     defaultValues: {
       title: "",
       image: "",
-      category: "",
+      categories: [],
       relatedCareerType: "",
       summary: "",
       about: "",
@@ -47,6 +54,32 @@ export default function CourseForm() {
 
     sessionStorage.clear();
   };
+
+  const [categories, setCategories] = useState();
+  const [careerTypes, setCareerTypes] = useState();
+  useEffect(() => {
+    const getCategoriesF = async () => {
+      try {
+        const data = await getCategories();
+
+        setCategories(data);
+      } catch (err) {
+        console.error("Error al cargar las categorías", err);
+      }
+    };
+
+    const getCareerTypesF = async () => {
+      try {
+        const data = await getCareerTypes();
+        setCareerTypes(data);
+      } catch (err) {
+        console.error("Error al cargar las categorías", err);
+      }
+    };
+
+    getCategoriesF();
+    getCareerTypesF();
+  }, []);
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
@@ -73,23 +106,52 @@ export default function CourseForm() {
         <ImagePreview watchContentImage={watch("image")} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <SelectInput
+          {/* <SelectInput
             name="category"
             labelText="Categoría"
             register={register}
             error={errors["category"]?.message}
             placeholder="Seleccione alguna categoría"
-            options={categories.map((category) => ({
-              value: category,
-              label: category,
-            }))}
+            options={
+              categories
+                ? categories.map((category) => ({
+                    value: category.id, // ID de la categoría como valor
+                    label: category.name, // Nombre de la categoría como etiqueta
+                  }))
+                : []
+            }
+            isLoading={categories ? false : true}
+          /> */}
+
+          <MultiSelectInput
+            name="categories"
+            labelText="Categories"
+            control={control}
+            options={
+              categories
+                ? categories.map((category) => ({
+                    value: category.id, // ID de la categoría como valor
+                    label: category.name, // Nombre de la categoría como etiqueta
+                  }))
+                : []
+            }
+            placeholder="Seleccione alguna categoría"
           />
-          <CustomInput
+          <SelectInput
             name="relatedCareerType"
             labelText="Tipo de Carrera Relacionada"
-            type="text"
             register={register}
             error={errors["relatedCareerType"]?.message}
+            placeholder="Seleccione algun tipo de carrera"
+            options={
+              careerTypes
+                ? careerTypes.map((careerType) => ({
+                    value: careerType.id,
+                    label: careerType.name,
+                  }))
+                : []
+            }
+            isLoading={careerTypes ? false : true}
           />
         </div>
 
