@@ -7,9 +7,9 @@ import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
-import ImagePreview from "@/shared/components/previews/ImagePreview";
+import ImagePreview from "@/course/components/Forms/previews/ImagePreview";
 
-import { ICourseInput } from "@/course/interfaces/course";
+import { ICourseInput } from "@/course/interfaces/interfaces";
 import { courseSchema } from "@/course/validations/courseSchema";
 
 import { useCourseContext } from "@/course/context/CourseContext";
