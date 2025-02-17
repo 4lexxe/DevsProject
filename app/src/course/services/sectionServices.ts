@@ -5,7 +5,7 @@ const SECTIONS_ENDPOINT = '/sections';
 // Obtener todas las secciones de un curso
 export const getSectionsByCourse = async (courseId: string) => {
   try {
-    const response = await api.get(`${SECTIONS_ENDPOINT}/course/${courseId}`);
+    const response = await api.get(`${SECTIONS_ENDPOINT}ByCourse/${courseId}`);
     return response.data;
   } catch (error) {
     console.error('Error al obtener las secciones del curso:', error);
@@ -53,6 +53,16 @@ export const deleteSection = async (id: string) => {
     return response.data;
   } catch (error) {
     console.error('Error al eliminar la sección:', error);
+    throw error;
+  }
+};
+
+export const getSectionCount = async (id: string) => {
+  try {
+    const response = await api.get(`${SECTIONS_ENDPOINT}/count`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener el conteo de secciones:', error);
     throw error;
   }
 };

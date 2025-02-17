@@ -5,17 +5,31 @@ interface Course {
   name: string;
 }
 
-const COURSES_ENDPOINT = '/courses';
+const COURSES_ENDPOINT = '/course';
 
+//Obtener todos los cursos activos
 export const getCourses = async () => {
   try {
-    const response = await api.get(COURSES_ENDPOINT);
+    const response = await api.get(COURSES_ENDPOINT + "/actives");
     return response.data;
   } catch (error) {
     console.error('Error al obtener los cursos:', error);
     throw error;
   }
 };
+
+// Obtener curso por id
+export const getById = async(id: string | undefined) => {
+  if(id){
+    try {
+      const response = await api.get(COURSES_ENDPOINT + `/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener los cursos:', error);
+      throw error;
+    }
+  }
+}
 
 // Agregar más servicios relacionados con cursos aquí
 export const createCourse = async (courseData: any) => {
@@ -51,7 +65,7 @@ export const deleteCourse = async (id: string) => {
 };
 
 // Servicio para obtener el conteo de módulos
-export const getModulesCount = async (courseId: number): Promise<number> => {
+/* export const getModulesCount = async (courseId: number): Promise<number> => { 
   try {
     const response = await api.get(`/courses/${courseId}/modules/count`);
     if (!response || !response.data) {
@@ -62,4 +76,4 @@ export const getModulesCount = async (courseId: number): Promise<number> => {
     console.error(`Error al obtener el conteo de módulos para el curso ${courseId}:`, error.message);
     throw error;
   }
-};
+}; */

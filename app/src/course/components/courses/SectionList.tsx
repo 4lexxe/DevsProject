@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getSectionsByCourse } from '../../services/sectionServices';
 import SectionModule from './SectionModule';
-
-interface Section {
-  id: number;
-  title: string;
-  description: string;
-  moduleType: string;
-  coverImage: string;
-  lessonsCount: number;
-  duration: number;
-}
+import { Section } from '@/course/interfaces/viewnerCourseInterface';
 
 interface SectionListProps {
   courseId: string;
@@ -27,8 +18,9 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       try {
         setLoading(true);
         const response = await getSectionsByCourse(courseId);
-        setSections(response.sections);
-        setSectionCount(response.sectionCount);
+        console.log(response)
+        setSections(response);
+        setSectionCount(response.length);
       } catch (err) {
         console.error('Error fetching sections:', err);
         setError('No se pudieron cargar las secciones del curso');
