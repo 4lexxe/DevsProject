@@ -146,10 +146,10 @@ export enum CustomComponentType {
   export const componentPropertiesConfig: ComponentPropertiesConfig = {
     [CustomComponentType.H1]: {
       showLabel: true,
-      showBorderColor: false,
-      showBackgroundColor: false,
+      showBorderColor: true,
+      showBackgroundColor: true,
       showColorText: true,
-      showBorderRadius: false,
+      showBorderRadius: true,
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,
