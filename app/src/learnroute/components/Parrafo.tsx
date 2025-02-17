@@ -1,17 +1,60 @@
-import React from 'react'
-import { Node, NodeProps, Position, Handle } from "@xyflow/react"
+import { NodeProps, NodeResizeControl, Node } from '@xyflow/react';
 import { ParrafoNodeData } from '../types/CustomComponentType';
+import { useNodeResize } from '../hooks/useNodeResize';
 
 type CustomComponentNode = Node<ParrafoNodeData, 'string'>;
 
 export default function Parrafo({
-    data: {label},
+  id,
+  data: {
+    content = "Contenido del párrafo",
+    colorText = "#000000",
+    backgroundColor = "",
+    fontSize = 16,
+    borderColor= '#ccc',
+    measured = { width: 300, height: 150 },
+    fontFamily = 'Arial',
+  },
 }: NodeProps<CustomComponentNode>) {
+  const { handleResize } = useNodeResize(id);
+
   return (
-    <div className="react-flow__node-paragraph">
-      <Handle type="target" position={Position.Top} />
-      <div>{label}</div>
-      <Handle type="source" position={Position.Bottom} />
+    <div
+      style={{
+        color: colorText,
+        backgroundColor,
+        fontSize: `${fontSize}px`,
+        width: `${measured.width}px`,
+        height: `${measured.height}px`,
+        border: `1px solid ${borderColor}`,
+        fontFamily,
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {content}
+      <NodeResizeControl
+        minWidth={200}
+        minHeight={100}
+        position="bottom-right"
+        onResize={handleResize}
+        style={{ background: 'transparent', border: 'none' }}
+      >
+        <div
+          style={{
+            width: '10px',
+            height: '10px',
+            borderRight: '2px solid #000',
+            borderBottom: '2px solid #000',
+            position: 'absolute',
+            bottom: '2px',
+            right: '2px',
+            cursor: 'se-resize',
+          }}
+        />
+      </NodeResizeControl>
     </div>
   );
 }

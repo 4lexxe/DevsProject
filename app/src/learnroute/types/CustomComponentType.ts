@@ -88,12 +88,13 @@ export enum CustomComponentType {
     label: string;
     colorText: string;
     backgroundColor: string;
-    borderColor:string; //feat(borderColor):string;
     borderRadius: number; //feat(borderRadius):string;
     fontSize: number;
     layoutOrder: number;
     content?: string;
     zIndex?: number;
+    borderColor: string;
+    fontFamily?: string;
   }
 
   export type TodoNodeData = CustomComponentData & {
@@ -140,6 +141,7 @@ export enum CustomComponentType {
       showPosition: boolean;
       showContent: boolean;
       showMeasured: boolean;
+      showFontFamily?: boolean;
     };
   };
 
@@ -205,16 +207,17 @@ export enum CustomComponentType {
       showMeasured: true,
     },
     [CustomComponentType.Parrafo]: {
-      showLabel: true,
-      showBorderColor: false,
+      showLabel: false,
+      showBorderColor: true,
       showBackgroundColor: false,
       showColorText: true,
-      showBorderRadius: false,
+      showBorderRadius: true,
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,
       showContent: true,
       showMeasured: true,
+      showFontFamily: true,
     },
     [CustomComponentType.ToDo]: {
       showLabel: true,

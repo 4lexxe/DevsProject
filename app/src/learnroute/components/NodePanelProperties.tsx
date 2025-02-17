@@ -27,6 +27,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
   const [posY, setPosY] = useState(node?.position?.y || 0);
   const [width, setWidth] = useState(node?.measured?.width || 200);
   const [height, setHeight] = useState(node?.measured?.height || 100);
+  const [fontFamily, setFontFamily] = useState(node?.data?.fontFamily || 'Arial');
 
   useEffect(() => {
     if (node) {
@@ -44,6 +45,8 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
 
       setWidth(node?.data?.measured?.width || 200);
       setHeight(node?.data?.measured?.height || 100);
+
+      setFontFamily(node.data?.fontFamily || 'Arial');
     }
   }, [node]);
 
@@ -62,6 +65,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
       fontSize: config.showFontSize ? fontSize : undefined,
       layoutOrder: config.showLayoutOrder ? layoutOrder : undefined,
       measured : config.showMeasured ? { width, height} : undefined, 
+      fontFamily: config.showFontFamily ? fontFamily : undefined,
     };
 
     const updatedData = {
@@ -83,6 +87,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
         border: `1px solid ${borderColor}`,
         width: `${width}px`,
         height: `${height}px`,
+        fontFamily,
       },
     });
 
@@ -135,7 +140,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
   return (
     <div className="fixed right-0 top-16 h-[calc(100vh-61px)] w-[400px] bg-white border-l shadow-lg p-6 overflow-y-auto">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-semibold">Propiedades del nodo - {node?.data?.label}</h2>
+        <h2 className="text-lg font-semibold">Propiedades del nodo - {nodeType}</h2>
         <Button variant="ghost" size="icon" onClick={onClose}>
           ✕
         </Button>
@@ -143,10 +148,22 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
       <div className="space-y-4">
         {config.showLabel && (
           <div className="space-y-2">
-            <Label>Contenido adicional</Label>
+            <Label>Contenido label:</Label>
             <Textarea
               value={label}
               onChange={(e) => setLabel(e.target.value)}
+              placeholder="Añade información adicional aquí..."
+              className="min-h-[100px]"
+            />
+          </div>
+        )}
+
+        {config.showContent && (
+          <div className="space-y-2">
+            <Label>Contenido adicional:</Label>
+            <Textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Añade información adicional aquí..."
               className="min-h-[100px]"
             />
@@ -258,6 +275,26 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
             />
           </div>
         )}
+
+      <div className="grid grid-cols-2 gap-4">
+        {config.showFontFamily && (
+          <div className="space-y-2 col-span-2">
+            <Label>Tipo de fuente</Label>
+            <select
+              value={fontFamily}
+              onChange={(e) => setFontFamily(e.target.value)}
+              className="w-full p-2 border rounded-md"
+            >
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Helvetica">Helvetica</option>
+              <option value="Georgia">Georgia</option>
+              <option value="Verdana">Verdana</option>
+              <option value="system-ui">System UI</option>
+            </select>
+          </div>
+        )}
+      </div>
 
         {config.showPosition && (
 
