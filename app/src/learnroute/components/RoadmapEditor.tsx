@@ -11,7 +11,9 @@ import {
   useNodesState,
   Node,
   Panel,
-  ReactFlowProvider
+  ReactFlowProvider,
+  ConnectionMode, // <- Agregar
+  MarkerType, // <- Agregar
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { initialNodes } from '../constants/InitialNodes.constants';
@@ -27,7 +29,14 @@ import Link from "../components/Link";
 import Seccion from "../components/Seccion";
 import Etiqueta from "../components/Etiqueta";
 import { NodeInfoPanel } from '../components/NodePanelProperties';
+import BiDirectionalEdge from '../components/BiDirectionalEdge';
+import type { BidirectionalEdge } from '../types/CustomComponentType';
 
+
+// Agregar edgeTypes
+const edgeTypes = {
+  bidirectional: BiDirectionalEdge,
+};
 
 const nodeTypes = {
   nodeButton: NodeButton,
@@ -48,10 +57,20 @@ const RoadmapEditor = () => {
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   
   // Manejar la conexión de nodos
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
-  );
+  const onConnect = useCallback((params: Connection) => {
+    setEdges((eds) => {
+      // Permitir múltiples conexiones entre los mismos nodos
+      const newEdge = {
+        ...params,
+        id: `${params.source}-${params.target}-${Date.now()}`,
+        type: 'bidirectional',
+        markerEnd: { type: MarkerType.ArrowClosed },
+      };
+      
+      return addEdge(newEdge, eds);
+    });
+  }, [setEdges]);
+  
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
@@ -143,6 +162,8 @@ useEffect(() => {
         onDragOver={onDragOver}
         onDrop={onDrop}
         onNodeClick={handleNodeClick}
+        edgeTypes={edgeTypes}
+        connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
         
         >

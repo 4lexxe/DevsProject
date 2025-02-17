@@ -67,9 +67,28 @@ export default function TopicNode({
         />
       </NodeResizeControl>
 
-      <Handle type="target" position={Position.Top} />
       <div>{label}</div>
-      <Handle type="source" position={Position.Bottom} />
+      <Handle 
+  type="source" 
+  position={Position.Right} 
+  id="right"
+/>
+<Handle 
+  type="target" 
+  position={Position.Left} 
+  id="left"
+/>
+
+<Handle 
+  type="source" 
+  position={Position.Left} 
+  id="left"
+/>
+<Handle 
+  type="target" 
+  position={Position.Right} 
+  id="right"
+/>
       </>
     </div>
   );

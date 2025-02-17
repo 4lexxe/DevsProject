@@ -1,5 +1,5 @@
 import React from 'react'
-import { Node, NodeProps, Position } from "@xyflow/react"
+import { Node, NodeProps, Position, Handle } from "@xyflow/react"
 import { NodeButtonData } from '../types/CustomComponentType';
 import CustomHandle from '../components/CustomHandle';
 
@@ -32,10 +32,27 @@ function NodeButton({
         <span className="text-sm absolute">
             {label}
         </span>
-        <CustomHandle type='source' position={Position.Top}/>
-        <CustomHandle type='source' position={Position.Left}/>
-        <CustomHandle type='source' position={Position.Right}/>
-        <CustomHandle type='source' position={Position.Bottom}/>
+        <Handle 
+          type="source" 
+          position={Position.Right} 
+          id="right"
+        />
+        <Handle 
+          type="target" 
+          position={Position.Left} 
+          id="left"
+        />
+        
+        <Handle 
+          type="source" 
+          position={Position.Left} 
+          id="left"
+        />
+        <Handle 
+          type="target" 
+          position={Position.Right} 
+          id="right"
+        />
     </div>
 
     </div>

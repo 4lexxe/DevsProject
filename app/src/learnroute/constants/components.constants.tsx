@@ -1,7 +1,7 @@
 import { MdCheckBoxOutlineBlank, MdOutlineTopic, MdTopic, MdNoteAlt   } from "react-icons/md";
 import { FaGripLinesVertical,FaLink } from "react-icons/fa";
 import { BsTypeH1,BsTextParagraph } from "react-icons/bs";
-import { LuListTodo, LuMousePointerClick  } from "react-icons/lu";
+import { LuListTodo  } from "react-icons/lu";
 import { TbSection } from "react-icons/tb";
 import { CustomComponentType } from "../types/CustomComponentType";
 
@@ -51,12 +51,6 @@ export const COMPONENTS = [
         label: "Etiqueta",
         icon: <MdNoteAlt/>,
         data: { content: "Nueva etiqueta..." },
-    },
-    {
-        type: CustomComponentType.BotonClick,
-        label: "Boton Click",
-        icon: <LuMousePointerClick />,
-        data: { content: "Nuevo Boton click..." },
     },
     { 
         type: CustomComponentType.Link, 

@@ -1,4 +1,4 @@
-import { NodeProps, NodeResizeControl, Node } from '@xyflow/react';
+import { NodeProps, NodeResizeControl, Node, Handle, Position } from '@xyflow/react';
 import { LinkNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
 
@@ -64,6 +64,27 @@ export default function Link({
           }}
         />
       </NodeResizeControl>
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        id="right"
+      />
+      <Handle 
+        type="target" 
+        position={Position.Left} 
+        id="left"
+      />
+      
+      <Handle 
+        type="source" 
+        position={Position.Left} 
+        id="left"
+      />
+      <Handle 
+        type="target" 
+        position={Position.Right} 
+        id="right"
+      />
     </div>
   );
 }

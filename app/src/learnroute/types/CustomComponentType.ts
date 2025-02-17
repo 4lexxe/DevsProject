@@ -1,3 +1,14 @@
+import { MarkerType, type Edge } from '@xyflow/react';
+
+export type BidirectionalEdge = Edge & {
+  type: 'bidirectional';
+  markerEnd: {
+    type: MarkerType.ArrowClosed;
+  };
+  sourceHandle: string;
+  targetHandle: string;
+};
+
 export enum CustomComponentType {
     NodeButton = "nodeButton",
     Line = "line",
@@ -7,7 +18,6 @@ export enum CustomComponentType {
     Parrafo = "parrafo",
     ToDo = "todo",
     Etiqueta = "etiqueta",
-    BotonClick = "botonClick",
     Link = "link",
     Seccion= "seccion"
   }
@@ -202,7 +212,7 @@ export enum CustomComponentType {
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,
-      showContent: true,
+      showContent: false,
       showMeasured: true,
     },
     [CustomComponentType.Line]: {
@@ -252,18 +262,6 @@ export enum CustomComponentType {
       showLayoutOrder: true,
       showPosition: true,
       showContent: false,
-      showMeasured: true,
-    },
-    [CustomComponentType.BotonClick]: {
-      showLabel: true,
-      showBorderColor: true,
-      showBackgroundColor: true,
-      showColorText: true,
-      showBorderRadius: true,
-      showFontSize: true,
-      showLayoutOrder: true,
-      showPosition: true,
-      showContent: true,
       showMeasured: true,
     },
     [CustomComponentType.Link]: {

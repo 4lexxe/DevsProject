@@ -59,10 +59,28 @@ export default function H1Title({
           }}
         />
       </NodeResizeControl>
-      <Handle type="source" position={Position.Bottom} />
-      <Handle type="source" position={Position.Right} />
-      <Handle type="source" position={Position.Left} />
-      <Handle type="source" position={Position.Top} />
+      <Handle 
+  type="source" 
+  position={Position.Right} 
+  id="right"
+/>
+<Handle 
+  type="target" 
+  position={Position.Left} 
+  id="left"
+/>
+
+<Handle 
+  type="source" 
+  position={Position.Left} 
+  id="left"
+/>
+<Handle 
+  type="target" 
+  position={Position.Right} 
+  id="right"
+/>
+
     </div>
   );
 }

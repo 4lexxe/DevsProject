@@ -9,26 +9,30 @@ import { FaLink } from "react-icons/fa";
 import { TbSection } from "react-icons/tb";
 
 
+
 export const initialNodes: Node[] = [
-  {
-    id: "1",
-    position: { x: 100, y: 100 },
-    type: "nodeButton",
-    data: { type: CustomComponentType.NodeButton, value: "Nuevo NODO" },
-  },
-  {
-    id: "2",
-    position: { x: 200, y: 200 },
-    type: "nodeButton",
-    data: { type: CustomComponentType.NodeButton, value: 3 },
-  },
-  {
-    id: "3",
-    position: { x: 300, y: 300 },
-    type: "nodeButton",
-    data: { type: CustomComponentType.NodeButton, value: 3 },
-  },
+    {
+      id: '1',
+      type: 'h1', // debe coincidir con el tipo registrado en nodeTypes
+      position: { x: 100, y: 50 },
+      data: {
+        label: 'Nodo Izquierdo',
+        measured: { width: 250, height: 60 },
+        type: CustomComponentType.NodeButton
+      },
+    },
+    {
+      id: '2',
+      type: 'h1',
+      position: { x: 500, y: 50 },
+      data: {
+        label: 'Nodo Derecho',
+        measured: { width: 250, height: 60 },
+        type: CustomComponentType.NodeButton
+      },
+    },
 ];
+
 
 export const COMPONENTS = [
     {

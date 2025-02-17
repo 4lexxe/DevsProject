@@ -64,15 +64,28 @@ export default function Subtema({
         }} />
       </NodeResizeControl>
 
-      <Handle 
-        type="target" 
-        position={Position.Left}  // Cambiar posición
-      />
       <div style={{ padding: '4px 0' }}>{label}</div>
       <Handle 
-        type="source" 
-        position={Position.Right}  // Cambiar posición
-      />
+  type="source" 
+  position={Position.Right} 
+  id="right"
+/>
+<Handle 
+  type="target" 
+  position={Position.Left} 
+  id="left"
+/>
+
+<Handle 
+  type="source" 
+  position={Position.Left} 
+  id="left"
+/>
+<Handle 
+  type="target" 
+  position={Position.Right} 
+  id="right"
+/>
     </div>
   );
 }
