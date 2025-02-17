@@ -109,6 +109,17 @@ export enum CustomComponentType {
     zIndex?: number;
   }
 
+  export type EtiquetaNodeData = CustomComponentData & {
+    label: string;
+    colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    zIndex?: number;
+  };
+
   export type LinkNodeData = CustomComponentData & {
     label: string;
     colorText: string;
@@ -228,7 +239,7 @@ export enum CustomComponentType {
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,
-      showContent: true,
+      showContent: false,
       showMeasured: true,
     },
     [CustomComponentType.Etiqueta]: {
@@ -240,7 +251,7 @@ export enum CustomComponentType {
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,
-      showContent: true,
+      showContent: false,
       showMeasured: true,
     },
     [CustomComponentType.BotonClick]: {

@@ -25,6 +25,7 @@ import Parrafo from "../components/Parrafo";
 import ToDo from "../components/ToDo";
 import Link from "../components/Link";
 import Seccion from "../components/Seccion";
+import Etiqueta from "../components/Etiqueta";
 import { NodeInfoPanel } from '../components/NodePanelProperties';
 
 
@@ -35,6 +36,7 @@ const nodeTypes = {
   subtema: Subtema,
   parrafo: Parrafo,
   todo: ToDo,
+  etiqueta: Etiqueta,
   link: Link,
   seccion: Seccion,
 }
