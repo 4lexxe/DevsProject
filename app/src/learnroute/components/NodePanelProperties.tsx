@@ -317,7 +317,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
 
 
 
-        <Button onClick={handleSave} className="w-full">
+        <Button onClick={handleSave} className="w-full bg-blue-500 hover:bg-blue-700 text-white p-2 rounded">
           Guardar cambios
         </Button>
       </div>

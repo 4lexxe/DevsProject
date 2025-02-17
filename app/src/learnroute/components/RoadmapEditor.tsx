@@ -25,7 +25,6 @@ import Parrafo from "../components/Parrafo";
 import ToDo from "../components/ToDo";
 import Link from "../components/Link";
 import Seccion from "../components/Seccion";
-import { CustomComponentType } from "../types/CustomComponentType";
 import { NodeInfoPanel } from '../components/NodePanelProperties';
 
 
@@ -128,25 +127,11 @@ useEffect(() => {
 }, [nodes, selectedNode]);
 
 
-  // Función para agregar un nuevo nodo
-  const addNode = (type: CustomComponentType) => {
-    const newNode: Node = {
-      id: (nodes.length + 1).toString(),
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
-      data: { label: `Node ${nodes.length + 1}` },
-      type: type,
-    };
-    setNodes([...nodes, newNode]);
-  };
 
   return (
     <ReactFlowProvider>
 
     <div className="w-full h-screen border border-gray-300 relative overflow-auto">
-      <button onClick={addNode}
-        className="absolute z-10 top-2 left-2 bg-blue-500 text-white p-2 rounded">
-        Add Node
-      </button>
       <ReactFlow
         nodes={nodes}
         edges={edges}

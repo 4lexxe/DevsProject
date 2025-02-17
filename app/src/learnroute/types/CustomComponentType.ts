@@ -38,6 +38,14 @@ export enum CustomComponentType {
 
   export type TitleNodeData = CustomComponentData & {
     label: string;
+    colorText: string;
+    backgroundColor: string;
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    fontSize: number;
+    layoutOrder: number;
+    content?: string;
+    zIndex?: number;
   };
 
   export type NodeButtonData = CustomComponentData & {
@@ -162,10 +170,10 @@ export enum CustomComponentType {
     },
     [CustomComponentType.Subtema]: {
       showLabel: true,
-      showBorderColor: false,
-      showBackgroundColor: false,
+      showBorderColor: true,
+      showBackgroundColor: true,
       showColorText: true,
-      showBorderRadius: false,
+      showBorderRadius: true,
       showFontSize: true,
       showLayoutOrder: true,
       showPosition: true,

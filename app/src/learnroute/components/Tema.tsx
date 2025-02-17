@@ -1,17 +1,13 @@
 import { NodeResizeControl  } from '@xyflow/react';
 import { Node, NodeProps, Position, Handle } from '@xyflow/react';
 import { TemaNodeData } from '../types/CustomComponentType';
-import { Expand } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useNodeResize } from '../hooks/useNodeResize';
+
 
 type CustomComponentNode = Node<TemaNodeData, 'string'>;
 
-const controlStyle = {
-  background: 'transparent',
-  border: 'none',
-};
-
 export default function TopicNode({
+  id,
   data: { 
     label='', 
     colorText = '#000000', 
@@ -24,10 +20,7 @@ export default function TopicNode({
     
   },
 }: NodeProps<CustomComponentNode>) {
-  const [dimensions, setDimensions] = useState({ width: measured.width, height: measured.height });
-  useEffect(() => {
-    setDimensions({ width: measured.width, height: measured.height });
-  }, [measured.width, measured.height]);
+  const { handleResize } = useNodeResize(id);
   return (
     <div
       className="react-flow__node-topic"
@@ -42,6 +35,9 @@ export default function TopicNode({
         width: `${measured.width}px`,
         height: `${measured.height}px`,
         position: 'relative', // Necesario para los controles de redimensionado
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <>
@@ -55,11 +51,7 @@ export default function TopicNode({
           border: 'none',
           cursor: 'se-resize',
         }}
-        onResize={(_, { width, height }) => {
-          setDimensions({ width, height });
-          measured.width = width;
-          measured.height = height;
-        }}
+        onResize={handleResize}
       >
         <div
           style={{

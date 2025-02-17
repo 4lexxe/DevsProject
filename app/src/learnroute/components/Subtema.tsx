@@ -1,21 +1,26 @@
-import { NodeProps, Position, Handle, NodeResizeControl,Node } from '@xyflow/react';
+import { NodeProps, Position, Handle, NodeResizeControl, Node } from '@xyflow/react';
 import { SubtemaNodeData } from '../types/CustomComponentType';
+import { useNodeResize } from '../hooks/useNodeResize';
 
 type CustomComponentNode = Node<SubtemaNodeData, 'string'>;
 
 
+// Subtema.tsx
 export default function Subtema({
+  id,
   data: {
-    label='', 
-    colorText = '#000000', 
-    backgroundColor = '#ccccc', 
-    fontSize = 16, 
-    layoutOrder = 0 ,
-    borderRadius=8 ,
-    borderColor= '#ccc',
+    label = '',
+    colorText = '#2d3436',
+    backgroundColor = '#f5f6fa',
+    fontSize = 14,
+    layoutOrder = 0,
+    borderRadius = 6,
+    borderColor = '#a4b0be',
     measured = { width: 200, height: 100 },
   }
 }: NodeProps<CustomComponentNode>) {
+  const { handleResize } = useNodeResize(id);
+  
   return (
     <div
       style={{
@@ -25,41 +30,49 @@ export default function Subtema({
         borderRadius: `${borderRadius}px`,
         width: `${measured.width}px`,
         height: `${measured.height}px`,
-        border: `$1px solid ${borderColor}`,
+        border: `2px dashed ${borderColor}`,  // Borde discontinuo
         position: 'relative',
-        zIndex: layoutOrder
+        zIndex: layoutOrder,
+        fontStyle: 'italic',  // Texto en cursiva
+        padding: '8px 12px',  // Padding diferente
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <NodeResizeControl
         minWidth={120}
         minHeight={40}
         position="bottom-right"
-        style={{ background: 'transparent', border: 'none' }}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          cursor: 'se-resize',
+        }}
+        onResize={handleResize}
       >
-        <div style={{width: '10px',
-  height: '10px',
-  borderRight: '2px solid #ccc',
-  borderBottom: '2px solid #ccc',
-  position: 'absolute',
-  bottom: '2px',
-  right: '2px',
-  cursor: 'se-resize'}} />
+        <div style={{
+          width: '12px',
+          height: '12px',
+          border: `2px solid ${borderColor}`,  // Cuadrado completo
+          position: 'absolute',
+          bottom: '4px',
+          right: '4px',
+          background: '#fff',
+          borderRadius: '2px',
+          cursor: 'se-resize'
+        }} />
       </NodeResizeControl>
-      
-      <Handle type="target" position={Position.Top} />
-      <div>{label}</div>
-      <Handle type="source" position={Position.Bottom} />
+
+      <Handle 
+        type="target" 
+        position={Position.Left}  // Cambiar posición
+      />
+      <div style={{ padding: '4px 0' }}>{label}</div>
+      <Handle 
+        type="source" 
+        position={Position.Right}  // Cambiar posición
+      />
     </div>
   );
 }
-
-const resizeHandleStyle = {
-  width: '10px',
-  height: '10px',
-  borderRight: '2px solid #ccc',
-  borderBottom: '2px solid #ccc',
-  position: 'absolute',
-  bottom: '2px',
-  right: '2px',
-  cursor: 'se-resize'
-};

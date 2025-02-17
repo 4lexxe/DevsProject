@@ -1,5 +1,6 @@
-import { NodeProps, NodeResizeControl, Node, useReactFlow } from '@xyflow/react';
+import { NodeProps, NodeResizeControl, Node } from '@xyflow/react';
 import { SeccionNodeData } from '../types/CustomComponentType';
+import { useNodeResize } from '../hooks/useNodeResize';
 
 type CustomComponentNode = Node<SeccionNodeData>;
 
@@ -12,30 +13,8 @@ export default function Seccion({
     measured = { width: 400, height: 300 },
   },
 }: NodeProps<CustomComponentNode>) {
-  // Usamos el hook para acceder a funciones globales de XYFlow
-  const { setNodes } = useReactFlow();
-
-  const handleResize = (_: any, { width, height }: { width: number; height: number }) => {
-    setNodes((nds) =>
-      nds.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              measured: { width, height },
-            },
-            style: {
-              ...node.style,
-              width: `${width}px`,
-              height: `${height}px`,
-            },
-          };
-        }
-        return node;
-      })
-    );
-  };
+  // Obtenemos la función handleResize del hook personalizado
+  const { handleResize } = useNodeResize(id);
 
   return (
     <div
@@ -46,6 +25,7 @@ export default function Seccion({
         width: `${measured.width}px`,
         height: `${measured.height}px`,
         position: 'relative',
+        
       }}
     >
       <NodeResizeControl
