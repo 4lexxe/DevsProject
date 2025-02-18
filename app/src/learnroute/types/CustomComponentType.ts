@@ -70,6 +70,14 @@ export enum CustomComponentType {
     zIndex?: number;
   };
 
+  export type LineNodeData = CustomComponentData & {
+    borderColor:string; //feat(borderColor):string;
+    borderRadius: number; //feat(borderRadius):string;
+    layoutOrder: number;
+    rotation?: number;
+    length?: number;
+  };
+
   export type TemaNodeData = CustomComponentData & {
     label: string;
     colorText: string;

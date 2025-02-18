@@ -44,6 +44,7 @@ import ToDo from "../components/ToDo";
 import Link from "../components/Link";
 import Seccion from "../components/Seccion";
 import Etiqueta from "../components/Etiqueta";
+import Linea from "../components/Linea"
 
 // Esquema de validación para el formulario de guardado
 const saveRoadmapSchema = z.object({
@@ -69,6 +70,7 @@ const nodeTypes = {
   etiqueta: Etiqueta,
   link: Link,
   seccion: Seccion,
+  line: Linea,
 };
 
 const RoadmapEditorContent = () => {
