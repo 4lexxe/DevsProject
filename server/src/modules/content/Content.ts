@@ -17,7 +17,7 @@ class Content extends Model {
   public markdown?: string;
   public linkType?: string;
   public link?: string;
-  public questions?: Array<{
+  public quiz?: Array<{
     question: string; // Pregunta
     text?: string;
     image?: string;
@@ -64,7 +64,7 @@ Content.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    questions: {
+    quiz: {
       type: DataTypes.JSONB,
       allowNull: true,
     },

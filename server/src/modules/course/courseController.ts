@@ -124,7 +124,7 @@ export class CourseController {
   // Obtener cursos por el ID de un admin
   static getByAdminId: RequestHandler = async (req, res) => {
     try {
-      const { adminId } = req.body;
+      const { adminId } = req.params;
       const courses = await Course.findAll({
         where: { adminId },
         include: [
@@ -222,6 +222,7 @@ export class CourseController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, image, summary, about, careerTypeId, learningOutcomes, isActive, isInDevelopment, adminId, categoryIds } = req.body;
+      
       
       const newCourse = await Course.create({
         title,

@@ -5,7 +5,7 @@ import {
   IContent,
   IContentInput,
   ICourseState,
-} from "../interfaces/interfaces";
+} from "../interfaces/CourseFormInterfaces";
 
 interface CourseContextType {
   state: ICourseState;
@@ -23,6 +23,7 @@ interface CourseContextType {
     contentId: string,
     newPosition: number
   ) => void;
+  addQuizToContent: (sectionId: string, contentId: string, quiz: any[]) => void;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
@@ -211,6 +212,24 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const addQuizToContent = (sectionId: string, contentId: string, quiz: any[]) => {
+    setState((prev) => {
+      const updatedSections = prev.sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            contents: section.contents.map((content) =>
+              content.id === contentId ? { ...content, quiz } : content
+            ),
+          };
+        }
+        return section;
+      });
+  
+      return { ...prev, sections: updatedSections };
+    });
+  };
+
   const cancelEdit = () =>
     setState((prev) => ({
       ...prev,
@@ -235,6 +254,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
         saveContent,
         cancelEdit,
         updateContentPosition,
+        addQuizToContent
       }}
     >
       {children}

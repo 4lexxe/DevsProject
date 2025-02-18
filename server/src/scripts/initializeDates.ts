@@ -147,7 +147,7 @@ const curso1 = {
         {
           title: "Prueba de conocimientos en JavaScript",
           text: "Este cuestionario evalúa tus conocimientos básicos sobre JavaScript.",
-          questions: [
+          quiz: [
             {
               question:
                 "¿Cuál de las siguientes opciones NO es un tipo de dato en JavaScript?",
@@ -210,7 +210,7 @@ const curso2 = {
         {
           title: "Prueba de conocimientos básicos",
           text: "Este cuestionario evalúa tus conocimientos básicos sobre HTML y CSS.",
-          questions: [
+          quiz: [
             {
               question: "¿Qué significa HTML?",
               answers: [
@@ -271,7 +271,7 @@ const curso3 = {
         {
           title: "Prueba de conocimientos básicos",
           text: "Este cuestionario evalúa tus conocimientos básicos sobre programación.",
-          questions: [
+          quiz: [
             {
               question: "¿Qué es una variable?",
               answers: [

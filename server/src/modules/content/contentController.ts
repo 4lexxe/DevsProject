@@ -80,14 +80,14 @@ export default class ContentController {
   // Crear un contenido
   static create: RequestHandler = async (req, res) => {
     try {
-      const { title, text, markdown, linkType, link, questions, resources, duration, position, sectionId } = req.body;
+      const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
       const content = await Content.create({
         title,
         text,
         markdown,
         linkType,
         link,
-        questions: questions ? JSON.stringify(questions) : null,
+        quiz: quiz ? JSON.stringify(quiz) : null,
         resources: resources ? JSON.stringify(resources) : null,
         duration,
         position,
@@ -111,7 +111,7 @@ export default class ContentController {
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, text, markdown, linkType, link, questions, resources, duration, position, sectionId } = req.body;
+      const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
       const content = await Content.findByPk(id);
       
       if (!content) {
@@ -128,7 +128,7 @@ export default class ContentController {
         markdown,
         linkType,
         link,
-        questions: questions ? JSON.stringify(questions) : null,
+        quiz: quiz ? JSON.stringify(quiz) : null,
         resources: resources ? JSON.stringify(resources) : null,
         duration,
         position,

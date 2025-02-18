@@ -10,7 +10,7 @@ class Course extends Model {
   public image!: string;
   public summary!: string;
   public about!: string;
-  public careerTypeId!: bigint;
+  public careerTypeId?: bigint;
   public learningOutcomes!: string[];
   public prerequisites?: string[];
   public isActive!: boolean;
@@ -68,6 +68,7 @@ Course.init(
     adminId: {
       type: DataTypes.BIGINT,
       references: { model: Admin, key: "id" },
+      allowNull: false,
     },
   },
   {

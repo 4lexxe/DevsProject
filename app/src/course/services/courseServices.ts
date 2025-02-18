@@ -37,7 +37,7 @@ export const createCourse = async (courseData: any) => {
     const response = await api.post(COURSES_ENDPOINT, courseData);
     return response.data;
   } catch (error) {
-    console.error('Error al crear el curso:', error);
+    console.error('Error al crear el curso desde el service:', error);
     throw error;
   }
 };

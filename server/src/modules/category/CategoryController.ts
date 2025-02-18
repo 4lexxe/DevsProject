@@ -28,6 +28,24 @@ export default class CategoryController {
     }
   };
 
+  static getAllActives: RequestHandler = async (req, res) => {
+    try {
+      const categories = await Category.findAll({ order: [["id", "ASC"]], where:{ isActive: true } });
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Categorías obtenidas correctamente",
+        length: categories.length,
+        data: categories,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener las categorías",
+        error,
+      });
+    }
+  };
+
   // Obtener una categoría por ID
   static getById: RequestHandler = async (req, res) => {
     try {

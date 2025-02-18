@@ -1,4 +1,5 @@
 import { Request, Response, RequestHandler } from "express";
+import sequelize from "../../infrastructure/database/db";
 import Section from "./Section";
 import Course from "../course/Course";
 import Content from "../content/Content";
@@ -66,7 +67,10 @@ export default class SectionController {
       const { courseId } = req.params;
       const sections = await Section.findAll({
         where: { courseId },
-        include: ["course", "contents"],
+        include: [
+          { model: Course, as: "course" }, // Si la relación con Course existe
+          { model: Content, as: "contents" }
+        ],
       });
       res.status(200).json({
         ...metadata(req, res),
@@ -130,6 +134,81 @@ export default class SectionController {
         message: "Error al crear la sección",
         error,
       });
+    }
+  };
+
+  static createSectionsAndContents: RequestHandler = async (req, res) => {
+    const transaction = await sequelize.transaction(); // Iniciar una transacción
+
+    try {
+      const {sections, courseId} = req.body;
+
+      if (!Array.isArray(sections) || sections.length === 0) {
+        res.status(400).json({
+          status: "error",
+          url: req.originalUrl,
+          message: "Debe proporcionar al menos una sección",
+          data: null,
+        });
+        return;
+      }
+
+      const createdSections = [];
+
+      for (const sectionData of sections) {
+        const newSection = await Section.create(
+          {
+            title: sectionData.title,
+            courseId: courseId,
+            description: sectionData.description,
+            moduleType: sectionData.moduleType,
+            coverImage: sectionData.coverImage,
+          },
+          { transaction }
+        );
+
+        if (Array.isArray(sectionData.contents)) {
+          for (const contentData of sectionData.contents) {
+            await Content.create(
+              {
+                sectionId: newSection.id,
+                title: contentData.title,
+                text: contentData.text,
+                markdown: contentData.markdown,
+                linkType: contentData.linkType,
+                link: contentData.link,
+                quiz: (contentData.quiz) ? JSON.stringify(contentData.quiz) : null,
+                resources: (contentData.resources) ? JSON.stringify(contentData.resources): null,
+                duration: contentData.duration,
+                position: contentData.position,
+              },
+              { transaction }
+            );
+          }
+        }
+
+        createdSections.push(newSection);
+      }
+
+      await transaction.commit(); // Confirmar la transacción
+
+      res.status(201).json({
+        status: "success",
+        url: req.originalUrl,
+        message: "Secciones y contenidos creados exitosamente",
+        data: createdSections,
+      });
+      return;
+    } catch (error) {
+      await transaction.rollback(); // Revertir en caso de error
+      console.error("Error al crear secciones y contenidos:", error);
+      res.status(500).json({
+        status: "error",
+        url: req.originalUrl,
+        message: "Error interno del servidor",
+        data: null,
+      });
+      return;
     }
   };
 

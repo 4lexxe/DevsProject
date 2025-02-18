@@ -48,8 +48,8 @@ type quizType = "Multiple Choice"
 type linkType = "video" | "pagina" | "imagen" | "documento"
 
 export interface Content {
-   id: bigint;
-   sectionId: bigint;
+   id: string;
+   sectionId: string;
    title: string;
    text: string;
    markdown?: string;

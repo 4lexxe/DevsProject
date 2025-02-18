@@ -18,7 +18,8 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       try {
         setLoading(true);
         const response = await getSectionsByCourse(courseId);
-        console.log(response)
+        console.log("Holanda", response)
+        
         setSections(response);
         setSectionCount(response.length);
       } catch (err) {

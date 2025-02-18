@@ -8,14 +8,9 @@ import '@/shared/assets/styles/main.css';
 import DefaultLayout from './shared/layouts/defaultLayout';
 import Home from './home/home';
 
-import QuizPage from './course/pages/QuizPage';
-import { CoursesPage }from '@/course/index';
-import { CourseFormPage } from '@/course/index';
-import {CourseDetail} from './course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage }from '@/course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
-
-import Profile from './course/pages/Profile';
 
 import LearnRoute from './learnroute/pages/LearnRoute';
 
@@ -35,10 +30,10 @@ function App() {
             <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-            <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            <Route path='course/form' element = {<CourseFormPage/>} />
+            <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            
+            <Route path='course/form' element = {<CourseFormPage/>} />
+            <Route path='course/sections/form' element = { <SectionsFormPage/> } />
             <Route path="/recursos" element={<ResourcePage />} />
-
-            
           </Route>
         </Routes>
       </AuthProvider>

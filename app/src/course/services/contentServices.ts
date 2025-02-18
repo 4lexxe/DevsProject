@@ -4,7 +4,7 @@ import api from '../../api/axios';
 export const getContentBySection = async (sectionId: string) => {
   try {
     console.log(`Obteniendo contenido para la sección ID: ${sectionId}`);
-    const response = await api.get(`/contentsBySection/${sectionId}`);
+    const response = await api.get(`/contents/section/${sectionId}`);
     return response.data;
   } catch (error: any) {
     console.error(

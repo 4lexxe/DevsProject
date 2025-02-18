@@ -7,12 +7,12 @@ import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
-import ImagePreview from "@/course/components/Forms/previews/ImagePreview";
+import ImagePreview from "@/course/components/forms/previews/ImagePreview";
 
-import { ICourseInput } from "@/course/interfaces/interfaces";
+import { ICourseInput } from "@/course/interfaces/CourseFormInterfaces";
 import { courseSchema } from "@/course/validations/courseSchema";
 
-import { useCourseContext } from "@/course/context/CourseContext";
+import { createFullCourse } from "@/course/services/courseFormService";
 
 import {
   getCategories,
@@ -28,35 +28,22 @@ export default function CourseForm() {
     control,
     formState: { errors },
   } = useForm<ICourseInput>({
-    /* resolver: zodResolver(courseSchema), */
+    resolver: zodResolver(courseSchema),
     defaultValues: {
       title: "",
       image: "",
-      categories: [],
-      relatedCareerType: "",
+      categoryIds: [],
       summary: "",
       about: "",
       learningOutcomes: "",
       isActive: false,
       isInDevelopment: false,
-      Sections: [],
     },
   });
 
-  const { state: courseState } = useCourseContext();
-
-  useEffect(() => {
-    setValue("Sections", courseState.sections);
-  }, [courseState.sections]);
-
-  const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
-    console.log(data);
-
-    sessionStorage.clear();
-  };
-
-  const [categories, setCategories] = useState();
-  const [careerTypes, setCareerTypes] = useState();
+  /* Cargar las categorias y carreras para seleccionar */
+  const [categories, setCategories] = useState<any[]>([]);
+  const [careerTypes, setCareerTypes] = useState<any[]>([]);
   useEffect(() => {
     const getCategoriesF = async () => {
       try {
@@ -81,8 +68,28 @@ export default function CourseForm() {
     getCareerTypesF();
   }, []);
 
+  /* Manejar el envio de la data del formulario al backend */
+  const handleCreateCourse = async (courseData: any) => {
+    try {
+      const newCourse = await createFullCourse(courseData);
+      console.log("Curso creado:", newCourse);
+      // Aquí podrías redirigir a otra página o limpiar el formulario
+    } catch (err) {
+      console.log("Error al crear el curso. Inténtalo nuevamente.", err);
+    }
+  };
+
+  const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
+    const newCategoryIds = data.categoryIds.map(Number);
+    const carrerId =(data.careerTypeId !== "") ? Number(data.careerTypeId) : null;
+    const newData = { ...data, categoryIds: newCategoryIds, adminId: 1, careerTypeId: carrerId };
+
+    console.log("Los datos del curso: ", newData);
+    handleCreateCourse(newData);
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
+    <div className="w-full mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-6">Añadir Nuevo Curso</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -106,30 +113,14 @@ export default function CourseForm() {
         <ImagePreview watchContentImage={watch("image")} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* <SelectInput
-            name="category"
-            labelText="Categoría"
-            register={register}
-            error={errors["category"]?.message}
-            placeholder="Seleccione alguna categoría"
-            options={
-              categories
-                ? categories.map((category) => ({
-                    value: category.id, // ID de la categoría como valor
-                    label: category.name, // Nombre de la categoría como etiqueta
-                  }))
-                : []
-            }
-            isLoading={categories ? false : true}
-          /> */}
-
           <MultiSelectInput
-            name="categories"
+            name="categoryIds"
             labelText="Categories"
             control={control}
+            error={errors.categoryIds?.message}
             options={
               categories
-                ? categories.map((category) => ({
+                ? categories.map((category: any) => ({
                     value: category.id, // ID de la categoría como valor
                     label: category.name, // Nombre de la categoría como etiqueta
                   }))
@@ -138,22 +129,30 @@ export default function CourseForm() {
             placeholder="Seleccione alguna categoría"
           />
           <SelectInput
-            name="relatedCareerType"
+            name="careerTypeId"
             labelText="Tipo de Carrera Relacionada"
             register={register}
-            error={errors["relatedCareerType"]?.message}
+            error={errors["careerTypeId"]?.message}
             placeholder="Seleccione algun tipo de carrera"
             options={
               careerTypes
-                ? careerTypes.map((careerType) => ({
+                ? careerTypes.map((careerType: any) => ({
                     value: careerType.id,
                     label: careerType.name,
                   }))
                 : []
             }
-            isLoading={careerTypes ? false : true}
           />
         </div>
+
+        <TextAreaInput
+          name="prerequisites"
+          labelText="Prerequisitos"
+          rows={2}
+          register={register}
+          error={errors["prerequisites"]?.message}
+          arrayValue={true}
+        />
 
         <TextAreaInput
           name="summary"
@@ -184,30 +183,15 @@ export default function CourseForm() {
               name="isActive"
               labelText="Activo"
               register={register}
-              error={errors["isActive"]?.message}
             />
             <CheckInput
               name="isInDevelopment"
               labelText="En desarrollo"
               register={register}
-              error={errors["isInDevelopment"]?.message}
             />
           </div>
         </div>
-
-        {errors.Sections?.message && (
-          <p className="mt-1 text-xs text-red-500">{errors.Sections.message}</p>
-        )}
-
-        {errors.Sections &&
-          Array.isArray(errors.Sections) &&
-          errors.Sections.map((sectionError, index) =>
-            sectionError?.contents ? (
-              <p key={index} className="text-red-500 text-sm">
-                {`La sección ${index + 1} debe tener al menos un contenido`}
-              </p>
-            ) : null
-          )}
+        {errors.isActive?.message && <p className="mt-1 text-xs text-red-500">{errors.isActive?.message}</p>}
 
         <div className="flex justify-end space-x-3 pt-8">
           <button
