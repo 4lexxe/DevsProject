@@ -88,7 +88,7 @@ const currentLevel: Level = {
 
 export default function LearningPath() {
   const [expandedTopics, setExpandedTopics] = useState<string[]>([])
-  const [completedTopics, setCompletedTopics] = useState<string[]>([])
+  const [completedTopics] = useState<string[]>([])
 
   const toggleTopic = (topicId: string) => {
     setExpandedTopics((current) =>

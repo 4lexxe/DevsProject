@@ -1,7 +1,6 @@
 import React from 'react'
 import { Node, NodeProps, Position, Handle } from "@xyflow/react"
 import { NodeButtonData } from '../types/CustomComponentType';
-import CustomHandle from '../components/CustomHandle';
 
 
 type CustomComponentNode = Node<NodeButtonData, 'string'>;

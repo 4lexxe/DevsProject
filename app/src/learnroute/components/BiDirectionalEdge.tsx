@@ -1,23 +1,16 @@
 import {
     getBezierPath,
-    useStore,
     BaseEdge,
     type EdgeProps,
-    type ReactFlowState,
-    MarkerType 
   } from '@xyflow/react';
   
   export default function BiDirectionalEdge({
-    id,
-    source,
-    target,
     sourceX,
     sourceY,
     targetX,
     targetY,
     sourcePosition,
     targetPosition,
-    markerEnd,
   }: EdgeProps) {
     /*const hasReverseEdge = useStore((s: ReactFlowState) => {
       return s.edges.some(
