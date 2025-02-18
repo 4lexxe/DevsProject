@@ -129,34 +129,34 @@ export default function BottomNavbar() {
                       transition={{ duration: 0.2 }}
                       className="absolute bottom-full mb-4 transform -translate-x-1/2 flex gap-4 items-center z-50"
                     >
-                      <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center">
                         <button
                           onClick={() => {
-                            navigate("/login");
-                            setIsAuthDropdownOpen(false);
+                          navigate("/login");
+                          setIsAuthDropdownOpen(false);
                           }}
                           className="w-12 h-12 rounded-full bg-white border-2 border-gray-400 shadow-md flex items-center justify-center transition-all duration-300 ease-in-out hover:border-gray-600"
                         >
                           <LogIn className="h-6 w-6 text-gray-600" />
                         </button>
-                        <span className="text-xs font-medium text-gray-600 mt-1">
+                        <span className="text-xs font-medium text-gray-600 mt-1 bg-white px-2 rounded">
                           Ingresar
                         </span>
-                      </div>
-                      <div className="flex flex-col items-center">
+                        </div>
+                        <div className="flex flex-col items-center">
                         <button
                           onClick={() => {
-                            navigate("/register");
-                            setIsAuthDropdownOpen(false);
+                          navigate("/register");
+                          setIsAuthDropdownOpen(false);
                           }}
                           className="w-12 h-12 rounded-full bg-white border-2 border-gray-400 shadow-md flex items-center justify-center transition-all duration-300 ease-in-out hover:border-gray-600"
                         >
                           <UserPlus className="h-6 w-6 text-gray-600" />
                         </button>
-                        <span className="text-xs font-medium text-gray-600 mt-1">
+                        <span className="text-xs font-medium text-gray-600 mt-1 bg-white px-2 rounded">
                           Registrar
                         </span>
-                      </div>
+                        </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
