@@ -3,14 +3,14 @@ import { Clock, BookOpen, Code } from 'lucide-react';
 
 interface CourseOverviewProps {
   about: string;
-  relatedCareerType: string;
+  careerType: string;
   numberOfModules: number;
   createdAt: string;
 }
 
 const CourseOverview: React.FC<CourseOverviewProps> = ({
   about,
-  relatedCareerType,
+  careerType,
   numberOfModules,
   createdAt,
 }) => {
@@ -29,7 +29,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="flex items-center space-x-2">
           <Code className="w-5 h-5 text-blue-600" />
-          <span>{relatedCareerType}</span>
+          <span>{careerType}</span>
         </div>
         <div className="flex items-center space-x-2">
           <BookOpen className="w-5 h-5 text-blue-600" />

@@ -1,24 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { getContentBySection } from '../../services/contentServices';
-import ContentViewer from './ContentViewer';
+import ContentViewer from './contentViewner/ContentViewer';
 import { Loader2 } from 'lucide-react';
-
-interface Content {
-  id: number;
-  type: string;
-  contentText?: string;
-  contentVideo?: string;
-  contentVideoTitle?: string;
-  contentImage?: string;
-  contentImageTitle?: string;
-  contentFile?: string;
-  contentFileTitle?: string;
-  externalLink?: string;
-  externalLinkTitle?: string;
-  duration?: number;
-  position?: number;
-  sectionId: number;
-}
+import { Content } from '@/course/interfaces/viewnerCourseInterface';
 
 interface SectionContentProps {
   sectionId: string;

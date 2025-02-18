@@ -30,6 +30,26 @@ export default class CareerTypeController {
     }
   };
 
+  static getAllActives: RequestHandler = async (req, res) => {
+    try {
+      const careerTypes = await CareerType.findAll({ order: [["id", "ASC"]], where:{ isActive: true } });
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Tipos de carrera obtenidos correctamente",
+        length: careerTypes.length,
+        data: careerTypes,
+      });
+    } catch (error) {
+      res
+        .status(500)
+        .json({
+          status: "error",
+          message: "Error al obtener los tipos de carrera",
+          error,
+        });
+    }
+  };
+
   // Obtener un CareerType por ID
   static getById: RequestHandler = async (req, res) => {
     try {

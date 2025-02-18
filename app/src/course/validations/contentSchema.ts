@@ -1,144 +1,59 @@
 import { z } from "zod";
 
-export const contentTypes = [
-    "Texto",
-    "Video",
-    "Imagen",
-    "Archivo",
-    "Link Externo",
-    "Cuestionario",
-] as const;
+const quizTypeEnum = z.enum(["Multiple Choice", "true or false", "Short Answer", "Checkbox"]);
 
-// Creamos un esquema que cambia dependiendo del `type`
-export const contentSchema = z.discriminatedUnion("type", [
-    // Tipo "Texto"
+/* export const quizSchema = z.object({
+  question: z.string().min(1, "La pregunta no puede estar vacía"),
+  text: z.string().optional(),
+  image: z.string().url("Debe ser una URL válida").optional(),
+  type: quizTypeEnum,
+  answers: z.array(
     z.object({
-        type: z.literal("Texto"),
-        contentText: z.string().nonempty("El texto es obligatorio"),
-        contentTextTitle: z.string().nonempty("El título del texto es obligatorio"),
-        contentVideo: z.string().optional(),
-        contentVideoTitle: z.string().optional(),
-        contentImage: z.string().optional(),
-        contentImageTitle: z.string().optional(),
-        contentFile: z.string().optional(),
-        contentFileTitle: z.string().optional(),
-        externalLink: z.string().optional(),
-        externalLinkTitle: z.string().optional(),
-        quizTitle: z.string().optional(),
-        quizContent: z.string().optional(),
-        questions: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
+      answer: z.string().min(1, "La respuesta no puede estar vacía"),
+      isCorrect: z.boolean()
+    })
+  ).min(1, "Debe haber al menos una respuesta")
+}); */
 
-    // Tipo "Video"
-    z.object({
-        type: z.literal("Video"),
-        contentVideo: z.string().url("El video es obligatorio"),
-        contentVideoTitle: z.string().nonempty("El título del video es obligatorio"),
-        contentText: z.string().optional(),
-        contentTextTitle: z.string().optional(),
-        contentImage: z.string().optional(),
-        contentImageTitle: z.string().optional(),
-        contentFile: z.string().optional(),
-        contentFileTitle: z.string().optional(),
-        externalLink: z.string().optional(),
-        externalLinkTitle: z.string().optional(),
-        quizTitle: z.string().optional(),
-        quizContent: z.string().optional(),
-        questions: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
 
-    // Tipo "Imagen"
-    z.object({
-        type: z.literal("Imagen"),
-        contentImage: z.string().url("La imagen es obligatoria"),
-        contentImageTitle: z
-            .string()
-            .nonempty("El título de la imagen es obligatorio"),
-        contentText: z.string().optional(),
-        contentTextTitle: z.string().optional(),
-        contentVideo: z.string().optional(),
-        contentVideoTitle: z.string().optional(),
-        contentFile: z.string().optional(),
-        contentFileTitle: z.string().optional(),
-        externalLink: z.string().optional(),
-        externalLinkTitle: z.string().optional(),
-        quizTitle: z.string().optional(),
-        quizContent: z.string().optional(),
-        questions: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
+// Esquema para una respuesta individual
+const answerSchema = z.object({
+  answer: z.string().min(1, "La respuesta no puede estar vacía"), // La respuesta no puede estar vacía
+  isCorrect: z.boolean(), // Debe ser un booleano
+});
 
-    // Tipo "Archivo"
-    z.object({
-        type: z.literal("Archivo"),
-        contentFile: z.string().url("Escribe una url válida").nonempty("El archivo es obligatorio"),
-        contentFileTitle: z.string().nonempty("El título del archivo es obligatorio"),
-        contentText: z.string().optional(),
-        contentTextTitle: z.string().optional(),
-        contentVideo: z.string().optional(),
-        contentVideoTitle: z.string().optional(),
-        contentImage: z.string().optional(),
-        contentImageTitle: z.string().optional(),
-        externalLink: z.string().optional(),
-        externalLinkTitle: z.string().optional(),
-        quizTitle: z.string().optional(),
-        quizContent: z.string().optional(),
-        questions: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
+// Esquema para una pregunta individual
+const questionSchema = z.object({
+  question: z.string().min(1, "La pregunta no puede estar vacía"), // La pregunta no puede estar vacía
+  type: z.enum(["Multiple Choice", "True or False", "Short Answer", "Checkbox"]), // Solo permite estos tipos
+  image: z.string().url("Debe ser una URL válida").optional().or(z.literal("")), // La imagen es opcional, pero si está presente, debe ser una URL válida
+  text: z.string().optional(), // El texto adicional es opcional
+  answers: z.array(answerSchema).min(1, "Debe haber al menos una respuesta"), // Debe haber al menos una respuesta
+});
 
-    // Tipo "Link Externo"
-    z.object({
-        type: z.literal("Link Externo"),
-        externalLink: z.string().url("El enlace externo es obligatorio"),
-        externalLinkTitle: z
-            .string()
-            .nonempty("El título del enlace externo es obligatorio"),
-        contentText: z.string().optional(),
-        contentTextTitle: z.string().optional(),
-        contentVideo: z.string().optional(),
-        contentVideoTitle: z.string().optional(),
-        contentImage: z.string().optional(),
-        contentImageTitle: z.string().optional(),
-        contentFile: z.string().optional(),
-        contentFileTitle: z.string().optional(),
-        quizTitle: z.string().optional(),
-        quizContent: z.string().optional(),
-        questions: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
+// Esquema para el formulario completo (lista de preguntas)
+export const quizSchema = z.object({
+  quiz: z.array(questionSchema).min(1, "Debe haber al menos una pregunta"), // Debe haber al menos una pregunta
+});
 
-    // Tipo "Cuestionario"
-    z.object({
-        type: z.literal("Cuestionario"),
-        quizTitle: z.string().nonempty("El título del cuestionario es obligatorio"),
-        quizContent: z
-            .string()
-            .nonempty("El contenido del cuestionario es obligatorio"),
-        questions: z
-        .array(z.string()).min(1, { message: "Debe haber al menos una pregunta" })
-        ,
-        
-        contentText: z.string().optional(),
-        contentTextTitle: z.string().optional(),
-        contentVideo: z.string().optional(),
-        contentVideoTitle: z.string().optional(),
-        contentImage: z.string().optional(),
-        contentImageTitle: z.string().optional(),
-        contentFile: z.string().optional(),
-        contentFileTitle: z.string().optional(),
-        externalLink: z.string().optional(),
-        externalLinkTitle: z.string().optional(),
-        duration: z.number().min(1, "Debe durar al menos 1 minuto").optional(),
-        position: z.number().optional(),
-    }),
-]);
 
-export type ContentType = z.infer<typeof contentSchema>;
+
+
+
+
+
+const resourceSchema = z.object({
+  title: z.string().min(1, "El título no puede estar vacío"),
+  url: z.string().url("Debe ser una URL válida")
+});
+
+export const contentSchema = z.object({
+  title: z.string().min(1, "El título es obligatorio"),
+  text: z.string().min(1, "El texto es obligatorio"),
+  markdown: z.string().optional(),
+  linkType: z.string().optional(),
+  link: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
+
+  resources: z.array(resourceSchema).optional(),
+  duration: z.number().positive("La duración debe ser mayor a 0").default(1),
+});
