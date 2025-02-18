@@ -9,6 +9,7 @@ export default function DefaultLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
+      <Navbar />
       <NotificationBubble />
       <main className="flex-grow w-full pt-20">
         {backendOnline ? (

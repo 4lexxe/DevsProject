@@ -1,12 +1,5 @@
 import axios from 'axios';
 
-// Definir el tipo para las variables de entorno de Vite
-interface ImportMetaEnv {
-  VITE_API_URL: string;
-  // Añade aquí otras variables de entorno si las necesitas
-}
-
-// Acceder a las variables de entorno de Vite
 const API_URL = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
@@ -14,6 +7,16 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true
+});
+
+// Interceptor para añadir el token
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default api;

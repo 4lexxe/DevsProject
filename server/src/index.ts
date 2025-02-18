@@ -16,6 +16,7 @@ import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import recourseRoutes from './modules/resource/resourceRoutes';
+import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -146,6 +147,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api', recourseRoutes);
+app.use('/api', roadMapRoutes);
 
 // Rutas públicas
 app.use('/api', courseRoutes);

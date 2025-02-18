@@ -1,32 +1,50 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './auth/contexts/AuthContext';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./auth/contexts/AuthContext";
+import { ReactFlowProvider } from "reactflow";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Importación de todos los estilos
-import '@/shared/assets/styles/main.css';
-import '@/shared/assets/styles/roadmap.css';
+import "@/shared/assets/styles/main.css";
+import "@/shared/assets/styles/roadmap.css";
 
 // Importación de los componentes
-import DefaultLayout from './shared/layouts/defaultLayout';
-import Home from './home/home';
+import DefaultLayout from "./shared/layouts/defaultLayout";
+import Home from "./home/home";
 
-import QuizPage from './course/pages/QuizPage';
-import { CoursesPage }from '@/course/index';
-import { CourseFormPage } from '@/course/index';
-import {CourseDetail} from './course/index';
+import QuizPage from "./course/pages/QuizPage";
+import { CoursesPage } from "@/course/index";
+import { CourseFormPage } from "@/course/index";
+import { CourseDetail } from "./course/index";
 
-import { LoginPage, RegisterPage } from './auth/auth';
+import { LoginPage, RegisterPage } from "./auth/auth";
 
-import Profile from './course/pages/Profile';
+import Profile from "./course/pages/Profile";
 
-import LearnRoute from './learnroute/pages/LearnRoute';
+import LearnRoute from "./learnroute/pages/LearnRoute";
 
-import ResourcePage from './recourse/pages/resourcePages';
-import RoadmapEditor from './learnroute/components/RoadmapEditor';
+import ResourcePage from "./recourse/pages/resourcePages";
+import RoadmapEditor from "./learnroute/components/RoadmapEditor";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    },
+  },
+});
 
 function App() {
   return (
     <Router>
-      <AuthProvider> {/* AuthProvider ahora está dentro del Router */}
+      <AuthProvider>
+        {" "}
+        {/* AuthProvider ahora está dentro del Router */}
         <Routes>
           <Route path="/" element={<DefaultLayout />}>
             <Route index element={<Home />} />
@@ -37,10 +55,24 @@ function App() {
             <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-            <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            <Route path='course/form' element = {<CourseFormPage/>} />
-            <Route path="/recursos" element={<ResourcePage />} />
-
-            <Route path="/editor-roadmap" element={<RoadmapEditor/>} />
+            <Route path="course/form" element={<CourseFormPage />} />
+            <Route path="/recursos" element={<ResourcePage />} />            
+            <Route 
+              path="/ruta-aprendizaje" 
+              element={
+                <QueryClientProvider client={queryClient}>
+                  <LearnRoute />
+                </QueryClientProvider>
+              } 
+            />
+            <Route
+              path="/editor-roadmap"
+              element={
+                <ReactFlowProvider>
+                  <RoadmapEditor />
+                </ReactFlowProvider>
+              }
+            />
           </Route>
         </Routes>
       </AuthProvider>

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService, { User } from '../services/auth.service';
 import useSocket from '../../hooks/useSocket';
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
@@ -13,7 +13,7 @@ interface AuthContextType {
   setShowWelcomeMessage: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -57,8 +57,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.setItem('hasShownWelcome', 'true');
       setShowWelcomeMessage(true);
       
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al iniciar sesión');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al iniciar sesión');
       throw err;
     }
   };
@@ -73,8 +74,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.setItem('hasShownWelcome', 'true');
       setShowWelcomeMessage(true);
       
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      setError(error.response?.data?.message || 'Error al registrarse');
       throw err;
     }
   };
@@ -89,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       sessionStorage.removeItem('hasShownWelcome');
       
       socket?.emit('logout', { userId: user?.id });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Logout error:', err);
     }
   };
