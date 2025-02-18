@@ -8,7 +8,8 @@ type CustomComponentNode = Node<NodeButtonData, 'string'>;
 function NodeButton({
     data: {
       label, 
-      colorText = '#000000', 
+      colorText = '#000000',
+      borderColor = '#000', 
       backgroundColor = '#facc15', 
       fontSize = 16, 
       layoutOrder = 0,
@@ -26,7 +27,7 @@ function NodeButton({
         zIndex: layoutOrder, // Aplicar el orden del layout
         padding: '12px 20px',
         borderRadius: `${borderRadius}px`,
-        border: '1px solid #ccc',
+        border: `1px solid ${borderColor}`,
       }}>
         <span className="text-sm absolute">
             {label}

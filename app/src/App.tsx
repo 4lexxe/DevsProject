@@ -29,6 +29,7 @@ import LearnRoute from "./learnroute/pages/LearnRoute";
 
 import ResourcePage from "./recourse/pages/resourcePages";
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
+import Roadmap from "./learnroute/pages/RoadMap";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,7 +57,7 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="course/form" element={<CourseFormPage />} />
-            <Route path="/recursos" element={<ResourcePage />} />            
+            <Route path="/recursos" element={<ResourcePage />} />
             <Route 
               path="/ruta-aprendizaje" 
               element={
@@ -65,6 +66,17 @@ function App() {
                 </QueryClientProvider>
               } 
             />
+            
+          <Route
+              path="/roadmaps/:id"
+              element={
+                <QueryClientProvider client={queryClient}>
+                  <Roadmap />
+                </QueryClientProvider>
+              }
+            />
+
+
             <Route
               path="/editor-roadmap"
               element={

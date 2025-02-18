@@ -61,14 +61,21 @@ export const RoadmapController = {
   getById: async (req: AuthRequest, res: Response) => {
     try {
       const userId = req.user?.id;
+      const whereClause = userId 
+        ? {
+            id: req.params.id,
+            [Op.or]: [
+              { isPublic: true },
+              { userId }
+            ]
+          }
+        : {
+            id: req.params.id,
+            isPublic: true
+          };
+
       const roadmap = await Roadmap.findOne({
-        where: {
-          id: req.params.id,
-          [Op.or]: [
-            { isPublic: true },
-            { userId }
-          ]
-        },
+        where: whereClause,
         attributes: ['id', 'title', 'description', 'isPublic', 'structure', 'userId', 'createdAt', 'updatedAt'],
         include: [{
           association: 'User',

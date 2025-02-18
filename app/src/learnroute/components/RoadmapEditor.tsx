@@ -2,7 +2,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
 import axios from 'axios';
-import { RoadmapService } from '../services/RoadMapService';
+import { RoadmapService } from '../services/RoadMap.service';
 import { AuthContext, AuthContextType }  from '../../auth/contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { useForm } from "react-hook-form";

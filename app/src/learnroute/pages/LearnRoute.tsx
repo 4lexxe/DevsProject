@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { RoadmapService, Roadmap } from '../services/RoadMapService';
+import { useNavigate } from 'react-router-dom';
+import { RoadmapService, Roadmap } from '../services/RoadMap.service';
 import { Map, Users, Clock, ArrowUpRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import PreviewRoadmap from '../components/PreviewRoadmap';
 
 const LearnRoute = () => {
+  const navigate = useNavigate();
   const { data: roadmaps, isLoading, error } = useQuery<Roadmap[]>({
     queryKey: ['roadmaps'],
     queryFn: RoadmapService.getAll,
@@ -101,10 +103,9 @@ const LearnRoute = () => {
                   </div>
                 </div>
                 <button
+                // boton para ver el roadmap por el id
                   className="absolute bottom-8 right-8 p-2.5 rounded-full bg-[#F1F0FB] text-[#403E43] opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#403E43] hover:text-white"
-                  onClick={() => {
-                    /* Handle navigation */
-                  }}
+                  onClick={() => navigate(`/roadmaps/${roadmap.id}`)}
                 >
                   <ArrowUpRight className="w-4 h-4" />
                 </button>

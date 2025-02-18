@@ -29,7 +29,7 @@ export default function H1Title({
         width: `${measured.width}px`,
         height: `${measured.height}px`,
         borderRadius: `${borderRadius}px`,
-        border: `$1px solid ${borderColor}`,
+        border: `1px solid ${borderColor}`,
         zIndex: layoutOrder,
         display: 'flex',
         alignItems: 'center',
