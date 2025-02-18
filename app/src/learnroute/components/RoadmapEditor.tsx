@@ -147,6 +147,37 @@ useEffect(() => {
   }
 }, [nodes, selectedNode]);
 
+const handleExport = () => {
+  const data = { nodes, edges };
+  const dataStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "roadmap.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files || e.target.files.length === 0) return;
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const data = JSON.parse(event.target?.result as string);
+      if (data.nodes && data.edges) {
+        setNodes(data.nodes);
+        setEdges(data.edges);
+      }
+    } catch (error) {
+      console.error("Error al leer el JSON", error);
+    }
+  };
+  reader.readAsText(file);
+};
+
+
 
 
   return (
@@ -188,6 +219,27 @@ useEffect(() => {
               </div>
             ))}
           </div>
+          <div className="flex flex-col gap-2 mt-4">
+    <button
+      onClick={handleExport}
+      className="p-2 bg-green-500 text-white rounded"
+    >
+      Exportar Roadmap
+    </button>
+    <label
+      htmlFor="import-json"
+      className="p-2 bg-blue-500 text-white rounded cursor-pointer text-center"
+    >
+      Importar Roadmap
+    </label>
+    <input
+      id="import-json"
+      type="file"
+      accept="application/json"
+      onChange={handleImport}
+      className="hidden"
+    />
+  </div>
         </Panel>
 
         <MiniMap />
