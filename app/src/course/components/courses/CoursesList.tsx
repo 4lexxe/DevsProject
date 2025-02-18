@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { getCourses } from '../../services/courseServices'
 import CourseListItem from './CourseListItem'
-/* import { ArrowRight } from 'lucide-react' */
+import { Category, CareerType } from "@/course/interfaces/viewnerCourseInterface";
 
 interface Course {
   id: number
   title: string
   summary: string
-  category: string
   image: string
-  relatedCareerType: string
+  categories: Category[]
+  careerType: CareerType
 }
 
 const CoursesList: React.FC = () => {
@@ -19,6 +19,7 @@ const CoursesList: React.FC = () => {
     const fetchCourses = async () => { 
       try {
         const data = await getCourses()
+        console.log(data)
         setCourses(data)
       } catch (error) {
         console.error('No se pudieron cargar los cursos', error)
@@ -36,7 +37,7 @@ const CoursesList: React.FC = () => {
             <CourseListItem
               key={course.id}
               {...course}
-              courseName={course.category}
+              categories={course.categories} 
             />
           ))}
         </div>

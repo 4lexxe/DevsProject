@@ -20,7 +20,7 @@ const CheckInput: React.FC<TextInputProps> = ({
           type="checkbox"
           id={name}
           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" 
-          {...register("acceptTerms")}
+          {...register(name)}
         />
         <label htmlFor={name} className="text-sm text-gray-600">
           {labelText}

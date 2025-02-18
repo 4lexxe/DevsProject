@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Edit, Trash2, GripVertical } from "lucide-react";
-import type { IContent } from "@/course/interfaces/interfaces";
+import type { IContent } from "@/course/interfaces/CourseFormInterfaces";
 
 export default function DraggableItem({
   item,
@@ -39,20 +39,15 @@ export default function DraggableItem({
       <div className="flex-1 px-4 space-y-2">
         <h5 className="font-semibold text-gray-800 text-lg leading-tight">
           {index + 1}.
-          {item.contentTextTitle ||
-            item.contentImageTitle ||
-            item.contentFileTitle ||
-            item.contentVideoTitle ||
-            item.externalLinkTitle ||
-            item.quizTitle}
+          {item.title || "Sin título"}
         </h5>
         <p className="text-sm text-gray-600 line-clamp-2">
-            {item.contentText ||
+            {item.text ||
             item?.duration}
             </p>
         <div className="flex items-center space-x-2">
           <span className="inline-block px-2 py-1 text-xs font-medium text-blue-600 bg-blue-100 rounded-full">
-            {item.type}
+            WOW
           </span>
           <span className="text-xs text-gray-400">
             {/* You can add additional info here, like date or length */}

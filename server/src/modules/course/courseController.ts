@@ -3,6 +3,7 @@ import Course, { CourseCategory } from "./Course";
 import Category from "../category/Category";
 import CareerType from "../careerType/CareerType";
 import Admin from "../admin/Admin";
+import Section from "../section/Section";
 
 const metadata = (req: any, res: any) => {
   return {
@@ -97,6 +98,7 @@ export class CourseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          { model: Section, as: "sections" }
         ],
       });
       if (!course) {
@@ -122,12 +124,13 @@ export class CourseController {
   // Obtener cursos por el ID de un admin
   static getByAdminId: RequestHandler = async (req, res) => {
     try {
-      const { adminId } = req.body;
+      const { adminId } = req.params;
       const courses = await Course.findAll({
         where: { adminId },
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          { model: Section, as: "sections" }
         ],
       });
       res.status(200).json({
@@ -219,6 +222,7 @@ export class CourseController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, image, summary, about, careerTypeId, learningOutcomes, isActive, isInDevelopment, adminId, categoryIds } = req.body;
+      
       
       const newCourse = await Course.create({
         title,

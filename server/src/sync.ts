@@ -17,13 +17,7 @@ import CareerType from './modules/careerType/CareerType';
 import Course from './modules/course/Course';
 import { CourseCategory } from './modules/course/Course';
 import Section from './modules/section/Section';
-
-import FileContent from './modules/content/models/FileContent';
-import ImageContent from './modules/content/models/ImageContent';
-import LinkContent from './modules/content/models/LinkContent';
-import QuizContent from './modules/content/models/QuizContent';
-import TextContent from './modules/content/models/TextContent';
-import VideoContent from './modules/content/models/VideoContent';
+import Content from './modules/content/Content';
 
 // sync.ts
 async function syncDatabase() {
@@ -52,12 +46,7 @@ async function syncDatabase() {
     await CourseCategory.sync({ force: true });
     await Section.sync({ force: true });
 
-    await FileContent.sync({ force: true })
-    await ImageContent.sync({ force: true })
-    await LinkContent.sync({ force: true })
-    await QuizContent.sync({ force: true })
-    await TextContent.sync({ force: true })
-    await VideoContent.sync({ force: true })
+    await Content.sync({ force: true });
 
 
     await Rating.sync({ force: true });
