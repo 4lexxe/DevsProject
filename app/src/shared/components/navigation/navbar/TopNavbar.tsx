@@ -1,5 +1,5 @@
 import { Search, Bell } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../auth/contexts/AuthContext';
 
 const getPageTitle = (pathname: string) => {
@@ -20,6 +20,7 @@ const getPageTitle = (pathname: string) => {
 export default function TopNavbar() {
   const location = useLocation();
   const { user } = useAuth(); // Obtener el estado del usuario desde el contexto de autenticación
+  const navigate = useNavigate(); // hook de navegación
   const pageTitle = getPageTitle(location.pathname);
 
   return (
@@ -37,7 +38,10 @@ export default function TopNavbar() {
   
         {/* Botones de búsqueda y notificaciones */}
         <div className="flex items-center space-x-6">
-          <button className="p-3 hover:bg-gray-100 rounded-full">
+        <button 
+            className="p-3 hover:bg-gray-100 rounded-full"
+            onClick={() => navigate('/search')} // Añadir onClick handler
+          >
             <Search className="h-7 w-7 text-gray-600" />
           </button>
           {user && (

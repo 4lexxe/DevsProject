@@ -5,6 +5,9 @@ import { AuthProvider } from './auth/contexts/AuthContext';
 import '@/shared/assets/styles/main.css';
 // Importación de los componentes
 import DefaultLayout from './shared/layouts/defaultLayout';
+
+import SearchPage from './search/pages/SearchPage';
+
 import Home from './home/home';
 
 import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage }from '@/course/index';
@@ -23,6 +26,7 @@ function App() {
       <AuthProvider> {/* AuthProvider ahora está dentro del Router */}
         <Routes>
           <Route path="/" element={<DefaultLayout />}>
+            <Route path="/search" element={<SearchPage />} />
             <Route index element={<Home />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="cursos" element={<CoursesPage />} />

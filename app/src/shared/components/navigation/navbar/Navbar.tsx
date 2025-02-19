@@ -3,17 +3,19 @@ import DesktopNavbar from './NavbarDesktop';
 import TopNavbar from './TopNavbar';
 import BottomNavbar from './BottomNavbar';
 
-export default function Navbar() {
+interface NavbarProps {
+  showTopNavbar?: boolean; // Propiedad opcional para controlar la visibilidad del TopNavbar
+}
+
+export default function Navbar({ showTopNavbar = true }: NavbarProps) {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   if (isMobile) {
     return (
       <>
-        <TopNavbar />
-        <div className="pb-16">
-          {/* Contenido */}
-        </div>
-        <BottomNavbar />
+        {showTopNavbar && <TopNavbar />} {/* Mostrar TopNavbar solo si showTopNavbar es true */}
+        {showTopNavbar}
+        <BottomNavbar /> {/* BottomNavbar siempre visible */}
       </>
     );
   }
