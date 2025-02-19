@@ -1,33 +1,44 @@
-import { useQuery } from '@tanstack/react-query';
+// LearnRoute.tsx
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { RoadmapService, Roadmap } from '../services/RoadMap.service';
-import { Map, Users, Clock, ArrowUpRight, Loader2 } from 'lucide-react';
+import { Map, Users, Clock, ArrowUpRight, Loader2, Trash, Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import PreviewRoadmap from '../components/PreviewRoadmap';
 
 const LearnRoute = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const { data: roadmaps, isLoading, error } = useQuery<Roadmap[]>({
     queryKey: ['roadmaps'],
     queryFn: RoadmapService.getAll,
     retry: 3,
   });
 
-  if (error) {
-    toast.error('Failed to load roadmaps. Please try again later.');
-  }
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => RoadmapService.delete(id),
+    onSuccess: () => {
+      toast.success('Roadmap eliminado');
+      queryClient.invalidateQueries({ queryKey: ['roadmaps'] });
+    },
+    onError: () => {
+      toast.error('Error al eliminar el roadmap');
+    }
+  });
 
   if (error) {
+    toast.error('Error al cargar los roadmaps. Porfavor intentalo de nuevo.');
     return (
       <div className="flex min-h-screen items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-lg text-[#8E9196] mb-4">Unable to load roadmaps</p>
+          <p className="text-lg text-[#8E9196] mb-4">No se pudo cargar los roadmaps</p>
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-[#F3F4F6] hover:bg-gray-200 rounded-lg transition-colors"
           >
-            Try Again
+            Intentar de nuevo
           </button>
         </div>
       </div>
@@ -44,13 +55,13 @@ const LearnRoute = () => {
             transition={{ duration: 0.5 }}
           >
             <span className="inline-block px-4 py-1.5 text-sm bg-[#F3F4F6] text-[#403E43] rounded-full mb-4">
-              Learning Paths
+              Rutas de Aprendizaje
             </span>
             <h1 className="text-3xl md:text-4xl font-semibold text-[#1A1F2C] mb-4">
-              Educational Roadmaps
+              Roadmaps Educativos
             </h1>
             <p className="text-[#8E9196] max-w-2xl mx-auto text-lg">
-              Navigate your learning journey with expert-curated educational paths
+              Navegue su viaje de aprendizaje con rutas educativas seleccionadas por expertos
             </p>
           </motion.div>
         </div>
@@ -68,6 +79,7 @@ const LearnRoute = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group relative bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300"
               >
+                
                 <div className="absolute top-6 right-6">
                   <span
                     className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
@@ -76,7 +88,7 @@ const LearnRoute = () => {
                         : 'bg-[#F1F0FB] text-[#403E43]'
                     }`}
                   >
-                    {roadmap.isPublic ? 'Public' : 'Private'}
+                    {roadmap.isPublic ? 'Publico' : 'Privado'}
                   </span>
                 </div>
                 <div className="flex items-center mb-6">
@@ -88,7 +100,6 @@ const LearnRoute = () => {
                 <p className="text-[#8E9196] mb-8 line-clamp-2 leading-relaxed">
                   {roadmap.description}
                 </p>
-                {/* Preview del roadmap */}
                 <div className="mb-6">
                   <PreviewRoadmap structure={roadmap.structure || { nodes: [], edges: [] }} />
                 </div>
@@ -102,13 +113,31 @@ const LearnRoute = () => {
                     <span>{new Date(roadmap.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <button
-                // boton para ver el roadmap por el id
-                  className="absolute bottom-8 right-8 p-2.5 rounded-full bg-[#F1F0FB] text-[#403E43] opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-[#403E43] hover:text-white"
-                  onClick={() => navigate(`/roadmaps/${roadmap.id}`)}
-                >
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
+                {/* Nueva sección de botones con mejor diseño */}
+                <div className="absolute top-[78.5%] right-8 flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <button
+                    onClick={() => {
+                      if (window.confirm('¿Estás seguro de eliminar este roadmap?')) {
+                        deleteMutation.mutate(roadmap.id);
+                      }
+                    }}
+                    className="p-2 rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
+                  >
+                    <Trash className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/editor-roadmap/${roadmap.id}`)}
+                    className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/roadmaps/${roadmap.id}`)}
+                    className="p-2 rounded-lg bg-[#403E43] text-white hover:bg-[#2A292D] transition-all duration-300 shadow-sm hover:shadow"
+                  >
+                    <ArrowUpRight className="w-4 h-4" />
+                  </button>
+                </div>
               </motion.div>
             ))}
           </div>

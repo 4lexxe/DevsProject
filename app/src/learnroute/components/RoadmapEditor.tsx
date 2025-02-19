@@ -1,5 +1,6 @@
 // Importaciones de bibliotecas y componentes
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, X, Plus } from "lucide-react";
 import axios from 'axios';
 import { RoadmapService } from '../services/RoadMap.service';
@@ -74,6 +75,8 @@ const nodeTypes = {
 };
 
 const RoadmapEditorContent = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   // Estados para el manejo del panel y responsive
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -91,12 +94,33 @@ const RoadmapEditorContent = () => {
     handleSubmit,
     formState: { errors },
     getValues,
+    reset,
   } = useForm<SaveRoadmapForm>({
     resolver: zodResolver(saveRoadmapSchema),
     defaultValues: {
       isPublic: true,
     },
   });
+
+  // Cargar roadmap existente si se está editando
+  useEffect(() => {
+    if (id) {
+      RoadmapService.getById(Number(id))
+        .then((data) => {
+          reset({
+            title: data.title,
+            description: data.description,
+            isPublic: data.isPublic,
+          });
+          setNodes(data.structure.nodes);
+          setEdges(data.structure.edges);
+        })
+        .catch((error) => {
+          console.log(error)
+          toast.error("Error al cargar el roadmap");
+        });
+    }
+  }, [id, reset, setNodes, setEdges]);
 
   // Función para conectar nodos
   const onConnect = useCallback(
@@ -214,6 +238,7 @@ const RoadmapEditorContent = () => {
       return;
     }
     setIsConfirmingSave(true);
+
   };
 
   const onSaveRoadmap = async (formData: SaveRoadmapForm) => {
@@ -222,21 +247,21 @@ const RoadmapEditorContent = () => {
         toast.error('Debes iniciar sesión para guardar un roadmap');
         return;
       }
+      const structure = { nodes, edges };
+      const roadmapData = { ...formData, structure };
 
-      const structure = {
-        nodes,
-        edges
-      };
-
-      const roadmapData = {
-        ...formData,
-        structure
-      };
-
-      await RoadmapService.create(roadmapData);
-      toast.success('¡Roadmap guardado exitosamente!');
+      if (id) {
+        // Actualizar roadmap existente
+        await RoadmapService.update(Number(id), roadmapData);
+        toast.success('¡Roadmap actualizado exitosamente!');
+      } else {
+        // Crear nuevo roadmap
+        await RoadmapService.create(roadmapData);
+        toast.success('¡Roadmap guardado exitosamente!');
+      }
       setIsConfirmingSave(false);
-
+      // Redirigir a la ruta deseada una vez guardado
+      navigate('/ruta-aprendizaje');
     } catch (error) {
       console.error("Error al guardar el roadmap:", error);
       if (axios.isAxiosError(error)) {

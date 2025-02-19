@@ -2,6 +2,9 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { RoadmapController } from './roadMapController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { AuthRequest } from './roadMapController';
+import { RequestHandler } from 'express';
+import User from "../../modules/user/User";
+import Roadmap from "../../modules/roadmap/RoadMap";
 
 const router = Router();
 
@@ -16,9 +19,44 @@ const handleRoute = (handler: (req: AuthRequest, res: Response) => Promise<any>)
   };
 };
 
+interface CustomRequest extends Request {
+  user?: User;
+  roadmap?: Roadmap;
+}
+
+const checkPublicRoadmap: RequestHandler = async (req, res, next) => {
+  try {
+    const roadmapId = req.params.id;
+    const roadmap = await Roadmap.findByPk(roadmapId);
+
+    if (!roadmap) {
+      res.status(404).json({ message: 'Roadmap no encontrado' });
+      return;
+    }
+
+    if (!roadmap.isPublic) {
+      const customReq = req as CustomRequest;
+      if (!customReq.user) {
+        res.status(401).json({ message: 'No autorizado' });
+        return;
+      }
+      if (roadmap.userId !== customReq.user.id) {
+        res.status(403).json({ message: 'Prohibido' });
+        return;
+      }
+    }
+
+    (req as CustomRequest).roadmap = roadmap;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// The routes remain the same
 // Rutas públicas
 router.get('/roadmaps', handleRoute(RoadmapController.getAll));
-router.get('/roadmaps/:id', handleRoute(RoadmapController.getById));
+router.get('/roadmaps/:id', checkPublicRoadmap, handleRoute(RoadmapController.getById));
 
 // Rutas protegidas
 router.use(authMiddleware);

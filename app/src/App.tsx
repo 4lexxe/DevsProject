@@ -30,6 +30,8 @@ import LearnRoute from "./learnroute/pages/LearnRoute";
 import ResourcePage from "./recourse/pages/resourcePages";
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";
+import { Toaster } from 'react-hot-toast';
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +45,7 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <Router>
+      <Toaster />
       <AuthProvider>
         {" "}
         {/* AuthProvider ahora está dentro del Router */}
@@ -84,6 +87,13 @@ function App() {
                   <RoadmapEditor />
                 </ReactFlowProvider>
               }
+            />
+            <Route path="/editor-roadmap/:id" 
+              element={
+                <ReactFlowProvider>
+                  <RoadmapEditor />
+                </ReactFlowProvider>
+              } 
             />
           </Route>
         </Routes>

@@ -22,7 +22,7 @@ import Link from "./Link";
 import Seccion from "./Seccion";
 import Etiqueta from "./Etiqueta";
 import BiDirectionalEdge from "./BiDirectionalEdge";
-
+import Linea from "./Linea"
 interface PreviewRoadmapProps {
   structure: {
     nodes: Node[];
@@ -40,6 +40,7 @@ const nodeTypes = {
   etiqueta: Etiqueta,
   link: Link,
   seccion: Seccion,
+  line: Linea
 };
 
 const edgeTypes = {
