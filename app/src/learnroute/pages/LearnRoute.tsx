@@ -133,7 +133,7 @@ const LearnRoute = () => {
                   </button>
                   <button
                     onClick={() => navigate(`/roadmaps/${roadmap.id}`)}
-                    className="p-2 rounded-lg bg-[#403E43] text-white hover:bg-[#2A292D] transition-all duration-300 shadow-sm hover:shadow"
+                    className="p-2 rounded-lg bg-[#3a383d] text-white hover:bg-[#2A292D] transition-all duration-300 shadow-sm hover:shadow"
                   >
                     <ArrowUpRight className="w-4 h-4" />
                   </button>
