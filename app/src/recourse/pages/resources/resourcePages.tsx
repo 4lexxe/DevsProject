@@ -67,11 +67,15 @@ const ResourceListPage: React.FC = () => {
   const fetchResources = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await ResourceService.getResources();
+      const response = await ResourceService.getResources({});
+
+      // Asegúrate de que los datos sean un array
+      const data = Array.isArray(response.results) ? response.results : [];
 
       // Ordenar los recursos por createdAt en orden descendente
       const sortedResources: Resource[] = data.sort(
-        (a: Resource, b: Resource) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        (a: Resource, b: Resource) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
       setResources(sortedResources);
@@ -92,14 +96,12 @@ const ResourceListPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ResourceListHeader />
-
         {/* Mostrar mensaje de error si ocurre */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm rounded-r-md animate-fade-in">
             {error}
           </div>
         )}
-
         {/* Mostrar indicador de carga o lista de recursos */}
         {loading ? (
           <div className="flex justify-center items-center h-64">

@@ -8,6 +8,8 @@ import DefaultLayout from './shared/layouts/defaultLayout';
 
 import SearchPage from './search/pages/SearchPage';
 
+import SearchResults from './search/pages/SearchResults';
+
 import Home from './home/home';
 
 import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage }from '@/course/index';
@@ -28,6 +30,7 @@ function App() {
           <Route path="/" element={<DefaultLayout />}>
             <Route path="/search" element={<SearchPage />} />
             <Route index element={<Home />} />
+            <Route path="/search_results" element={<SearchResults />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="cursos" element={<CoursesPage />} />
             <Route path="/course/:id" element={<CourseDetail />} />
