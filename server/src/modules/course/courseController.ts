@@ -169,7 +169,7 @@ export class CourseController {
   // Obtener cursos por categoría
   static getByCategory: RequestHandler = async (req, res) => {
     try {
-      const { categoryId } = req.body;
+      const { categoryId } = req.params;
       const courses = await Course.findAll({
         include: [
           { model: Category, as: "categories", where: { id: categoryId } },
@@ -179,14 +179,14 @@ export class CourseController {
       res.status(200).json({
         ...metadata(req, res),
         message:
-          "Cursos obtenidos correctamente por categoría y tipo de carrera",
+          "Cursos obtenidos correctamente por categoría",
         length: courses.length,
         data: courses,
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
-        message: "Error al obtener los cursos por categoría y tipo de carrera",
+        message: "Error al obtener los cursos por categoría",
         error,
       });
     }

@@ -1,67 +1,98 @@
-import { GraduationCap, Globe, Smartphone, Settings, RefreshCw, Database, Cpu } from 'lucide-react';
-import CategoryCard from './CategoryCard';
+import { GraduationCap } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import CategoryCard from "./CategoryCard";
+import { getCategoriesActivesLimited } from "@/home/services/categoriesService";
+import { useState, useEffect } from "react";
 
-const categories = [
-  {
-    id: 1,
-    name: 'Desarrollo Web',
-    icon: <Globe className="w-6 h-6 text-blue-600" />, // Ícono de globo
-    count: 24,
-    color: '#E5F6FF'
-  },
-  {
-    id: 2,
-    name: 'Móvil',
-    icon: <Smartphone className="w-6 h-6 text-blue-600" />, // Ícono de smartphone
-    count: 18,
-    color: '#F0F7FF'
-  },
-  {
-    id: 3,
-    name: 'Backend',
-    icon: <Settings className="w-6 h-6 text-blue-600" />, // Ícono de ajustes
-    count: 16,
-    color: '#F5F8FF'
-  },
-  {
-    id: 4,
-    name: 'DevOps',
-    icon: <RefreshCw className="w-6 h-6 text-blue-600" />, // Ícono de recargar
-    count: 12,
-    color: '#F8F9FF'
-  },
-  {
-    id: 5,
-    name: 'Bases de Datos',
-    icon: <Database className="w-6 h-6 text-blue-600" />, // Ícono de base de datos
-    count: 10,
-    color: '#E5F6FF'
-  },
-  {
-    id: 6,
-    name: 'IA & ML',
-    icon: <Cpu className="w-6 h-6 text-blue-600" />, // Ícono de CPU
-    count: 8,
-    color: '#F0F7FF'
-  }
-];
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation'
+import "@/shared/assets/styles/categorySwiper.css";
 
 export default function CourseCategories() {
+  const [categories, setCategories] = useState<any>(null); // Usa un tipo adecuado en lugar de 'any'
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoriesActivesLimited("8");
+
+        setCategories(data);
+      } catch (err) {
+        console.error("Error al obtener el contenido:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []); // Se ejecuta cuando `categoriesId` cambia
+
   return (
-    <section className="py-24 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center gap-3 mb-12">
-          <GraduationCap className="w-8 h-8 text-blue-600" />
-          <h2 className="text-3xl font-bold text-gray-900">
-            Categorías de Cursos
-          </h2>
+    <section className=" from-white to-gray-50">
+      <div className="max-w-[90%] mx-auto">
+        <div className="flex items-center gap-4 mb-16">
+          <div className="p-3 bg-blue-100 rounded-xl">
+            <GraduationCap className="w-8 h-8 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Categorías de Cursos
+            </h2>
+            <p className="text-gray-600 mt-2">
+              
+              Explora nuestra amplia variedad de cursos por categoría
+              
+            </p>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          {categories.map((category) => (
-            <CategoryCard key={category.id} {...category} />
-          ))}
-        </div>
+
+        <Swiper
+          modules={[Navigation, Pagination/* , Autoplay */]}
+          navigation
+          autoplay={{
+            delay: 2000,
+            disableOnInteraction: false,
+          }}
+          pagination={{ clickable: true }}
+          breakpoints={{
+            0: {
+              slidesPerView: 1,
+            },
+            430: {
+              slidesPerView: 2,
+            },
+            650: {
+              slidesPerView: 3,
+            },
+            850: {
+              slidesPerView: 4,
+            },
+            1050: {
+              slidesPerView: 5,
+            },
+            1280: {
+              slidesPerView: 6,
+            },
+            1480:{
+              slidesPerView: 7,
+            },
+            1700: {
+              slidesPerView: 8,
+            }
+            
+          }}
+          
+          className=""
+        >
+          {categories &&
+            categories.map((category: any) => (
+              <SwiperSlide key={category.id}>
+                <CategoryCard {...category} />
+              </SwiperSlide>
+            ))}
+        </Swiper>
       </div>
     </section>
   );

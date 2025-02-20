@@ -3,12 +3,13 @@
  
  const router = Router();
  
- router.get("/category", CategoryController.getAll); // Obtener todos los tipos de carrera
- router.get("/category/actives", CategoryController.getAllActives); // Obtener todos los tipos de carrera
- router.get("/category/:id", CategoryController.getById); // Obtener un tipo de carrera por ID
- router.post("/category", CategoryController.create); // Crear un nuevo tipo de carrera
- router.put("/category/:id", CategoryController.update); // Actualizar un tipo de carrera por ID
- router.delete("/category/:id", CategoryController.delete); // Eliminar un tipo de carrera por ID
+ router.get("/categories", CategoryController.getAll); // Obtener todas las categorias
+ router.get("/categories/actives", CategoryController.getAllActives); // Obtener todas las categorias activas
+ router.get("/categories/actives/limit", CategoryController.getAllActivesLimited)
+ router.get("/categories/:id", CategoryController.getById); // Obtener una categoria
+ router.post("/categories", CategoryController.create); // Crear una nueva categoria
+ router.put("/categories/:id", CategoryController.update); // Actualizar una categoria
+ router.delete("/categories/:id", CategoryController.delete); // Eliminar una categoria
  
  export default router;
- 
+  

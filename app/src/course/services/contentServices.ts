@@ -19,7 +19,7 @@ export const getContentBySection = async (sectionId: string) => {
 export const getContentById = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
-    const response = await api.get(`/content/${contentId}`);
+    const response = await api.get(`/contents/${contentId}`);
     return response.data;
   } catch (error: any) {
     console.error(

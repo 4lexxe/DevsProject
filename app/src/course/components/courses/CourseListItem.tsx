@@ -4,7 +4,7 @@ interface CourseListItemProps {
   id: number;
   title: string;
   summary: string; 
-  categories: Category[];
+  categories: Category[];         
   image: string;
   careerType: CareerType;
 }
@@ -24,7 +24,7 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
         <img
           src={image || "/placeholder.svg"}
           alt={title}
-          className="w-full sm:w-48 h-32 object-cover rounded-lg"
+          className="w-full sm:w-48 h-32 object-contain rounded-lg "
         />
       </div>
 

@@ -7,7 +7,7 @@ import '@/shared/assets/styles/main.css';
 import DefaultLayout from './shared/layouts/defaultLayout';
 import Home from './home/home';
 
-import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage }from '@/course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage, ContentPage }from '@/course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
 
@@ -16,6 +16,7 @@ import ResourcePage from './recourse/pages/resources/resourcePages';
 import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
 import ResourceDetailsPage from './recourse/pages/resourceDetails/ResourceDetailsPage';
 import ProtectedRoute from './auth/contexts/ProtectedRoute'; // Importa el componente de protección
+
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
             <Route path='course/form' element = {<CourseFormPage/>} />
             <Route path='course/sections/form' element = { <SectionsFormPage/> } />
             <Route path="/recursos" element={<ResourcePage />} />
+            <Route path='/course/section/content/:contentId' element={<ContentPage/>} />
+            <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true}/>}/>
 
             {/* Rutas protegidas */}
             <Route element={<ProtectedRoute />}>

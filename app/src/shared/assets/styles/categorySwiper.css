@@ -1,0 +1,43 @@
+.category-carousel .swiper-button-next,
+.category-carousel .swiper-button-prev {
+  color: #2563eb;
+}
+
+
+.category-carousel{
+  
+}
+
+.category-carousel .swiper-pagination-bullet {
+  background-color: #2563eb; 
+}
+
+.category-carousel .swiper-pagination-bullet-active {
+  background-color: #1d4ed8; 
+}
+
+.swiper-pagination{
+  position: relative;
+  bottom: 0px !important;
+}
+
+.category-card-title {
+  height: 3rem; /* Adjust based on your font size and line height */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.swiper-slide {
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}

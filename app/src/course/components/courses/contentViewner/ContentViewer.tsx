@@ -61,9 +61,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
             )}
           </button>
           {expandedSection === "text" && (
-            <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50">
-              {content.text}
-            </div>
+            <Link to={`/course/section/content/${content.id}`}>
+              <div className="prose max-w-none text-gray-700 leading-relaxed p-4 bg-gray-50">
+                {content.text}
+              </div>
+            </Link>
           )}
         </div>
       )}

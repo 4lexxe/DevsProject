@@ -5,39 +5,36 @@ import { CourseController } from './courseController';
 const router = Router();
 
 // Ruta para obtener todos los cursos (público)
-router.get('/course', CourseController.getAll);
+router.get('/courses', CourseController.getAll);
 
 // Obtener todos los curso activos
-router.get('/course/actives', CourseController.getActiveCourses)
+router.get('/courses/actives', CourseController.getActiveCourses)
 
 // Obtener todos los cursos en desarrollo
-router.get('/course/development', CourseController.getInDevelopmentCourses)
+router.get('/courses/development', CourseController.getInDevelopmentCourses)
 
 // Obtener conteo de todos los cursos
-router.get('/course/count', CourseController.getTotalCount)
+router.get('/courses/count', CourseController.getTotalCount)
 
 // Obtener todos los cursos por categoria
-router.get('/category/courses', CourseController.getByCategory)
+router.get('/courses/category/actives/:categoryId', CourseController.getByCategory)
 
 // Obtener todos los cursos por tipo de carrera
-router.get('/carrerType/courses', CourseController.getByCareerType)
+router.get('/courses/careerType', CourseController.getByCareerType)
 
 // Obtener los cursos por admin
-router.get('/course/admin/:id', CourseController.getByAdminId)
+router.get('/courses/admin/:id', CourseController.getByAdminId)
 
 // Ruta para obtener un curso por ID (público)
-router.get('/course/:id', CourseController.getById);
+router.get('/courses/:id', CourseController.getById);
 
 // Ruta para crear un curso (solo Admin y SuperAdmin)
-router.post('/course', CourseController.create);
-
-// Ruta para obtener el conteo de módulos de un curso (público)
-/* router.get('/course/:courseId/modules/count', getSectionsByCourse); */
+router.post('/courses', CourseController.create);
 
 // Ruta para actualizar un curso (solo Admin y SuperAdmin)
-router.put('/course/:id', CourseController.update);
+router.put('/courses/:id', CourseController.update);
 
 // Ruta para eliminar un curso (solo Admin y SuperAdmin)
-router.delete('/course/:id', CourseController.delete);
+router.delete('/courses/:id', CourseController.delete);
 
 export default router;

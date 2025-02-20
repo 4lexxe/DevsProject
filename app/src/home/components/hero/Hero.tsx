@@ -20,7 +20,8 @@ export default function Hero() {
     const fetchHeaderSections = async () => {
       try {
         const sections = await getHeaderSections();
-        setHeaderSections(sections);
+        if(sections) setHeaderSections(sections);
+        else return
       } catch (error) {
         console.error('Error al obtener las secciones de encabezado:', error);
       }
@@ -30,10 +31,17 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
+    console.log(headerSections)
+}, [headerSections])
+
+
+  useEffect(() => {
+    if (headerSections.length === 0) return; // 🔹 Evita cálculos si no hay datos
+  
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % headerSections.length);
     }, 5000);
-
+  
     return () => clearInterval(interval);
   }, [currentIndex, headerSections.length]);
 

@@ -1,8 +1,8 @@
 import api from "@/api/axios"; // Importa la instancia de axios
 
-const CATEGORY_ENDPOINT = "/category/actives";
-const CAREERTYPE_ENPOINT = "/careerType/actives"
-const COURSES_ENDPOINT = "/course"
+const CATEGORY_ENDPOINT = "/categories/actives";
+const CAREERTYPE_ENPOINT = "/careerTypes/actives"
+const COURSES_ENDPOINT = "/courses"
 const SECTIONS_ENDPOINT = '/sections';
 
 

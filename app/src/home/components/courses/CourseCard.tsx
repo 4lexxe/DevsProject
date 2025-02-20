@@ -7,7 +7,7 @@ interface CourseCardProps {
   summary: string;
   courseName: string;
   image: string;
-  relatedCareerType: string;
+  careerType: string;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -16,7 +16,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   summary,
   courseName,
   image,
-  relatedCareerType
+  careerType
 }) => {
   const navigate = useNavigate();
 
@@ -39,12 +39,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <img
             src={image || '/placeholder.svg'}
             alt={title}
-            className="w-full h-48 object-cover rounded-t-2xl"
+            className="w-full h-48 rounded-t-2xl object-contain"
           />
           {/* Tipo de carrera en esquina - visible solo en móvil */}
           <div className="md:hidden absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-sm font-medium text-gray-700 backdrop-blur-sm flex items-center gap-2">
             <GraduationCap className="w-4 h-4" />
-            {relatedCareerType}
+            {careerType}
           </div>
         </div>
 
@@ -74,7 +74,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           {/* Tipo de carrera - visible solo en desktop */}
           <div className="hidden md:flex items-center text-sm text-gray-500 gap-2 mb-4">
             <GraduationCap className="w-4 h-4" />
-            <span className="line-clamp-1">{relatedCareerType}</span>
+            <span className="line-clamp-1">{careerType}</span>
           </div>
 
           {/* Botón */}

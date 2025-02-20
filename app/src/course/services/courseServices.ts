@@ -5,7 +5,7 @@ interface Course {
   name: string;
 }
 
-const COURSES_ENDPOINT = '/course';
+const COURSES_ENDPOINT = '/courses';
 
 //Obtener todos los cursos activos
 export const getCourses = async () => {

@@ -14,8 +14,8 @@ import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
 
 /* Rutas relacionadas con el area de cursos */
-import careerTypeRoutes from './modules/careerType/CareerTypeRoutes'
-import categoryRoutes from './modules/category/CategoryRoutes'
+import careerTypeRoutes from './modules/careerType/careerTypeRoutes'
+import categoryRoutes from './modules/category/categoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 //Contenidos
@@ -47,7 +47,7 @@ declare module 'geoip-lite' {
 }
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = /* process.env.PORT || */ 3000;
 
 // Configuración inicial de seguridad y middleware
 app.set('trust proxy', true);
@@ -210,7 +210,7 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
 });
 
 // Inicialización del servidor
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0' ,  () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Configuración de geolocalización:', GeoUtils.checkServiceStatus());
