@@ -1,58 +1,29 @@
-import React, {useRef, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NodeResizeControl } from '@xyflow/react';
-import { Node, NodeProps, Position, Handle, useUpdateNodeInternals  } from '@xyflow/react';
+import { Node, NodeProps, Position, Handle, useUpdateNodeInternals } from '@xyflow/react';
 import { useNodeResize } from '../hooks/useNodeResize';
 import type { LineNodeData } from '../types/CustomComponentType';
-import { drag } from 'd3-drag';
-import { select } from 'd3-selection';
+import { useRotation } from "../hooks/useRotation";
 
 type CustomComponentNode = Node<LineNodeData, 'string'>;
 
 export default function LineaNode({
   id,
+  selected,
   data: {
     borderColor = '#ccc',
     borderRadius = 0,
     layoutOrder = 1,
-    length, // Longitud específica, si se provee
-    measured = { width: 200, height: 2 }, // width: longitud; height: grosor
+    measured = { width: 200, height: 2 },
   },
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
-  const rotateControlRef = useRef(null);
   const updateNodeInternals = useUpdateNodeInternals();
-  const [rotation, setRotation] = useState(0);
+  const { rotation, rotateControlRef } = useRotation(0);
 
   useEffect(() => {
-    if (!rotateControlRef.current) {
-      return;
-    }
- 
-    const selection = select<Element, unknown>(rotateControlRef.current);
-    const dragHandler = drag().on('drag', (evt) => {
-      const dx = evt.x - 100;
-      const dy = evt.y - 100;
-      const rad = Math.atan2(dx, dy);
-      const deg = rad * (180 / Math.PI);
-      setRotation(180 - deg);
-      updateNodeInternals(id);
-    });
- 
-    selection.call(dragHandler);
-  }, [id, updateNodeInternals]);
-
-  // Si se define 'length', se utiliza; de lo contrario se usa measured.width
-  const lineLength = length || measured.width;
-  const thickness = measured.height;
-
-  const lineStyle: React.CSSProperties = {
-    width: `${lineLength}px`,
-    height: `${thickness}px`,
-    backgroundColor: borderColor,
-    borderRadius: `${borderRadius}px`,
-    transform: `rotate(${rotation}deg)`,
-    transformOrigin: 'center',
-  };
+    updateNodeInternals(id);
+  }, [rotation, id, updateNodeInternals]);
 
   return (
     <div
@@ -63,13 +34,40 @@ export default function LineaNode({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transform: `rotate(${rotation}deg)`
+        transform: `rotate(${rotation}deg)`,
+        transformOrigin: 'center',
       }}
     >
       {/* Renderiza la línea */}
-      <div style={lineStyle}></div>
+      <div
+        style={{
+          width: `${measured.width}px`,
+          height: `${measured.height}px`,
+          backgroundColor: borderColor,
+          borderRadius: `${borderRadius}px`,
+        }}
+      />
+
+      {/* Solo renderiza el círculo rojo si el nodo está seleccionado */}
       
-      {/* Control de redimensionado para modificar longitud y grosor */}
+        <div
+          ref={rotateControlRef}
+          className="nodrag rotatable-node__handle"
+          style={{
+            width: '10px',
+            height: '10px',
+            backgroundColor: selected ? 'red' : '',
+            borderRadius: '50%',
+            position: 'absolute',
+            top: '-10px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            cursor: 'grab',
+          }}
+        />
+      
+
+      {/* Control de redimensionado */}
       <NodeResizeControl
         minWidth={50}
         minHeight={2}
@@ -81,6 +79,8 @@ export default function LineaNode({
         }}
         onResize={handleResize}
       >
+        {selected && (
+
         <div
           style={{
             width: '10px',
@@ -93,9 +93,10 @@ export default function LineaNode({
             cursor: 'se-resize',
           }}
         />
+        )}
       </NodeResizeControl>
-      
-      {/* Handles ocultos para permitir conexiones si fuera necesario */}
+
+      {/* Handles ocultos para permitir conexiones */}
       <Handle type="source" position={Position.Right} id="right" style={{ opacity: 0 }} />
       <Handle type="target" position={Position.Left} id="left" style={{ opacity: 0 }} />
     </div>

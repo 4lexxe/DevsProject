@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Importación de todos los estilos
 import "@/shared/assets/styles/main.css";
+import '@xyflow/react/dist/style.css';
 import "@/shared/assets/styles/roadmap.css";
 
 // Importación de los componentes

@@ -1,12 +1,16 @@
+import { useState } from "react";
+
 import { NodeProps, NodeResizeControl, Node, Handle, Position } from '@xyflow/react';
 import { EtiquetaNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
+import BidirectionalHandle from './BidirectionalHandle';
 
 type CustomComponentNode = Node<EtiquetaNodeData, 'string'>;
 
 
 export default function Etiqueta({
   id,
+  selected,
   data: {
     label = "Etiqueta",
     colorText = "#000000",
@@ -19,6 +23,7 @@ export default function Etiqueta({
   },
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
@@ -36,6 +41,8 @@ export default function Etiqueta({
         position: 'relative',
         zIndex: layoutOrder,
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {label}
       <NodeResizeControl
@@ -45,6 +52,8 @@ export default function Etiqueta({
         onResize={handleResize}
         style={{ background: 'transparent', border: 'none' }}
       >
+        {selected && (
+
         <div
           style={{
             width: '8px',
@@ -57,28 +66,12 @@ export default function Etiqueta({
             cursor: 'se-resize',
           }}
         />
+        )}
       </NodeResizeControl>
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        id="right"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Left} 
-        id="left"
-      />
-      
-      <Handle 
-        type="source" 
-        position={Position.Left} 
-        id="left"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Right} 
-        id="right"
-      />
+      <BidirectionalHandle position={Position.Left} id="left" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Right} id="right" style={isHovered ? { opacity: 1 } : { opacity: 0 } } />
+      <BidirectionalHandle position={Position.Top} id="top" style={isHovered ? { opacity: 1 } : { opacity: 0 } } />
+      <BidirectionalHandle position={Position.Bottom} id="bottom" style={isHovered ? { opacity: 1 } : { opacity: 0 } } />
     </div>
   );
 }

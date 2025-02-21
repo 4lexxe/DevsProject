@@ -1,6 +1,8 @@
-import { NodeProps, Position, Handle, NodeResizeControl, Node } from '@xyflow/react';
+import { NodeProps, Position, NodeResizeControl, Node } from '@xyflow/react';
 import { SubtemaNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
+import BidirectionalHandle from './BidirectionalHandle';
+import { useState } from 'react';
 
 type CustomComponentNode = Node<SubtemaNodeData, 'string'>;
 
@@ -8,6 +10,7 @@ type CustomComponentNode = Node<SubtemaNodeData, 'string'>;
 // Subtema.tsx
 export default function Subtema({
   id,
+  selected,
   data: {
     label = '',
     colorText = '#2d3436',
@@ -20,7 +23,8 @@ export default function Subtema({
   }
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
-  
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       style={{
@@ -39,6 +43,8 @@ export default function Subtema({
         alignItems: 'center',
         justifyContent: 'center',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <NodeResizeControl
         minWidth={120}
@@ -51,6 +57,8 @@ export default function Subtema({
         }}
         onResize={handleResize}
       >
+        {selected && (
+
         <div style={{
           width: '12px',
           height: '12px',
@@ -62,30 +70,14 @@ export default function Subtema({
           borderRadius: '2px',
           cursor: 'se-resize'
         }} />
+        )}
       </NodeResizeControl>
 
       <div style={{ padding: '4px 0' }}>{label}</div>
-      <Handle 
-  type="source" 
-  position={Position.Right} 
-  id="right"
-/>
-<Handle 
-  type="target" 
-  position={Position.Left} 
-  id="left"
-/>
-
-<Handle 
-  type="source" 
-  position={Position.Left} 
-  id="left"
-/>
-<Handle 
-  type="target" 
-  position={Position.Right} 
-  id="right"
-/>
+      <BidirectionalHandle position={Position.Left} id="left" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Right} id="right" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Top} id="top" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Bottom} id="bottom" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
     </div>
   );
 }

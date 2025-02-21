@@ -1,11 +1,13 @@
-import { NodeProps, NodeResizeControl, Node, Handle, Position } from '@xyflow/react';
+import { NodeProps, NodeResizeControl, Node, Position } from '@xyflow/react';
 import { ParrafoNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
-
+import BidirectionalHandle from './BidirectionalHandle';
+import { useState } from 'react';
 type CustomComponentNode = Node<ParrafoNodeData, 'string'>;
 
 export default function Parrafo({
   id,
+  selected,
   data: {
     content = "Contenido del párrafo",
     colorText = "#000000",
@@ -17,6 +19,7 @@ export default function Parrafo({
   },
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
@@ -33,6 +36,8 @@ export default function Parrafo({
         alignItems: 'center',
         justifyContent: 'center',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {content}
       <NodeResizeControl
@@ -42,6 +47,8 @@ export default function Parrafo({
         onResize={handleResize}
         style={{ background: 'transparent', border: 'none' }}
       >
+        {selected && (
+
         <div
           style={{
             width: '10px',
@@ -54,28 +61,12 @@ export default function Parrafo({
             cursor: 'se-resize',
           }}
         />
+        )}
       </NodeResizeControl>
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        id="right"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Left} 
-        id="left"
-      />
-      
-      <Handle 
-        type="source" 
-        position={Position.Left} 
-        id="left"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Right} 
-        id="right"
-      />
+      <BidirectionalHandle position={Position.Left} id="left" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Right} id="right" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Top} id="top" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Bottom} id="bottom" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
     </div>
   );
 }

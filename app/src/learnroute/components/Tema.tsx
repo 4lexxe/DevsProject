@@ -1,13 +1,15 @@
 import { NodeResizeControl  } from '@xyflow/react';
-import { Node, NodeProps, Position, Handle } from '@xyflow/react';
+import { Node, NodeProps, Position } from '@xyflow/react';
 import { TemaNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
-
+import BidirectionalHandle from './BidirectionalHandle';
+import { useState } from 'react';
 
 type CustomComponentNode = Node<TemaNodeData, 'string'>;
 
 export default function TopicNode({
   id,
+  selected,
   data: { 
     label='', 
     colorText = '#000000', 
@@ -21,6 +23,8 @@ export default function TopicNode({
   },
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       className="react-flow__node-topic"
@@ -39,6 +43,8 @@ export default function TopicNode({
         alignItems: 'center',
         justifyContent: 'center',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <>
       
@@ -53,6 +59,8 @@ export default function TopicNode({
         }}
         onResize={handleResize}
       >
+        {selected && (
+
         <div
           style={{
             width: '10px',
@@ -65,30 +73,14 @@ export default function TopicNode({
             cursor: 'se-resize',
           }}
         />
+        )}
       </NodeResizeControl>
 
       <div>{label}</div>
-      <Handle 
-  type="source" 
-  position={Position.Right} 
-  id="right"
-/>
-<Handle 
-  type="target" 
-  position={Position.Left} 
-  id="left"
-/>
-
-<Handle 
-  type="source" 
-  position={Position.Left} 
-  id="left"
-/>
-<Handle 
-  type="target" 
-  position={Position.Right} 
-  id="right"
-/>
+      <BidirectionalHandle position={Position.Left} id="left" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Right} id="right" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Top} id="top" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Bottom} id="bottom" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
       </>
     </div>
   );

@@ -25,7 +25,10 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { ReactFlowProvider } from '@xyflow/react';
-import "@xyflow/react/dist/style.css";
+import "@/shared/assets/styles/main.css";
+import '@xyflow/react/dist/style.css';
+import "@/shared/assets/styles/roadmap.css";
+
 
 // Importaciones de constantes y componentes
 import { initialNodes } from "../constants/InitialNodes.constants";

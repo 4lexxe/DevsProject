@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { NodeProps, NodeResizeControl, Node, Handle, Position } from '@xyflow/react';
+import { NodeProps, NodeResizeControl, Node, Position } from '@xyflow/react';
 import { TodoNodeData } from '../types/CustomComponentType';
 import { useNodeResize } from '../hooks/useNodeResize';
+import BidirectionalHandle from './BidirectionalHandle';
 
 type CustomComponentNode = Node<TodoNodeData>;
 
 export default function ToDo({
   id,
+  selected,
   data: {
     label = "Tarea pendiente",
     colorText = "#000000",
@@ -17,6 +19,7 @@ export default function ToDo({
 }: NodeProps<CustomComponentNode>) {
   const { handleResize } = useNodeResize(id);
   const [checked, setChecked] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
@@ -32,6 +35,8 @@ export default function ToDo({
         border: '1px solid #ccc',
         position: 'relative',
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <input
         type="checkbox"
@@ -49,40 +54,26 @@ export default function ToDo({
         onResize={handleResize}
         style={{ background: 'transparent', border: 'none' }}
       >
-        <div
-          style={{
-            width: '10px',
-            height: '10px',
-            borderRight: '2px solid #000',
-            borderBottom: '2px solid #000',
-            position: 'absolute',
-            bottom: '2px',
-            right: '2px',
-            cursor: 'se-resize',
-          }}
-        />
+        {selected && (
+          <div
+            style={{
+              width: '10px',
+              height: '10px',
+              borderRight: '2px solid #000',
+              borderBottom: '2px solid #000',
+              position: 'absolute',
+              bottom: '2px',
+              right: '2px',
+              cursor: 'se-resize',
+            }}
+          />
+
+        )}
       </NodeResizeControl>
-      <Handle 
-        type="source" 
-        position={Position.Right} 
-        id="right"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Left} 
-        id="left"
-      />
-      
-      <Handle 
-        type="source" 
-        position={Position.Left} 
-        id="left"
-      />
-      <Handle 
-        type="target" 
-        position={Position.Right} 
-        id="right"
-      />
+      <BidirectionalHandle position={Position.Left} id="left" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Right} id="right" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Top} id="top" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
+      <BidirectionalHandle position={Position.Bottom} id="bottom" style={isHovered ? { opacity: 1 } : { opacity: 0 } }/>
     </div>
   );
 }
