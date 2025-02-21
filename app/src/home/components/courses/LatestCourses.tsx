@@ -36,9 +36,9 @@ export default function LatestCourses() {
     fetchCourses();
   }, []);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(courses)
-  }, [courses])
+  }, [courses]) */
 
   return (
     <section className="py-16 px-6">

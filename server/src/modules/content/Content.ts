@@ -2,12 +2,9 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "./../../infrastructure/database/db";
 import Section from "./../section/Section";
 
-type quizType = "Multiple Choice"
-  | "true or false"
-  | "Short Answer"
-  | "Checkbox";
+type quizType = "Single" | "MultipleChoice" | "TrueOrFalse" | "ShortAnswer";
 
-type linkType = "video" | "pagina" | "imagen" | "documento"
+type linkType = "video" | "pagina" | "imagen" | "documento";
 
 class Content extends Model {
   public id!: bigint;
@@ -53,8 +50,8 @@ Content.init(
       allowNull: false,
     },
     markdown: {
-        type: DataTypes.TEXT,
-        allowNull: true
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     linkType: {
       type: DataTypes.STRING,
@@ -69,8 +66,8 @@ Content.init(
       allowNull: true,
     },
     resources: {
-        type: DataTypes.JSONB,
-        allowNull: true,
+      type: DataTypes.JSONB,
+      allowNull: true,
     },
     duration: {
       type: DataTypes.INTEGER,

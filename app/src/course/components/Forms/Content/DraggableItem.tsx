@@ -1,7 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Edit, Trash2, GripVertical } from "lucide-react";
-import type { IContent } from "@/course/interfaces/CourseFormInterfaces";
+import type { IContent } from "@/course/interfaces/Content";
 
 export default function DraggableItem({
   item,

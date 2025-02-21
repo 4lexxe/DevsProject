@@ -8,9 +8,8 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { getContentBySection } from "../../services/contentServices";
-import ContentViewer from "./contentViewner/ContentViewer";
-import { Section } from "@/course/interfaces/viewnerCourseInterface";
+import ContentViewer from "../contentViewner/ContentViewer";
+import { Section } from "@/course/interfaces/ViewnerCourse";
 
 interface SectionModuleProps {
   section: Section;
@@ -59,27 +58,6 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
         return "from-teal-400/90 to-blue-500/90";
     }
   };
-
-  // Fetch content when section is expanded
-  /* useEffect(() => {
-    const fetchContent = async () => {
-      if (isExpanded && section.contents.length === 0) {
-        try {
-          setLoading(true);
-          const data = await getContentBySection(section.id.toString());
-          setContents(data);
-          setError(null);
-        } catch (err) {
-          setError('Failed to load content');
-          console.error('Error loading content:', err);
-        } finally {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchContent();
-  }, [isExpanded, section.id]); */
 
   return (
     <div className="bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100">
@@ -141,7 +119,7 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
 
       {/* Content Section */}
       {isExpanded && (
-        <div className="border-t border-gray-100 p-6">
+        <div className="border-t border-gray-100 py-6">
           {loading ? (
             <div className="flex justify-center py-4">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getSectionsByCourse } from '../../services/sectionServices';
 import SectionModule from './SectionModule';
-import { Section } from '@/course/interfaces/viewnerCourseInterface';
+import { Section } from '@/course/interfaces/ViewnerCourse';
 
 interface SectionListProps {
   courseId: string;

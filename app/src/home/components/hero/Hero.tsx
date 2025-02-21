@@ -31,11 +31,6 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    console.log(headerSections)
-}, [headerSections])
-
-
-  useEffect(() => {
     if (headerSections.length === 0) return; // 🔹 Evita cálculos si no hay datos
   
     const interval = setInterval(() => {

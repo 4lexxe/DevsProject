@@ -14,7 +14,7 @@ import {
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 
 import { Plus } from "lucide-react";
-import type { IContent } from "@/course/interfaces/CourseFormInterfaces";
+import type { IContent } from "@/course/interfaces/Content";
 
 import DraggableItem from "@/course/components/forms/content/DraggableItem";
 import { useCourseContext } from "@/course/context/CourseFormContext";

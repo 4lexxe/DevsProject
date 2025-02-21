@@ -1,74 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import Quiz from '../components/courses/Quiz';
-import { getContentById } from '../services/contentServices';
+import { useState, useEffect } from "react";
+import { getQuizById } from "../services/contentServices";
+import { useParams } from "react-router-dom";
 
-interface Content {
-  id: number; 
-  quizTitle?: string;
-  quizContent?: string;
-  questions?: Array<{
-    question: string;
-    answers: Array<{
-      answer: string;
-      isCorrect: boolean;
-    }>;
-  }>;
-}
+import QuizComponent from "../components/contentViewner/PaginationQuiz";
 
-const QuizPage: React.FC = () => {
+function QuizPage() {
   const { contentId } = useParams<{ contentId: string }>();
-  const [content, setContent] = useState<Content | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [quiz, setQuiz] = useState<any | null | undefined>(); // Usa un tipo adecuado en lugar de 'any'
 
   useEffect(() => {
-    const fetchQuiz = async () => {
+    const fetchContent = async () => {
+      if (!contentId) return; // Evita hacer la petición si no hay un ID válido
       try {
-        setLoading(true);
-        const data = await getContentById(contentId!);
-        if (!data.quizTitle || !data.questions) {
-          throw new Error('Invalid quiz content');
-        }
-        setContent(data);
+        const data = await getQuizById(contentId);
+        setQuiz(data.quiz)
       } catch (err) {
-        setError('Failed to load quiz');
-        console.error('Error loading quiz:', err);
-      } finally {
-        setLoading(false);
+        console.error("Error al obtener el contenido:", err);
       }
     };
 
-    fetchQuiz();
-  }, [contentId]);
+    fetchContent();
+  }, [contentId]); // Se ejecuta cuando `contentId` cambia
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  /* useEffect(() => {
+    console.log(quiz);
+  }, [quiz]); */
+
+  if(quiz === null){
+    return(
+      <div className="min-h-screen flex items-center justify-center  from-blue-50 via-white to-purple-50">
+          <div className=" text-xl text-gray-600">No hay quiz disponible para este contenido</div>
       </div>
-    );
+    )
   }
 
-  if (error || !content) {
+  if (quiz === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 text-lg">{error || 'Quiz not found'}</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="animate-pulse text-xl text-gray-600">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <Quiz
-        title={content.quizTitle!}
-        content={content.quizContent}
-        questions={content.questions!}
-      />
+    <div>
+      <QuizComponent quizzes={quiz} />
     </div>
   );
-};
+}
 
 export default QuizPage;

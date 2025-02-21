@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { ISectionInput } from "@/course/interfaces/CourseFormInterfaces";
+import { ISectionInput } from "@/course/interfaces/CourseForm";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";

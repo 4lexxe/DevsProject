@@ -28,7 +28,6 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="cursos" element={<CoursesPage />} />
             <Route path="/course/:id" element={<CourseDetail />} />
-            <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            
@@ -36,6 +35,7 @@ function App() {
             <Route path='course/sections/form' element = { <SectionsFormPage/> } />
             <Route path="/recursos" element={<ResourcePage />} />
             <Route path='/course/section/content/:contentId' element={<ContentPage/>} />
+            <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
             <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true}/>}/>
 
             {/* Rutas protegidas */}

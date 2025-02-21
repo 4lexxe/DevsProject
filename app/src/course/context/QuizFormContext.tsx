@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { Quiz } from "../interfaces/CourseFormInterfaces";
+import { Quiz } from "../interfaces/CourseForm";
 
 interface QuizContextType {
   quizState: Quiz[];

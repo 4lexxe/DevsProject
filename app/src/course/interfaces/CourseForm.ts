@@ -1,3 +1,5 @@
+import { IContent, IContentInput} from './Content'
+
 // Curso ----------------------------------------------------------------------------------------------------------------------------
 export interface ICourseInput {
   title: string;
@@ -51,66 +53,7 @@ export interface ISectionState {
 
 // Contenido ----------------------------------------------------------------------------------------------------------------------------
 
-export const linkTypes = ["Video", "Página", "Imagen", "Documento"] as const;
-export type linkType = (typeof linkTypes)[number];
 
-export const quizTypes = [
-  "Multiple Choice",
-  "true or false",
-  "Short Answer",
-  "Checkbox",
-] as const;
-export type quizType = (typeof quizTypes)[number];
-
-export type Quiz = {
-  question: string; // Pregunta
-  text?: string;
-  image?: string;
-  type: quizType;
-  answers: Array<{
-    answer: string; // Respuesta
-    isCorrect: boolean; // Indica si es una respuesta correcta
-  }>;
-};
-
-export interface IContentInput {
-  title: string;
-  text: string;
-  markdown?: string;
-  linkType?: linkType;
-  link?: string;
-  quiz?: Quiz[];
-  resources?: Array<{
-    title: string;
-    url: string;
-  }>;
-  duration: number;
-  position: number;
-}
-
-export interface IContent {
-  id: string;
-  sectionId: string;
-  title: string;
-  text: string;
-  markdown?: string;
-  linkType?: linkType;
-  link?: string;
-  quiz?: Quiz[];
-  resources?: Array<{
-    title: string;
-    url: string;
-  }>;
-  duration: number;
-  position: number;
-}
-
-export interface IContentState {
-  contents: IContent[];
-  editingContent: IContent | null;
-  isAddingContent: boolean;
-  currentSectionId: string | null;
-}
 
 export interface SectionListProps {
   sections: ISectionInput[];

@@ -5,7 +5,7 @@ import HeroCourse from '../components/courses/HeroCourse';
 import CourseOverview from '../components/courses/CourseOverview';
 import LearningOutcomes from '../components/courses/LearningOutcomes';
 import SectionList from '../components/courses/SectionList';
-import { Course } from '../interfaces/viewnerCourseInterface';
+import { Course } from '../interfaces/ViewnerCourse';
 
 
 const CourseDetails: React.FC = () => {

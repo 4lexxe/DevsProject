@@ -4,7 +4,7 @@ import {
   quizType,
   quizTypes,
   Quiz,
-} from "@/course/interfaces/CourseFormInterfaces";
+} from "@/course/interfaces/Content";
 import { useQuizContext } from "@/course/context/QuizFormContext";
 import { Save, X } from "lucide-react";
 

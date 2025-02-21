@@ -1,0 +1,80 @@
+export const linkTypes = ["Video", "Página", "Imagen", "Documento"] as const;
+export type linkType = (typeof linkTypes)[number];
+
+export const quizTypes = [
+  "Single",
+  "MultipleChoice",
+  "TrueOrFalse",
+  "ShortAnswer",
+] as const;
+export type quizType = (typeof quizTypes)[number];
+
+export type Quiz = {
+  question: string; // Pregunta
+  text?: string;
+  image?: string;
+  type: quizType;
+  answers: Array<{
+    answer: string; // Respuesta
+    isCorrect: boolean; // Indica si es una respuesta correcta
+  }>;
+};
+
+export interface IContentInput {
+  title: string;
+  text: string;
+  markdown?: string;
+  linkType?: linkType;
+  link?: string;
+  quiz?: Quiz[];
+  resources?: Array<{
+    title: string;
+    url: string;
+  }>;
+  duration: number;
+  position: number;
+}
+
+export interface IContent {
+  id: string;
+  sectionId: string;
+  title: string;
+  text: string;
+  markdown?: string;
+  linkType?: linkType;
+  link?: string;
+  quiz?: Quiz[];
+  resources?: Array<{
+    title: string;
+    url: string;
+  }>;
+  duration: number;
+  position: number;
+}
+
+export interface IContentState {
+  contents: IContent[];
+  editingContent: IContent | null;
+  isAddingContent: boolean;
+  currentSectionId: string | null;
+}
+
+export interface IContentApi {
+  id: string;
+  sectionId: string;
+  title: string;
+  text: string;
+  markdown?: string;
+  linkType?: string;
+  link?: string;
+  quiz?: Quiz[];
+  resources?: Array<{
+    title: string;
+    url: string;
+  }>;
+  duration: number;
+  position: number;
+  section: any;
+  createdAt: Date;
+  updatedAt: Date;
+}

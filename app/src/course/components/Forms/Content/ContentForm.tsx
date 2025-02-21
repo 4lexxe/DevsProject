@@ -4,7 +4,7 @@ import {
   IContentInput,
   linkTypes,
   quizTypes,
-} from "@/course/interfaces/CourseFormInterfaces";
+} from "@/course/interfaces/Content";
 
 import MarkdownPreview from "../previews/MarkdownPreview";
 

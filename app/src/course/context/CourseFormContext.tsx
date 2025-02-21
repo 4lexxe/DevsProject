@@ -5,7 +5,7 @@ import {
   IContent,
   IContentInput,
   ICourseState,
-} from "../interfaces/CourseFormInterfaces";
+} from "../interfaces/CourseForm";
 
 interface CourseContextType {
   state: ICourseState;

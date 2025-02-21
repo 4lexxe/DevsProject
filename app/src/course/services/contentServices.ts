@@ -1,10 +1,12 @@
 import api from '../../api/axios';
 
 // Obtiene el contenido por sección
+const CONTENT = "/contents"
+
 export const getContentBySection = async (sectionId: string) => {
   try {
     console.log(`Obteniendo contenido para la sección ID: ${sectionId}`);
-    const response = await api.get(`/contents/section/${sectionId}`);
+    const response = await api.get(`${CONTENT}/section/${sectionId}`);
     return response.data;
   } catch (error: any) {
     console.error(
@@ -19,7 +21,21 @@ export const getContentBySection = async (sectionId: string) => {
 export const getContentById = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
-    const response = await api.get(`/contents/${contentId}`);
+    const response = await api.get(`${CONTENT}/${contentId}`);
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      `Error al obtener el contenido (ID: ${contentId}):`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const getQuizById = async (contentId: string) => {
+  try {
+    console.log(`Obteniendo contenido con ID: ${contentId}`);
+    const response = await api.get(`${CONTENT}/${contentId}/quiz`);
     return response.data;
   } catch (error: any) {
     console.error(

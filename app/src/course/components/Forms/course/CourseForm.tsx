@@ -9,7 +9,7 @@ import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
 import ImagePreview from "@/course/components/forms/previews/ImagePreview";
 
-import { ICourseInput } from "@/course/interfaces/CourseFormInterfaces";
+import { ICourseInput } from "@/course/interfaces/CourseForm";
 import { courseSchema } from "@/course/validations/courseSchema";
 
 import { createFullCourse } from "@/course/services/courseFormService";
