@@ -30,7 +30,7 @@ import ProtectedRouteAdmin from './auth/contexts/ProtectRouteAdmin';
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
-
+import NotFound from "./shared/components/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -103,6 +103,12 @@ function App() {
                 </ReactFlowProvider>
               }
             />
+
+            {/* Ruta específica para /not-found */}
+            <Route path="/not-found" element={<NotFound />} />
+
+            <Route path="*" element={<NotFound/>} />
+
           </Route>
         </Routes>
       </AuthProvider>

@@ -38,7 +38,7 @@ const checkPublicRoadmap: RequestHandler = async (req, res, next) => {
       const customReq = req as CustomRequest;
       if (!customReq.user) {
         res.status(401).json({ message: 'No autorizado' });
-        return;
+        return ;
       }
       if (roadmap.userId !== customReq.user.id) {
         res.status(403).json({ message: 'Prohibido' });

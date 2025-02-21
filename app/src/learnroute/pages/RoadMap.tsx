@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   ReactFlow,
@@ -23,6 +23,7 @@ import Link from '../components/Link';
 import Seccion from '../components/Seccion';
 import Etiqueta from '../components/Etiqueta';
 import Linea from '../components/Linea';
+import NotFound from '@/shared/components/NotFound';
 
 const nodeTypes = {
   nodeButton: NodeButton,
@@ -43,6 +44,7 @@ const edgeTypes = {
 
 const RoadMap = () => {
   const { id } = useParams<{ id: string }>();
+  
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const { data: roadmap, isLoading, error } = useQuery({
     queryKey: ['roadmap', id],
@@ -78,7 +80,7 @@ const RoadMap = () => {
     toast.error('Error al cargar el roadmap');
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-red-500">Error al cargar el roadmap</p>
+        <NotFound/>
       </div>
     );
   }
