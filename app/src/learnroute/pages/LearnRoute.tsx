@@ -6,6 +6,8 @@ import { Map, Users, Clock, ArrowUpRight, Loader2, Trash, Edit2 } from 'lucide-r
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import PreviewRoadmap from '../components/PreviewRoadmap';
+import ProtectedComponent from "../components/ProtectComponent";
+import { Plus } from 'react-feather';
 
 const LearnRoute = () => {
   const navigate = useNavigate();
@@ -48,6 +50,27 @@ const LearnRoute = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] px-6 py-12 md:px-8 lg:px-12">
       <div className="max-w-7xl mx-auto">
+
+        {/* Sección del botón flotante */}
+        <ProtectedComponent>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed bottom-8 right-8 z-50"
+          >
+            <button
+              // El handler es simple y no utiliza funciones peligrosas
+              onClick={() => navigate('/editor-roadmap')}
+              className="flex items-center gap-2 px-6 py-3 bg-[#3a383d] text-white rounded-lg shadow-lg hover:bg-[#2A292D] transition-all duration-300 hover:shadow-xl"
+            >
+              <Plus className="w-5 h-5" />
+              Crear Roadmap
+            </button>
+          </motion.div>
+        </ProtectedComponent>
+
         <div className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -79,14 +102,13 @@ const LearnRoute = () => {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="group relative bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                
+
                 <div className="absolute top-6 right-6">
                   <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      roadmap.isPublic
-                        ? 'bg-[#F1F0FB] text-[#403E43]'
-                        : 'bg-[#F1F0FB] text-[#403E43]'
-                    }`}
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${roadmap.isPublic
+                      ? 'bg-[#F1F0FB] text-[#403E43]'
+                      : 'bg-[#F1F0FB] text-[#403E43]'
+                      }`}
                   >
                     {roadmap.isPublic ? 'Publico' : 'Privado'}
                   </span>
@@ -115,22 +137,29 @@ const LearnRoute = () => {
                 </div>
                 {/* Nueva sección de botones con mejor diseño */}
                 <div className="absolute top-[78.5%] right-8 flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <button
-                    onClick={() => {
-                      if (window.confirm('¿Estás seguro de eliminar este roadmap?')) {
-                        deleteMutation.mutate(roadmap.id);
-                      }
-                    }}
-                    className="p-2 rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
-                  >
-                    <Trash className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => navigate(`/editor-roadmap/${roadmap.id}`)}
-                    className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
+                  <ProtectedComponent>
+
+                    <button
+                      onClick={() => {
+                        if (window.confirm('¿Estás seguro de eliminar este roadmap?')) {
+                          deleteMutation.mutate(roadmap.id);
+                        }
+                      }}
+                      className="p-2 rounded-lg bg-white border border-red-200 text-red-500 hover:bg-red-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
+                    >
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </ProtectedComponent>
+
+                  <ProtectedComponent>
+
+                    <button
+                      onClick={() => navigate(`/editor-roadmap/${roadmap.id}`)}
+                      className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-300 shadow-sm hover:shadow backdrop-blur-sm"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </ProtectedComponent>
                   <button
                     onClick={() => navigate(`/roadmaps/${roadmap.id}`)}
                     className="p-2 rounded-lg bg-[#3a383d] text-white hover:bg-[#2A292D] transition-all duration-300 shadow-sm hover:shadow"

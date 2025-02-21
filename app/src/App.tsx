@@ -16,7 +16,7 @@ import "@/shared/assets/styles/roadmap.css";
 import DefaultLayout from "./shared/layouts/defaultLayout";
 import Home from "./home/home";
 
-import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage }from '@/course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage } from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./auth/auth";
 
@@ -25,7 +25,7 @@ import ResourcePage from './recourse/pages/resources/resourcePages';
 import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
 import ResourceDetailsPage from './recourse/pages/resourceDetails/ResourceDetailsPage';
 import ProtectedRoute from './auth/contexts/ProtectedRoute'; // Importa el componente de protección
-
+import ProtectedRouteAdmin from './auth/contexts/ProtectRouteAdmin';
 
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";
@@ -57,8 +57,8 @@ function App() {
             <Route path="/quiz/:contentId" element={<QuizPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
-            <Route path='course/form' element = {<CourseFormPage/>} />
-            <Route path='course/sections/form' element = { <SectionsFormPage/> } />
+            <Route path='course/form' element={<CourseFormPage />} />
+            <Route path='course/sections/form' element={<SectionsFormPage />} />
             <Route path="/recursos" element={<ResourcePage />} />
 
             {/* Rutas protegidas */}
@@ -67,16 +67,16 @@ function App() {
             </Route>
 
             <Route path="/resources/:id" element={<ResourceDetailsPage />} />
-            <Route 
-              path="/ruta-aprendizaje" 
+            <Route
+              path="/ruta-aprendizaje"
               element={
                 <QueryClientProvider client={queryClient}>
                   <LearnRoute />
                 </QueryClientProvider>
-              } 
+              }
             />
-            
-          <Route
+
+            <Route
               path="/roadmaps/:id"
               element={
                 <QueryClientProvider client={queryClient}>
@@ -85,21 +85,23 @@ function App() {
               }
             />
 
+            <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
+              <Route
+                path="/editor-roadmap"
+                element={
+                  <ReactFlowProvider>
+                    <RoadmapEditor />
+                  </ReactFlowProvider>
+                }
+              />
+            </Route>
 
-            <Route
-              path="/editor-roadmap"
+            <Route path="/editor-roadmap/:id"
               element={
                 <ReactFlowProvider>
                   <RoadmapEditor />
                 </ReactFlowProvider>
               }
-            />
-            <Route path="/editor-roadmap/:id" 
-              element={
-                <ReactFlowProvider>
-                  <RoadmapEditor />
-                </ReactFlowProvider>
-              } 
             />
           </Route>
         </Routes>
