@@ -26,6 +26,7 @@ import recourseRoutes from './modules/resource/routes/resource.routes';
 import ratingRoutes from './modules/resource/rating/rating.routes';
 import commentRoutes from './modules/resource/comment/comment.routes';
 import uploadRoutes from './modules/resource/routes/upload.routes';
+import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -156,6 +157,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/resources', recourseRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api', roadMapRoutes);
 
 // Rutas públicas
 app.use('/api', HeaderSectionRoutes);

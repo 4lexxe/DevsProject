@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* xyflow theme files. Delete these to start from our base */
+ 
+.react-flow {
+    /* Custom Variables */
+    --xy-theme-selected: #F57DBD;
+    --xy-theme-hover: #C5C5C5;
+    --xy-theme-edge-hover: black;
+    --xy-theme-color-focus: #E8E8E8;
+ 
+    /* Built-in Variables see https://reactflow.dev/learn/customization/theming */
+    --xy-node-border-default: 1px solid #EDEDED;
+  
+    --xy-node-boxshadow-default: 
+      0px 3.54px 4.55px 0px #00000005, 
+      0px 3.54px 4.55px 0px #0000000D, 
+      0px 0.51px 1.01px 0px #0000001A;
+  
+    --xy-node-border-radius-default: 8px;
+  
+    --xy-handle-background-color-default: #ffffff;
+    --xy-handle-border-color-default: #AAAAAA;
+  
+    --xy-edge-label-color-default: #505050;
+}
+ 
+.react-flow.dark { 
+    --xy-node-boxshadow-default: 
+    0px 3.54px 4.55px 0px rgba(255, 255, 255, 0.05), /* light shadow */
+    0px 3.54px 4.55px 0px rgba(255, 255, 255, 0.13), /* medium shadow */
+    0px 0.51px 1.01px 0px rgba(255, 255, 255, 0.2);  /* smallest shadow */  
+    --xy-theme-color-focus: #535353;
+}
+ 
+
+/* Customizing Default Theming */
+ 
+.react-flow__node {
+    box-shadow: var(--xy-node-boxshadow-default);
+    border-radius: var(--xy-node-border-radius-default);
+    background-color: var(--xy-node-background-color-default);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    flex-direction: column;
+    border: var(--xy-node-border-default);
+    color: var(--xy-node-color, var(--xy-node-color-default));
+}
+ 
+.react-flow__node.selectable:focus {
+    box-shadow: 0px 0px 0px 4px var(--xy-theme-color-focus);
+    border-color: #d9d9d9;
+}
+ 
+.react-flow__node.selectable:focus:active {
+    box-shadow: var(--xy-node-boxshadow-default);
+}
+ 
+ 
+.react-flow__node.selectable:hover, 
+.react-flow__node.draggable:hover {
+    border-color: var(--xy-theme-hover);
+}
+ 
+.react-flow__node.selectable.selected {
+    border-color: var(--xy-theme-selected);
+    box-shadow: var(--xy-node-boxshadow-default);
+}
+ 
+.react-flow__node-group {
+    background-color: rgba(207, 182, 255, 0.4);
+    border-color: #9E86ED;
+}
+ 
+.react-flow__edge.selectable:hover .react-flow__edge-path,
+.react-flow__edge.selectable.selected .react-flow__edge-path {
+    stroke: var(--xy-theme-edge-hover);
+}
+ 
+.react-flow__handle {
+    background-color: var(--xy-handle-background-color-default);
+}
+
+.rotatable-node__handle {
+    pointer-events: all !important;
+    cursor: grab !important;
+    transition: transform 0.2s ease !important;
+}
+
+.nodrag.rotatable-node__handle:hover {
+    transform: scale(1.2) !important;
+    cursor: grabbing !important;
+}
+
+ 
+.react-flow__handle.connectionindicator:hover {
+    pointer-events: all;
+    border-color: var(--xy-theme-edge-hover);
+    background-color: white;
+}
+ 
+.react-flow__handle.connectionindicator:focus , 
+.react-flow__handle.connectingfrom,
+.react-flow__handle.connectingto {
+    border-color: var(--xy-theme-edge-hover);
+}
+ 
+.react-flow__node-resizer {
+    border-radius: 0;
+    border: none;
+}
+ 
+.react-flow__resize-control.handle {
+    background-color: #ffffff;
+    border-color: #9E86ED;
+    border-radius: 0;
+    width: 5px;
+    height: 5px;
+}
+
+/* Eliminamos @layer base y definimos los valores directamente */
+
+.component-drag-button {
+    @apply w-full p-3 flex items-center gap-2 rounded-lg hover:bg-gray-100 transition-colors cursor-grab;
+}
+/* Esta clase se añade automaticamente a cada nodo */
+.react-flow__node {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.react-flow__nodeButton {
+    @apply flex items-center justify-center cursor-pointer bg-yellow-400 border border-black rounded-md shadow-md;
+    padding: 12px 20px;
+    min-width: 150px;
+    min-height: 48px;
+}
+
+.react-flow__node-title {
+    @apply rounded-lg bg-cyan-400 shadow-lg border border-gray-200 font-semibold text-lg;
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+.react-flow__node-topic {
+    @apply rounded-lg bg-white shadow-lg border border-gray-200 text-black; /* Usamos el valor directo en lugar de la variable */
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+.react-flow__node-subtopic {
+    @apply rounded-lg bg-white shadow-lg border border-gray-200 bg-[#f3f4f6] text-[#111827]; /* Reemplazamos --secondary y --secondary-foreground con valores directos */
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+.react-flow__node-paragraph {
+    @apply font-normal text-base;
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+.react-flow__node-todo {
+    @apply font-normal text-base;
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+.react-flow__node-link {
+    @apply font-normal text-base;
+    padding: 12px 20px;
+    min-width: 150px;
+}
+
+/*La clase react-flow__node-seccion se aplica a todos los nodos seccion.tsx, ahora entiendo*/
+.react-flow__node-seccion { 
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.react-flow__handle {
+    @apply w-3 h-3 bg-[#3b82f6] border-2 border-white; /* Reemplazamos --primary con el valor directo */
+}
+
+.react-flow__handle-connecting {
+    @apply bg-green-500;
+}
+
+.react-flow__handle-valid {
+    @apply bg-green-500;
+}
+
+.react-flow__edge-path {
+    @apply stroke-2;
+}
+
+.react-flow__controls {
+    @apply shadow-lg rounded-lg overflow-hidden;
+}
+
+.react-flow__controls-button {
+    @apply border-gray-200 bg-white hover:bg-gray-50;
+}
+
+
+.sidebar {
+    @apply w-64 border-r border-gray-200 bg-white p-4 flex flex-col gap-2;
+}

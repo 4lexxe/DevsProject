@@ -10,6 +10,7 @@ import SectionHeader from './modules/headerSection/HeaderSection';
 import Recourse from './modules/resource/Resource';
 import Rating from './modules/resource/rating/Rating';
 import Comment from './modules/resource/comment/Comment';
+import RoadMap from './modules/roadmap/RoadMap';
 
 /* Modelos relacionados con el area de cursos */
 import Category from './modules/category/Category';
@@ -30,7 +31,7 @@ async function syncDatabase() {
     await RolePermission.sync({ force: true }); // ¡Primero debe existir esta tabla!
 
     // Poblar datos DESPUÉS de crear todas las tablas
-    /* await seedInitialData(); */
+     await seedInitialData(); 
 
     await User.sync({ force: true });
 
@@ -52,6 +53,9 @@ async function syncDatabase() {
     await Rating.sync({ force: true });
 
     await Comment.sync({ force: true });
+    await Recourse.sync({ force: true });
+
+    await RoadMap.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {
@@ -61,7 +65,7 @@ async function syncDatabase() {
   }
 }
 
-/* async function seedInitialData() {
+ async function seedInitialData() {
   for (const roleData of rolesIniciales) {
     const [role] = await Role.findOrCreate({
       where: { name: roleData.name },
@@ -82,6 +86,6 @@ async function syncDatabase() {
       }));
     }
   }
-} */
+} 
 
 syncDatabase();

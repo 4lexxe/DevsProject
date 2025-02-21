@@ -49,6 +49,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5",
     "sharp": "^0.33.5",
+    "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
