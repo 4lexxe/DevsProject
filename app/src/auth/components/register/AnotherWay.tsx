@@ -1,16 +1,13 @@
 import React from 'react';
-import { Github, Disc as Discord } from 'lucide-react';
+import { Github } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import authService from '../../services/auth.service';
 
 function AnotherWay() {
   const handleOAuthLogin = (url: string) => {
-    // Obtener la URL actual (desde donde se solicitó la autenticación)
     const redirectUrl = window.location.href;
-
-    // Agregar la URL de origen como parámetro en la solicitud de autenticación
     const authUrl = `${url}?redirect=${encodeURIComponent(redirectUrl)}`;
-
-    // Redirigir al usuario a la página de autenticación
     window.location.href = authUrl;
   };
 
@@ -37,7 +34,7 @@ function AnotherWay() {
           onClick={() => handleOAuthLogin(authService.getDiscordAuthUrl())}
           className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
         >
-          <Discord className="h-5 w-5 mr-2" />
+          <FontAwesomeIcon icon={faDiscord} className="h-5 w-5 mr-2" />
           Discord
         </button>
       </div>

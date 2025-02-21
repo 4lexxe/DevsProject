@@ -3,9 +3,12 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 export const registerSchema = z
   .object({
-    name: z.string().min(1, {
-      message: "Este campo no puede estar vacío",
-    }),
+    name: z.string()
+      .min(1, { message: "Este campo no puede estar vacío" })
+      .max(20, { message: "El nombre no puede exceder los 20 caracteres" })
+      .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, {
+        message: "Solo se permiten letras y espacios",
+      }),
     email: z
       .string()
       .min(1, {

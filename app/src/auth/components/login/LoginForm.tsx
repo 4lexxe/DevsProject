@@ -1,8 +1,10 @@
-import {Github} from "lucide-react";
+import { Github } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from 'axios';
+import { useState } from 'react';
 import { loginSchema } from "../../validations/loginValidator";
 import AuthService from "../../services/auth.service";
 import CustomInput from "@/shared/components/inputs/CustomInput";
@@ -13,43 +15,86 @@ type Inputs = {
   password: string;
 };
 
+interface ApiError {
+  message?: string;
+  error?: string;
+  errors?: Array<{
+    path: string[];
+    message: string;
+  }>;
+}
+
 export default function LForm() {
+  const [showPassword, setShowPassword] = useState(false); // Añadir estado
+
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(loginSchema),
   });
 
+  // Función para alternar visibilidad
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     try {
       const response = await AuthService.login(data);
-      console.log("Login successful:", response);
-
-      // Guarda el token en el localStorage después de un inicio de sesión exitoso
+      
       if (response.token) {
-        AuthService.setToken(response.token); // Guarda el token
-        window.location.href = "/"; // Redirige al usuario a la página de inicio
+        AuthService.setToken(response.token);
+        window.location.href = "/";
       }
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: unknown) {
+      let errorMessage = 'Error al iniciar sesión';
+      
+      if (axios.isAxiosError(error)) {
+        const serverError = error.response?.data as ApiError;
+        
+        if (serverError?.errors) {
+          serverError.errors.forEach((err) => {
+            const fieldName = err.path[0];
+            setError(fieldName as keyof Inputs, {
+              type: 'manual',
+              message: err.message
+            });
+          });
+          return;
+        }
+        
+        errorMessage = serverError?.message || 
+                      serverError?.error || 
+                      error.message || 
+                      errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      setError('root', {
+        type: 'manual',
+        message: errorMessage
+      });
     }
   };
 
   const handleOAuthLogin = (url: string) => {
-    // Obtener la URL actual (desde donde se solicitó la autenticación)
     const redirectUrl = window.location.href;
-
-    // Agregar la URL de origen como parámetro en la solicitud de autenticación
     const authUrl = `${url}?redirect=${encodeURIComponent(redirectUrl)}`;
-
-    // Redirigir al usuario a la página de autenticación
     window.location.href = authUrl;
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {errors.root && (
+        <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+          {errors.root.message}
+        </div>
+      )}
+
       <CustomInput
         name="email"
         type="email"
@@ -57,11 +102,17 @@ export default function LForm() {
         error={errors["email"]?.message}
         placeholder="tu@ejemplo.com"
         labelText="Email"
+        autoComplete="email"
       />
+      
       <PasswordInput
         name="password"
         register={register}
         error={errors["password"]?.message}
+        autoComplete="current-password"
+        showPassword={showPassword} // Pasar prop
+        onToggle={togglePasswordVisibility} // Pasar prop
+        showButton={true} // Pasar prop
       />
 
       <button
@@ -72,7 +123,6 @@ export default function LForm() {
       </button>
 
       <div className="flex justify-center space-x-4">
-        {/* Botón de Discord */}
         <button
           type="button"
           onClick={() => handleOAuthLogin(AuthService.getDiscordAuthUrl())}
@@ -82,7 +132,6 @@ export default function LForm() {
           Iniciar con Discord
         </button>
 
-        {/* Botón de GitHub */}
         <button
           type="button"
           onClick={() => handleOAuthLogin(AuthService.getGithubAuthUrl())}
