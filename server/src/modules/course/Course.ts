@@ -10,8 +10,9 @@ class Course extends Model {
   public image!: string;
   public summary!: string;
   public about!: string;
-  public careerTypeId!: bigint;
+  public careerTypeId?: bigint;
   public learningOutcomes!: string[];
+  public prerequisites?: string[];
   public isActive!: boolean;
   public isInDevelopment!: boolean;
   public adminId!: bigint;
@@ -50,6 +51,10 @@ Course.init(
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
     },
+    prerequisites: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -63,6 +68,7 @@ Course.init(
     adminId: {
       type: DataTypes.BIGINT,
       references: { model: Admin, key: "id" },
+      allowNull: false,
     },
   },
   {

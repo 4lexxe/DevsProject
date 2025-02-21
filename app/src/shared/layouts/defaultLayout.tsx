@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import Navbar from '../components/navigation/Navbar';
+import Navbar from '../components/navigation/navbar/Navbar';
 import Footer from '../components/navigation/Footer';
 import NotificationBubble from '../../notification/NotificationBubble';
 import useSocket from '../../hooks/useSocket';
@@ -11,7 +11,7 @@ export default function DefaultLayout() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <NotificationBubble />
-      <main className="flex-grow w-full pt-20">
+      <main className="flex-grow w-full">
         {backendOnline ? (
           <Outlet />
         ) : (

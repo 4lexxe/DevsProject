@@ -14,10 +14,10 @@ import {
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 
 import { Plus } from "lucide-react";
-import type { IContent } from "@/course/interfaces/interfaces";
+import type { IContent } from "@/course/interfaces/CourseFormInterfaces";
 
-import DraggableItem from "@/course/components/Forms/Content/DraggableItem";
-import { useCourseContext } from "@/course/context/CourseContext";
+import DraggableItem from "@/course/components/forms/content/DraggableItem";
+import { useCourseContext } from "@/course/context/CourseFormContext";
 import { useState, useEffect } from "react";
 
 interface DraggableContentProps {
@@ -39,7 +39,7 @@ export default function DraggableContentList({
   
   // 🔹 Sincronizar items con `courseState` cuando cambia la sección
   useEffect(() => {
-    const section = courseState.sections.find((s) => s.id === sectionId);
+    const section = courseState.sections.find((s: any) => s.id === sectionId);
     if (section) {
       setItems([...section.contents].sort((a, b) => a.position - b.position)); // 🔥 Siempre ordenamos
     }

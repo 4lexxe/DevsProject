@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { ISectionInput } from "@/course/interfaces/interfaces";
+import { ISectionInput } from "@/course/interfaces/CourseFormInterfaces";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
@@ -9,12 +9,12 @@ import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { X, Save } from "lucide-react";
 import { sectionSchema, moduleTypes } from "@/course/validations/sectionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCourseContext } from "@/course/context/CourseContext"; 
+import { useCourseContext } from "@/course/context/CourseFormContext"; 
 
 export default function SectionForm() {
   const { state: sectionState, saveSection, cancelEdit } = useCourseContext();
   const initialData = sectionState.editingSection;
-
+ 
   const {
     register,
     handleSubmit,
@@ -30,7 +30,7 @@ export default function SectionForm() {
   });
 
   const onSubmit: SubmitHandler<ISectionInput> = (data: ISectionInput): void => {
-    saveSection(data)
+    saveSection(data) 
   };
 
   return (

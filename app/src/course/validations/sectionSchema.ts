@@ -3,10 +3,11 @@ import { contentSchema } from "./contentSchema";
 
 export const moduleTypes = [
     "Introductorio",
-    "Básico",
+    "Principiante",
     "Intermedio",
     "Avanzado",
     "Experto",
+    "Insano Hardcore"
 ] as const;
 
 export type moduleTypes = (typeof moduleTypes)[number];

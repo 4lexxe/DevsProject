@@ -16,14 +16,14 @@ router.get('/course/development', CourseController.getInDevelopmentCourses)
 // Obtener conteo de todos los cursos
 router.get('/course/count', CourseController.getTotalCount)
 
-// Obtener todos los curso por categoria
-router.get('/courseByCategory', CourseController.getByCategory)
+// Obtener todos los cursos por categoria
+router.get('/category/courses', CourseController.getByCategory)
 
 // Obtener todos los cursos por tipo de carrera
-router.get('/courseByCareerType', CourseController.getByCareerType)
+router.get('/carrerType/courses', CourseController.getByCareerType)
 
 // Obtener los cursos por admin
-router.get('/courseByAdmin', CourseController.getByAdminId)
+router.get('/course/admin/:id', CourseController.getByAdminId)
 
 // Ruta para obtener un curso por ID (público)
 router.get('/course/:id', CourseController.getById);

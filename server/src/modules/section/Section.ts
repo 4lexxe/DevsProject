@@ -8,11 +8,12 @@ class Section extends Model {
   public description!: string;
   public courseId!: bigint;
   public coverImage!: string;
+  public moduleType!: 'Introductorio'| 'Principiante'| 'Intermedio'| 'Avanzado' | 'Experto' | 'Insano Hardcore';
   
   public readonly createdAt!: Date; 
   public readonly updatedAt!: Date; 
 }
-
+ 
 Section.init(
   {
     id: {

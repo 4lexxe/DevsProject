@@ -3,19 +3,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
 import { Howl } from "howler";
 import { useAuth } from "../auth/contexts/AuthContext";
-import notificationSoundPath from "../shared/assets/sounds/notification.wav";
+
+const notificationSoundPath = "/notification.wav";
 
 let notificationSound: Howl | null = null;
 
 const NotificationBubble = () => {
   const { showWelcomeMessage, setShowWelcomeMessage, user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
+
+  const name = user?.name || "Usuario";
+  const welcomeText = `¡Bienvenido ${name}!`;
 
   useEffect(() => {
     const enableAudioContext = () => {
       setUserInteracted(true);
-
       if (!notificationSound) {
         notificationSound = new Howl({
           src: [notificationSoundPath],
@@ -23,7 +27,6 @@ const NotificationBubble = () => {
           html5: true,
         });
       }
-
       window.removeEventListener("click", enableAudioContext);
       window.removeEventListener("keydown", enableAudioContext);
     };
@@ -40,17 +43,26 @@ const NotificationBubble = () => {
   useEffect(() => {
     if (showWelcomeMessage && user) {
       setIsVisible(true);
-
       if (userInteracted && notificationSound) {
         notificationSound.play();
       }
 
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-        setShowWelcomeMessage(false);
-      }, 3000);
+      const expandTimer = setTimeout(() => {
+        setIsExpanded(true);
+      }, 1000);
 
-      return () => clearTimeout(timer);
+      const closeTimer = setTimeout(() => {
+        setIsExpanded(false);
+        setTimeout(() => {
+          setIsVisible(false);
+          setShowWelcomeMessage(false);
+        }, 500);
+      }, 5000);
+
+      return () => {
+        clearTimeout(expandTimer);
+        clearTimeout(closeTimer);
+      };
     }
   }, [showWelcomeMessage, setShowWelcomeMessage, user, userInteracted]);
 
@@ -58,25 +70,123 @@ const NotificationBubble = () => {
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: -30, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-          transition={{
-            type: "spring",
-            stiffness: 200,
-            damping: 20,
-            duration: 0.5,
-          }}
-          className="fixed top-20 inset-x-0 mx-auto z-50 px-4 sm:px-6 md:px-8 max-w-md"
+          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50"
+          initial="initial"
+          animate="animate"
+          exit="exit"
         >
-          <div className="flex items-center gap-3 p-4 bg-white/90 backdrop-blur-md border border-gray-200 rounded-lg shadow-lg dark:bg-gray-900/90 dark:border-gray-800">
-            <div className="flex-shrink-0">
-              <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-            </div>
-            <p className="flex-1 text-sm font-medium text-gray-800 dark:text-gray-200 break-words">
-              ¡Bienvenido! Has iniciado sesión correctamente
-            </p>
-          </div>
+          {/* Círculo de pulso exterior */}
+          <motion.div
+            variants={{
+              initial: {
+                scale: 0.8,
+                opacity: 0,
+                x: "-50%",
+              },
+              animate: {
+                scale: [1, 1.2, 1],
+                opacity: [0, 0.5, 0],
+                x: "-50%",
+                transition: {
+                  duration: 1,
+                  times: [0, 0.5, 1],
+                  repeat: isExpanded ? 0 : Infinity,
+                  repeatType: "reverse",
+                },
+              },
+              exit: {
+                scale: 0.8,
+                opacity: 0,
+                x: "-50%",
+                transition: {
+                  duration: 0.3,
+                },
+              },
+            }}
+            className="absolute left-1/2 -translate-x-1/2 bg-blue-500 rounded-full w-10 h-10"
+          />
+
+          {/* Contenedor principal */}
+          <motion.div
+            className="relative flex items-center justify-center"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: "backOut",
+            }}
+          >
+            <motion.div
+              className="flex items-center bg-white/90 backdrop-blur-md border border-gray-200 rounded-full shadow-lg dark:bg-slate-700 dark:border-gray-800 overflow-hidden"
+              initial={{
+                width: "40px",
+                height: "40px",
+              }}
+              animate={{
+                width: isExpanded ? "auto" : "40px",
+                height: "40px",
+                transition: {
+                  duration: 0.5,
+                  ease: "easeInOut",
+                },
+              }}
+              exit={{
+                width: "40px",
+                height: "40px",
+                transition: {
+                  duration: 0.5,
+                  ease: "easeInOut",
+                },
+              }}
+            >
+              {/* Ícono de notificación */}
+              <motion.div
+                className="flex-shrink-0 p-2"
+                initial={{ scale: 0.5, rotate: -180 }}
+                animate={{
+                  scale: 1,
+                  rotate: 0,
+                  transition: {
+                    type: "spring",
+                    stiffness: 200,
+                    damping: 15,
+                  },
+                }}
+                exit={{
+                  scale: 0.5,
+                  rotate: -180,
+                  transition: {
+                    duration: 0.3,
+                    ease: "easeInOut",
+                  },
+                }}
+              >
+                <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+              </motion.div>
+
+              {/* Mensaje de bienvenida */}
+              <motion.p
+                className="px-4 text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap"
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: isExpanded ? 1 : 0,
+                  transition: {
+                    duration: 0.3,
+                    delay: isExpanded ? 0.2 : 0,
+                  },
+                }}
+                exit={{
+                  opacity: 0,
+                  transition: {
+                    duration: 0.2,
+                  },
+                }}
+              >
+                {welcomeText}
+              </motion.p>
+            </motion.div>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

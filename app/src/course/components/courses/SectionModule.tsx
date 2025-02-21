@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, Code, Rocket, Beaker, BookCopy, ChevronDown, ChevronUp } from 'lucide-react';
-import { getContentBySection } from '../../services/contentServices';
-import ContentViewer from './ContentViewer';
-
-interface Section {
-  id: number;
-  title: string;
-  description: string;
-  moduleType: string;
-  coverImage: string;
-  lessonsCount: number;
-  duration: number;
-}
+import React, { useState, useEffect } from "react";
+import {
+  BookOpen,
+  Code,
+  Rocket,
+  Beaker,
+  BookCopy,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { getContentBySection } from "../../services/contentServices";
+import ContentViewer from "./contentViewner/ContentViewer";
+import { Section } from "@/course/interfaces/viewnerCourseInterface";
 
 interface SectionModuleProps {
   section: Section;
@@ -19,7 +18,7 @@ interface SectionModuleProps {
 
 const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [contents, setContents] = useState<any[]>([]);
+  const [contents, setContents] = useState(section.contents);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,22 +26,22 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
   const formatDuration = (minutes: number): string => {
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-    
+
     if (hours === 0) {
       return `${remainingMinutes} min`;
     }
-    
-    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ''}`;
+
+    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`;
   };
 
   // Helper function to get icon based on module type
   const getModuleIcon = () => {
     switch (section.moduleType.toLowerCase()) {
-      case 'fundamental':
+      case "fundamental":
         return <BookOpen className="w-6 h-6 text-gray-700" />;
-      case 'avanzado':
+      case "avanzado":
         return <Rocket className="w-6 h-6 text-gray-700" />;
-      case 'practico':
+      case "practico":
         return <Code className="w-6 h-6 text-gray-700" />;
       default:
         return <Beaker className="w-6 h-6 text-gray-700" />;
@@ -52,19 +51,19 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
   // Helper function to get gradient based on module type
   const getGradient = () => {
     switch (section.moduleType.toLowerCase()) {
-      case 'fundamental':
-        return 'from-purple-500/90 to-pink-500/90';
-      case 'avanzado':
-        return 'from-yellow-400/90 to-orange-500/90';
+      case "fundamental":
+        return "from-purple-500/90 to-pink-500/90";
+      case "avanzado":
+        return "from-yellow-400/90 to-orange-500/90";
       default:
-        return 'from-teal-400/90 to-blue-500/90';
+        return "from-teal-400/90 to-blue-500/90";
     }
   };
 
   // Fetch content when section is expanded
-  useEffect(() => {
+  /* useEffect(() => {
     const fetchContent = async () => {
-      if (isExpanded && contents.length === 0) {
+      if (isExpanded && section.contents.length === 0) {
         try {
           setLoading(true);
           const data = await getContentBySection(section.id.toString());
@@ -80,11 +79,11 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
     };
 
     fetchContent();
-  }, [isExpanded, section.id]);
+  }, [isExpanded, section.id]); */
 
   return (
     <div className="bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100">
-      <div 
+      <div
         className="cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -92,24 +91,29 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
           {/* Background image with gradient overlay */}
           <div className="relative h-24 w-full">
             {/* Background image */}
-            <div 
+            <div
               className="absolute inset-0 bg-cover bg-center"
-              style={{ 
-                backgroundImage: `url(${section.coverImage || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070'})` 
+              style={{
+                backgroundImage: `url(${
+                  section.coverImage ||
+                  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070"
+                })`,
               }}
             />
             {/* Gradient overlay */}
-            <div className={`absolute inset-0 bg-gradient-to-r ${getGradient()}`} />
-            
+            <div
+              className={`absolute inset-0 bg-gradient-to-r ${getGradient()}`}
+            />
+
             {/* Module icon */}
             <div className="absolute -bottom-6 left-6">
               <div className="bg-white p-3 rounded-lg shadow-md">
-                <BookCopy/>
+                <BookCopy />
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="p-6 pt-8">
           {/* Module type badge */}
           <div className="flex justify-between items-center">
@@ -122,12 +126,12 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
               <ChevronDown className="w-5 h-5 text-gray-500" />
             )}
           </div>
-          
+
           {/* Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             {section.title}
           </h3>
-          
+
           {/* Description */}
           <p className="text-gray-600 mb-4 line-clamp-2">
             {section.description}
@@ -145,12 +149,15 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
           ) : error ? (
             <div className="text-red-500 text-center py-4">{error}</div>
           ) : contents.length === 0 ? (
-            <div className="text-gray-500 text-center py-4">No content available</div>
+            <div className="text-gray-500 text-center py-4">
+              No content available
+            </div>
           ) : (
             <div className="space-y-4">
-              {contents.map((content) => (
-                <ContentViewer key={content.id} content={content} />
-              ))}
+              {contents &&
+                contents.map((content) => (
+                  <ContentViewer key={content.id} content={content} />
+                ))}
             </div>
           )}
         </div>

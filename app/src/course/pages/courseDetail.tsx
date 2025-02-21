@@ -1,35 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCourses } from '../services/courseServices';
-import { getModulesCount as fetchModulesCount } from '../services/courseServices';
+import { getById } from '../services/courseServices';
 import HeroCourse from '../components/courses/HeroCourse';
 import CourseOverview from '../components/courses/CourseOverview';
 import LearningOutcomes from '../components/courses/LearningOutcomes';
 import SectionList from '../components/courses/SectionList';
+import { Course } from '../interfaces/viewnerCourseInterface';
 
-interface Module {
-  id: number;
-  title: string;
-  description: string;
-  order: number;
-  courseId: number;
-}
-
-interface Course {
-  id: number;
-  title: string;
-  image: string;
-  summary: string;
-  category: string;
-  about: string;
-  relatedCareerType: string;
-  learningOutcomes: string[];
-  isActive: boolean;
-  isInDevelopment: boolean;
-  adminId: number; 
-  createdAt: string;
-  modules: Module[];
-}
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,14 +19,10 @@ const CourseDetails: React.FC = () => {
     const fetchCourseData = async () => {
       try {
         setLoading(true);
-        const courses = await getCourses();
-        const fetchedCourse: Course | undefined = courses.find(
-          (course: Course) => course.id === Number(id)
-        );
-
-        if (fetchedCourse) {
-          setCourse(fetchedCourse);
-          const count = await fetchModulesCount(Number(id));
+        const course = await getById(id);
+        if (course) {
+          setCourse(course);
+          const count = course.sections.length;
           setModuleCount(count);
         } else {
           setError('Curso no encontrado.');
@@ -85,7 +58,7 @@ const CourseDetails: React.FC = () => {
           title={course.title}
           description={course.summary}
           image={course.image}
-          category={course.category}
+          categories={course.categories}
         />
       </div>
       
@@ -95,7 +68,7 @@ const CourseDetails: React.FC = () => {
           <div className="lg:col-span-2">
             <CourseOverview
               about={course.about}
-              relatedCareerType={course.relatedCareerType}
+              careerType={course.careerType.name}
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />

@@ -39,6 +39,8 @@ export default function SelectInput({
             ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
             : 'border-gray-300'
         }`}
+
+        defaultValue=""
       >
         {placeholder && (
           <option value="" disabled>

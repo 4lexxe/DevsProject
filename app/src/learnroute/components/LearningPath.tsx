@@ -65,7 +65,7 @@ const currentLevel: Level = {
       completed: false,
       resources: [{ type: "Docs", title: "Route Parameters", url: "#" }],
     },
-    {
+    { 
       id: "5",
       title: "Route Naming",
       completed: false,
@@ -88,7 +88,7 @@ const currentLevel: Level = {
 
 export default function LearningPath() {
   const [expandedTopics, setExpandedTopics] = useState<string[]>([])
-  const [completedTopics, setCompletedTopics] = useState<string[]>([])
+  const [completedTopics] = useState<string[]>([])
 
   const toggleTopic = (topicId: string) => {
     setExpandedTopics((current) =>

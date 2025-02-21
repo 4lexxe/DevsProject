@@ -19,18 +19,14 @@ import categoryRoutes from './modules/category/CategoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 //Contenidos
-import fileContentRoutes from './modules/content/routes/fileContentRoutes'
-import imageContentRoutes from './modules/content/routes/imageContentRoutes'
-import linkConentRoutes from './modules/content/routes/linkContentRoutes'
-import quizContentRoutes from './modules/content/routes/quizContentRoutes'
-import textContentRoutes from './modules/content/routes/textContentRoutes'
-import videoContentRoutes from './modules/content/routes/videoContentRoutes'
+import contentRoutes from './modules/content/contentRoutes'
 
 //import contentRoutes from './modules/content/contentRoutes';
 import recourseRoutes from './modules/resource/routes/resource.routes';
 import ratingRoutes from './modules/resource/rating/rating.routes';
 import commentRoutes from './modules/resource/comment/comment.routes';
 import uploadRoutes from './modules/resource/routes/upload.routes';
+import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 import geoip from 'geoip-lite';
 import { Request } from 'express';
@@ -161,6 +157,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
 app.use('/api/resources', recourseRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api', roadMapRoutes);
 
 // Rutas públicas
 app.use('/api', HeaderSectionRoutes);
@@ -170,13 +167,8 @@ app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
 app.use('/api', careerTypeRoutes);
 app.use('/api', categoryRoutes);
-//Contenidos
-app.use('/api', fileContentRoutes);
-app.use('/api', imageContentRoutes);
-app.use('/api', linkConentRoutes);
-app.use('/api', quizContentRoutes);
-app.use('/api', textContentRoutes);
-app.use('/api', videoContentRoutes);
+app.use('/api', contentRoutes);
+
 
 // Rutas de comentarios y valoraciones
 app.use('/api/rating', ratingRoutes);
