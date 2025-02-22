@@ -81,3 +81,30 @@
 .rotate-effect {
   animation: rotate 2s linear infinite;
 }
+
+.responsive-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .responsive-button {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    background: linear-gradient(to right, #333, #007acc);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+  }
+
+  .responsive-button:hover {
+    background: linear-gradient(to right, #0056b3, #0069d9);
+    transform: scale(1.1);
+  }
+
+  .responsive-button .plus-icon {
+    margin-right: 0;
+  }
+}

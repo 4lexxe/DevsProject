@@ -5,7 +5,11 @@ import { User, Settings, Mail, Key, Calendar, Shield, LogOut } from 'lucide-reac
 
 const Profile = () => {
   const { user, logout, loading } = useAuth();
-
+  if (user) {
+    console.log(user.email);
+    console.log(user.displayName);
+    console.log('el id del usuario es',user.id);
+  }
   if (loading) {
     return <div>Cargando...</div>; // Mostrar un mensaje de carga mientras se verifica la autenticación
   }

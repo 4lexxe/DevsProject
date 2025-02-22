@@ -18,6 +18,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
   const { socket } = useSocket();
@@ -41,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error("Error verifying auth:", err);
       } finally {
         setLoading(false);
+        setInitialCheckDone(true);
       }
     };
 
@@ -100,7 +102,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        loading: loading || !initialCheckDone,
         error,
         login,
         register,

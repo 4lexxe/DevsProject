@@ -13,7 +13,7 @@ import Comment from '../../components/Comment';
 const ResourceDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [resource, setResource] = useState<Resource | null>(null);
-  const [user, setUser] = useState<UserInfo | null>(null);
+  const [resourceUser, setResourceUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ const ResourceDetailsPage: React.FC = () => {
         const resourceData = await ResourceService.getResourceById(Number(id));
         setResource(resourceData);
         const userData = await UserService.getUserById(resourceData.userId);
-        setUser(userData);
+        setResourceUser(userData);
       } catch (err) {
         console.error('Error fetching resource details:', err);
         setError('Error al cargar el recurso. Por favor, intenta nuevamente.');
@@ -32,7 +32,6 @@ const ResourceDetailsPage: React.FC = () => {
         setLoading(false);
       }
     };
-
     if (id) {
       fetchResourceAndUser();
     }
@@ -73,15 +72,13 @@ const ResourceDetailsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado del recurso */}
         <ResourceHeader resource={resource} />
-
         {/* Contenido principal del recurso */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <ResourceContent resource={resource} />
-          <ResourceInfo resource={resource} user={user} />
-          {resource.id !== undefined && (
-            <ResourceActions resourceId={resource.id} onShare={handleShare} />
+          <ResourceInfo resource={resource} user={resourceUser} />
+          {resource.id !== undefined && resource.userId !== undefined && (
+            <ResourceActions resourceId={resource.id} ownerId={resource.userId} onShare={handleShare} />
           )}
-
           {/* Componente de Comentarios */}
           {resource.id !== undefined && (
             <div className="p-6">

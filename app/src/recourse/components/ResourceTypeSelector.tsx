@@ -9,6 +9,7 @@ import {
 interface ResourceTypeSelectorProps {
   type: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  disabled?: boolean;
 }
 
 const ResourceTypeSelector: React.FC<ResourceTypeSelectorProps> = ({ type, onChange }) => {

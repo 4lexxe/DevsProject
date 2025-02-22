@@ -3,6 +3,7 @@ import React from 'react';
 interface ResourceVisibilityToggleProps {
   isVisible: boolean;
   onChange: (isVisible: boolean) => void;
+  disabled?: boolean;
 }
 
 const ResourceVisibilityToggle: React.FC<ResourceVisibilityToggleProps> = ({
