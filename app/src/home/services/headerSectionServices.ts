@@ -6,7 +6,7 @@ const HEADER_SECTION_ENDPOINT = '/header-sections';
 export const getHeaderSections = async () => {
   try {
     const response = await api.get(HEADER_SECTION_ENDPOINT);
-    return response;
+    return response.data;
   } catch (error) {
     console.error('Error al obtener las secciones de encabezado:', error);
     throw error;

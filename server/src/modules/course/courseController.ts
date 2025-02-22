@@ -3,11 +3,12 @@ import Course, { CourseCategory } from "./Course";
 import Category from "../category/Category";
 import CareerType from "../careerType/CareerType";
 import Admin from "../admin/Admin";
+import { validationResult } from "express-validator";
 import Section from "../section/Section";
 
 const metadata = (req: any, res: any) => {
   return {
-    status: res.statusCode,
+    statusCode: res.statusCode,
     url: req.protocol + "://" + req.get("host") + req.originalUrl,
   };
 };
@@ -52,7 +53,7 @@ export class CourseController {
       res.status(200).json({
         ...metadata(req, res),
         message: "Cursos activos obtenidos correctamente",
-        length: courses.length, 
+        length: courses.length,
         data: courses,
       });
     } catch (error) {
@@ -98,7 +99,7 @@ export class CourseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
-          { model: Section, as: "sections" }
+          { model: Section, as: "sections" },
         ],
       });
       if (!course) {
@@ -130,7 +131,7 @@ export class CourseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
-          { model: Section, as: "sections" }
+          { model: Section, as: "sections" },
         ],
       });
       res.status(200).json({
@@ -178,8 +179,7 @@ export class CourseController {
       });
       res.status(200).json({
         ...metadata(req, res),
-        message:
-          "Cursos obtenidos correctamente por categoría",
+        message: "Cursos obtenidos correctamente por categoría",
         length: courses.length,
         data: courses,
       });
@@ -220,48 +220,76 @@ export class CourseController {
 
   // Crear un nuevo curso con categorías
   static create: RequestHandler = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        statusCode: 400,
+        status: "error",
+        message: "Error de validaciones",
+        errors: errors.array(),
+      });
+      return;
+    }
+
     try {
-      const { title, image, summary, about, careerTypeId, learningOutcomes, isActive, isInDevelopment, adminId, categoryIds } = req.body;
-      
-      
+      const {
+        title,
+        image,
+        summary,
+        about,
+        careerTypeId,
+        prerequisites,
+        learningOutcomes,
+        isActive,
+        isInDevelopment,
+        adminId,
+        categoryIds,
+      } = req.body;
+
       const newCourse = await Course.create({
         title,
         image,
         summary,
         about,
         careerTypeId,
+        prerequisites,
         learningOutcomes,
         isActive,
         isInDevelopment,
-        adminId
+        adminId,
       });
-      
+
       if (categoryIds && categoryIds.length > 0) {
-        const activeCategories = await Category.findAll({ where: { id: categoryIds, isActive: true } });
-        
+        const activeCategories = await Category.findAll({
+          where: { id: categoryIds, isActive: true },
+        });
+
         if (activeCategories.length !== categoryIds.length) {
           res.status(400).json({
+            ...metadata(req, res),
             status: "error",
             message: "Una o más categorías no están activas",
           });
-          return
+          return;
         }
-        
+
         const courseCategories = categoryIds.map((categoryId: bigint) => ({
           courseId: newCourse.id,
-          categoryId
+          categoryId,
         }));
-        
+
         await CourseCategory.bulkCreate(courseCategories);
       }
 
       res.status(201).json({
         ...metadata(req, res),
-        message: "Curso creado correctamente con categorías",
+        status: "success",
+        message: "Curso creado correctamente",
         data: newCourse,
       });
     } catch (error) {
       res.status(500).json({
+        ...metadata(req, res),
         status: "error",
         message: "Error al crear el curso",
         error,
@@ -269,44 +297,81 @@ export class CourseController {
     }
   };
 
-
   // Actualizar un curso por ID
   static update: RequestHandler = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        statusCode: 400,
+        status: "error",
+        message: "Error de validaciones",
+        errors: errors.array(),
+      });
+      return;
+    }
+
     try {
       const { id } = req.params;
       const {
         title,
         image,
         summary,
+        prerequisites,
         about,
         careerTypeId,
         learningOutcomes,
         isActive,
         isInDevelopment,
         adminId,
+        categoryIds, // 🔹 Nuevo campo
       } = req.body;
+
+      // Buscar el curso
       const course = await Course.findByPk(id);
+
       if (!course) {
-        res
-          .status(404)
-          .json({ status: "error", message: "Curso no encontrado" });
-        return;
+        res.status(404).json({ status: "error", message: "Curso no encontrado" });
+        return
       }
+
+      // Actualizar los datos del curso
       await course.update({
         title,
         image,
         summary,
         about,
+        prerequisites,
         careerTypeId,
         learningOutcomes,
         isActive,
         isInDevelopment,
         adminId,
       });
+
+      // 🔹 Si `categoryIds` existe, actualizar la relación
+      if (Array.isArray(categoryIds)) {
+        // 1️⃣ Eliminar relaciones previas del curso en la tabla intermedia
+        await CourseCategory.destroy({ where: { courseId: id } });
+
+        // 2️⃣ Insertar nuevas relaciones en la tabla intermedia
+        const categoryRelations = categoryIds.map((categoryId: string) => ({
+          courseId: id,
+          categoryId,
+        }));
+
+        await CourseCategory.bulkCreate(categoryRelations);
+      }
+
+      // Obtener el curso actualizado con sus relaciones
+      const updatedCourse = await Course.findByPk(id, {
+        include: [{ model: Category, as: "categories" }],
+      });
+
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Curso actualizado correctamente",
-        data: course,
+        data: updatedCourse,
       });
     } catch (error) {
       res.status(500).json({

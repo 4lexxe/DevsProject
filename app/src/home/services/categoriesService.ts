@@ -7,7 +7,7 @@ const CATEGORY_ENDPOINT = "/categories/actives";
 export const getCategoriesActivesLimited = async (limit: string) => {
   try {
     const response = await api.get(CATEGORY_ENDPOINT + `?limit=${limit}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error al obtener las categorias activas:", error);
     throw error;
@@ -17,7 +17,7 @@ export const getCategoriesActivesLimited = async (limit: string) => {
 export const getCoursesByCategory = async (id: string) => {
   try {
     const response = await api.get(`/courses/category/actives/${id}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error("Error al obtener los cursos de categorias activas:", error);
     throw error;

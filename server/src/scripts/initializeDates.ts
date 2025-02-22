@@ -281,17 +281,24 @@ const curso1 = {
               ],
             },
             {
-              question: "Node.js es un lenguaje de programación.",
-              text: "",
-              image: "",
+              question: "Conceptos de Node.js",
+              text: "Indica si las siguientes afirmaciones son verdaderas o falsas",
               type: "TrueOrFalse",
               answers: [
                 {
-                  answer: "Verdadero",
+                  answer: "Node.js es un entorno de ejecución para JavaScript",
+                  isCorrect: true,
+                },
+                {
+                  answer: "Node.js solo puede ejecutarse en el navegador",
                   isCorrect: false,
                 },
                 {
-                  answer: "Falso",
+                  answer: "Node.js es un lenguaje de programación",
+                  isCorrect: false,
+                },
+                {
+                  answer: "Node.js soporta programación asíncrona",
                   isCorrect: true,
                 },
               ],

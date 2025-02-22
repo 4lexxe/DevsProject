@@ -7,7 +7,7 @@ export const getContentBySection = async (sectionId: string) => {
   try {
     console.log(`Obteniendo contenido para la sección ID: ${sectionId}`);
     const response = await api.get(`${CONTENT}/section/${sectionId}`);
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     console.error(
       `Error al obtener el contenido de la sección (ID: ${sectionId}):`,
@@ -22,7 +22,7 @@ export const getContentById = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
     const response = await api.get(`${CONTENT}/${contentId}`);
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     console.error(
       `Error al obtener el contenido (ID: ${contentId}):`,
@@ -36,7 +36,7 @@ export const getQuizById = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
     const response = await api.get(`${CONTENT}/${contentId}/quiz`);
-    return response.data;
+    return response.data.data;
   } catch (error: any) {
     console.error(
       `Error al obtener el contenido (ID: ${contentId}):`,

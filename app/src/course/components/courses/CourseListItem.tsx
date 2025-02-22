@@ -1,4 +1,4 @@
-import { Category, CareerType } from "@/course/interfaces/viewnerCourseInterface";
+import { Category, CareerType } from "@/course/interfaces/ViewnerCourse";
 
 interface CourseListItemProps {
   id: number;

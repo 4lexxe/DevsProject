@@ -31,7 +31,8 @@ function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            
-            <Route path='course/form' element = {<CourseFormPage/>} />
+            <Route path='/course/form' element = {<CourseFormPage/>} />
+            <Route path='/course/:id/form' element= {<CourseFormPage/>}/>
             <Route path='course/sections/form' element = { <SectionsFormPage/> } />
             <Route path="/recursos" element={<ResourcePage />} />
             <Route path='/course/section/content/:contentId' element={<ContentPage/>} />

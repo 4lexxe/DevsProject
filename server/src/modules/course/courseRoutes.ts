@@ -1,6 +1,7 @@
 import {Router} from 'express';
 
 import { CourseController } from './courseController';
+import { validateCourse } from './courseValidation';
 
 const router = Router();
 
@@ -29,10 +30,10 @@ router.get('/courses/admin/:id', CourseController.getByAdminId)
 router.get('/courses/:id', CourseController.getById);
 
 // Ruta para crear un curso (solo Admin y SuperAdmin)
-router.post('/courses', CourseController.create);
+router.post('/courses', validateCourse, CourseController.create);
 
 // Ruta para actualizar un curso (solo Admin y SuperAdmin)
-router.put('/courses/:id', CourseController.update);
+router.put('/courses/:id', validateCourse, CourseController.update);
 
 // Ruta para eliminar un curso (solo Admin y SuperAdmin)
 router.delete('/courses/:id', CourseController.delete);

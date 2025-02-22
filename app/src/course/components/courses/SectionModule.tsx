@@ -56,7 +56,7 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
         return "from-yellow-400/90 to-orange-500/90";
       default:
         return "from-teal-400/90 to-blue-500/90";
-    }
+    } 
   };
 
   return (

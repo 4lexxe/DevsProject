@@ -3,6 +3,7 @@ import { getCourses } from "../services/courseServices";
 import { getCoursesByCategory } from "@/home/services/categoriesService";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function CoursesPage({ activeByCategory = false }) {
   const { categoryId } = useParams<{ categoryId: string | undefined }>();
@@ -42,6 +43,11 @@ export default function CoursesPage({ activeByCategory = false }) {
         <h1 className="text-4xl font-bold text-center text-black mb-12">
           Todos los Cursos
         </h1>
+        <Link to="/course/form">
+          <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
+            Crear nuevo curso
+          </button>
+        </Link>
         <CoursesList courses={courses} />
       </div>
     </div>

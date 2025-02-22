@@ -1,4 +1,4 @@
-import { Content } from "./Content";
+import { IContent } from "./Content";
 
 export interface Category{
   id: string;
@@ -23,6 +23,7 @@ export interface Course {
   categories: Category[];
   about: string;
   careerType: CareerType;
+  prerequisites: string[];
   learningOutcomes: string[];
   isActive: boolean;
   isInDevelopment: boolean;
@@ -39,6 +40,6 @@ export interface Section {
   lessonsCount: number;
   duration: number;
 
-  contents: Content[];
+  contents: IContent[];
 }
 

@@ -11,7 +11,7 @@ const COURSES_ENDPOINT = '/courses';
 export const getCourses = async () => {
   try {
     const response = await api.get(COURSES_ENDPOINT + "/actives");
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error al obtener los cursos:', error);
     throw error;
@@ -23,7 +23,7 @@ export const getById = async(id: string | undefined) => {
   if(id){
     try {
       const response = await api.get(COURSES_ENDPOINT + `/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error al obtener los cursos:', error);
       throw error;
@@ -35,7 +35,7 @@ export const getById = async(id: string | undefined) => {
 export const createCourse = async (courseData: any) => {
   try {
     const response = await api.post(COURSES_ENDPOINT, courseData);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error al crear el curso desde el service:', error);
     throw error;
@@ -46,7 +46,7 @@ export const createCourse = async (courseData: any) => {
 export const updateCourse = async (id: string, courseData: any) => {
   try {
     const response = await api.put(`${COURSES_ENDPOINT}/${id}`, courseData);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error al actualizar el curso:', error);
     throw error;
@@ -57,7 +57,7 @@ export const updateCourse = async (id: string, courseData: any) => {
 export const deleteCourse = async (id: string) => {
   try {
     const response = await api.delete(`${COURSES_ENDPOINT}/${id}`);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error al eliminar el curso:', error);
     throw error;

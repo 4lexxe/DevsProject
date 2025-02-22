@@ -40,6 +40,18 @@ export const createFullCourse = async (courseData: any) => {
   }
 };
 
+
+export const editFullCourse = async (id:string, courseData: any) => {
+  try {
+    const response = await api.put(`${COURSES_ENDPOINT}/${id}`, courseData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear el curso cons sus categorias y tipo de carrera desde el service:', error);
+    throw error;
+  }
+};
+
+
 // Crear una nueva sección
 export const createSections = async (sectionData: any) => {
   try {

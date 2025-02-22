@@ -2,6 +2,7 @@ import { IContent, IContentInput} from './Content'
 
 // Curso ----------------------------------------------------------------------------------------------------------------------------
 export interface ICourseInput {
+  id?: string;
   title: string;
   image: string;
   summary: string;
@@ -12,6 +13,7 @@ export interface ICourseInput {
   prerequisites?: string[] | "";
   isActive: boolean;
   isInDevelopment: boolean;
+  adminId: string;
 }
 
 export interface ICourse {
@@ -21,11 +23,12 @@ export interface ICourse {
   summary: string;
   categoryIds: string[];
   about: string;
-  careerTypeId?: string;
+  careerTypeId?: string
   learningOutcomes: string[] | "";
   prerequisites?: string[] | "";
   isActive: boolean;
   isInDevelopment: boolean;
+  adminId: string;
 }
 
 // Seccion ----------------------------------------------------------------------------------------------------------------------------

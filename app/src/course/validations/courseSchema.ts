@@ -4,7 +4,7 @@ export const courseSchema = z
   .object({
     title: z
       .string()
-      .min(3, { message: "El título debe tener al menos 3 caracteres" })
+      .min(5, { message: "El título debe tener al menos 5 caracteres" })
       .nonempty({ message: "El título es obligatorio" }),
 
     image: z
@@ -28,9 +28,9 @@ export const courseSchema = z
       .min(20, { message: "La descripción debe tener al menos 20 caracteres" })
       .optional(),
 
-    prerequisites: z.array(z.string()).optional(),
+    prerequisites: z.array(z.string()).optional().or(z.literal(null)),
 
-    careerTypeId: z.string().optional(),
+    careerTypeId: z.string().optional().or(z.literal(null)),
 
     learningOutcomes: z
       .array(z.string(), { message: "Tipo invalido" })
@@ -38,6 +38,7 @@ export const courseSchema = z
 
     isActive: z.boolean(),
     isInDevelopment: z.boolean(),
+    adminId: z.string()
   })
   .refine((data) => data.isActive !== data.isInDevelopment, {
     message: "El curso no puede estar activo y en desarrollo a la vez",
