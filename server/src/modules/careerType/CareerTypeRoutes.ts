@@ -1,5 +1,5 @@
 import { Router } from "express";
-import CareerTypeController from "./careerTypeController";
+import CareerTypeController from "./CareerTypeController";
 
 const router = Router();
 

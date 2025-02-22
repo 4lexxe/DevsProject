@@ -14,8 +14,8 @@ import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
 
 /* Rutas relacionadas con el area de cursos */
-import careerTypeRoutes from './modules/careerType/careerTypeRoutes'
-import categoryRoutes from './modules/category/categoryRoutes'
+import careerTypeRoutes from './modules/careerType/CareerTypeRoutes'
+import categoryRoutes from './modules/category/CategoryRoutes'
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 //Contenidos

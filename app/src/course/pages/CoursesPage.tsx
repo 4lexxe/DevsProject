@@ -38,18 +38,27 @@ export default function CoursesPage({ activeByCategory = false }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 to-neutral-100">
-      <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-center text-black mb-12">
-          Todos los Cursos
-        </h1>
-        <Link to="/course/form">
-          <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
-            Crear nuevo curso
-          </button>
-        </Link>
-        <CoursesList courses={courses} />
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-5xl mx-auto">
+        {/* Header section */}
+        <div className="px-4 py-6 md:py-8 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl md:text-2xl font-semibold text-gray-900">
+              Todos los Cursos
+            </h1>
+            <Link to="/course/form">
+              <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                Crear curso
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Courses list section */}
+        <div className="pb-20">
+          <CoursesList courses={courses} />
+        </div>
       </div>
     </div>
   );
-}
+};
