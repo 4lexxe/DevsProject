@@ -13,23 +13,19 @@ type SocialLink = {
 
 const menuItems = {
   column1: [
-    { label: "Inicio", href: "/" },
+    { label: "Inicio", href: "/" }, 
     { label: "Cursos", href: "/cursos" },
-    { label: "Instructores", href: "/instructores" },
-    { label: "Precios", href: "/precios" },
   ],
   column2: [
-    { label: "Sobre Nosotros", href: "/nosotros" },
-    { label: "Blog", href: "/blog" },
+    { label: "Sobre Nosotros", href: "/sobre-nosotros" },
     { label: "Contacto", href: "/contacto" },
-    { label: "Soporte", href: "/soporte" },
   ],
 }
 
 const socialLinks: (SocialLink & { color: string })[] = [
-  { icon: faDiscord, href: "#", label: "Discord", isFontAwesome: true, color: "#171515" },
-  { icon: faWhatsapp, href: "#", label: "WhatsApp", isFontAwesome: true, color: "#171515" },
-  { icon: Github, href: "#", label: "GitHub", isFontAwesome: false, color: "#171515" },
+  { icon: faDiscord, href: "https://discord.gg/sfkZkv5cZs", label: "Discord", isFontAwesome: true, color: "#171515" },
+  { icon: faWhatsapp, href: "https://chat.whatsapp.com/ImICgrdizYG2elipsk7SwN", label: "WhatsApp", isFontAwesome: true, color: "#171515" },
+  { icon: Github, href: "https://github.com/4lexxe/DevsProject", label: "GitHub", isFontAwesome: false, color: "#171515" },
   { icon: Youtube, href: "#", label: "YouTube", isFontAwesome: false, color: "#171515" },
 ]
 

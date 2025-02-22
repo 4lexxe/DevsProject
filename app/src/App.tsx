@@ -19,6 +19,7 @@ import Home from "./home/home";
 import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage } from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./auth/auth";
+import AboutUs from "./shared/components/navigation/AboutUs";
 
 import LearnRoute from './learnroute/pages/LearnRoute';
 import ResourcePage from './recourse/pages/resources/resourcePages';
@@ -88,7 +89,7 @@ function App() {
               }
             />
 
-            
+
 
             <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
               <Route
@@ -109,10 +110,12 @@ function App() {
               }
             />
 
+            <Route path="/sobre-nosotros" element={<AboutUs />} />
+
             {/* Ruta específica para /not-found */}
             <Route path="/not-found" element={<NotFound />} />
 
-            <Route path="*" element={<NotFound/>} />
+            <Route path="*" element={<NotFound />} />
 
           </Route>
         </Routes>
