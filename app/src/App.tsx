@@ -66,6 +66,9 @@ function App() {
               <Route path="/resources/create" element={<CreateResourceForm />} />
             </Route>
 
+            <Route path="/resources/:id/edit" element={<CreateResourceForm />} />
+
+
             <Route path="/resources/:id" element={<ResourceDetailsPage />} />
             <Route
               path="/ruta-aprendizaje"
@@ -84,6 +87,8 @@ function App() {
                 </QueryClientProvider>
               }
             />
+
+            
 
             <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
               <Route

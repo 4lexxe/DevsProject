@@ -11,7 +11,7 @@ export interface Comment {
   User?: {
     id: number;
     name: string;
-    avatar?: string;
+    avatar?: string;  
   };
 }
 

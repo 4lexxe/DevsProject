@@ -1,7 +1,7 @@
 import type React from "react";
 import { Link } from "react-router-dom";
 import RegisterForm from "../components/register/RegisterForm";
-//import AnotherWay from "../components/register/AnotherWay";
+import AnotherWay from "../components/register/AnotherWay";
 import withAuthCheck from "../hoc/WithAuthCheck";
 
 function RegisterPage() {
@@ -12,6 +12,7 @@ function RegisterPage() {
         
         <RegisterForm />
 
+        <AnotherWay />
 
         <p className="mt-6 text-center text-sm text-gray-600">
           ¿Ya tienes una cuenta?{" "}

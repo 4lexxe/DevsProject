@@ -4,6 +4,7 @@ import { UserService } from "../../../profile/services/user.service";
 import ResourceListHeader from "../../navigation/ResourceListHeader";
 import ResourceCard from "../../components/ResourceCard";
 
+
 interface Resource {
   id: number;
   type: string;
@@ -90,7 +91,7 @@ const ResourceListPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <ResourceListHeader />
 
         {/* Mostrar mensaje de error si ocurre */}

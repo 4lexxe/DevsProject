@@ -9,6 +9,7 @@ interface InputFileProps {
   value: string | null; // URL de la imagen seleccionada (si existe)
   onChange: (fileUrl: string | null) => void; // Callback para pasar la URL o limpiarla
   error?: string; // Mensaje de error (opcional)
+  disabled?: boolean; // Deshabilitar el campo (opcional)
 }
 
 const InputFile: React.FC<InputFileProps> = ({ value, onChange, error }) => {
@@ -142,14 +143,6 @@ const InputFile: React.FC<InputFileProps> = ({ value, onChange, error }) => {
               </div>
             </div>
           </div>
-          {/* Mostrar la URL de la imagen */}
-          {previewUrl && (
-            <div className="mt-2">
-              <p className="text-sm text-gray-500 break-all">
-                URL: <span className="text-blue-600">{previewUrl}</span>
-              </p>
-            </div>
-          )}
         </div>
       )}
       {/* Estado de carga */}
