@@ -20,6 +20,11 @@ export type Quiz = {
   }>;
 };
 
+export type Resource = {
+  title: string;
+  url: string;
+}
+
 export interface IContentInput {
   title: string;
   text: string;
@@ -27,27 +32,20 @@ export interface IContentInput {
   linkType?: linkType;
   link?: string;
   quiz?: Quiz[];
-  resources?: Array<{
-    title: string;
-    url: string;
-  }>;
+  resources?: Resource[];
   duration: number;
   position: number;
 }
 
 export interface IContent {
   id: string;
-  sectionId: string;
   title: string;
   text: string;
   markdown?: string;
   linkType?: linkType;
   link?: string;
   quiz?: Quiz[];
-  resources?: Array<{
-    title: string;
-    url: string;
-  }>;
+  resources?: Resource[];
   duration: number;
   position: number;
 }

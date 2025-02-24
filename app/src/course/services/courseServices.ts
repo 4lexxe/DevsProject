@@ -19,7 +19,7 @@ export const getCourses = async () => {
 };
 
 // Obtener curso por id
-export const getById = async(id: string | undefined) => {
+export const getById = async(id: string) => {
   if(id){
     try {
       const response = await api.get(COURSES_ENDPOINT + `/${id}`);

@@ -38,8 +38,8 @@ export const getSectionById = async (id: string) => {
 // Actualizar una sección existente
 export const updateSection = async (id: string, sectionData: any) => {
   try {
-    const response = await api.put(`${SECTIONS_ENDPOINT}/${id}`, sectionData);
-    return response.data.data;
+    const response = await api.put(`${SECTIONS_ENDPOINT}/${id}/contents`, sectionData);
+    return response.data;
   } catch (error) {
     console.error('Error al actualizar la sección:', error);
     throw error;

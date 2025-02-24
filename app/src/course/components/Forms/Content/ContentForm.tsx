@@ -1,31 +1,20 @@
-import { useState, useEffect } from "react";
 import { useForm, type SubmitHandler, useFieldArray } from "react-hook-form";
-import {
-  IContentInput,
-  linkTypes,
-  quizTypes,
-} from "@/course/interfaces/Content";
+import { type IContentInput, linkTypes } from "@/course/interfaces/Content";
 
 import MarkdownPreview from "../previews/MarkdownPreview";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
-import { Save, X } from "lucide-react";
-
+import { Save, X, Plus, Trash2 } from "lucide-react";
+import { useSectionContext } from "@/course/context/SectionFormContext";
+import { useQuizContext } from "@/course/context/QuizFormContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contentSchema } from "@/course/validations/contentSchema";
-import { useCourseContext } from "@/course/context/CourseFormContext";
-import { useQuizContext } from "@/course/context/QuizFormContext";
 
-interface propsContentForm {
-  sectionId: string;
-}
-
-export default function ContentForm({ sectionId }: propsContentForm) {
-  const { state: courseState, saveContent, cancelEdit } = useCourseContext();
-  const initialData = courseState.editingContent;
-  const { quizState, startAddingQuiz, startEditingQuiz } = useQuizContext();
+export default function ContentForm() {
+  const { state: sectionState, saveContent, cancelEdit } = useSectionContext();
+  const initialData = sectionState.editingContent;
 
   const {
     register,
@@ -34,20 +23,14 @@ export default function ContentForm({ sectionId }: propsContentForm) {
     control,
     formState: { errors },
   } = useForm<IContentInput>({
-    /* resolver: zodResolver(contentSchema), */
+    resolver: zodResolver(contentSchema),
     defaultValues: {
       title: initialData?.title || "",
       text: initialData?.text || "",
-
       markdown: initialData?.markdown || undefined,
-
       linkType: initialData?.linkType || undefined,
       link: initialData?.link || undefined,
-
-      quiz: quizState || undefined,
-
       resources: initialData?.resources || undefined,
-
       duration: initialData?.duration || undefined,
       position: initialData?.position || 0,
     },
@@ -65,12 +48,11 @@ export default function ContentForm({ sectionId }: propsContentForm) {
   });
 
   const onSubmit: SubmitHandler<IContentInput> = async (data) => {
-    saveContent(sectionId, data);
+    saveContent(data);
   };
 
   return (
     <div className="w-full mx-auto p-6">
-      {/* max-w-4xl */}
       <h2 className="text-2xl font-semibold mb-6">Añadir Nuevo Contenido</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -121,55 +103,82 @@ export default function ContentForm({ sectionId }: propsContentForm) {
         </div>
 
         <div className="space-y-4">
-          {(quizState.length > 0) ? (
-            <button
-              className="px-4 py-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
-              onClick={startEditingQuiz}
-            >
-              Editar Cuestionario
-            </button>
-          ) : (
-            <button
-              className="px-4 py-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
-              onClick={startAddingQuiz}
-            >
-              Añadir Cuestionario
-            </button>
-          )}
-        </div>
-
-        <div className="space-y-4">
           <h3 className="text-lg font-semibold">Resources</h3>
-          {resourceFields.map((field, index) => (
-            <div key={field.id} className="p-4 border rounded-md space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Resource Title"
-                  {...register(`resources.${index}.title` as const)}
-                  className="w-full p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  placeholder="Resource URL"
-                  {...register(`resources.${index}.url` as const)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <button
-                type="button"
-                className="px-3 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200"
-                onClick={() => removeResource(index)}
+          {resourceFields.map((field, index) => {
+            const titleError = errors?.resources?.[index]?.title;
+            const urlError = errors?.resources?.[index]?.url;
+
+            return (
+              <div
+                key={field.id}
+                className="p-4 border rounded-md space-y-4 shadow-sm"
               >
-                Remove Resource
-              </button>
-            </div>
-          ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* 🔹 Campo de título del recurso */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Resource Title
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Resource Title"
+                      {...register(`resources.${index}.title` as const)}
+                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${
+                        titleError
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
+                      }`}
+                    />
+                    {titleError && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {titleError.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* 🔹 Campo de URL del recurso */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Resource URL
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Resource URL"
+                      {...register(`resources.${index}.url` as const)}
+                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${
+                        urlError
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-blue-500"
+                      }`}
+                    />
+                    {urlError && (
+                      <p className="mt-1 text-xs text-red-500">
+                        {urlError.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 🔹 Botón para eliminar recurso */}
+                <button
+                  type="button"
+                  className="flex items-center px-3 py-1 text-sm text-red-600 bg-red-100 rounded-md hover:bg-red-200"
+                  onClick={() => removeResource(index)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Remove Resource
+                </button>
+              </div>
+            );
+          })}
+
+          {/* 🔹 Botón para agregar nuevo recurso */}
           <button
             type="button"
-            className="px-4 py-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200"
+            className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200"
             onClick={() => appendResource({ title: "", url: "" })}
           >
+            <Plus className="w-4 h-4 mr-2" />
             Add Resource
           </button>
         </div>

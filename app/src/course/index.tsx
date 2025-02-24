@@ -7,6 +7,6 @@ export { default as CourseDetail } from './pages/CourseDetail'
 export { default as QuizPage } from './pages/QuizPage'
 export { default as Profile } from '../profile/Profile'
 
-export { default as SectionsFormPage } from './pages/SectionsFormPage'
+export { default as SectionFormPage } from './pages/SectionFormPage'
 
 export { default as ContentPage } from './pages/ContentPage'

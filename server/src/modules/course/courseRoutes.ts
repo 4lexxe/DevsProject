@@ -1,33 +1,34 @@
 import {Router} from 'express';
 
-import { CourseController } from './courseController';
+import CourseController from './Controller/courseController';
+import CourseGetController from './Controller/courseGetController';
 import { validateCourse } from './courseValidation';
 
 const router = Router();
 
 // Ruta para obtener todos los cursos (público)
-router.get('/courses', CourseController.getAll);
+router.get('/courses', CourseGetController.getAll);
 
 // Obtener todos los curso activos
-router.get('/courses/actives', CourseController.getActiveCourses)
+router.get('/courses/actives', CourseGetController.getActiveCourses)
 
 // Obtener todos los cursos en desarrollo
-router.get('/courses/development', CourseController.getInDevelopmentCourses)
+router.get('/courses/development', CourseGetController.getInDevelopmentCourses)
 
 // Obtener conteo de todos los cursos
-router.get('/courses/count', CourseController.getTotalCount)
+router.get('/courses/count', CourseGetController.getTotalCount)
 
 // Obtener todos los cursos por categoria
-router.get('/courses/category/actives/:categoryId', CourseController.getByCategory)
+router.get('/courses/category/actives/:categoryId', CourseGetController.getByCategory)
 
 // Obtener todos los cursos por tipo de carrera
-router.get('/courses/careerType', CourseController.getByCareerType)
+router.get('/courses/careerType', CourseGetController.getByCareerType)
 
 // Obtener los cursos por admin
-router.get('/courses/admin/:id', CourseController.getByAdminId)
+router.get('/courses/admin/:id', CourseGetController.getByAdminId)
 
 // Ruta para obtener un curso por ID (público)
-router.get('/courses/:id', CourseController.getById);
+router.get('/courses/:id', CourseGetController.getById);
 
 // Ruta para crear un curso (solo Admin y SuperAdmin)
 router.post('/courses', validateCourse, CourseController.create);

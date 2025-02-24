@@ -1,4 +1,5 @@
 import { IContent } from "./Content";
+import { IContentApi } from "./Content";
 
 export interface Category{
   id: string;
@@ -39,7 +40,8 @@ export interface Section {
   coverImage: string;
   lessonsCount: number;
   duration: number;
+  course: Course,
 
-  contents: IContent[];
+  contents: IContentApi[];
 }
 

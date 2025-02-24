@@ -9,11 +9,11 @@ import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { X, Save } from "lucide-react";
 import { sectionSchema, moduleTypes } from "@/course/validations/sectionSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCourseContext } from "@/course/context/CourseFormContext"; 
+import { useSectionContext } from "@/course/context/SectionFormContext"; 
 
 export default function SectionForm() {
-  const { state: sectionState, saveSection, cancelEdit } = useCourseContext();
-  const initialData = sectionState.editingSection;
+  const { state: sectionState, cancelEdit, setSection, editSection } = useSectionContext();
+  const initialData = sectionState.section;
  
   const {
     register,
@@ -30,7 +30,11 @@ export default function SectionForm() {
   });
 
   const onSubmit: SubmitHandler<ISectionInput> = (data: ISectionInput): void => {
-    saveSection(data) 
+    if(!sectionState.isEditingSection){
+      setSection({...data, contents: []}) 
+    } else {
+      editSection(data)
+    }
   };
 
   return (
@@ -85,7 +89,7 @@ export default function SectionForm() {
             <X className="w-4 h-4 mr-2" />
             Cancel
           </button>
-          
+           
           <button
             type="submit"
             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"

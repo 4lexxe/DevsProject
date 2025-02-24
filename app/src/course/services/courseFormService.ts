@@ -52,10 +52,10 @@ export const editFullCourse = async (id:string, courseData: any) => {
 };
 
 
-// Crear una nueva sección
-export const createSections = async (sectionData: any) => {
+// Crear una nueva sección con contenidos
+export const createSection = async (sectionData: any) => {
   try {
-    const response = await api.post(SECTIONS_ENDPOINT, sectionData);
+    const response = await api.post(SECTIONS_ENDPOINT + "/contents", sectionData);
     return response.data;
   } catch (error) {
     console.error('Error al crear las secciones con sus contenidos:', error);
@@ -63,3 +63,13 @@ export const createSections = async (sectionData: any) => {
   }
 };
 
+// actualizar una sección con contenidos
+export const editSection = async (sectionData: any) => {
+  try {
+    const response = await api.put(SECTIONS_ENDPOINT + "/contents", sectionData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear las secciones con sus contenidos:', error);
+    throw error;
+  }
+};

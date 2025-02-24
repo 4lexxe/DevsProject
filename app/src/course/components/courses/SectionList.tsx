@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { getSectionsByCourse } from '../../services/sectionServices';
-import SectionModule from './SectionModule';
-import { Section } from '@/course/interfaces/ViewnerCourse';
+import React, { useEffect, useState } from "react";
+import { getSectionsByCourse } from "../../services/sectionServices";
+import SectionModule from "./SectionModule";
+import { Section } from "@/course/interfaces/ViewnerCourse";
+import { Link } from "react-router-dom";
+import { div } from "@tensorflow/tfjs";
 
 interface SectionListProps {
   courseId: string;
@@ -18,13 +20,12 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       try {
         setLoading(true);
         const response = await getSectionsByCourse(courseId);
-        console.log("Holanda", response)
-        
+
         setSections(response);
         setSectionCount(response.length);
       } catch (err) {
-        console.error('Error fetching sections:', err);
-        setError('No se pudieron cargar las secciones del curso');
+        console.error("Error fetching sections:", err);
+        setError("No se pudieron cargar las secciones del curso");
       } finally {
         setLoading(false);
       }
@@ -62,7 +63,9 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
   if (sections.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">No hay secciones disponibles para este curso.</p>
+        <p className="text-gray-500">
+          No hay secciones disponibles para este curso.
+        </p>
       </div>
     );
   }
@@ -70,17 +73,32 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Módulos del Curso
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900">Módulos del Curso</h2>
         <span className="text-sm text-gray-500">
-          {sectionCount} {sectionCount === 1 ? 'módulo' : 'módulos'} en total
+          {sectionCount} {sectionCount === 1 ? "módulo" : "módulos"} en total
         </span>
       </div>
       <div className="grid grid-cols-1 gap-4">
         {sections.map((section) => (
-          <SectionModule key={section.id} section={section} />
+          <div key={section.id}>
+            <SectionModule section={section} />
+            <Link
+              to={`/course/${section.course.id}/section/${section.id}/form`}
+            >
+              <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
+                Editar esta sección
+              </button>
+            </Link>
+          </div>
         ))}
+      </div>
+
+      <div className="my-8">
+        <Link to={`/course/${sections[0].course.id}/section/form`}>
+          <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
+            Añadir una nueva sección
+          </button>
+        </Link>
       </div>
     </div>
   );

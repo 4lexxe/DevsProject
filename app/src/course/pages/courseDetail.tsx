@@ -18,21 +18,23 @@ const CourseDetails: React.FC = () => {
 
   useEffect(() => {
     const fetchCourseData = async () => {
-      try {
-        setLoading(true);
-        const course = await getById(id);
-        if (course) {
-          setCourse(course);
-          const count = course.sections.length;
-          setModuleCount(count);
-        } else {
-          setError("Curso no encontrado.");
+      if (id) {
+        try {
+          setLoading(true);
+          const course = await getById(id);
+          if (course) {
+            setCourse(course);
+            const count = course.sections.length;
+            setModuleCount(count);
+          } else {
+            setError("Curso no encontrado.");
+          }
+        } catch (err) {
+          console.error("Error al cargar el curso:", err);
+          setError("Hubo un error al cargar los datos del curso.");
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Error al cargar el curso:", err);
-        setError("Hubo un error al cargar los datos del curso.");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -75,12 +77,14 @@ const CourseDetails: React.FC = () => {
             />
 
             {/* Sections List */}
-            <div className="mt-12"> 
+            <div className="mt-12">
               <SectionList courseId={id || ""} />
             </div>
           </div>
           <div className="lg:col-span-1 flex flex-col items-center space-y-6">
-            <Prerequisites prerequisites={course.prerequisites}/>
+            {course.prerequisites.length > 0 && (
+              <Prerequisites prerequisites={course.prerequisites} />
+            )}
             <LearningOutcomes outcomes={course.learningOutcomes} />
 
             <Link to={`/course/${course.id}/form`}>

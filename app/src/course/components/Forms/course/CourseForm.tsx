@@ -24,9 +24,7 @@ import {
 
 export default function CourseForm({ course }: { course?: ICourse }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [status, setStatus] = useState<"success" | "error" | undefined>(
-    undefined
-  );
+  const [status, setStatus] = useState<"success" | "error" | undefined>(undefined);
   const [message, setMessage] = useState<string>();
   // Se obtienen datos de las categorias y tipo de carrera del backend para poder ser seleccionadas
   const [categories, setCategories] = useState<any[]>([]);
@@ -63,102 +61,63 @@ export default function CourseForm({ course }: { course?: ICourse }) {
     if (course) {
       reset(course);
     }
-  }, [course]);
+  }, [course, reset]);
 
   /* Cargar las categorias y carreras para seleccionar */
   useEffect(() => {
-    const getCategoriesF = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getCategories();
-
-        setCategories(data.data);
+        const [categoriesData, careerTypesData] = await Promise.all([
+          getCategories(),
+          getCareerTypes(),
+        ]);
+        setCategories(categoriesData.data);
+        setCareerTypes(careerTypesData.data);
       } catch (err) {
-        console.error("Error al cargar las categorías", err);
+        console.error("Error al cargar datos", err);
       }
     };
-
-    const getCareerTypesF = async () => {
-      try {
-        const data = await getCareerTypes();
-        setCareerTypes(data.data);
-      } catch (err) {
-        console.error("Error al cargar las categorías", err);
-      }
-    };
-
-    getCategoriesF();
-    getCareerTypesF();
+    fetchData();
   }, []);
 
   /* Manejar el envio de la data del formulario al backend */
-  const handleCreateCourse = async (courseData: any) => {
-    try {
-      const response = await createFullCourse(courseData);
-
-      setStatus(response.status);
-      setMessage(response.message);
-
-      if (response.statusCode === 201) {
-        setTimeout(() => {
-          navigate(`/course/${response.data.id}`);
-        }, 2000);
-      }
-    } catch (err: any) {
-      setMessage(err.response.data.message);
-      setStatus("error");
-      if (err.response.data.errors) {
-        setErrors2(err.response.data.errors.map((error: any) => error.msg));
-      }
-      console.log("Error al crear el curso. Inténtalo nuevamente.", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  /* Manejar el envio de la data del formulario al backend */
-  const handleEditCourse = async (courseData: any) => {
-    try {
-      const response = await editFullCourse(
-        course ? course.id : "1",
-        courseData
-      );
-
-      setStatus(response.status);
-      setMessage(response.message);
-
-      if (response.statusCode === 200) {
-        setTimeout(() => {
-          navigate(`/course/${response.data.id}`);
-        }, 2000);
-      }
-    } catch (err: any) {
-      setMessage(err.response.data.message);
-      setStatus("error");
-      if (err.response.data.errors) {
-        setErrors2(err.response.data.errors.map((error: any) => error.msg));
-      }
-      console.log("Error al editar el curso. Inténtalo nuevamente.", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const onSubmit: SubmitHandler<ICourseInput> = (data: ICourseInput): void => {
+  const handleSubmitCourse = async (courseData: any) => {
     setIsLoading(true);
-    setTimeout(() => {
-      const newData = {
-        ...data,
-        categoryIds: data.categoryIds?.map(Number) ?? [], // Asegura que sea un array de números o vacío
-        careerTypeId: data.careerTypeId ? Number(data.careerTypeId) : null, // Convierte solo si existe
-        adminId: Number(data.adminId),
-      };
+    try {
+      const response = course
+        ? await editFullCourse(course.id, courseData)
+        : await createFullCourse(courseData);
 
-      if (course) {
-        handleEditCourse(newData);
-      } else {
-        handleCreateCourse(newData);
+      setStatus(response.status);
+      setMessage(response.message);
+
+      if (response.statusCode === (course ? 200 : 201)) {
+        setTimeout(() => {
+          navigate(`/course/${response.data.id}`);
+
+        }, 500)
       }
-    }, 1000);
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "Error desconocido");
+      setStatus("error");
+      if (err.response?.data?.errors) {
+        setErrors2(err.response.data.errors.map((error: any) => error.msg));
+      }
+      console.error("Error al guardar el curso:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmit: SubmitHandler<ICourseInput> = (data) => {
+    setTimeout(() => {
+      handleSubmitCourse({
+        ...data,
+        categoryIds: data.categoryIds?.map(Number) ?? [],
+        careerTypeId: data.careerTypeId ? Number(data.careerTypeId) : null,
+        adminId: Number(data.adminId),
+      });
+    }, 500)
   };
   const getButtonClasses = () => {
     const baseClasses =

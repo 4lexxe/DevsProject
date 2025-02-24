@@ -7,7 +7,7 @@ import '@/shared/assets/styles/main.css';
 import DefaultLayout from './shared/layouts/defaultLayout';
 import Home from './home/home';
 
-import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionsFormPage, ContentPage }from '@/course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage }from '@/course/index';
 
 import { LoginPage, RegisterPage } from './auth/auth';
 
@@ -33,7 +33,8 @@ function App() {
             <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            
             <Route path='/course/form' element = {<CourseFormPage/>} />
             <Route path='/course/:id/form' element= {<CourseFormPage/>}/>
-            <Route path='course/sections/form' element = { <SectionsFormPage/> } />
+            <Route path='course/:courseId/section/form' element = { <SectionFormPage/> } />
+            <Route path='course/:courseId/section/:sectionId/form' element = { <SectionFormPage/> } />
             <Route path="/recursos" element={<ResourcePage />} />
             <Route path='/course/section/content/:contentId' element={<ContentPage/>} />
             <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />

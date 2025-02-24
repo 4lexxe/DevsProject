@@ -9,29 +9,33 @@ function CourseFormPage() {
 
   useEffect(() => {
     const getCourse = async () => {
-      try {
-        const c = await getById(id);
-        setCourse(transformCourseData(c));
-      } catch (err) {
-        console.error("Hubo un error: ", err);
+      if (id) {
+        try {
+          const c = await getById(id);
+          setCourse(transformCourseData(c));
+        } catch (err) {
+          console.error("Hubo un error: ", err);
+        }
       }
     };
 
-    if (id) {
-      getCourse();
-    }
+    getCourse();
   }, []);
 
   const transformCourseData = (course: any) => {
     return {
       ...course,
-      categoryIds: course.categories.map((category: any) => category.id), 
+      categoryIds: course.categories.map((category: any) => category.id),
       careerTypeId: course.careerTypeId || "",
-      learningOutcomes: Array.isArray(course.learningOutcomes) 
-        ? (course.learningOutcomes.length > 0 ? course.learningOutcomes.join("\n") : "") 
+      learningOutcomes: Array.isArray(course.learningOutcomes)
+        ? course.learningOutcomes.length > 0
+          ? course.learningOutcomes.join("\n")
+          : ""
         : "",
-      prerequisites: Array.isArray(course.prerequisites) 
-        ? (course.prerequisites.length > 0 ? course.prerequisites.join("\n") : "") 
+      prerequisites: Array.isArray(course.prerequisites)
+        ? course.prerequisites.length > 0
+          ? course.prerequisites.join("\n")
+          : ""
         : "",
     };
   };

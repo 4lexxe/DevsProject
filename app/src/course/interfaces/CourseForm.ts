@@ -1,4 +1,4 @@
-import { IContent, IContentInput} from './Content'
+import { IContent, IContentInput } from "./Content";
 
 // Curso ----------------------------------------------------------------------------------------------------------------------------
 export interface ICourseInput {
@@ -23,7 +23,7 @@ export interface ICourse {
   summary: string;
   categoryIds: string[];
   about: string;
-  careerTypeId?: string
+  careerTypeId?: string;
   learningOutcomes: string[] | "";
   prerequisites?: string[] | "";
   isActive: boolean;
@@ -40,7 +40,6 @@ export interface ISectionInput {
   coverImage: string;
 }
 export interface ISection {
-  id: string;
   title: string;
   description: string;
   moduleType: string;
@@ -49,14 +48,16 @@ export interface ISection {
 }
 
 export interface ISectionState {
-  sections: ISection[];
-  editingSection: ISection | null;
-  isAddingSection: boolean;
+  section: ISection | null;
+  isEditingSection: boolean; // 🔹 Indica si la sección está en edición
+  editingContent: IContent | null;
+  isAddingContent: boolean;
+  isEditingContent: boolean; // 🔹 Indica si un contenido está en edición
 }
 
+
+
 // Contenido ----------------------------------------------------------------------------------------------------------------------------
-
-
 
 export interface SectionListProps {
   sections: ISectionInput[];

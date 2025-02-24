@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import ContentViewer from "../contentViewner/ContentViewer";
 import { Section } from "@/course/interfaces/ViewnerCourse";
+import { Link } from "react-router-dom";
 
 interface SectionModuleProps {
   section: Section;
