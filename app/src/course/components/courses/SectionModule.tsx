@@ -11,6 +11,7 @@ import {
 import ContentViewer from "../contentViewner/ContentViewer";
 import { Section } from "@/course/interfaces/ViewnerCourse";
 import { Link } from "react-router-dom";
+import EditSectionButton from "./EditSectionButton";
 
 interface SectionModuleProps {
   section: Section;
@@ -63,7 +64,7 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
   return (
     <div className="bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100">
       <div
-        className="cursor-pointer"
+        className="cursor-pointer relative"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="relative">
@@ -82,6 +83,12 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
             {/* Gradient overlay */}
             <div
               className={`absolute inset-0 bg-gradient-to-r ${getGradient()}`}
+            />
+
+            {/* Edit button */}
+            <EditSectionButton 
+              courseId={section.course.id.toString()} 
+              sectionId={section.id.toString()}
             />
 
             {/* Module icon */}

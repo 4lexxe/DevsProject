@@ -6,8 +6,8 @@ import CourseOverview from "../components/courses/CourseOverview";
 import LearningOutcomes from "../components/courses/LearningOutcomes";
 import Prerequisites from "../components/courses/Prerequisites";
 import SectionList from "../components/courses/SectionList";
+import AddSectionButton from "../components/courses/AddSectionButton";
 import { Course } from "../interfaces/ViewnerCourse";
-import { Link } from "react-router-dom";
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,7 +37,6 @@ const CourseDetails: React.FC = () => {
         }
       }
     };
-
     fetchCourseData();
   }, [id]);
 
@@ -62,6 +61,7 @@ const CourseDetails: React.FC = () => {
           description={course.summary}
           image={course.image}
           categories={course.categories}
+          courseId={id} // Pasamos el ID del curso aquí
         />
       </div>
 
@@ -75,8 +75,17 @@ const CourseDetails: React.FC = () => {
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />
-
             {/* Sections List */}
+            {/* Contenedor del título, contador y botón */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Módulos del Curso
+                </h2>
+              </div>
+              {/* Botón "Añadir una nueva sección" */}
+              <AddSectionButton courseId={id || ""} />
+            </div>
             <div className="mt-12">
               <SectionList courseId={id || ""} />
             </div>
@@ -86,12 +95,6 @@ const CourseDetails: React.FC = () => {
               <Prerequisites prerequisites={course.prerequisites} />
             )}
             <LearningOutcomes outcomes={course.learningOutcomes} />
-
-            <Link to={`/course/${course.id}/form`}>
-              <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
-                Editar curso
-              </button>
-            </Link>
           </div>
         </div>
       </div>
