@@ -91,7 +91,7 @@ const CourseDetails: React.FC = () => {
             </div>
           </div>
           <div className="lg:col-span-1 flex flex-col items-center space-y-6">
-            {course.prerequisites.length > 0 && (
+            {course.prerequisites && course.prerequisites.length > 0 && (
               <Prerequisites prerequisites={course.prerequisites} />
             )}
             <LearningOutcomes outcomes={course.learningOutcomes} />
