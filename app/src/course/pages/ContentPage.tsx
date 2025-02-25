@@ -14,8 +14,7 @@ const ContentPage: React.FC = () => {
       if (!contentId) return; // Evita hacer la petición si no hay un ID válido
       try {
         const data = await getContentById(contentId);
-        const data2 = { ...data, resources: JSON.parse(data.resources) };
-        setContent(data2);
+        setContent(data);
       } catch (err) {
         console.error("Error al obtener el contenido:", err);
       }
@@ -23,10 +22,6 @@ const ContentPage: React.FC = () => {
 
     fetchContent();
   }, [contentId]); // Se ejecuta cuando `contentId` cambia
-
-  /* useEffect(() => {
-        console.log(content)
-    }, [content]) */
 
   if (!content) {
     return (

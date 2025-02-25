@@ -22,10 +22,6 @@ function QuizPage() {
     fetchContent();
   }, [contentId]); // Se ejecuta cuando `contentId` cambia
 
-  /* useEffect(() => {
-    console.log(quiz);
-  }, [quiz]); */
-
   if(quiz === null){
     return(
       <div className="min-h-screen flex items-center justify-center  from-blue-50 via-white to-purple-50">

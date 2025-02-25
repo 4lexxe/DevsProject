@@ -17,21 +17,21 @@ const QuizCustomInput: React.FC<CustomInputProps> = ({
   error,
 }) => {
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+    <div className="flex flex-col gap-1.5 w-full">
+      <label htmlFor={id} className="text-sm font-semibold text-gray-700">
         {label}
       </label>
       <input
         id={id}
         type={type}
         {...register}
-        className={`w-full px-3 py-2 border ${
+        className={`w-full px-4 py-2.5 border transition-all duration-200 ${
           error ? "border-red-500" : "border-gray-300"
-        } rounded-md focus:outline-none focus:ring-2 ${
-          error ? "focus:ring-red-500" : "focus:ring-blue-500"
-        }`}
+        } rounded-lg shadow-sm focus:outline-none focus:ring-2 ${
+          error ? "focus:ring-red-500/20" : "focus:ring-blue-500/20"
+        } focus:border-${error ? "red" : "blue"}-500`}
       />
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   );
 };

@@ -9,7 +9,7 @@ import QuizResults from './quiz/QuizResults';
 
 interface QuizComponentProps {
   quizzes: Quiz[];
-}
+} 
 
 const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
   const [currentPage, setCurrentPage] = useState(0);

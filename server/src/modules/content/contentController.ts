@@ -107,14 +107,15 @@ export default class ContentController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
+    
       const content = await Content.create({
         title,
         text,
         markdown,
         linkType,
         link,
-        quiz: quiz ? JSON.stringify(quiz) : null,
-        resources: resources ? JSON.stringify(resources) : null,
+        quiz,
+        resources,
         duration,
         position,
         sectionId,
@@ -154,8 +155,8 @@ export default class ContentController {
         markdown,
         linkType,
         link,
-        quiz: quiz ? JSON.stringify(quiz) : null,
-        resources: resources ? JSON.stringify(resources) : null,
+        quiz,
+        resources,
         duration,
         position,
         sectionId,

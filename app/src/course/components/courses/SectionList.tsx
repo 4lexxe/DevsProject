@@ -66,6 +66,12 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
         <p className="text-gray-500">
           No hay secciones disponibles para este curso.
         </p>
+
+        <Link to={`/course/${courseId}/section/form`}>
+          <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
+            Añadir una nueva sección
+          </button>
+        </Link>
       </div>
     );
   }
@@ -94,7 +100,7 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       </div>
 
       <div className="my-8">
-        <Link to={`/course/${sections[0].course.id}/section/form`}>
+        <Link to={`/course/${courseId}/section/form`}>
           <button className="px-6 py-3 text-md rounded-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-transform duration-300 hover:scale-105 text-white bg-blue-600 hover:bg-blue-700">
             Añadir una nueva sección
           </button>

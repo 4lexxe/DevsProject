@@ -38,12 +38,10 @@ export default function SectionList({
       const response = sectionId
         ? await updateSection(sectionId, data)
         : await createSection(data);
-        console.log("Esta es la respuesta: ", response)
       setStatus(response.status);
       setMessage(response.message);
 
       if (response.statusCode === (sectionId ? 200 : 201)) {
-        sessionStorage.removeItem("section-form-data")
         setTimeout(() => {
           navigate(`/course/${response.data.courseId}`);
 
@@ -76,7 +74,6 @@ export default function SectionList({
   };
 
   const onSubmit = () => {
-    console.log(sectionState.section);
     if (!sectionState.section) return;
 
     const sectionData = {
