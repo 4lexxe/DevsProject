@@ -25,9 +25,9 @@ const handleValidationErrors = (req: Request, res: Response) => {
       message: "Errores de validación",
       errors: errors.array(),
     });
-    return false; // Indica que hay errores
+    return false;
   }
-  return true; // Indica que no hay errores
+  return true;
 };
 
 // Función para manejar errores internos del servidor
@@ -42,12 +42,10 @@ const handleServerError = (res: Response, req: Request, error: any, message: str
 };
 
 export default class SectionController {
-
-
   // Crear una nueva sección
   static create: RequestHandler = async (req, res) => {
     try {
-      const { title, description, courseId, coverImage, moduleType } = req.body;
+      const { title, description, courseId, coverImage, moduleType, colorGradient } = req.body;
       const course = await Course.findByPk(courseId);
       if (!course) {
         res.status(400).json({
@@ -63,6 +61,7 @@ export default class SectionController {
         courseId,
         coverImage,
         moduleType,
+        colorGradient,
       });
       res.status(201).json({
         ...metadata(req, res),
@@ -89,6 +88,7 @@ export default class SectionController {
           description: section.description,
           moduleType: section.moduleType,
           coverImage: section.coverImage,
+          colorGradient: section.colorGradient,
         },
         { transaction }
       );
@@ -153,6 +153,7 @@ export default class SectionController {
           description: section.description,
           moduleType: section.moduleType,
           coverImage: section.coverImage,
+          colorGradient: section.colorGradient,
         },
         { transaction }
       );
@@ -226,7 +227,7 @@ export default class SectionController {
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, description, courseId, coverImage, moduleType } = req.body;
+      const { title, description, courseId, coverImage, moduleType, colorGradient } = req.body;
       const section = await Section.findByPk(id);
 
       if (!section) {
@@ -244,6 +245,7 @@ export default class SectionController {
         courseId,
         coverImage,
         moduleType,
+        colorGradient,
       });
       res.status(200).json({
         ...metadata(req, res),

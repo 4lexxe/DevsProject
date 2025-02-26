@@ -38,6 +38,7 @@ export interface ISectionInput {
   description: string;
   moduleType: string;
   coverImage: string;
+  colorGradient: [string, string];
 }
 export interface ISection {
   title: string;
@@ -45,16 +46,17 @@ export interface ISection {
   moduleType: string;
   coverImage: string;
   contents: IContent[];
+  colorGradient: [string, string];
 }
 
 export interface ISectionState {
   section: ISection | null;
+  isAddingSection: boolean; // 🔹 Nueva propiedad: indica si se está agregando una nueva sección
   isEditingSection: boolean; // 🔹 Indica si la sección está en edición
   editingContent: IContent | null;
   isAddingContent: boolean;
   isEditingContent: boolean; // 🔹 Indica si un contenido está en edición
 }
-
 
 
 // Contenido ----------------------------------------------------------------------------------------------------------------------------

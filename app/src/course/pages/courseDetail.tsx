@@ -61,40 +61,48 @@ const CourseDetails: React.FC = () => {
           description={course.summary}
           image={course.image}
           categories={course.categories}
-          courseId={id} // Pasamos el ID del curso aquí
+          courseId={id}
         />
       </div>
 
       {/* Content section with constrained width */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          {/* Mobile-first sidebar content */}
+          <div className="lg:col-span-1 lg:order-2 flex flex-col space-y-6">
+            {course.prerequisites && course.prerequisites.length > 0 && (
+              <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+                <Prerequisites prerequisites={course.prerequisites} />
+              </div>
+            )}
+            <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
+              <LearningOutcomes outcomes={course.learningOutcomes} />
+            </div>
+          </div>
+
+          {/* Main content */}
+          <div className="lg:col-span-2 lg:order-1">
             <CourseOverview
               about={course.about}
               careerType={course.careerType.name}
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />
-            {/* Sections List */}
-            {/* Contenedor del título, contador y botón */}
-            <div className="flex items-center justify-between mb-6">
+            
+            {/* Sections header */}
+            <div className="flex items-center justify-between mb-6 mt-8">
               <div className="flex items-center gap-4">
                 <h2 className="text-2xl font-bold text-gray-900">
                   Módulos del Curso
                 </h2>
               </div>
-              {/* Botón "Añadir una nueva sección" */}
               <AddSectionButton courseId={id || ""} />
             </div>
-            <div className="mt-12">
+
+            {/* Sections List */}
+            <div className="mt-6">
               <SectionList courseId={id || ""} />
             </div>
-          </div>
-          <div className="lg:col-span-1 flex flex-col items-center space-y-6">
-            {course.prerequisites && course.prerequisites.length > 0 && (
-              <Prerequisites prerequisites={course.prerequisites} />
-            )}
-            <LearningOutcomes outcomes={course.learningOutcomes} />
           </div>
         </div>
       </div>

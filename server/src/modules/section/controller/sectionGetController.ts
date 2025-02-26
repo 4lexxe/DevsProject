@@ -3,8 +3,7 @@ import sequelize from "../../../infrastructure/database/db";
 import Section from "../Section";
 import Course from "../../course/Course";
 import Content from "../../content/Content";
-import { Sequelize, Op } from "sequelize";
-import { validationResult } from "express-validator";
+import { Op } from "sequelize";
 
 // Función para generar metadata
 const metadata = (req: Request, res: Response) => {
@@ -25,8 +24,9 @@ const handleServerError = (res: Response, req: Request, error: any, message: str
     error: error.message,
   });
 };
-export default class SectionGetController{
-      // Obtener todas las secciones
+
+export default class SectionGetController {
+  // Obtener todas las secciones
   static getAll: RequestHandler = async (req, res) => {
     try {
       const sections = await Section.findAll({

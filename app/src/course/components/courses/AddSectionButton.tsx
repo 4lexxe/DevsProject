@@ -1,6 +1,6 @@
 // components/courses/AddSectionButton.tsx
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react'; // Importar React
+import { Link } from 'react-router-dom'; // Importar Link de react-router-dom
 import { PlusCircle } from 'lucide-react'; // Importamos el ícono de Lucide
 
 interface AddSectionButtonProps {

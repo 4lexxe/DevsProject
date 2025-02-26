@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import {
   ISection,
   ISectionInput,
@@ -10,6 +10,7 @@ interface SectionContextType {
   state: ISectionState;
   setSection: (section: ISection) => void;
   editSection: (sectionData: ISectionInput) => void;
+  startAddingSection: () => void;
   startEditingSection: () => void;
   deleteSection: () => void;
   addContent: () => void;
@@ -28,61 +29,77 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
     section: null,
     editingContent: null,
     isAddingContent: false,
+    isAddingSection: false,
     isEditingSection: false,
     isEditingContent: false,
   });
 
   /*** 🔹 MÉTODOS PARA SECCIÓN ***/
-  const setSection = (section: ISection) =>
-    setState({ ...state, section, isEditingSection: false });
+  const setSection = useCallback((section: ISection) => {
+    setState((prev) => ({ ...prev, section, isEditingSection: false }));
+  }, []);
 
-  const editSection = (sectionData: ISectionInput) => {
-    if (!state.section) return;
-    setState({
-      ...state,
-      section: { ...state.section, ...sectionData },
-      isEditingSection: false,
+  const editSection = useCallback((sectionData: ISectionInput) => {
+    setState((prev) => {
+      if (!prev.section) return prev;
+      return {
+        ...prev,
+        section: { ...prev.section, ...sectionData },
+        isEditingSection: false,
+      };
     });
-  };
+  }, []);
 
-  const startEditingSection = () =>
+  const startAddingSection = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      isAddingSection: true,
+      isEditingSection: false,
+      section: null,
+    }));
+  }, []);
+
+  const startEditingSection = useCallback(() => {
     setState((prev) => ({ ...prev, isEditingSection: true }));
+  }, []);
 
-  const deleteSection = () =>
-    setState({ ...state, section: null, isEditingSection: false });
+  const deleteSection = useCallback(() => {
+    setState((prev) => ({ ...prev, section: null, isEditingSection: false }));
+  }, []);
 
   /*** 🔹 MÉTODOS PARA CONTENIDO ***/
-  const addContent = () =>
-    setState({ ...state, isAddingContent: true, isEditingContent: false });
+  const addContent = useCallback(() => {
+    setState((prev) => ({ ...prev, isAddingContent: true, isEditingContent: false }));
+  }, []);
 
-  const editContent = (content: IContent) =>
-    setState({
-      ...state,
+  const editContent = useCallback((content: IContent) => {
+    setState((prev) => ({
+      ...prev,
       editingContent: content,
       isEditingContent: true,
-    });
+    }));
+  }, []);
 
-  const deleteContent = (contentId: string) => {
-    if (!state.section) return;
-
-    setState({
-      ...state,
-      section: {
-        ...state.section,
-        contents: state.section.contents
-          .filter((content) => content.id !== contentId)
-          .map((content, index) => ({ ...content, position: index })),
-      },
-    });
-  };
-
-  const saveContent = (contentData: IContentInput): void => {
-    if (!state.section) return;
-
+  const deleteContent = useCallback((contentId: string) => {
     setState((prev) => {
+      if (!prev.section) return prev;
+      return {
+        ...prev,
+        section: {
+          ...prev.section,
+          contents: prev.section.contents
+            .filter((content) => content.id !== contentId)
+            .map((content, index) => ({ ...content, position: index })),
+        },
+      };
+    });
+  }, []);
+
+  const saveContent = useCallback((contentData: IContentInput): void => {
+    setState((prev) => {
+      if (!prev.section) return prev;
       const section = prev.section!;
       const { editingContent } = prev;
-
       if (editingContent) {
         return {
           ...prev,
@@ -102,13 +119,11 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         const lastPosition = section.contents.length
           ? Math.max(...section.contents.map((c) => c.position))
           : 0;
-
         const newContent: IContent = {
           id: crypto.randomUUID(),
           ...contentData,
           position: lastPosition + 1,
         };
-
         return {
           ...prev,
           section: {
@@ -120,12 +135,11 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         };
       }
     });
-  };
+  }, []);
 
-  const updateContentPosition = (contentId: string, newPosition: number) => {
+  const updateContentPosition = useCallback((contentId: string, newPosition: number) => {
     setState((prev) => {
       if (!prev.section) return prev;
-
       return {
         ...prev,
         section: {
@@ -140,30 +154,33 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         },
       };
     });
-  };
+  }, []);
 
-  const addQuizToContent = (contentId: string, quiz: any[]) => {
-    if (!state.section) return;
-
-    setState({
-      ...state,
-      section: {
-        ...state.section,
-        contents: state.section.contents.map((content) =>
-          content.id === contentId ? { ...content, quiz } : content
-        ),
-      },
+  const addQuizToContent = useCallback((contentId: string, quiz: any[]) => {
+    setState((prev) => {
+      if (!prev.section) return prev;
+      return {
+        ...prev,
+        section: {
+          ...prev.section,
+          contents: prev.section.contents.map((content) =>
+            content.id === contentId ? { ...content, quiz } : content
+          ),
+        },
+      };
     });
-  };
+  }, []);
 
-  const cancelEdit = () =>
-    setState({
-      ...state,
+  const cancelEdit = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
       editingContent: null,
       isAddingContent: false,
       isEditingContent: false,
+      isAddingSection: false,
       isEditingSection: false,
-    });
+    }));
+  }, []);
 
   return (
     <SectionContext.Provider
@@ -171,6 +188,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         state,
         setSection,
         editSection,
+        startAddingSection,
         startEditingSection,
         deleteSection,
         addContent,

@@ -57,7 +57,8 @@ export const deleteSection = async (id: string) => {
   }
 };
 
-export const getSectionCount = async (id: string) => {
+// Obtener el conteo total de secciones
+export const getSectionCount = async () => {
   try {
     const response = await api.get(`${SECTIONS_ENDPOINT}/count`);
     return response.data.data;

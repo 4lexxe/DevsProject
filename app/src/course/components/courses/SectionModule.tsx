@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  BookOpen,
-  Code,
-  Rocket,
-  Beaker,
   BookCopy,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
 import ContentViewer from "../contentViewner/ContentViewer";
 import { Section } from "@/course/interfaces/ViewnerCourse";
-import { Link } from "react-router-dom";
 import EditSectionButton from "./EditSectionButton";
 
 interface SectionModuleProps {
@@ -19,50 +14,9 @@ interface SectionModuleProps {
 
 const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [contents, setContents] = useState(section.contents);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Helper function to format duration
-  const formatDuration = (minutes: number): string => {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (hours === 0) {
-      return `${remainingMinutes} min`;
-    }
-
-    return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}min` : ""}`;
-  };
-
-  // Helper function to get icon based on module type
-  const getModuleIcon = () => {
-    switch (section.moduleType.toLowerCase()) {
-      case "fundamental":
-        return <BookOpen className="w-6 h-6 text-gray-700" />;
-      case "avanzado":
-        return <Rocket className="w-6 h-6 text-gray-700" />;
-      case "practico":
-        return <Code className="w-6 h-6 text-gray-700" />;
-      default:
-        return <Beaker className="w-6 h-6 text-gray-700" />;
-    }
-  };
-
-  // Helper function to get gradient based on module type
-  const getGradient = () => {
-    switch (section.moduleType.toLowerCase()) {
-      case "fundamental":
-        return "from-purple-500/90 to-pink-500/90";
-      case "avanzado":
-        return "from-yellow-400/90 to-orange-500/90";
-      default:
-        return "from-teal-400/90 to-blue-500/90";
-    } 
-  };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-100">
+    <div className="bg-slate-50 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-300">
       <div
         className="cursor-pointer relative"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -82,15 +36,19 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
             />
             {/* Gradient overlay */}
             <div
-              className={`absolute inset-0 bg-gradient-to-r ${getGradient()}`}
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(to right, 
+                ${section.colorGradient[0]}cc, 
+                ${section.colorGradient[1]}cc)`,
+              }}
             />
 
             {/* Edit button */}
-            <EditSectionButton 
-              courseId={section.course.id.toString()} 
+            <EditSectionButton
+              courseId={section.course.id.toString()}
               sectionId={section.id.toString()}
             />
-
             {/* Module icon */}
             <div className="absolute -bottom-6 left-6">
               <div className="bg-white p-3 rounded-lg shadow-md">
@@ -99,7 +57,6 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
             </div>
           </div>
         </div>
-
         <div className="p-6 pt-8">
           {/* Module type badge */}
           <div className="flex justify-between items-center">
@@ -112,40 +69,25 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
               <ChevronDown className="w-5 h-5 text-gray-500" />
             )}
           </div>
-
           {/* Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-2">
             {section.title}
           </h3>
-
           {/* Description */}
           <p className="text-gray-600 mb-4 line-clamp-2">
             {section.description}
           </p>
         </div>
       </div>
-
       {/* Content Section */}
       {isExpanded && (
         <div className="border-t border-gray-100 py-6">
-          {loading ? (
-            <div className="flex justify-center py-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          ) : error ? (
-            <div className="text-red-500 text-center py-4">{error}</div>
-          ) : contents.length === 0 ? (
-            <div className="text-gray-500 text-center py-4">
-              No content available
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {contents &&
-                contents.map((content) => (
-                  <ContentViewer key={content.id} content={content} />
-                ))}
-            </div>
-          )}
+          <div className="space-y-4">
+            {section.contents &&
+              section.contents.map((content) => (
+                <ContentViewer key={content.id} content={content} />
+              ))}
+          </div>
         </div>
       )}
     </div>

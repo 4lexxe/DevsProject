@@ -1,3 +1,6 @@
+// ==================================================
+// Importaciones de librerías y módulos necesarios
+// ==================================================
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -5,31 +8,48 @@ import passport from 'passport';
 import session from 'express-session';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import './infrastructure/passport/passport';
+import geoip from 'geoip-lite';
+import { Server, Socket } from 'socket.io';
+import { Request } from 'express';
+
+// ==================================================
+// Importaciones de rutas
+// ==================================================
+
+// Rutas de Autenticación
 import authRoutes from './modules/auth/routes/auth.routes';
+
+// Rutas de Usuarios
 import userRoutes from './modules/user/userRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
 import roleRoutes from './modules/role/roleRoutes';
-import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import { GeoUtils } from './modules/auth/utils/geo.utils';
 
-/* Rutas relacionadas con el area de cursos */
-import careerTypeRoutes from './modules/careerType/CareerTypeRoutes'
-import categoryRoutes from './modules/category/CategoryRoutes'
+// Rutas de Contenido
+import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
+import careerTypeRoutes from './modules/careerType/CareerTypeRoutes';
+import categoryRoutes from './modules/category/CategoryRoutes';
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
-//Contenidos
-import contentRoutes from './modules/content/contentRoutes'
+import contentRoutes from './modules/content/contentRoutes';
 
-//import contentRoutes from './modules/content/contentRoutes';
+// Rutas de Recursos
 import recourseRoutes from './modules/resource/routes/resource.routes';
 import ratingRoutes from './modules/resource/rating/rating.routes';
 import commentRoutes from './modules/resource/comment/comment.routes';
 import uploadRoutes from './modules/resource/routes/upload.routes';
 
-import geoip from 'geoip-lite';
-import { Request } from 'express';
-import { Server, Socket } from 'socket.io';
+// Rutas de Roadmap
+import roadMapRoutes from './modules/roadmap/roadMapRoutes';
+
+// ==================================================
+// Importaciones de utilidades y configuraciones
+// ==================================================
+import './infrastructure/passport/passport';
+import { GeoUtils } from './modules/auth/utils/geo.utils';
+
+// ==================================================
+// Extensiones de tipos para librerías externas
+// ==================================================
 
 // Extender tipos para Socket.IO
 declare module 'socket.io' {
@@ -46,10 +66,16 @@ declare module 'geoip-lite' {
   }
 }
 
+// ==================================================
+// Configuración inicial de la aplicación
+// ==================================================
 const app = express();
 const PORT = /* process.env.PORT || */ 3000;
 
-// Configuración inicial de seguridad y middleware
+// ==================================================
+// 1. Middlewares de seguridad básicos
+// Configuración inicial
+// ==================================================
 app.set('trust proxy', true);
 app.use(helmet()); // Seguridad de cabeceras HTTP
 app.use(cors({
@@ -61,11 +87,13 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-// Rate limiting con validación reforzada
+// ==================================================
+// 2. Limitador de peticiones para API pública
+// Rate limiting con validación reforzada de IP
+// ==================================================
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
@@ -74,14 +102,16 @@ const apiLimiter = rateLimit({
   },
   handler: (req, res) => {
     res.status(429).json({
-      error: 'Too many requests',
+      error: 'Demasiadas peticiones. Intente nuevamente en 15 minutos.',
       ip: getValidIP(req),
       timestamp: new Date().toISOString()
     });
   }
 });
 
-// Configuración de sesión segura
+// ==================================================
+// 3. Configuración de sesiones seguras
+// ==================================================
 app.use(session({
   secret: process.env.SESSION_SECRET!,
   resave: false,
@@ -89,56 +119,80 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas de duración de la sesión 
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   },
   name: 'sessionId',
   rolling: true,
-  store: process.env.NODE_ENV === 'production' ? new (require('connect-pg-simple')(session))() : undefined
+  store: process.env.NODE_ENV === 'production' 
+    ? new (require('connect-pg-simple')(session))() 
+    : undefined
 }));
 
-// Middleware de geolocalización mejorado
+// ==================================================
+// 4. Middleware de geolocalización mejorado
+// ==================================================
 app.use((req: Request, res, next) => {
   try {
-    const ip = GeoUtils.getValidIP(req);
+    let ip = GeoUtils.getValidIP(req);
     
-    // Forzar IP pública en desarrollo para testing
+    // Forzar IP de prueba en entorno de desarrollo para testing
     if (process.env.NODE_ENV === 'development' && ip === '127.0.0.1') {
-      req.realIp = '190.190.190.190'; // IP de prueba (Argentina)
+      ip = '190.190.190.190'; // IP de prueba (Argentina)
     } else {
       req.realIp = ip || undefined;
     }
+
     // Obtener datos geográficos
     const geo: geoip.Lookup = req.realIp ? geoip.lookup(req.realIp) || {} as geoip.Lookup : {} as geoip.Lookup;
-    
-    // Añadir datos al request
+
+   // Añadir datos al request
     req.geo = {
       city: geo.city || 'Desconocido',
       region: geo.region || 'Desconocido',
       country: geo.country || 'Desconocido',
       ll: geo.ll?.length === 2 ? geo.ll : [0, 0],
       timezone: geo.timezone || 'UTC',
-      proxy: geo.proxy || false
+      proxy: !!geo.proxy
     };
-    // Logging para debugging
-    console.log('Datos de conexión:', {
-      ip: req.realIp,
-      geo: req.geo,
-      method: req.method,
-      endpoint: req.originalUrl
-    });
+
+    // Mostrar en formato de tablas
+    console.log('\n══════════════════════════════════════════════════');
+    console.log('           DATOS DE CONEXIÓN            ');
+    console.log('══════════════════════════════════════════════════');
+    console.table([{
+      'IP': ip,
+      'Ciudad': req.geo.city,
+      'Región': req.geo.region,
+      'País': req.geo.country,
+      'Coordenadas': `Lat: ${req.geo.ll[0]}, Lon: ${req.geo.ll[1]}`
+    }]);
+    console.table([{
+      'Zona Horaria': req.geo.timezone,
+      'Proxy': req.geo.proxy ? '✅ Sí' : '❌ No',
+      'Método': req.method,
+      'Endpoint': req.originalUrl
+    }]);
+    console.log('══════════════════════════════════════════════════');
+    
+    // este es next es para que siga con la ejecución de la aplicación
     next();
+    
   } catch (error) {
-    console.error('Error en middleware de geolocalización:', error);
+    console.error('\n⚠️  Error en geolocalización:', error);
     next();
   }
 });
 
-// Inicialización de Passport
+// ==================================================
+// 5. Configuración de Passport (Autenticación)
+// ==================================================
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Headers de seguridad adicionales
+// ==================================================
+// 6. Headers de seguridad adicionales
+// ==================================================
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
@@ -148,75 +202,112 @@ app.use((req, res, next) => {
   next();
 });
 
-// Sistema de rutas
-// Rutas protegidas por autenticación
+// ==================================================
+// 7. Sistema de enrutamiento
+// ==================================================
+
+// --------------------------
+// 7.1 Rutas de Autenticación
+// --------------------------
 app.use('/api/auth', apiLimiter, authRoutes);
+
+// --------------------------
+// 7.2 Rutas
+// --------------------------
+
+// NO CAMBIAR EL ORDEN DE LAS RUTAS!
+
+/* 
+--------------------------
+Aclaración de rutas: Usuario necesita de la ruta de autenticación para poder acceder a las rutas de usuario, admin y roles.
+
+admin y roles no necesitan de la ruta de autenticación para poder acceder a sus rutas pero si de la ruta de usuario para poder acceder a sus rutas.
+--------------------------
+*/
+
+// Rutas de Usuarios
 app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
+
+/*
+--------------------------
+
+Aclaración de rutas: Recursos necesita de la ruta de autenticación para poder acceder a sus rutas.
+--------------------------
+*/
+
+// Rutas de Recursos
 app.use('/api/resources', recourseRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/rating', ratingRoutes);
+app.use('/api/comment', commentRoutes);
 
-// Rutas públicas
+// Rutas de Contenido en el hero
 app.use('/api', HeaderSectionRoutes);
 
-/* Ruas relacionadas con el area de cursos */
+// Rutas de Cursos
 app.use('/api', courseRoutes);
 app.use('/api', sectionRoutes);
 app.use('/api', careerTypeRoutes);
 app.use('/api', categoryRoutes);
 app.use('/api', contentRoutes);
 
+// Rutas de Roadmap
+app.use('/api', roadMapRoutes);
 
-// Rutas de comentarios y valoraciones
-app.use('/api/rating', ratingRoutes);
-app.use('/api/comment', commentRoutes);
-
-// Endpoint de estado mejorado
+// Endpoint de estado del sistema
 app.get('/api/status', (req: Request, res) => {
   res.json({
     status: 'OK',
-    environment: process.env.NODE_ENV,
-    clientIp: req.realIp,
-    geoData: req.geo,
-    services: {
-      database: 'connected',
-      auth: 'active',
-      geo: req.geo?.country !== 'Desconocido' ? 'active' : 'inactive'
+    entorno: process.env.NODE_ENV,
+    ipCliente: req.realIp,
+    geolocalizacion: req.geo,
+    servicios: {
+      baseDatos: 'conectada',
+      autenticacion: 'activa',
+      geo: req.geo?.country !== 'Desconocido' ? 'activo' : 'inactivo'
     }
   });
 });
 
-// Manejador de errores global mejorado
+// ==================================================
+// 8. Manejo de errores global
+// ==================================================
 app.use((err: any, req: Request, res: express.Response, next: express.NextFunction) => {
   const errorData = {
     timestamp: new Date().toISOString(),
     endpoint: req.originalUrl,
-    method: req.method,
+    método: req.method,
     ip: req.realIp,
     error: {
-      message: err.message,
+      mensaje: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
-      code: err.code,
-      details: err.errors
+      código: err.code,
+      detalles: err.errors
     }
   };
+  
   console.error('Error global:', errorData);
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message,
-    referenceId: errorData.timestamp,
-    ...(process.env.NODE_ENV === 'development' && { details: errorData })
+    error: process.env.NODE_ENV === 'production' ? 'Error interno del servidor' : err.message,
+    referencia: errorData.timestamp,
+    ...(process.env.NODE_ENV === 'development' && { detalles: errorData })
   });
 });
 
-// Inicialización del servidor
-const server = app.listen(PORT, '0.0.0.0' ,  () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+// ==================================================
+// 9. Configuración del servidor web
+// ==================================================
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
-  console.log('Configuración de geolocalización:', GeoUtils.checkServiceStatus());
+  console.log('Estado geolocalización:', GeoUtils.checkServiceStatus());
 });
 
-// Configuración de WebSockets con Socket.IO
+// ==================================================
+// 10. Configuración de WebSockets (Socket.IO)
+// ==================================================
 const io = new Server(server, {
   cors: {
     origin: process.env.CLIENT_URL,
@@ -224,34 +315,32 @@ const io = new Server(server, {
   },
 });
 
-// Almacenamiento temporal para el estado del mensaje de bienvenida
-const welcomeMessageStatus: Record<string, boolean> = {};
+const estadoMensajesBienvenida: Record<string, boolean> = {};
 
-io.on('connection', (socket) => {
-  console.log('Cliente conectado');
+io.on('connection', (socket: Socket) => {
+  console.log('🔌 Nuevo cliente conectado');
 
-  // Identificar al usuario (si es necesario)
   socket.on('identify', ({ userId }) => {
-    console.log(`Usuario ${userId} identificado`);
-    socket.userId = userId; // Asignar ID al socket
-
-    // Emitir el estado actual del mensaje de bienvenida
-    const status = welcomeMessageStatus[userId] || false;
-    socket.emit('welcomeMessageStatus', { shown: status });
+    console.log(`🆔 Usuario identificado: ${userId}`);
+    socket.userId = userId;
+    socket.emit('welcomeMessageStatus', { 
+      shown: estadoMensajesBienvenida[userId] || false 
+    });
   });
 
-  // Manejar evento de mensaje de bienvenida mostrado
   socket.on('welcomeMessageShown', ({ userId }) => {
-    console.log(`Mensaje de bienvenida mostrado para el usuario ${userId}`);
-    welcomeMessageStatus[userId] = true; // Marcar como mostrado
+    console.log(`✅ Mensaje visto por usuario: ${userId}`);
+    estadoMensajesBienvenida[userId] = true;
   });
 
   socket.on('disconnect', () => {
-    console.log(`Cliente desconectado (ID: ${socket.userId})`);
+    console.log(`❌ Cliente desconectado: ${socket.userId}`);
   });
 });
 
-// Función para obtener la IP válida del request
+// ==================================================
+// Funciones auxiliares
+// ==================================================
 function getValidIP(req: Request): string | undefined {
   const forwardedFor = req.headers['x-forwarded-for'];
   if (typeof forwardedFor === 'string') {
@@ -261,3 +350,14 @@ function getValidIP(req: Request): string | undefined {
   }
   return req.socket.remoteAddress || undefined;
 }
+
+// ==================================================
+// Manejo de rutas no encontradas (404)
+// ==================================================
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Endpoint no encontrado',
+    método: req.method,
+    ruta: req.originalUrl
+  });
+});

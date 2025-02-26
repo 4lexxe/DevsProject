@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'react-hot-toast';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { ArrowLeft, Edit, PlusCircle, AlertCircle, FileText, Package, Image, Link2, AlignLeft, Eye, EyeOff, XCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ResourceService } from '../../services/resource.service';
 import { resourceSchema, type ResourceFormData } from '../../validations/resourceValidation';
 import NSFWDetectionService from '../../services/nsfwDetection.service';
@@ -11,16 +11,23 @@ import ResourceTypeSelector from '../../components/ResourceTypeSelector';
 import ResourceUrlInput from '../../components/ResourceUrlInput';
 import ResourceVisibilityToggle from '../../components/ResourceVisibilityToggle';
 import InputFile from '../../components/InputFile';
+import { useAuth } from '../../../auth/contexts/AuthContext';
 
-const CreateResourceForm: React.FC = () => {
-  const navigate = useNavigate(); // Hook para redirigir
+const ResourceForm: React.FC = () => {
+  const { user } = useAuth();
+  const { id } = useParams<{ id?: string }>();
+  const navigate = useNavigate();
+  const resourceId = id ? parseInt(id) : undefined;
+  const isEditMode = !!resourceId;
+  const [isLoading, setIsLoading] = useState(isEditMode);
+  
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     reset,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, isValid }
   } = useForm<ResourceFormData>({
     resolver: zodResolver(resourceSchema),
     defaultValues: {
@@ -30,20 +37,68 @@ const CreateResourceForm: React.FC = () => {
       type: 'video',
       isVisible: true,
       coverImage: '',
-    }
+    },
+    mode: 'onChange'
   });
+
   const [explicitContentWarning, setExplicitContentWarning] = React.useState<string>('');
 
-  // Memorizar valores observados para prevenir renderizados innecesarios
+  // Valores observados
   const type = watch('type');
   const title = watch('title');
   const description = watch('description');
   const url = watch('url');
   const coverImage = watch('coverImage');
   const isVisible = watch('isVisible');
-  const titleLength = useMemo(() => title?.length || 0, [title]);
-  const descriptionLength = useMemo(() => description?.length || 0, [description]);
 
+  // Efecto para cargar recurso existente en modo edición
+  // Verificar autenticación antes de cargar el formulario
+  useEffect(() => {
+    if (isLoading) return; // Esperar a que termine la verificación de autenticación
+
+    if (!user) {
+      toast.error('Debes iniciar sesión para acceder a esta página.');
+      navigate('/login', { replace: true });
+    }
+  }, [user, isLoading, navigate]);
+
+  // Cargar recurso existente en modo edición
+  useEffect(() => {
+    if (!isEditMode || !user) return;
+
+    const loadResource = async () => {
+      try {
+        const resource = await ResourceService.getResourceById(resourceId);
+
+        // Verificar si el usuario es el propietario
+        if (resource.userId !== user.id) {
+          toast.error('No tienes permisos para editar este recurso.');
+          console.error('No tienes permisos para editar este recurso.');
+          console.log('Recurso:', resource);
+          console.log('Usuario:', user);
+          navigate('/recursos', { replace: true });
+          return;
+        }
+
+        // Cargar datos del recurso en el formulario
+        reset({
+          ...resource,
+          coverImage: resource.coverImage || '',
+          isVisible: resource.isVisible ?? true,
+        });
+      } catch (error) {
+        console.error('Error al cargar recurso:', error);
+        toast.error('Error al cargar el recurso.');
+        navigate('/recursos', { replace: true });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadResource();
+  }, [isEditMode, user, resourceId, reset, navigate]);
+
+  // Cargar modelo NSFW
   useEffect(() => {
     const initNSFW = async () => {
       await NSFWDetectionService.loadModel();
@@ -51,10 +106,12 @@ const CreateResourceForm: React.FC = () => {
     initNSFW();
   }, []);
 
+  // Resetear advertencias cuando cambia el tipo
   useEffect(() => {
     setExplicitContentWarning('');
   }, [type]);
 
+  // Manejo de imagen de portada
   const handleCoverImageChange = useCallback(async (fileUrl: string | null) => {
     if (!fileUrl) {
       setValue('coverImage', '');
@@ -64,61 +121,17 @@ const CreateResourceForm: React.FC = () => {
 
     try {
       const isExplicit = await NSFWDetectionService.checkExplicitContent(fileUrl);
-      if (isExplicit) {
-        throw new Error('La imagen de portada contiene contenido explícito.');
-      }
-      setValue('coverImage', fileUrl);
+      if (isExplicit) throw new Error('Contenido explícito detectado');
+      setValue('coverImage', fileUrl, { shouldValidate: true });
       setExplicitContentWarning('');
     } catch (error) {
-      console.error('Error al verificar la imagen de portada:', error);
-      toast.error('La imagen de portada contiene contenido inapropiado.');
-      setExplicitContentWarning('¡Advertencia! La imagen de portada contiene contenido explícito.');
+      console.error('Error en imagen de portada:', error);
+      toast.error('Contenido inapropiado detectado');
+      setExplicitContentWarning('¡Advertencia! Contenido explícito en la imagen de portada');
     }
   }, [setValue]);
 
-  const onSubmit = useCallback(async (data: ResourceFormData) => {
-    try {
-      if (data.type === 'image' && data.url) {
-        const isUrlExplicit = await NSFWDetectionService.checkExplicitContent(data.url);
-        if (isUrlExplicit) {
-          const warningMessage =
-            ' ¿Estás seguro de querer subir eso? Nuestra plataforma implementa estrictas políticas de seguridad y filtros de contenido para prevenir la publicación de material inapropiado. No pongas en riesgo tu cuenta, podríamos suspenderla permanentemente >:(';
-          setExplicitContentWarning(warningMessage);
-          throw new Error('La URL contiene contenido explícito.');
-        }
-      }
-
-      if (data.coverImage) {
-        const isCoverImageExplicit = await NSFWDetectionService.checkExplicitContent(data.coverImage);
-        if (isCoverImageExplicit) {
-          const warningMessage = '¡Advertencia! La imagen de portada contiene contenido explícito. Por favor, selecciona una imagen adecuada.';
-          setExplicitContentWarning(warningMessage);
-          throw new Error('La imagen de portada contiene contenido explícito.');
-        }
-      }
-
-      const userId = 1;
-      const createdResource = await ResourceService.createResource({ ...data, userId });
-
-      // Redirigir al recurso creado usando su ID
-      const resourceId = createdResource.id; // Suponemos que el servicio devuelve el ID del recurso
-      toast.success('Recurso creado correctamente');
-      navigate(`/resources/${resourceId}`); // Redirigir al detalle del recurso
-    } catch (error) {
-      console.error('Error al crear el recurso:', error);
-      toast.error('Error al crear el recurso. Por favor, intenta nuevamente.');
-    }
-  }, [navigate]);
-
-  const handleReset = useCallback(() => {
-    reset();
-    setExplicitContentWarning('');
-  }, [reset]);
-
-  const handleTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setValue('type', e.target.value as 'video' | 'image');
-  }, [setValue]);
-
+  // Manejo de URL/imagen principal
   const handleUrlChange = useCallback(async (fileUrl: string | null) => {
     if (!fileUrl) {
       setValue('url', '');
@@ -127,23 +140,59 @@ const CreateResourceForm: React.FC = () => {
     }
 
     try {
-      const isExplicit = await NSFWDetectionService.checkExplicitContent(fileUrl);
-      if (isExplicit) {
-        throw new Error('La imagen contiene contenido explícito.');
+      if (type === 'image') {
+        const isExplicit = await NSFWDetectionService.checkExplicitContent(fileUrl);
+        if (isExplicit) throw new Error('Contenido explícito detectado');
       }
-      setValue('url', fileUrl);
+      setValue('url', fileUrl, { shouldValidate: true });
       setExplicitContentWarning('');
     } catch (error) {
-      console.error('Error al verificar la imagen:', error);
-      toast.error('La imagen contiene contenido inapropiado.');
-      setExplicitContentWarning(' ¡Advertencia! La imagen contiene contenido explícito.');
+      console.error('Error en URL/imagen:', error);
+      toast.error('Contenido inapropiado detectado');
+      setExplicitContentWarning('¡Advertencia! Contenido explícito detectado');
     }
-  }, [setValue]);
+  }, [setValue, type]);
 
-  const handleVisibilityChange = useCallback((isVisible: boolean) => {
-    setValue('isVisible', isVisible);
-  }, [setValue]);
+  // Envío del formulario
+  const onSubmit = useCallback(async (data: ResourceFormData) => {
+    try {
+      // Validaciones NSFW
+      if (type === 'image' && data.url) {
+        const isUrlExplicit = await NSFWDetectionService.checkExplicitContent(data.url);
+        if (isUrlExplicit) throw new Error('Contenido explícito en URL');
+      }
 
+      if (data.coverImage) {
+        const isCoverExplicit = await NSFWDetectionService.checkExplicitContent(data.coverImage);
+        if (isCoverExplicit) throw new Error('Contenido explícito en portada');
+      }
+
+      // Operación crear/actualizar
+      if (isEditMode) {
+        await ResourceService.updateResource(resourceId, data);
+        toast.success('Recurso actualizado correctamente');
+      } else {
+        const userId = 1; // Obtener de autenticación en producción
+        const createdResource = await ResourceService.createResource({ ...data, userId });
+        navigate(`/resources/${createdResource.id}`);
+        toast.success('Recurso creado correctamente');
+        return;
+      }
+
+      navigate(`/resources/${resourceId}`);
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      toast.error(error instanceof Error ? error.message : 'Error al guardar el recurso');
+    }
+  }, [isEditMode, resourceId, navigate, type]);
+
+  // Resetear formulario
+  const handleReset = useCallback(() => {
+    reset();
+    setExplicitContentWarning('');
+  }, [reset]);
+
+  // Componentes dinámicos
   const renderUrlInput = useMemo(() => {
     if (type === 'image') {
       return (
@@ -151,39 +200,67 @@ const CreateResourceForm: React.FC = () => {
           value={url}
           onChange={handleUrlChange}
           error={errors.url?.message}
+          disabled={isEditMode} // Opcional: bloquear en edición si es necesario
         />
       );
     }
     return (
       <ResourceUrlInput 
         url={url}
-        onChange={(e) => setValue('url', e.target.value)}
+        onChange={(e) => setValue('url', e.target.value, { shouldValidate: true })}
         error={errors.url?.message}
       />
     );
-  }, [type, url, errors.url?.message, handleUrlChange, setValue]);
+  }, [type, url, errors.url?.message, handleUrlChange, setValue, isEditMode]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {/* Encabezado */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 flex items-center gap-3">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => navigate(-1)}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 text-gray-500" />
         </button>
-        <h1 className="text-xl font-bold text-gray-900">Crear Nuevo Recurso</h1>
+        <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+          {isEditMode ? (
+            <>
+              <Edit className="w-5 h-5 text-blue-500" /> Editar Recurso
+            </>
+          ) : (
+            <>
+              <PlusCircle className="w-5 h-5 text-green-500" /> Crear Nuevo Recurso
+            </>
+          )}
+        </h1>
       </div>
+
+      {/* Formulario */}
       <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-sm space-y-6">
+        {/* Advertencia de contenido explícito */}
         {explicitContentWarning && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <strong className="font-bold">¡Advertencia!</strong>
-            <span className="block sm:inline">{explicitContentWarning}</span>
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex items-center gap-2" role="alert">
+            <AlertCircle className="w-5 h-5 text-red-500" />
+            <span>
+              <strong className="font-bold">¡Advertencia!</strong>{' '}
+              <span className="block sm:inline">{explicitContentWarning}</span>
+            </span>
           </div>
         )}
+
+        {/* Campo Título */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-            Título *
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-gray-400" /> Título *
           </label>
           <input
             type="text"
@@ -191,64 +268,142 @@ const CreateResourceForm: React.FC = () => {
             {...register('title')}
             maxLength={55}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            disabled={isSubmitting}
           />
-          {title && (
-            <p className="text-xs text-gray-500 mt-1">{titleLength}/55</p>
-          )}
-          {errors.title && (
-            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-          )}
+          <div className="flex justify-between mt-1">
+            {errors.title ? (
+              <p className="text-red-500 text-sm flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.title.message}
+              </p>
+            ) : (
+              <div />
+            )}
+            <span className="text-xs text-gray-500">{title?.length || 0}/55</span>
+          </div>
         </div>
-        <ResourceTypeSelector 
-          type={type} 
-          onChange={handleTypeChange}
-        />
-        {renderUrlInput}
+
+        {/* Selector de Tipo */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Descripción
+          <label htmlFor="type" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            <Package className="w-5 h-5 text-gray-400" /> Tipo de Recurso
+          </label>
+          <ResourceTypeSelector
+            type={type}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setValue('type', e.target.value as 'video' | 'document' | 'image' | 'link', { shouldValidate: true })
+            }
+            disabled={isSubmitting || isEditMode}
+          />
+        </div>
+
+        {/* Campo URL/Archivo */}
+        <div>
+          <label htmlFor="url" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            {type === 'image' ? (
+              <>
+                <Image className="w-5 h-5 text-gray-400" /> Subir Imagen
+              </>
+            ) : (
+              <>
+                <Link2 className="w-5 h-5 text-gray-400" /> URL del Recurso
+              </>
+            )}
+          </label>
+          {renderUrlInput}
+        </div>
+
+        {/* Campo Descripción */}
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            <AlignLeft className="w-5 h-5 text-gray-400" /> Descripción
           </label>
           <textarea
             id="description"
             {...register('description')}
             maxLength={500}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            disabled={isSubmitting}
+            rows={4}
           />
-          {description && (
-            <p className="text-xs text-gray-500 mt-1">{descriptionLength}/500</p>
-          )}
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
-          )}
+          <div className="flex justify-between mt-1">
+            {errors.description ? (
+              <p className="text-red-500 text-sm flex items-center gap-1">
+                <AlertCircle className="w-4 h-4" /> {errors.description.message}
+              </p>
+            ) : (
+              <div />
+            )}
+            <span className="text-xs text-gray-500">{description?.length || 0}/500</span>
+          </div>
         </div>
+
+        {/* Imagen de Portada */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Imagen de Portada
+          <label htmlFor="coverImage" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            <Image className="w-5 h-5 text-gray-400" /> Imagen de Portada
           </label>
           <InputFile
             value={coverImage}
             onChange={handleCoverImageChange}
             error={errors.coverImage?.message}
+            disabled={isSubmitting}
           />
         </div>
-        <ResourceVisibilityToggle 
-          isVisible={isVisible}
-          onChange={handleVisibilityChange}
-        />
+
+        {/* Visibilidad */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+            {isVisible ? (
+              <Eye className="w-5 h-5 text-gray-400" />
+            ) : (
+              <EyeOff className="w-5 h-5 text-gray-400" />
+            )}{' '}
+            Visibilidad
+          </label>
+          <ResourceVisibilityToggle
+            isVisible={isVisible}
+            onChange={(value) => setValue('isVisible', value, { shouldValidate: true })}
+            disabled={isSubmitting}
+          />
+        </div>
+
+        {/* Botones de Acción */}
         <div className="flex justify-end gap-4">
-          <button
+            <button
             type="button"
-            onClick={handleReset}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
-          >
-            Cancelar
-          </button>
+            onClick={() => {
+              handleReset();
+              navigate(-1);
+            }}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors flex items-center gap-2"
+            disabled={isSubmitting}
+            >
+            <XCircle className="w-5 h-5 text-gray-500" /> Cancelar
+            </button>
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+            disabled={isSubmitting || !isValid}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            {isSubmitting ? 'Creando...' : 'Crear Recurso'}
+            {isSubmitting ? (
+              isEditMode ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" /> Actualizando...
+                </>
+              ) : (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" /> Creando...
+                </>
+              )
+            ) : isEditMode ? (
+              <>
+                <CheckCircle className="w-5 h-5" /> Actualizar Recurso
+              </>
+            ) : (
+              <>
+                <CheckCircle className="w-5 h-5" /> Crear Recurso
+              </>
+            )}
           </button>
         </div>
       </form>
@@ -256,4 +411,4 @@ const CreateResourceForm: React.FC = () => {
   );
 };
 
-export default CreateResourceForm;
+export default ResourceForm;

@@ -15,7 +15,7 @@ export default function RoadmapDescription() {
     "Backend developers que quieren mejorar en React o Next.js.",
     "Cualquier persona interesada en crear aplicaciones modernas y escalables.",
   ]
-
+ 
   return (
     <div className="bg-white py-16 px-4">
       <div className="max-w-4xl mx-auto space-y-12">

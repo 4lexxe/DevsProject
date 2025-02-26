@@ -1,4 +1,3 @@
-import { IContent } from "./Content";
 import { IContentApi } from "./Content";
 
 export interface Category{
@@ -41,7 +40,7 @@ export interface Section {
   lessonsCount: number;
   duration: number;
   course: Course,
-
+  colorGradient: [string, string];
   contents: IContentApi[];
 }
 
