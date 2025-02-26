@@ -4,7 +4,7 @@ import {
   Route,
 } from "react-router-dom";
 import { AuthProvider } from "./auth/contexts/AuthContext";
-import { ReactFlowProvider } from 'reactflow';
+import { ReactFlowProvider } from "reactflow";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Importación de todos los estilos
@@ -45,88 +45,50 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <Router>
-      <Toaster />
-      <AuthProvider>
-        {" "}
-        {/* AuthProvider ahora está dentro del Router */}
-        <Routes>
-          <Route path="/" element={<DefaultLayout />}>
-            <Route index element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="cursos" element={<CoursesPage />} />
-            <Route path="/course/:id" element={<CourseDetail />} />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="/ruta-aprendizaje" element={< LearnRoute/>} />            
-            <Route path='/course/form' element = {<CourseFormPage/>} />
-            <Route path='/course/:id/form' element= {<CourseFormPage/>}/>
-            <Route path='course/:courseId/section/form' element = { <SectionFormPage/> } />
-            <Route path='course/:courseId/section/:sectionId/form' element = { <SectionFormPage/> } />
-            <Route path="/recursos" element={<ResourcePage />} />
-            <Route path='/course/section/content/:contentId' element={<ContentPage/>} />
-            <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
-            <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true}/>}/>
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <Toaster />
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<DefaultLayout />}>
+              <Route index element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="cursos" element={<CoursesPage />} />
+              <Route path="/course/:id" element={<CourseDetail />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<RegisterPage />} />
+              <Route path="/ruta-aprendizaje" element={<LearnRoute />} />
+              <Route path='/course/form' element={<CourseFormPage />} />
+              <Route path='/course/:id/form' element={<CourseFormPage />} />
+              <Route path='course/:courseId/section/form' element={<SectionFormPage />} />
+              <Route path='course/:courseId/section/:sectionId/form' element={<SectionFormPage />} />
+              <Route path="/recursos" element={<ResourcePage />} />
+              <Route path='/course/section/content/:contentId' element={<ContentPage />} />
+              <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
+              <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
 
-            {/* Rutas protegidas */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/resources/create" element={<CreateResourceForm />} />
+              {/* Rutas protegidas */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/resources/create" element={<CreateResourceForm />} />
+              </Route>
+
+              <Route path="/resources/:id/edit" element={<CreateResourceForm />} />
+              <Route path="/resources/:id" element={<ResourceDetailsPage />} />
+              <Route path="/roadmaps/:id" element={<Roadmap />} />
+
+              <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
+                <Route path="/editor-roadmap" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
+              </Route>
+
+              <Route path="/editor-roadmap/:id" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
+              <Route path="/sobre-nosotros" element={<AboutUs />} />
+              <Route path="/not-found" element={<NotFound />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
-
-            <Route path="/resources/:id/edit" element={<CreateResourceForm />} />
-
-
-            <Route path="/resources/:id" element={<ResourceDetailsPage />} />
-            <Route
-              path="/ruta-aprendizaje"
-              element={
-                <QueryClientProvider client={queryClient}>
-                  <LearnRoute />
-                </QueryClientProvider>
-              }
-            />
-
-            <Route
-              path="/roadmaps/:id"
-              element={
-                <QueryClientProvider client={queryClient}>
-                  <Roadmap />
-                </QueryClientProvider>
-              }
-            />
-
-
-
-            <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
-              <Route
-                path="/editor-roadmap"
-                element={
-                  <ReactFlowProvider>
-                    <RoadmapEditor />
-                  </ReactFlowProvider>
-                }
-              />
-            </Route>
-
-            <Route path="/editor-roadmap/:id"
-              element={
-                <ReactFlowProvider>
-                  <RoadmapEditor />
-                </ReactFlowProvider>
-              }
-            />
-
-            <Route path="/sobre-nosotros" element={<AboutUs />} />
-
-            {/* Ruta específica para /not-found */}
-            <Route path="/not-found" element={<NotFound />} />
-
-            <Route path="*" element={<NotFound />} />
-
-          </Route>
-        </Routes>
-      </AuthProvider>
-    </Router>
+          </Routes>
+        </AuthProvider>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
