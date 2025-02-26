@@ -1,0 +1,28 @@
+{
+  "records": [
+    {
+      "action": "updated",
+      "application_id": "4832380742964303",
+      "data": {
+        "id": "123456"
+      },
+      "date": "2021-11-01T02:02:02Z",
+      "entity": "preapproval",
+      "id": "123456",
+      "type": "subscription_preapproval",
+      "version": 8
+    },
+    {
+      "action": "payment.updated",
+      "api_version": "v1",
+      "data": {
+        "id": "123456"
+      },
+      "date_created": "2021-11-01T02:02:02Z",
+      "id": "123456",
+      "live_mode": false,
+      "type": "payment",
+      "user_id": 2290216045
+    }
+  ]
+}

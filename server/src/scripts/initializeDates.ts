@@ -21,19 +21,17 @@ const plansToInsert = [
   {
     name: "Plan Básico",
     description: "Plan ideal para usuarios que recién comienzan",
-    price: 9.99,
+    price: 10000,
     duration: "1 mes",
     features: ["Acceso básico", "Soporte Básico", "Actualizaciones mensuales"],
     isActive: true,
     supportLevel: "Básico",
-    /* installments: 1,
-    installmentPrice: 9.99, */
   },
   {
     name: "Plan Estándar",
     description: "Plan para usuarios que necesitan más funcionalidades",
-    price: 29.99,
-    duration: "3 meses",
+    price: 10000,
+    duration: "1 mes",
     features: [
       "Acceso completo",
       "Soporte Estándar",
@@ -41,15 +39,13 @@ const plansToInsert = [
     ],
     isActive: true,
     supportLevel: "Estándar",
-    installments: 3,
-    installmentPrice: 9.99,
   },
   {
     name: "Plan Premium",
     description:
       "Plan para usuarios avanzados que requieren soporte prioritario",
-    price: 99.99,
-    duration: "1 año",
+    price: 24000,
+    duration: "3 meses",
     features: [
       "Acceso completo",
       "Soporte Premium",
@@ -58,8 +54,8 @@ const plansToInsert = [
     ],
     isActive: true,
     supportLevel: "Premium",
-    installments: 12,
-    installmentPrice: 8.33,
+    installments: 3,
+    installmentPrice: 8000,
   },
 ];
 

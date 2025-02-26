@@ -39,6 +39,7 @@
     "geoip-lite": "^1.4.10",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
+    "mercadopago": "^2.3.0",
     "multer": "^1.4.5-lts.1",
     "nsfwjs": "^4.2.1",
     "passport": "^0.7.0",
