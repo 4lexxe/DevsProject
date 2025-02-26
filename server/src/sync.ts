@@ -30,7 +30,7 @@ async function syncDatabase() {
     await RolePermission.sync({ force: true }); // ¡Primero debe existir esta tabla!
 
     // Poblar datos DESPUÉS de crear todas las tablas
-    /* await seedInitialData(); */
+    await seedInitialData();
 
     await User.sync({ force: true });
 
@@ -61,7 +61,7 @@ async function syncDatabase() {
   }
 }
 
-/* async function seedInitialData() {
+async function seedInitialData() {
   for (const roleData of rolesIniciales) {
     const [role] = await Role.findOrCreate({
       where: { name: roleData.name },
@@ -82,6 +82,6 @@ async function syncDatabase() {
       }));
     }
   }
-} */
+}
 
 syncDatabase();
