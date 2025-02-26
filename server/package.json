@@ -17,7 +17,7 @@
   "description": "",
   "dependencies": {
     "@google-cloud/vision": "^4.3.2",
-    "@tensorflow/tfjs-node": "^4.22.0",
+    "@tensorflow/tfjs": "^4.22.0",
     "@types/axios": "^0.9.36",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",

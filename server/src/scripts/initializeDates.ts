@@ -10,8 +10,71 @@ import HeaderSection from "../modules/headerSection/HeaderSection";
 import { link } from "fs";
 import { text } from "stream/consumers";
 
+import Plan from "../modules/Membership/models/Plan";
+import Discount from "../modules/Membership/models/Discount";
+
 // Carga las variables de entorno del archivo .env
 dotenv.config();
+
+//Datos para los planes de membresia
+const plansToInsert = [
+  {
+    name: "Plan Básico",
+    description: "Plan ideal para usuarios que recién comienzan",
+    price: 9.99,
+    duration: "1 mes",
+    features: ["Acceso básico", "Soporte Básico", "Actualizaciones mensuales"],
+    isActive: true,
+    supportLevel: "Básico",
+    /* installments: 1,
+    installmentPrice: 9.99, */
+  },
+  {
+    name: "Plan Estándar",
+    description: "Plan para usuarios que necesitan más funcionalidades",
+    price: 29.99,
+    duration: "3 meses",
+    features: [
+      "Acceso completo",
+      "Soporte Estándar",
+      "Actualizaciones semanales",
+    ],
+    isActive: true,
+    supportLevel: "Estándar",
+    installments: 3,
+    installmentPrice: 9.99,
+  },
+  {
+    name: "Plan Premium",
+    description:
+      "Plan para usuarios avanzados que requieren soporte prioritario",
+    price: 99.99,
+    duration: "1 año",
+    features: [
+      "Acceso completo",
+      "Soporte Premium",
+      "Actualizaciones diarias",
+      "Acceso anticipado a nuevas funciones",
+    ],
+    isActive: true,
+    supportLevel: "Premium",
+    installments: 12,
+    installmentPrice: 8.33,
+  },
+];
+
+// Datos para los descuentos de los planes
+const descuentos = [
+  {
+    description: 'Descuento especial para Navidad', // Descripción opcional
+    value: 25, // 25% de descuento
+    startDate: new Date('2023-12-20'), // Fecha de inicio
+    endDate: new Date('2023-12-31'), // Fecha de fin (posterior a startDate)
+    isActive: true, // Descuento activo
+    planId: 1, // ID del plan asociado (debe existir en la tabla Plans)
+    event: 'Navidad 2023', // Evento obligatorio
+  }
+];
 
 //Datos de ejemplo para las categorias
 const categorias = [
@@ -180,14 +243,18 @@ const curso1 = {
 
 const curso2 = {
   title: "Curso de React.js",
-  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png",
+  image:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png",
   summary: "Aprende React.js desde cero.",
-  about: "Este curso cubre los fundamentos y conceptos avanzados de React.js, incluyendo Hooks y Context API.",
+  about:
+    "Este curso cubre los fundamentos y conceptos avanzados de React.js, incluyendo Hooks y Context API.",
   careerTypeId: 2,
-  prerequesites: [
-    "Conocimientos básicos de HTML, CSS y JavaScript",
+  prerequesites: ["Conocimientos básicos de HTML, CSS y JavaScript"],
+  learningOutcomes: [
+    "Manejo de componentes",
+    "Uso de React Router",
+    "Gestión de estado con Redux",
   ],
-  learningOutcomes: ["Manejo de componentes", "Uso de React Router", "Gestión de estado con Redux"],
   isActive: true,
   isInDevelopment: false,
   adminId: 1,
@@ -214,14 +281,18 @@ const curso2 = {
             {
               question: "¿Qué significa HTML?",
               answers: [
-                { answer: "Hyperlinks and Text Markup Language", isCorrect: false },
+                {
+                  answer: "Hyperlinks and Text Markup Language",
+                  isCorrect: false,
+                },
                 { answer: "Home Tool Markup Language", isCorrect: false },
                 { answer: "Hyper Text Markup Language", isCorrect: true },
                 { answer: "Hyper Text Machine Language", isCorrect: false },
               ],
             },
             {
-              question: "¿Cuál es la propiedad de CSS para cambiar el color del texto?",
+              question:
+                "¿Cuál es la propiedad de CSS para cambiar el color del texto?",
               answers: [
                 { answer: "text-color", isCorrect: false },
                 { answer: "font-color", isCorrect: false },
@@ -241,14 +312,18 @@ const curso2 = {
 
 const curso3 = {
   title: "Curso de Python",
-  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png",
+  image:
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png",
   summary: "Aprende Python desde cero.",
-  about: "Este curso cubre los fundamentos de Python, incluyendo estructuras de datos, funciones y programación orientada a objetos.",
+  about:
+    "Este curso cubre los fundamentos de Python, incluyendo estructuras de datos, funciones y programación orientada a objetos.",
   careerTypeId: 3,
-  prerequesites: [
-    "Ninguno, este curso es para principiantes.",
+  prerequesites: ["Ninguno, este curso es para principiantes."],
+  learningOutcomes: [
+    "Manejo de listas y diccionarios",
+    "Uso de funciones",
+    "Programación orientada a objetos",
   ],
-  learningOutcomes: ["Manejo de listas y diccionarios", "Uso de funciones", "Programación orientada a objetos"],
   isActive: true,
   isInDevelopment: false,
   adminId: 1,
@@ -276,7 +351,10 @@ const curso3 = {
               question: "¿Qué es una variable?",
               answers: [
                 { answer: "Un tipo de dato", isCorrect: false },
-                { answer: "Un contenedor para almacenar datos", isCorrect: true },
+                {
+                  answer: "Un contenedor para almacenar datos",
+                  isCorrect: true,
+                },
                 { answer: "Una función", isCorrect: false },
                 { answer: "Un bucle", isCorrect: false },
               ],
@@ -356,6 +434,14 @@ async function insertData() {
     // Sincronizar los modelos con la base de datos
     await sequelize.sync();
     console.log("Modelos sincronizados con la base de datos.");
+
+    //Datos para los planes de membresia
+    for (const plan of plansToInsert) {
+      await Plan.create(plan);
+    }
+    for(const descuento of descuentos){
+      await Discount.create(descuento)
+    }
 
     //Insertar categorias y carreras
     for (const categoria of categorias) {
