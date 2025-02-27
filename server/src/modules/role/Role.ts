@@ -8,7 +8,7 @@ export interface IRoleAttributes {
   id?: number;
   name: string;
   description: string;
-  permissions?: string[];
+  permissions?: number[]; // Ahora usamos IDs de permisos
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -50,50 +50,93 @@ class Role extends Model<IRoleAttributes, IRoleAttributes> implements IRoleAttri
   }
 }
 
-// Definimos los roles iniciales con sus permisos
+// Definimos los roles iniciales con sus permisos (usando IDs)
 export const rolesIniciales = [
   { 
     name: 'student', 
     description: 'Estudiante del sistema',
     permissions: [
-      'read:courses', 'enroll:courses',
-      'access:course_content', 'read:own_progress',
+      8,  // read:courses
+      10, // enroll:courses
+      11, // access:course_content
+      16, // read:own_progress
+      15, // manage:own_profile
+      35, // read:resources
+      36, // manage:resources
+      37, // comment:resources
+      38, // star:resources
+      41, // view:stars
+      42  // view:comments
     ]
   },
   { 
     name: 'instructor', 
     description: 'Instructor de cursos',
     permissions: [
-      'manage:courses', 'manage:course_content', 'read:courses',
-      'enroll:courses', 'manage:own_profile',
+      8,  // read:courses
+      17, // manage:courses
+      19, // manage:course_content
+      15, // manage:own_profile
+      10, // enroll:courses
+      35, // read:resources
+      36, // manage:resources
+      37, // comment:resources
+      38, // star:resources
+      39, // manage:comments
+      40, // manage:stars
+      41, // view:stars
+      42  // view:comments
     ]
   },
   { 
     name: 'moderator', 
     description: 'Moderador de la comunidad',
     permissions: [
-      'moderate:content', 'read:users', 'read:courses',
-      'manage:categories', 'manage:course_content',
+      8,  // read:courses
+      1,  // read:users
+      21, // moderate:content
+      18, // manage:categories
+      19, // manage:course_content
+      15, // manage:own_profile
+      35, // read:resources
+      36, // manage:resources
+      37, // comment:resources
+      38, // star:resources
+      39, // manage:comments
+      40, // manage:stars
+      41, // view:stars
+      42  // view:comments
     ]
   },
   { 
     name: 'admin', 
     description: 'Administrador del sistema',
     permissions: [
-      'manage:all_users', 'manage:roles', 'manage:permissions',
-      'manage:courses', 'manage:categories', 'manage:course_content',
-      'view:analytics', 'audit:logs', 'manage:system_settings',
+      8,  // read:courses
+      17, // manage:courses
+      26, // manage:all_users
+      4,  // manage:roles
+      5,  // manage:permissions
+      27, // view:analytics
+      28, // audit:logs
+      24, // manage:system_settings
+      18, // manage:categories
+      19, // manage:course_content
+      15, // manage:own_profile
+      35, // read:resources
+      36, // manage:resources
+      37, // comment:resources
+      38, // star:resources
+      39, // manage:comments
+      40, // manage:stars
+      41, // view:stars
+      42  // view:comments
     ]
   },
   { 
     name: 'superadmin', 
-    description: 'Super administrador con acceso completo',
-    permissions: [
-      'manage:all_users', 'manage:roles', 'manage:permissions',
-      'manage:courses', 'manage:categories', 'manage:course_content',
-      'view:analytics', 'audit:logs', 'manage:system_settings', 'manage:backups',
-      'impersonate:users', 'manage:system_settings',
-    ]
+    description: 'Super administrador con acceso total',
+    permissions: Array.from({ length: 42 }, (_, i) => i + 1) // Todos los IDs de permisos (1 a 42)
   }
 ];
 
@@ -117,7 +160,7 @@ Role.init({
   permissions: {
     type: DataTypes.VIRTUAL,
     get() {
-      return this.Permissions?.map((p: Permission) => p.name) ?? [];
+      return this.Permissions?.map((p: Permission) => p.id) ?? [];
     }
   }
 }, {

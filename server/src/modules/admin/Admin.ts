@@ -14,7 +14,6 @@ class Admin extends Model {
   declare readonly updatedAt: Date;
   declare adminUser?: User;
 
-  // Agregar un método para verificar permisos
   public hasPermission(permission: string): boolean {
     return this.permissions.includes(permission);
   }

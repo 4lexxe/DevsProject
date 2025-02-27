@@ -38,7 +38,7 @@ export const getAllAdmins = async (): Promise<Admin[]> => {
       include: [
         {
           model: User,
-          as: 'user',
+          as: 'adminUser', // Usa el alias correcto
         },
       ],
     });
@@ -56,7 +56,7 @@ export const getAdminById = async (adminId: number): Promise<Admin | null> => {
       include: [
         {
           model: User,
-          as: 'user',
+          as: 'adminUser', // Usa el alias correcto
         },
       ],
     });

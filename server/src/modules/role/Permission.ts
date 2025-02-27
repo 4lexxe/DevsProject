@@ -4,7 +4,7 @@ import sequelize from '../../infrastructure/database/db';
 class Permission extends Model {
   static permisos = [
     // Módulo: Usuarios
-    { name: 'read:users', description: 'Puede ver usuarios' },
+    { name: 'read:users', description: 'Puede ver los usuarios' },
     { name: 'write:users', description: 'Puede crear/editar usuarios' },
     { name: 'delete:users', description: 'Puede eliminar usuarios' },
     { name: 'manage:roles', description: 'Puede gestionar roles' },
@@ -60,6 +60,16 @@ class Permission extends Model {
     { name: 'manage:sales', description: 'Puede gestionar todas las ventas' },
     { name: 'refund:sales', description: 'Puede emitir reembolsos de ventas' },
     { name: 'view:sales', description: 'Puede ver las ventas realizadas' },
+
+    // Módulo: Recursos
+    { name: 'read:resources', description: 'Puede ver recursos disponibles' },
+    { name: 'manage:resources', description: 'Puede gestionar recursos' },
+    { name: 'comment:resources', description: 'Puede comentar en recursos' },
+    { name: 'star:resources', description: 'Puede dar estrellas a recursos' },
+    { name: 'manage:comments', description: 'Puede gestionar comentarios' },
+    { name: 'manage:stars', description: 'Puede gestionar estrellas' },
+    { name: 'view:stars', description: 'Puede ver estrellas en recursos' },
+    { name: 'view:comments', description: 'Puede ver comentarios en recursos' },
   ];
 
   declare id: number;

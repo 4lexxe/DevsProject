@@ -228,7 +228,7 @@ admin y roles no necesitan de la ruta de autenticación para poder acceder a sus
 // Rutas de Usuarios
 app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/roles', roleRoutes);
+app.use('/api/', roleRoutes);
 
 /*
 --------------------------

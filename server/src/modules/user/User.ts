@@ -1,7 +1,8 @@
-import { Sequelize, DataTypes, Model, Op } from "sequelize";
+import { DataTypes, Model, Op, BelongsToGetAssociationMixin } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
 import Role from "../role/Role";
 import Permission from "../role/Permission";
+import UserPermissionException from "./UserPermissionExceptions";
 
 export enum AuthProvider {
   LOCAL = "local",
@@ -56,21 +57,78 @@ class User extends Model {
   public isActiveSession!: boolean;
   public lastActiveAt!: Date | null;
   public Role?: Role;
+  public Permissions?: Permission[];
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
+  // Métodos generados por Sequelize para la relación con Permission
+  public addPermissions!: (permission: Permission) => Promise<void>; // Declarar explícitamente addPermissions
+  public removePermissions!: (permission: Permission) => Promise<void>; // Declarar explícitamente removePermissions
+  public getPermissions!: () => Promise<Permission[]>; // Declarar explícitamente getPermissions
+
+  declare getRole: BelongsToGetAssociationMixin<Role>;
+
   async hasPermission(permissionName: string): Promise<boolean> {
+    // Obtener el rol del usuario con sus permisos
     const role = await Role.findByPk(this.roleId, {
       include: [
         {
           model: Permission,
-          as: "Permissions", // Asegurar que coincida con la asociación en Role
+          as: "Permissions",
           attributes: ["name"],
         },
       ],
     });
 
-    return !!role?.Permissions?.some((p) => p.name === permissionName);
+    // Obtener permisos personalizados del usuario
+    const userPermissions = this.Permissions || [];
+
+    // Combinar permisos del rol y permisos personalizados
+    const rolePermissions = role?.Permissions?.map((p) => p.name) || [];
+    const customPermissions = userPermissions.map((p) => p.name);
+    const allPermissions = [...rolePermissions, ...customPermissions];
+
+    // Verificar si el permiso está bloqueado para el usuario
+    const permission = role?.Permissions?.find((p) => p.name === permissionName);
+    if (!permission) {
+      console.log(`Permiso "${permissionName}" no encontrado en el rol.`);
+      return false; // Si no existe el permiso, denegar acceso
+    }
+
+    console.log('Verificando permiso bloqueado:', {
+      userId: this.id,
+      permissionId: permission.id,
+    });
+
+    const isPermissionBlocked = await UserPermissionException.findOne({
+      where: {
+        userId: this.id,
+        permissionId: permission.id, // Asegurar que permissionId está definido
+      },
+    });
+
+    // Si el permiso está bloqueado, denegar acceso
+    if (isPermissionBlocked) {
+      console.log(`Permiso "${permissionName}" está bloqueado para el usuario.`);
+      return false;
+    }
+
+    // Verificar si el usuario tiene el permiso requerido
+    const hasPermission = allPermissions.includes(permissionName);
+    console.log(`Usuario ${this.id} tiene permiso "${permissionName}":`, hasPermission);
+    return hasPermission;
+  }
+
+  // Método para agregar un permiso personalizado
+  async addPermission(permission: Permission): Promise<void> {
+    if (!permission || !permission.id) {
+      throw new Error('Permiso no válido');
+    }
+
+    console.log('Agregando permiso:', permission.name, 'ID:', permission.id);
+
+    // Usar el método generado por Sequelize para agregar el permiso
+    await this.addPermissions(permission); // ¡Aquí está la corrección!
   }
 }
 
@@ -203,6 +261,21 @@ User.belongsTo(Role, {
 Role.hasMany(User, {
   foreignKey: "roleId",
   as: "Users",
+});
+
+// Relación muchos a muchos entre User y Permission para permisos personalizados
+User.belongsToMany(Permission, {
+  through: 'UserPermissions', // Tabla intermedia
+  foreignKey: 'userId',
+  as: 'Permissions', // Alias para la relación
+  timestamps: false, // Desactivar marcas de tiempo
+});
+
+Permission.belongsToMany(User, {
+  through: 'UserPermissions', // Tabla intermedia
+  foreignKey: 'permissionId',
+  as: 'Users', // Alias para la relación
+  timestamps: false, // Desactivar marcas de tiempo
 });
 
 export default User;

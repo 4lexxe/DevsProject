@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import User from '../user/User';
 import Role from '../role/Role';
+import Permission from '../role/Permission';
+import UserPermissionException from './UserPermissionExceptions';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
@@ -107,11 +109,41 @@ export class UserController {
   static async getUserSecurityDetails(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      if (!(req.user as User)?.hasPermission('VIEW_SECURITY_DETAILS')) {
-        res.status(403).json({ error: 'No autorizado' });
-        return;
-      }
+      
+      // Obtener los permisos del usuario
+      const userPermissions = (req.user as User)?.Permissions;
+      console.log('Permisos del usuario:', userPermissions);
+  
+      // Obtener los permisos bloqueados
+      const blockedPermissions = await UserPermissionException.findAll({
+        where: { userId: id },
+        include: [{ model: Permission, as: 'Permission' }],
+      });
+      console.log('Permisos bloqueados:', blockedPermissions);
+  
+      // Obtener los permisos combinados (rol + personalizados)
       const user = await User.findByPk(id, {
+        include: [
+          {
+            model: Role,
+            as: 'Role',
+            include: [{ model: Permission, as: 'Permissions' }],
+          },
+          {
+            model: Permission,
+            as: 'Permissions',
+          },
+        ],
+      });
+  
+      const combinedPermissions = [
+        ...(user?.Role?.Permissions?.map((p) => p.name) || []),
+        ...(user?.Permissions?.map((p) => p.name) || []),
+      ];
+      console.log('Permisos combinados:', combinedPermissions);
+  
+      // Buscar el usuario en la base de datos
+      const userDetails = await User.findByPk(id, {
         attributes: [
           'id',
           'registrationIp',
@@ -124,32 +156,36 @@ export class UserController {
         ],
         include: [{
           model: Role,
-          as: 'Role', // Usa el alias definido en la relación
-          attributes: ['name']
-        }]
+          as: 'Role',
+          attributes: ['name'],
+        }],
       });
-      if (!user) {
+  
+      // Si el usuario no existe, devolver un error 404
+      if (!userDetails) {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
+  
+      // Devolver los detalles de seguridad del usuario
       res.json({
-        id: user.id,
-        role: user.Role?.name,
-        registrationGeo: user.registrationGeo,
-        lastLoginIp: user.lastLoginIp,
-        registrationLocation: user.registrationGeo ? {
-          city: user.registrationGeo.city,
-          country: user.registrationGeo.country,
-          coordinates: user.registrationGeo.loc
+        id: userDetails.id,
+        role: userDetails.Role?.name,
+        registrationGeo: userDetails.registrationGeo,
+        lastLoginIp: userDetails.lastLoginIp,
+        registrationLocation: userDetails.registrationGeo ? {
+          city: userDetails.registrationGeo.city,
+          country: userDetails.registrationGeo.country,
+          coordinates: userDetails.registrationGeo.loc,
         } : null,
-        lastLoginLocation: user.lastLoginGeo ? {
-          city: user.lastLoginGeo.city,
-          country: user.lastLoginGeo.country,
-          coordinates: user.lastLoginGeo.loc
+        lastLoginLocation: userDetails.lastLoginGeo ? {
+          city: userDetails.lastLoginGeo.city,
+          country: userDetails.lastLoginGeo.country,
+          coordinates: userDetails.lastLoginGeo.loc,
         } : null,
-        suspiciousActivities: user.suspiciousActivities.length,
-        isActiveSession: user.isActiveSession, // Incluir isActiveSession
-        lastActiveAt: user.lastActiveAt,       // Incluir lastActiveAt
+        suspiciousActivities: userDetails.suspiciousActivities.length,
+        isActiveSession: userDetails.isActiveSession,
+        lastActiveAt: userDetails.lastActiveAt,
       });
     } catch (error) {
       console.error('Error fetching security details:', error);
@@ -252,6 +288,99 @@ export class UserController {
     } catch (error) {
       console.error('Error deleting user:', error);
       res.status(500).json({ error: 'Error al eliminar usuario' });
+    }
+  }
+
+  // Asignar un permiso personalizado a un usuario
+  static async assignCustomPermission(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId, permissionId } = req.body;
+  
+      // Validar que userId y permissionId estén presentes
+      if (!userId || !permissionId) {
+        res.status(400).json({ error: 'userId y permissionId son requeridos' });
+        return;
+      }
+  
+      const user = await User.findByPk(userId);
+      const permission = await Permission.findByPk(permissionId);
+  
+      if (!user || !permission) {
+        res.status(404).json({ error: 'Usuario o permiso no encontrado' });
+        return;
+      }
+  
+      // Asignar el permiso personalizado
+      await user.addPermission(permission);
+  
+      res.json({ message: 'Permiso asignado correctamente' });
+    } catch (error) {
+      console.error('Error assigning custom permission:', error);
+      res.status(500).json({ error: 'Error al asignar permiso personalizado' });
+    }
+  }
+
+  // Bloquear un permiso para un usuario (excepción de permiso)
+  static async blockPermission(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId, permissionId } = req.body;
+  
+      // Validar que userId y permissionId estén presentes
+      if (!userId || !permissionId) {
+        res.status(400).json({ error: 'userId y permissionId son requeridos' });
+        return;
+      }
+  
+      const user = await User.findByPk(userId);
+      const permission = await Permission.findByPk(permissionId);
+  
+      if (!user || !permission) {
+        res.status(404).json({ error: 'Usuario o permiso no encontrado' });
+        return;
+      }
+  
+      // Crear una excepción de permiso
+      await UserPermissionException.create({
+        userId,
+        permissionId,
+      });
+  
+      res.json({ message: 'Permiso bloqueado correctamente' });
+    } catch (error) {
+      console.error('Error blocking permission:', error);
+      res.status(500).json({ error: 'Error al bloquear permiso' });
+    }
+  }
+  // Desbloquear un permiso para un usuario (eliminar excepción de permiso)
+  static async unblockPermission(req: Request, res: Response): Promise<void> {
+    try {
+      const { userId, permissionId } = req.body;
+
+      // Validar que userId y permissionId estén presentes
+      if (!userId || !permissionId) {
+        res.status(400).json({ error: 'userId y permissionId son requeridos' });
+        return;
+      }
+
+      const exception = await UserPermissionException.findOne({
+        where: {
+          userId,
+          permissionId,
+        },
+      });
+
+      if (!exception) {
+        res.status(404).json({ error: 'Excepción de permiso no encontrada' });
+        return;
+      }
+
+      // Eliminar la excepción de permiso
+      await exception.destroy();
+
+      res.json({ message: 'Permiso desbloqueado correctamente' });
+    } catch (error) {
+      console.error('Error unblocking permission:', error);
+      res.status(500).json({ error: 'Error al desbloquear permiso' });
     }
   }
 }

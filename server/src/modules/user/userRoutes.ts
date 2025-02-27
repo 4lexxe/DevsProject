@@ -13,10 +13,29 @@ router.use(geoMiddleware);
 router.get('/users', UserController.getUsers); // Obtener todos los usuarios (público)
 router.get('/users/:id', UserController.getUserById); // Obtener un usuario por ID (público)
 
+// Rutas para permisos personalizados (deben definirse antes de las rutas dinámicas)
+router.post('/users/assign-permission',
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  UserController.assignCustomPermission
+);
+
+router.post('/users/block-permission',
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  UserController.blockPermission
+);
+
+router.delete('/users/unblock-permission',
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  UserController.unblockPermission
+);
+
 // Rutas que requieren autenticación y permisos
 router.get('/users/:id/security',
   authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['view:security_details']),  // Verificar permisos
+  permissionsMiddleware(['read:courses']),  // Verificar permisos
   UserController.getUserSecurityDetails
 );
 

@@ -5,6 +5,8 @@ import { rolesIniciales } from './modules/role/Role';
 import Permission from './modules/role/Permission';
 import RolePermission from './modules/role/RolePermission';
 import User from './modules/user/User';
+import UserPermission from './modules/user/UserPermissions';
+import UserPermissionException from './modules/user/UserPermissionExceptions';
 import Admin from './modules/admin/Admin';
 import SectionHeader from './modules/headerSection/HeaderSection';
 import Recourse from './modules/resource/Resource';
@@ -34,6 +36,10 @@ async function syncDatabase() {
      await seedInitialData(); 
 
     await User.sync({ force: true });
+
+    await UserPermission.sync({ force: true });
+
+    await UserPermissionException.sync({ force: true });
 
     await Admin.sync({ force: true });
 
@@ -65,8 +71,9 @@ async function syncDatabase() {
   }
 }
 
- async function seedInitialData() {
+async function seedInitialData() {
   for (const roleData of rolesIniciales) {
+    // Crear o encontrar el rol
     const [role] = await Role.findOrCreate({
       where: { name: roleData.name },
       defaults: { 
@@ -75,17 +82,18 @@ async function syncDatabase() {
       },
     });
 
+    // Buscar los permisos por su ID
     const permissions = await Permission.findAll({
-      where: { name: roleData.permissions }
+      where: { id: roleData.permissions } // Usar el campo "id" en lugar de "name"
     });
 
-    // Modificar esta parte
+    // Asociar los permisos al rol
     if (permissions.length > 0) {
       await Promise.all(permissions.map(async (permission) => {
         await role.addPermission(permission);
       }));
     }
   }
-} 
+}
 
 syncDatabase();
