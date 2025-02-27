@@ -8,15 +8,13 @@ import JsonFileHandler from "../../../infrastructure/config/ficheroJSON";
 
 class MercadoPagoController {
   // Instancia de las clases de suscripcion y suscripcionPlan
-  static config = new MercadoPagoConfig({
-    accessToken: "APP_USR-4832380742964303-022610-ceb2dc7161d8ed7338977cea9e1d80d6-2290216045", // Reemplaza con tu Access Token
-  });
   
-  private static preApproval = new PreApproval(this.config);
-  private static preApprovalPlan = new PreApprovalPlan(this.config);
+  
+  private static preApproval = new PreApproval(MpConfig);
+  
 
   // Función para generar metadata
-  private static metadata(req: Request, res: Response) {
+  static metadata(req: Request, res: Response) {
     return {
       statusCode: res.statusCode,
       url: req.protocol + "://" + req.get("host") + req.originalUrl,
@@ -37,11 +35,14 @@ class MercadoPagoController {
       status: "error",
       message,
       error: error.message,
+      fullError: error,
     });
   }
 
   // Método estático para crear un plan de suscripción
-  static async createSubscriptionPlan(req: Request, res: Response) {
+  static createSubscriptionPlan: RequestHandler = async(req, res) => {
+    const preApprovalPlan = new PreApprovalPlan(MpConfig);
+
     const planData = {
       reason: "Plan de papitas",
       autoRecurring: {
@@ -56,7 +57,7 @@ class MercadoPagoController {
 
     try {
       // Crear el plan en Mercado Pago
-      const plan = await this.preApprovalPlan.create({
+      const plan = await preApprovalPlan.create({
         body: {
           reason: planData.reason,
           auto_recurring: planData.autoRecurring,
@@ -72,12 +73,7 @@ class MercadoPagoController {
         metadata: this.metadata(req, res),
       });
     } catch (error) {
-      this.handleServerError(
-        res,
-        req,
-        error,
-        "Error al crear el plan de suscripción"
-      );
+      this.handleServerError(res, req, error, "Error al crear la suscripción");
     }
   }
 
@@ -86,10 +82,10 @@ class MercadoPagoController {
     const {} = req.body;
 
     const suscripcion = {
-      preApprovalPlanId: "",
-      reason: "",
+      preApprovalPlanId: "2c938084953dde16019544c8aca20401",
+      reason: "Plan de papitas con chocolate",
       externalReference: "",
-      payerEmail: "test_user_695200991@testuser.com",
+      payerEmail: "test_user_437832978@testuser.com",
       cardTokenId: "",
       autoRecurring: {
         frequency: 1,
@@ -107,11 +103,11 @@ class MercadoPagoController {
       // Crear la suscripción en Mercado Pago
       const subscription = await this.preApproval.create({
         body: {
+          /* preapproval_plan_id: suscripcion.preApprovalPlanId, */
           reason: suscripcion.reason,
           payer_email: suscripcion.payerEmail,
           auto_recurring: suscripcion.autoRecurring,
           back_url: suscripcion.backUrl,
-          status: suscripcion.status,
         },
       });
 

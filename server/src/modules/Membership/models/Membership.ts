@@ -43,5 +43,5 @@ Customer.hasMany(Membership, { foreignKey: "customerId" }); */
 
 Membership.belongsTo(Plan, { foreignKey: "planId" });
 Plan.hasMany(Membership, { foreignKey: "planId" });
-
+ 
 export default Membership;

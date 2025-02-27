@@ -25,11 +25,8 @@ import Discount from "./modules/Membership/models/Discount";
 import Invoice from "./modules/Membership/models/Invoice";
 import Membership from "./modules/Membership/models/Membership";
 import Payment from "./modules/Membership/models/Payment";
-import PaymentGateway from "./modules/Membership/models/PaymentGateway";
-import PaymentMethod from "./modules/Membership/models/PaymentMethod";
 import Plan from "./modules/Membership/models/Plan";
 import Refund from "./modules/Membership/models/Refund";
-import Transaction from "./modules/Membership/models/Transaction";
 
 // sync.ts
 async function syncDatabase() {
@@ -69,10 +66,7 @@ async function syncDatabase() {
     /* Sincronización de modelos en el orden correcto */
     await Plan.sync({ force: true });
     await Membership.sync({ force: true }); 
-    await PaymentGateway.sync({ force: true });
-    await PaymentMethod.sync({ force: true });
     await Payment.sync({ force: true });
-    await Transaction.sync({ force: true });
     await Invoice.sync({ force: true });
     await Discount.sync({ force: true });
     await Refund.sync({ force: true });
