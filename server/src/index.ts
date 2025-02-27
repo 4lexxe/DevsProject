@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import geoip from 'geoip-lite';
 import { Server, Socket } from 'socket.io';
 import { Request } from 'express';
+import { Resend } from "resend"; //Libreria para mandar Emails
 
 // ==================================================
 // Importaciones de rutas
@@ -41,6 +42,9 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 // Rutas de Roadmap
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
+// Rutas de Contacto
+import contactMessageRoutes from './modules/contact/ContactMessageRoute';
+
 // ==================================================
 // Importaciones de utilidades y configuraciones
 // ==================================================
@@ -70,6 +74,7 @@ declare module 'geoip-lite' {
 // Configuración inicial de la aplicación
 // ==================================================
 const app = express();
+const resend = new Resend(process.env.API_KEY_RESEND);
 const PORT = /* process.env.PORT || */ 3000;
 
 // ==================================================
@@ -206,6 +211,9 @@ app.use((req, res, next) => {
 // 7. Sistema de enrutamiento
 // ==================================================
 
+// Rutas de Contacto
+app.use('/api', contactMessageRoutes);
+
 // --------------------------
 // 7.1 Rutas de Autenticación
 // --------------------------
@@ -255,6 +263,8 @@ app.use('/api', contentRoutes);
 
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);
+
+
 
 // Endpoint de estado del sistema
 app.get('/api/status', (req: Request, res) => {

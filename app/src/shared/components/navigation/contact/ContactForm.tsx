@@ -1,28 +1,18 @@
 import { useForm } from "react-hook-form";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { Textarea } from "./Textarea";
 import { Label } from "./Label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useState } from "react";
+import { ContactMessageService } from "./services/contact.service";
 
-// Definir el esquema de validación con zod
-const formSchema = z.object({
-  name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
-  email: z.string().email("Ingresa un email válido"),
-  subject: z.string().min(5, "El asunto debe tener al menos 5 caracteres"),
-  message: z.string().min(10, "El mensaje debe tener al menos 10 caracteres"),
-});
-
-// Inferir el tipo desde el esquema de zod
-type FormData = z.infer<typeof formSchema>;
-
+import { formSchema, FormData } from "./types";
 
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Configurar react-hook-form con zodResolver
   const {
     register,
@@ -39,21 +29,16 @@ const ContactForm = () => {
     },
   });
 
-  // Función para manejar el envío del formulario
+  // Función para manejar el envío del formulario usando el service
   const onSubmit = async (formData: FormData) => {
     setIsSubmitting(true);
-
     try {
-      // Simular envío del formulario
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success('Formulario enviado con exito!');
-
-      // Resetear el formulario
+      await ContactMessageService.create(formData);
+      toast.success("Formulario enviado con éxito!");
       reset();
     } catch (error) {
-      console.log("Error al cargar el formulario.", error)
-      toast.error("Error al cargar formulario")
+      console.error("Error al enviar el formulario.", error);
+      toast.error("Error al enviar el formulario");
     } finally {
       setIsSubmitting(false);
     }
