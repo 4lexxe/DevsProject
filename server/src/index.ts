@@ -11,7 +11,6 @@ import rateLimit from 'express-rate-limit';
 import geoip from 'geoip-lite';
 import { Server, Socket } from 'socket.io';
 import { Request } from 'express';
-import { Resend } from "resend"; //Libreria para mandar Emails
 
 // ==================================================
 // Importaciones de rutas
@@ -74,7 +73,6 @@ declare module 'geoip-lite' {
 // Configuración inicial de la aplicación
 // ==================================================
 const app = express();
-const resend = new Resend(process.env.API_KEY_RESEND);
 const PORT = /* process.env.PORT || */ 3000;
 
 // ==================================================
