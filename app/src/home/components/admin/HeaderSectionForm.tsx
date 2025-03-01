@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HeaderSection } from '../../services/headerSectionServices';
 import { AlertCircle, Image, Type, MessageSquare, Link2, Loader2 } from 'lucide-react';
+import InputFile from './InputFile';
 
 interface HeaderSectionFormProps {
   initialData: HeaderSection;
@@ -209,6 +210,37 @@ const HeaderSectionForm: React.FC<HeaderSectionFormProps> = ({
     return `${baseClasses} border-gray-300 focus:outline-none`;
   };
 
+  // Manejar cambio de imagen
+  const handleImageChange = (fileUrl: string | null) => {
+    const updatedFormData = {
+      ...formData,
+      image: fileUrl || ''
+    };
+    
+    setFormData(updatedFormData);
+    
+    // Marcar el campo como tocado
+    if (!touchedFields.image) {
+      setTouchedFields({
+        ...touchedFields,
+        image: true
+      });
+    }
+    
+    // Notificar cambios al componente padre si existe onChange
+    if (onChange) {
+      onChange(updatedFormData);
+    }
+    
+    // Limpiar error cuando el usuario cambia la imagen
+    if (errors.image) {
+      setErrors({
+        ...errors,
+        image: ''
+      });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-4">
@@ -245,25 +277,19 @@ const HeaderSectionForm: React.FC<HeaderSectionFormProps> = ({
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 mb-1" htmlFor="image">
             <Image className="h-4 w-4 mr-2 text-gray-400" />
-            URL de la Imagen
+            Imagen de Fondo
           </label>
-          <input
-            type="text"
-            id="image"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            className={getFieldClassName('image')}
-            placeholder="https://ejemplo.com/imagen.jpg"
-            disabled={loading}
-          />
-          {touchedFields.image && errors.image && (
-            <div className="mt-1 flex items-center text-sm text-red-600">
-              <AlertCircle className="h-4 w-4 mr-1" />
-              {errors.image}
-            </div>
-          )}
+          <div className="mt-1">
+            <InputFile
+              value={formData.image}
+              onChange={handleImageChange}
+              error={touchedFields.image ? errors.image : undefined}
+              disabled={loading}
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Tamaño recomendado: 1920x1080 píxeles
+          </p>
         </div>
 
         {/* Slogan */}
