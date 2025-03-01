@@ -1,9 +1,21 @@
 import api from '../../api/axios';
 
+// Definir la interfaz para HeaderSection
+export interface HeaderSection {
+  id?: string;
+  image: string;
+  title: string;
+  slogan: string;
+  about: string;
+  buttonName: string;
+  buttonLink: string;
+  adminId: number;
+}
+
 const HEADER_SECTION_ENDPOINT = '/header-sections';
 
 // Obtener todas las secciones de encabezado
-export const getHeaderSections = async () => {
+export const getHeaderSections = async (): Promise<HeaderSection[]> => {
   try {
     const response = await api.get(HEADER_SECTION_ENDPOINT);
     return response.data;
@@ -25,8 +37,9 @@ export const getHeaderSectionById = async (id: string) => {
 };
 
 // Crear una nueva sección de encabezado
-export const createHeaderSection = async (headerSectionData: any) => {
+export const createHeaderSection = async (headerSectionData: HeaderSection) => {
   try {
+    // Asegurarse de que se envía el ID si está definido
     const response = await api.post(HEADER_SECTION_ENDPOINT, headerSectionData);
     return response;
   } catch (error) {
@@ -36,7 +49,7 @@ export const createHeaderSection = async (headerSectionData: any) => {
 };
 
 // Actualizar una sección de encabezado
-export const updateHeaderSection = async (id: string, headerSectionData: any) => {
+export const updateHeaderSection = async (id: string, headerSectionData: HeaderSection) => {
   try {
     const response = await api.put(`${HEADER_SECTION_ENDPOINT}/${id}`, headerSectionData);
     return response;
