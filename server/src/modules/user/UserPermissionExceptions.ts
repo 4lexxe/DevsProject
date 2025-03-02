@@ -1,6 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
-import Permission from "../role/Permission";
+import Permission from "../Permission/Permission";
 
 class UserPermissionException extends Model {
   declare userId: number;

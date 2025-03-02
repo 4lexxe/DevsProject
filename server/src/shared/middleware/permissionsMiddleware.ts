@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import User from "../../modules/user/User";
 import UserPermissionException from "../../modules/user/UserPermissionExceptions";
-import Permission from "../../modules/role/Permission";
+import Permission from "../../modules/Permission/Permission";
 import { Op } from "sequelize";
 
 export const permissionsMiddleware = (requiredPermissions: string[]) => {

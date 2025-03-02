@@ -1,7 +1,7 @@
 import { DataTypes, Model, Op, BelongsToGetAssociationMixin } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
 import Role from "../role/Role";
-import Permission from "../role/Permission";
+import Permission from "../Permission/Permission";
 import UserPermissionException from "./UserPermissionExceptions";
 
 export enum AuthProvider {

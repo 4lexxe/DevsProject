@@ -53,24 +53,24 @@ export class AdminController {
 
   static async getAllAdmins(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const admins = await AdminService.getAllAdmins();
-      res.status(200).json(admins);
+      const admins = await AdminService.getAllAdmins()
+      res.status(200).json(admins)
     } catch (error) {
-      next(error);
+      next(error)
     }
   }
 
   static async getAdminById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { adminId } = req.params;
-      const admin = await AdminService.getAdminById(Number(adminId));
+      const { adminId } = req.params
+      const admin = await AdminService.getAdminById(Number(adminId))
       if (admin) {
-        res.status(200).json(admin);
+        res.status(200).json(admin)
       } else {
-        res.status(404).json({ error: `Administrador con id ${adminId} no encontrado` });
+        res.status(404).json({ error: `Administrador con id ${adminId} no encontrado` })
       }
     } catch (error) {
-      next(error);
+      next(error)
     }
   }
 

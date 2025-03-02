@@ -1,7 +1,7 @@
 import sequelize from "../../infrastructure/database/db";
 import User from "../../modules/user/User";
 import Role from "../../modules/role/Role";
-import Permission from "../../modules/role/Permission";
+import Permission from "../../modules/Permission/Permission";
 import RolePermission from "../../modules/role/RolePermission";
 import bcrypt from "bcrypt";
 

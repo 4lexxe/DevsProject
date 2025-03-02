@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
 import Role, { IRoleAttributes, IRoleInstance } from '../role/Role';
-import Permission from '../role/Permission';
+import Permission from '../Permission/Permission';
 
 interface RoleRequestBody {
   name: string;
