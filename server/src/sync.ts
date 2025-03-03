@@ -20,6 +20,17 @@ import { CourseCategory } from './modules/course/Course';
 import Section from './modules/section/Section';
 import Content from './modules/content/Content';
 
+/* Modelos relacionados con el foro */
+import ForumCategory from './modules/forum/models/ForumCategory';
+import ForumThread from './modules/forum/models/ForumThread';
+import ForumPost from './modules/forum/models/ForumPost';
+import ForumReply from './modules/forum/models/ForumReply';
+import ForumVote from './modules/forum/models/ForumVote';
+import ForumFlair from './modules/forum/models/ForumFlair';
+import { predefinedFlairs } from './modules/forum/models/ForumFlair';
+import Report from './modules/forum/models/Report';
+import ForumReaction from './modules/forum/models/ForumReaction';
+
 // sync.ts
 async function syncDatabase() {
   try {
@@ -49,13 +60,22 @@ async function syncDatabase() {
 
     await Content.sync({ force: true });
 
-
     await Rating.sync({ force: true });
 
     await Comment.sync({ force: true });
     await Recourse.sync({ force: true });
 
     await RoadMap.sync({ force: true });
+    
+    // Sincronizar modelos del foro
+    await ForumCategory.sync({ force: true });
+    await ForumThread.sync({ force: true });
+    await ForumPost.sync({ force: true });
+    await ForumReply.sync({ force: true });
+    await ForumVote.sync({ force: true });
+    await ForumFlair.sync({ force: true });
+    await Report.sync({ force: true });
+    await ForumReaction.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {
@@ -65,7 +85,8 @@ async function syncDatabase() {
   }
 }
 
- async function seedInitialData() {
+async function seedInitialData() {
+  // Inicializar roles y permisos
   for (const roleData of rolesIniciales) {
     const [role] = await Role.findOrCreate({
       where: { name: roleData.name },
@@ -86,6 +107,28 @@ async function syncDatabase() {
       }));
     }
   }
+  
+  // Inicializar los distintivos predefinidos del foro
+  await initializeForumFlairs();
 } 
+
+/**
+ * @function initializeForumFlairs
+ * @description Inicializa los distintivos predefinidos en la base de datos
+ * @returns {Promise<void>}
+ */
+async function initializeForumFlairs(): Promise<void> {
+  try {
+    for (const flair of predefinedFlairs) {
+      await ForumFlair.findOrCreate({
+        where: { name: flair.name },
+        defaults: flair
+      });
+    }
+    console.log('Distintivos predefinidos del foro inicializados correctamente.');
+  } catch (error) {
+    console.error('Error al inicializar los distintivos predefinidos del foro:', error);
+  }
+}
 
 syncDatabase();
