@@ -9,9 +9,9 @@ interface ForumThreadAttributes {
   title: string;
   categoryId: number;
   authorId: number;
-  isPinned: boolean;
-  isLocked: boolean;
-  isAnnouncement: boolean;
+  isPinned?: boolean;
+  isLocked?: boolean;
+  isAnnouncement?: boolean;
   viewCount: number;
   postCount: number;
   lastActivityAt: Date;
@@ -26,9 +26,9 @@ class ForumThread extends Model<ForumThreadAttributes, ForumThreadCreationAttrib
   public title!: string;
   public categoryId!: number;
   public authorId!: number;
-  public isPinned!: boolean;
-  public isLocked!: boolean;
-  public isAnnouncement!: boolean;
+  public isPinned?: boolean;
+  public isLocked?: boolean;
+  public isAnnouncement?: boolean;
   public viewCount!: number;
   public postCount!: number;
   public lastActivityAt!: Date;

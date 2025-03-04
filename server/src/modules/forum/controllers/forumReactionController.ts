@@ -95,100 +95,100 @@ export const getReactionsByTarget = async (req: Request, res: Response): Promise
  * @param {Response} res - Express response object
  */
 export const addReaction = async (req: Request, res: Response): Promise<void> => {
-  const transaction = await sequelize.transaction();
-  
-  try {
-    const { targetId, targetType } = req.params;
-    const { userId, emojiId, emojiName, isCustom = false } = req.body;
+    const transaction = await sequelize.transaction();
     
-    // Validaciones básicas
-    if (!userId || !emojiId || !emojiName) {
-      res.status(400).json({ 
-        success: false, 
-        message: 'userId, emojiId y emojiName son obligatorios' 
+    try {
+      const { targetId, targetType } = req.params;
+      const { userId, emojiId, emojiName, isCustom = false } = req.body;
+      
+      // Validaciones básicas
+      if (!userId || !emojiId || !emojiName) {
+        res.status(400).json({ 
+          success: false, 
+          message: 'userId, emojiId y emojiName son obligatorios' 
+        });
+        return;
+      }
+      
+      // Validar el tipo de objetivo
+      if (!Object.values(ReactionTargetType).includes(targetType as ReactionTargetType)) {
+        res.status(400).json({ 
+          success: false, 
+          message: 'Tipo de objetivo no válido. Debe ser "post" o "reply"' 
+        });
+        return;
+      }
+      
+      // Verificar si el objetivo existe
+      let targetExists = false;
+      if (targetType === ReactionTargetType.POST) {
+        targetExists = !!(await ForumPost.findByPk(Number(targetId)));
+      } else {
+        targetExists = !!(await ForumReply.findByPk(Number(targetId)));
+      }
+      
+      if (!targetExists) {
+        res.status(404).json({ 
+          success: false, 
+          message: `El ${targetType === ReactionTargetType.POST ? 'post' : 'reply'} no existe` 
+        });
+        return;
+      }
+      
+      // Verificar si el usuario existe
+      const user = await User.findByPk(userId);
+      if (!user) {
+        res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        return;
+      }
+      
+      // Verificar si ya existe alguna reacción del usuario para este objetivo (sin importar el emoji)
+      const existingReaction = await ForumReaction.findOne({
+        where: {
+          userId,
+          targetId: Number(targetId),
+          targetType
+        },
+        transaction
       });
-      return;
-    }
-    
-    // Validar el tipo de objetivo
-    if (!Object.values(ReactionTargetType).includes(targetType as ReactionTargetType)) {
-      res.status(400).json({ 
-        success: false, 
-        message: 'Tipo de objetivo no válido. Debe ser "post" o "reply"' 
-      });
-      return;
-    }
-    
-    // Verificar si el objetivo existe
-    let targetExists = false;
-    if (targetType === ReactionTargetType.POST) {
-      targetExists = !!(await ForumPost.findByPk(Number(targetId)));
-    } else {
-      targetExists = !!(await ForumReply.findByPk(Number(targetId)));
-    }
-    
-    if (!targetExists) {
-      res.status(404).json({ 
-        success: false, 
-        message: `El ${targetType === ReactionTargetType.POST ? 'post' : 'reply'} no existe` 
-      });
-      return;
-    }
-    
-    // Verificar si el usuario existe
-    const user = await User.findByPk(userId);
-    if (!user) {
-      res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-      return;
-    }
-    
-    // Verificar si ya existe la misma reacción del usuario
-    const existingReaction = await ForumReaction.findOne({
-      where: {
+      
+      if (existingReaction) {
+        await transaction.rollback();
+        res.status(409).json({ 
+          success: false, 
+          message: 'El usuario ya reaccionó a este objetivo' 
+        });
+        return;
+      }
+      
+      // Crear la reacción
+      const reaction = await ForumReaction.create({
         userId,
         targetId: Number(targetId),
-        targetType,
-        emojiId
-      },
-      transaction
-    });
-    
-    if (existingReaction) {
-      await transaction.rollback();
-      res.status(409).json({ 
-        success: false, 
-        message: 'Ya existe esta reacción del usuario' 
+        targetType: targetType as ReactionTargetType,
+        emojiId,
+        emojiName,
+        isCustom
+      }, { transaction });
+      
+      await transaction.commit();
+      
+      res.status(201).json({ 
+        success: true, 
+        message: 'Reacción agregada exitosamente', 
+        data: reaction 
       });
-      return;
+    } catch (error) {
+      await transaction.rollback();
+      console.error('Error al agregar la reacción:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error al agregar la reacción',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
-    
-    // Crear la reacción
-    const reaction = await ForumReaction.create({
-      userId,
-      targetId: Number(targetId),
-      targetType: targetType as ReactionTargetType,
-      emojiId,
-      emojiName,
-      isCustom
-    }, { transaction });
-    
-    await transaction.commit();
-    
-    res.status(201).json({ 
-      success: true, 
-      message: 'Reacción agregada exitosamente', 
-      data: reaction 
-    });
-  } catch (error) {
-    await transaction.rollback();
-    console.error('Error al agregar la reacción:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al agregar la reacción',
-      error: error instanceof Error ? error.message : String(error)
-    });
-  }
-};
+  };
+  
 
 /**
  * @function removeReaction

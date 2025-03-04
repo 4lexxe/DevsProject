@@ -11,7 +11,8 @@ import ForumReply, { ReplyStatus } from './ForumReply';
 import ForumVote, { VoteType } from './ForumVote';
 import ForumFlair, { FlairType } from './ForumFlair';
 import Report from './Report';
-import ForumReaction, { ReactionTargetType } from './ForumReaction';
+import ForumReaction from './ForumReaction';
+import ForumVoteReply, { VoteType as ReplyVoteType } from './ForumVoteReply';
 
 // Establecer relaciones adicionales entre modelos
 ForumPost.belongsTo(ForumThread, {
@@ -38,7 +39,8 @@ export {
   FlairType,
   Report,
   ForumReaction,
-  ReactionTargetType
+  ForumVoteReply,
+  ReplyVoteType,
 };
 
 /**
@@ -53,5 +55,6 @@ export default {
   ForumVote,
   ForumFlair,
   Report,
-  ForumReaction
-}; 
+  ForumReaction,
+  ForumVoteReply,
+};

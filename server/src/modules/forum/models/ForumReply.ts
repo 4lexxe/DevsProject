@@ -2,6 +2,7 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 // Mejorar importaciones para evitar ciclos
 import  ForumPost  from "./ForumPost";
+import ForumVote, { VoteType } from "./ForumVote";
 
 /**
  * @enum {string} ReplyStatus
@@ -9,10 +10,6 @@ import  ForumPost  from "./ForumPost";
  * @property {string} ACTIVE - Respuesta visible
  * @property {string} HIDDEN - Respuesta ocultada por moderación
  */
-export enum ReplyStatus {
-    ACTIVE = "active",
-    HIDDEN = "hidden",
-}
 
 interface ForumReplyAttributes {
   id: number;
@@ -21,30 +18,45 @@ interface ForumReplyAttributes {
   content: string;
   parentReplyId?: number;
   isAcceptedAnswer: boolean; // true aceptada, false no aceptada
-  status: ReplyStatus;
   isNSFW: boolean;
   isSpoiler: boolean;
   coverImage?: string;
+  voteScore: number;
+  upvoteCount: number;
+  downvoteCount: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface ForumReplyCreationAttributes extends Optional<ForumReplyAttributes, "id" | "isAcceptedAnswer" | "status"> {}
+interface ForumReplyCreationAttributes extends Optional<ForumReplyAttributes, "id" | "isAcceptedAnswer"> {}
 
 class ForumReply extends Model<ForumReplyAttributes, ForumReplyCreationAttributes> implements ForumReplyAttributes {
   public id!: number;
   public postId!: number;
   public authorId!: number;
   public content!: string;
-  public status!: ReplyStatus;
   public parentReplyId?: number;
   public isAcceptedAnswer!: boolean;
   public coverImage?: string;
   public isNSFW!: boolean;
   public isSpoiler!: boolean;
+  public voteScore!: number;
+  public upvoteCount!: number;
+  public downvoteCount!: number;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // Método estático para obtener los conteos de votos de un reply
+  public static async getVoteCounts(postId: number): Promise<{ upvotes: number; downvotes: number }> {
+    const upvotes = await ForumVote.count({
+      where: { postId, voteType: VoteType.UPVOTE }
+    });
+    const downvotes = await ForumVote.count({
+      where: { postId, voteType: VoteType.DOWNVOTE }
+    });
+    return { upvotes, downvotes };
+  }
 }
 
 ForumReply.init(
@@ -86,11 +98,6 @@ ForumReply.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    status: {
-        type: DataTypes.ENUM(...Object.values(ReplyStatus)),
-        allowNull: false,
-        defaultValue: ReplyStatus.ACTIVE,
-    },
     isNSFW: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -104,6 +111,21 @@ ForumReply.init(
     coverImage: {
       type: DataTypes.STRING,
       allowNull: true,
+    },
+    voteScore: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    upvoteCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    downvoteCount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
     }
   },
   {

@@ -110,7 +110,7 @@ ForumReaction.init(
     indexes: [
       {
         unique: true,
-        fields: ["userId", "targetId", "targetType", "emojiId"],
+        fields: ["userId", "targetId", "targetType"],
         name: "unique_user_reaction_per_target",
       },
       {

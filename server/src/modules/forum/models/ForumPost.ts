@@ -3,6 +3,7 @@ import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumThread from "./ForumThread";
 import ForumReply from "./ForumReply";
+import ForumReaction from "./ForumReaction";
 import ForumVote from "./ForumVote";
 
 export enum PostStatus {
@@ -56,6 +57,7 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes> 
   public getReplies!: () => Promise<ForumReply[]>;
   public getAuthor!: () => Promise<User>;
   public getVotes!: () => Promise<ForumVote[]>;
+  public getReactions!: () => Promise<ForumReaction[]>;
 }
 
 ForumPost.init(
@@ -210,6 +212,12 @@ ForumPost.hasMany(ForumVote, {
     foreignKey: "postId",
     as: "votes",
   });
+
+// Relaciones con ForumReactionPost
+ForumPost.hasMany(ForumReaction, {
+    foreignKey: "postId",
+    as: "reactions",
+});
 
 export default ForumPost;
 
