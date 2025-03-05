@@ -23,9 +23,6 @@ function SectionManager() {
     const getSection = async () => {
       if (sectionId) {
         try {
-          
-          sessionStorage.removeItem("section-form-data")
-          
           const response = await getSectionById(sectionId);
           sectionState.section = transformSectionData(response);
         } catch (err) {
@@ -78,6 +75,8 @@ function SectionManager() {
       }),
     };
   };
+
+  console.log("El estado de la seccino es: ", sectionState)
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
