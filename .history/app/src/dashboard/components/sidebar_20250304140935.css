@@ -1,0 +1,51 @@
+/* Estilos para los tooltips del sidebar */
+.tooltip-container {
+  position: relative;
+}
+
+.sidebar-tooltip {
+  visibility: hidden;
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(55, 65, 81, 0.9);
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin-left: 10px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  
+  /* Añadir flecha */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent rgba(55, 65, 81, 0.9) transparent transparent;
+  }
+}
+
+/* Mostrar el tooltip al hacer hover sobre el contenedor */
+.tooltip-container:hover .sidebar-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Efecto de animación al aparecer */
+.tooltip-container .sidebar-tooltip {
+  transform: translateY(-50%) translateX(-10px);
+  transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+}
+
+.tooltip-container:hover .sidebar-tooltip {
+  transform: translateY(-50%) translateX(0);
+}

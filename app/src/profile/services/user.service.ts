@@ -1,6 +1,37 @@
 // userService.ts
 import api from '../../api/axios'; // Importa la instancia de axios configurada
 
+// Interfaces para los datos de permisos
+interface PermissionRequest {
+  userId: number;
+  permissionId: number; // Cambiado de permissionName a permissionId para que coincida con la API
+}
+
+// Interfaces para las respuestas de permisos
+interface Permission {
+  id: number;
+  name: string;
+  description: string;
+}
+
+interface UserPermission extends Permission {
+  source?: 'role' | 'custom';
+}
+
+interface UserPermissionsResponse {
+  userId: number;
+  username: string;
+  roleName: string;
+  availablePermissions: UserPermission[];
+  blockedPermissions: Permission[];
+}
+
+// Nueva interfaz para asignar múltiples permisos
+interface MultiplePermissionsRequest {
+  userId: number;
+  permissionIds: number[];
+}
+
 export const UserService = {
   // Obtener todos los usuarios (público)
   async getUsers() {
@@ -65,4 +96,118 @@ export const UserService = {
       throw error;
     }
   },
+
+  // Asignar un permiso personalizado a un usuario
+  async assignCustomPermission(data: PermissionRequest) {
+    try {
+      const response = await api.post('/users/assign-permission', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning custom permission:', error);
+      throw error;
+    }
+  },
+
+  // Nuevo método para agregar múltiples permisos personalizados a un usuario
+  async addCustomPermissions(data: MultiplePermissionsRequest) {
+    try {
+      // Modificamos la llamada para usar el endpoint correcto
+      const promises = data.permissionIds.map(permissionId => 
+        api.post('/users/assign-permission', {
+          userId: data.userId,
+          permissionId
+        })
+      );
+      
+      await Promise.all(promises);
+      return { success: true, message: 'Permisos asignados correctamente' };
+    } catch (error) {
+      console.error('Error adding custom permissions:', error);
+      throw error;
+    }
+  },
+
+  // Bloquear un permiso para un usuario
+  async blockPermission(data: PermissionRequest) {
+    try {
+      const response = await api.post('/users/block-permission', data);
+      return response.data;
+    } catch (error) {
+      console.error('Error blocking permission:', error);
+      throw error;
+    }
+  },
+
+  // Desbloquear un permiso para un usuario
+  async unblockPermission(data: PermissionRequest) {
+    try {
+      const response = await api.delete('/users/unblock-permission', { 
+        data: data 
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error unblocking permission:', error);
+      throw error;
+    }
+  },
+
+  // Obtener todos los permisos disponibles
+  async getAvailablePermissions() {
+    try {
+      const response = await api.get('/permissions');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching available permissions:', error);
+      throw error;
+    }
+  },
+
+  // Obtener permisos de un usuario específico
+  async getUserPermissions(userId: number): Promise<UserPermissionsResponse> {
+    try {
+      const response = await api.get(`/users/${userId}/permissions`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user permissions:', error);
+      throw error;
+    }
+  },
+
+  // Métodos de utilidad para trabajar con permisos
+  
+  // Obtener permisos agrupados por su origen (rol o personalizado)
+  async getUserPermissionsBySource(userId: number): Promise<{
+    rolePermissions: UserPermission[];
+    customPermissions: UserPermission[];
+    blockedPermissions: Permission[];
+    allAvailablePermissions: UserPermission[];
+  }> {
+    try {
+      const response = await this.getUserPermissions(userId);
+      
+      const rolePermissions = response.availablePermissions.filter(p => p.source === 'role');
+      const customPermissions = response.availablePermissions.filter(p => p.source === 'custom');
+      
+      return {
+        rolePermissions,
+        customPermissions,
+        blockedPermissions: response.blockedPermissions,
+        allAvailablePermissions: response.availablePermissions
+      };
+    } catch (error) {
+      console.error('Error processing user permissions by source:', error);
+      throw error;
+    }
+  },
+  
+  // Verificar si un usuario tiene un permiso específico
+  async hasPermission(userId: number, permissionName: string): Promise<boolean> {
+    try {
+      const response = await this.getUserPermissions(userId);
+      return response.availablePermissions.some(p => p.name === permissionName);
+    } catch (error) {
+      console.error(`Error checking if user has permission ${permissionName}:`, error);
+      return false;
+    }
+  }
 };
