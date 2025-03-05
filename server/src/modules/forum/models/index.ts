@@ -7,11 +7,12 @@
 import ForumCategory from './ForumCategory';
 import ForumThread from './ForumThread';
 import ForumPost from './ForumPost';
-import ForumReply, { ReplyStatus } from './ForumReply';
-import ForumVote, { VoteType } from './ForumVote';
+import ForumReply from './ForumReply';
+import ForumVote, { VoteType } from './ForumVotePost';
 import ForumFlair, { FlairType } from './ForumFlair';
 import Report from './Report';
-import ForumReaction from './ForumReaction';
+import ForumReactionPost from './ForumReactionPost';
+import ForumReactionReply from './ForumReactionReply';
 import ForumVoteReply, { VoteType as ReplyVoteType } from './ForumVoteReply';
 
 // Establecer relaciones adicionales entre modelos
@@ -32,13 +33,13 @@ export {
   ForumThread,
   ForumPost,
   ForumReply,
-  ReplyStatus,
   ForumVote,
   VoteType,
   ForumFlair,
   FlairType,
   Report,
-  ForumReaction,
+  ForumReactionPost,
+  ForumReactionReply,
   ForumVoteReply,
   ReplyVoteType,
 };
@@ -55,6 +56,7 @@ export default {
   ForumVote,
   ForumFlair,
   Report,
-  ForumReaction,
+  ForumReactionPost,
+  ForumReactionReply,
   ForumVoteReply,
 };

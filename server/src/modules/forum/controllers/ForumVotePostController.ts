@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ForumVote, { VoteType } from "../models/ForumVote";
+import ForumVote, { VoteType } from "../models/ForumVotePost";
 import ForumPost from "../models/ForumPost";
 import User from "../../user/User";
 import sequelize from '../../../infrastructure/database/db';
@@ -33,10 +33,6 @@ export const ForumVotePostController: IForumVoteController = {
 
   // Obtener el voto de un usuario en un post específico
   async getUserVoteForPost(req: AuthRequest, res: Response) {
-    if (!req.isAuthenticated()) {
-      res.status(401).json({ error: "No autorizado." });
-      return;
-    }
     try {
       const userId = req.user?.id;
       const { postId } = req.params;

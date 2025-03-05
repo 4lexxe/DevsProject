@@ -1,22 +1,15 @@
 import { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import ForumThread from '../models/ForumThread';
 import ForumPost, { PostStatus } from '../models/ForumPost';
 import User from '../../user/User';
 import ForumCategory from '../models/ForumCategory';
 import sequelize from '../../../infrastructure/database/db';
 import { Op } from 'sequelize';
-
+import { threadValidations } from '../validators/thread.validator';
 export class ForumThreadController {
   // Validaciones para los datos de entrada
-  static threadValidations = [
-    body('title').notEmpty().withMessage('El título es obligatorio'),
-    body('categoryId').isInt().withMessage('El ID de la categoría debe ser un número entero'),
-    body('firstPostContent').notEmpty().withMessage('El contenido del primer post es obligatorio'),
-    body('isPinned').optional().isBoolean().withMessage('isPinned debe ser un valor booleano'),
-    body('isLocked').optional().isBoolean().withMessage('isLocked debe ser un valor booleano'),
-    body('isAnnouncement').optional().isBoolean().withMessage('isAnnouncement debe ser un valor booleano'),
-  ];
+  static threadValidations = threadValidations;
 
   /**
    * @function getAllThreads
@@ -143,12 +136,6 @@ export class ForumThreadController {
     const transaction = await sequelize.transaction();
     
     try {
-        // Verificar si el usuario está autenticado
-        if (!req.isAuthenticated()) {
-          res.status(401).json({ error: 'Usuario no autenticado' });
-          return;
-        }
-  
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
           res.status(400).json({ errors: errors.array() });
@@ -214,12 +201,6 @@ export class ForumThreadController {
     const transaction = await sequelize.transaction();
     
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -284,11 +265,6 @@ export class ForumThreadController {
     const transaction = await sequelize.transaction();
     
     try {
-        // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -297,13 +273,6 @@ export class ForumThreadController {
       }
 
       const { id } = req.params;
-
-      const userId = (req.user as User)?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
       
       // Buscar el hilo
       const thread = await ForumThread.findByPk(id);
@@ -403,13 +372,6 @@ export class ForumThreadController {
    */
   static async pinThread(req: Request, res: Response): Promise<void> {
     try {
-
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -418,12 +380,6 @@ export class ForumThreadController {
       
       const { id } = req.params;
       const { isPinned } = req.body;
-      const userId = (req.user as User)?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
       
       if (typeof isPinned !== 'boolean') {
         res.status(400).json({ 
@@ -465,13 +421,6 @@ export class ForumThreadController {
    */
   static async lockThread(req: Request, res: Response): Promise<void> {
     try {
-
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -480,12 +429,6 @@ export class ForumThreadController {
 
       const { id } = req.params;
       const { isLocked } = req.body;
-      const userId = (req.user as User)?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
 
       if (typeof isLocked !== 'boolean') {
         res.status(400).json({ 
@@ -577,13 +520,6 @@ export class ForumThreadController {
    */
   static async toggleAnnouncementStatus(req: Request, res: Response): Promise<void> {
     try {
-
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -592,12 +528,6 @@ export class ForumThreadController {
 
       const { id } = req.params;
       const { isAnnouncement } = req.body;
-      const userId = (req.user as User)?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
 
       if (typeof isAnnouncement !== 'boolean') {
         res.status(400).json({ 

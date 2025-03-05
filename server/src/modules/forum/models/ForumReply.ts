@@ -2,8 +2,8 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 // Mejorar importaciones para evitar ciclos
 import  ForumPost  from "./ForumPost";
-import ForumVote, { VoteType } from "./ForumVote";
-
+import ForumVote, { VoteType } from "./ForumVotePost";
+import ForumReactionReply from "./ForumReactionReply";
 /**
  * @enum {string} ReplyStatus
  * @description Estados posibles para una respuesta
@@ -178,6 +178,11 @@ ForumReply.hasMany(ForumReply, {
 ForumReply.belongsTo(ForumReply, {
   foreignKey: "parentReplyId",
   as: "parentReply",
+});
+
+ForumReply.hasMany(ForumReactionReply, {
+  foreignKey: "replyId",
+  as: "reactions",
 });
 
 /**

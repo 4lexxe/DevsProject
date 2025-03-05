@@ -25,7 +25,7 @@ import ForumCategory from './modules/forum/models/ForumCategory';
 import ForumThread from './modules/forum/models/ForumThread';
 import ForumPost from './modules/forum/models/ForumPost';
 import ForumReply from './modules/forum/models/ForumReply';
-import ForumVote from './modules/forum/models/ForumVote';
+import ForumVote from './modules/forum/models/ForumVotePost';
 import ForumFlair from './modules/forum/models/ForumFlair';
 import { predefinedFlairs } from './modules/forum/models/ForumFlair';
 import Report from './modules/forum/models/Report';

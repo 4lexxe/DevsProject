@@ -3,13 +3,14 @@ import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumThread from "./ForumThread";
 import ForumReply from "./ForumReply";
-import ForumReaction from "./ForumReaction";
-import ForumVote from "./ForumVote";
+import ForumReactionPost from "./ForumReactionPost";
+import ForumReactionReply from "./ForumReactionReply";
+import ForumVotePost from "./ForumVotePost";
+import ForumVoteReply from "./ForumVoteReply";
 
 export enum PostStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
-    HIDDEN = "hidden",
 }
 
 interface ForumPostAttributes {
@@ -56,8 +57,8 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes> 
   public getThread!: () => Promise<ForumThread>;
   public getReplies!: () => Promise<ForumReply[]>;
   public getAuthor!: () => Promise<User>;
-  public getVotes!: () => Promise<ForumVote[]>;
-  public getReactions!: () => Promise<ForumReaction[]>;
+  public getVotes!: () => Promise<ForumVotePost[]>;
+  public getReactions!: () => Promise<ForumReactionPost[]>;
 }
 
 ForumPost.init(
@@ -208,13 +209,13 @@ ForumPost.belongsTo(User, {
   as: "author",
 })
 
-ForumPost.hasMany(ForumVote, {
+ForumPost.hasMany(ForumVotePost, {
     foreignKey: "postId",
     as: "votes",
   });
 
 // Relaciones con ForumReactionPost
-ForumPost.hasMany(ForumReaction, {
+ForumPost.hasMany(ForumReactionPost, {
     foreignKey: "postId",
     as: "reactions",
 });

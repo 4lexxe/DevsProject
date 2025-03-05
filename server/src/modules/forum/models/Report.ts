@@ -133,6 +133,14 @@ Report.init(
         name: "report_status_idx",
       }
     ],
+    hooks: {
+      beforeCreate: async (report: Report) => {
+        const target = await report.getReportedObject();
+        if (!target) {
+          throw new Error('El contenido reportado no existe');
+        }
+      }
+    }
   }
 );
 

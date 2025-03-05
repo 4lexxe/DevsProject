@@ -1,7 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 // Mejorar importaciones para evitar ciclos
-import { ForumPost } from "../models";
+import  ForumPost  from "./ForumPost";
 import User from "../../user/User";
 
 /**
@@ -37,7 +37,7 @@ interface ForumVoteCreationAttributes extends Optional<ForumVoteAttributes, "id"
  * @description Modelo para gestionar votos positivos y negativos en posts del foro
  * @extends Model<ForumVoteAttributes, ForumVoteCreationAttributes>
  */
-class ForumVote extends Model<ForumVoteAttributes, ForumVoteCreationAttributes> implements ForumVoteAttributes {
+class ForumVotePost extends Model<ForumVoteAttributes, ForumVoteCreationAttributes> implements ForumVoteAttributes {
   public id!: number;
   public postId!: number;
   public userId!: number;
@@ -47,7 +47,7 @@ class ForumVote extends Model<ForumVoteAttributes, ForumVoteCreationAttributes> 
   public readonly updatedAt!: Date;
 }
 
-ForumVote.init(
+ForumVotePost.init(
   { 
     id: {
       type: DataTypes.INTEGER,
@@ -93,7 +93,7 @@ ForumVote.init(
        * @hook afterCreate
        * @description Actualiza el contador de votos en el post cuando se crea un nuevo voto
        */
-      afterCreate: async (vote: ForumVote) => {
+      afterCreate: async (vote: ForumVotePost) => {
         try {
           await updatePostVoteCount(vote.postId);
         } catch (error) {
@@ -105,7 +105,7 @@ ForumVote.init(
        * @hook afterUpdate
        * @description Actualiza el contador de votos en el post cuando se modifica un voto
        */
-      afterUpdate: async (vote: ForumVote) => {
+      afterUpdate: async (vote: ForumVotePost) => {
         try {
           await updatePostVoteCount(vote.postId);
         } catch (error) {
@@ -117,7 +117,7 @@ ForumVote.init(
        * @hook afterDestroy
        * @description Actualiza el contador de votos en el post cuando se elimina un voto
        */
-      afterDestroy: async (vote: ForumVote) => {
+      afterDestroy: async (vote: ForumVotePost) => {
         try {
           await updatePostVoteCount(vote.postId);
         } catch (error) {
@@ -131,18 +131,18 @@ ForumVote.init(
 /**
  * Relaciones del modelo
  */
-ForumVote.belongsTo(ForumPost, {
+ForumVotePost.belongsTo(ForumPost, {
   foreignKey: "postId",
   as: "post",
   onDelete: 'CASCADE'
 });
 
-ForumVote.belongsTo(User, {
+ForumVotePost.belongsTo(User, {
   foreignKey: "userId",
   as: "user",
 });
 
-User.hasMany(ForumVote, {
+User.hasMany(ForumVotePost, {
   foreignKey: "userId",
   as: "votes",
 });
@@ -150,19 +150,19 @@ User.hasMany(ForumVote, {
 /**
  * Métodos estáticos para consultas comunes
  */
-ForumVote.addScope('postVotes', (postId: number) => ({
+ForumVotePost.addScope('postVotes', (postId: number) => ({
   where: { postId }
 }));
 
-ForumVote.addScope('userVotes', (userId: number) => ({
+ForumVotePost.addScope('userVotes', (userId: number) => ({
   where: { userId }
 }));
 
-ForumVote.addScope('upvotes', {
+ForumVotePost.addScope('upvotes', {
   where: { voteType: VoteType.UPVOTE }
 });
 
-ForumVote.addScope('downvotes', {
+ForumVotePost.addScope('downvotes', {
   where: { voteType: VoteType.DOWNVOTE }
 });
 
@@ -175,14 +175,14 @@ async function updatePostVoteCount(postId: number): Promise<void> {
   try {
     // Usar la importación desde el índice
     // Calculamos los totales de votos positivos y negativos
-    const upvotes = await ForumVote.count({
+    const upvotes = await ForumVotePost.count({
       where: { 
         postId,
         voteType: VoteType.UPVOTE
       }
     });
     
-    const downvotes = await ForumVote.count({
+    const downvotes = await ForumVotePost.count({
       where: { 
         postId,
         voteType: VoteType.DOWNVOTE
@@ -210,4 +210,4 @@ async function updatePostVoteCount(postId: number): Promise<void> {
   }
 }
 
-export default ForumVote;
+export default ForumVotePost;

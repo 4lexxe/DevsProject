@@ -1,18 +1,55 @@
 import { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import ForumReply from '../models/ForumReply';
 import ForumPost from '../models/ForumPost';
 import User from '../../user/User';
 import sequelize from '../../../infrastructure/database/db';
+import { replyValidations } from '../validators/reply.validator';
 
 export class ForumReplyController {
   // Validaciones para los datos de entrada
-  static replyValidations = [
-    body('postId').isInt().withMessage('El ID del post debe ser un número entero'),
-    body('content').notEmpty().withMessage('El contenido de la respuesta es obligatorio'),
-    body('isNSFW').optional().isBoolean().withMessage('isNSFW debe ser un valor booleano'),
-    body('isSpoiler').optional().isBoolean().withMessage('isSpoiler debe ser un valor booleano'),
-  ];
+  static replyValidations = replyValidations;
+
+  /**
+   * @function getAllReplies
+   * @description Obtiene todas las respuestas
+   */
+  static async getAllReplies(req: Request, res: Response): Promise<void> {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const replies = await ForumReply.findAll({
+        include: [
+          {
+            model: User,
+            as: 'author',
+            attributes: ['id', 'username', 'avatar']
+          },
+          {
+            model: ForumPost,
+            as: 'post',
+            attributes: ['id', 'title']
+          }
+        ],
+        limit,
+        offset,
+        order: [['createdAt', 'DESC']]
+      });
+
+      res.status(200).json({
+        success: true,
+        data: replies
+      });
+    } catch (error) {
+      console.error('Error al obtener todas las respuestas:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener todas las respuestas',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
 
   /**
    * @function createReply
@@ -22,19 +59,14 @@ export class ForumReplyController {
     const transaction = await sequelize.transaction();
     
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
         return;
       }
-
-      const { postId, content, isNSFW = false, isSpoiler = false } = req.body;
+      const { postId } = req.params;
+      const {content, isNSFW = false, isSpoiler = false } = req.body;
       const userId = (req.user as User)?.id;
 
       if (!userId) {
@@ -48,14 +80,16 @@ export class ForumReplyController {
         res.status(404).json({ success: false, message: 'Post no encontrado' });
         return;
       }
-
       // Crear la respuesta
       const reply = await ForumReply.create({
-        postId,
+        postId: Number(postId),
         authorId: userId,
         content,
         isNSFW,
-        isSpoiler
+        isSpoiler,
+        voteScore: 0,
+        upvoteCount: 0,
+        downvoteCount: 0
       }, { transaction });
 
       await transaction.commit();

@@ -1,18 +1,14 @@
 import { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { validationResult } from 'express-validator';
 import ForumPost, { PostStatus } from '../models/ForumPost';
 import ForumThread from '../models/ForumThread';
 import User from '../../user/User';
 import sequelize from '../../../infrastructure/database/db';
+import { postValidations } from '../validators/post.validator';
 
 export class ForumPostController {
   // Validaciones para los datos de entrada
-  static postValidations = [
-    body('threadId').isInt().withMessage('El ID del hilo debe ser un número entero'),
-    body('content').notEmpty().withMessage('El contenido del post es obligatorio'),
-    body('isNSFW').optional().isBoolean().withMessage('isNSFW debe ser un valor booleano'),
-    body('isSpoiler').optional().isBoolean().withMessage('isSpoiler debe ser un valor booleano'),
-  ];
+  static postValidations = postValidations;
 
   /**
    * @function createPost
@@ -22,12 +18,6 @@ export class ForumPostController {
     const transaction = await sequelize.transaction();
     
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -126,12 +116,6 @@ export class ForumPostController {
     const transaction = await sequelize.transaction();
     
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -195,12 +179,6 @@ export class ForumPostController {
     const transaction = await sequelize.transaction();
     
     try {
-        // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
-
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
