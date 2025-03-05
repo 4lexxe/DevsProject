@@ -1,25 +1,31 @@
-import { Model, DataTypes } from 'sequelize';
-import sequelize from '../../../infrastructure/database/db';
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../../../infrastructure/database/db";
+import MPSubPlan from "./MPSubPlan"; // Import MPSubPlan model
 
-// Definimos el modelo de Sequelize
 class Plan extends Model {
   public id!: bigint;
   public name!: string;
   public description!: string;
-  public price!: number;
-  public duration!: string;
+  public totalPrice!: number;  // Precio total de todo el plan
+
+  public durationType!: string; // dias o meses 
+  public duration!: number; // Duracion total del ciclo de de pago 
+
   public features!: string[];
   public isActive!: boolean;
-  public supportLevel!: 'Básico' | 'Estándar' | 'Premium';
-  public installments?: number;
-  public installmentPrice?: number;
+  public accessLevel!: "Básico" | "Estándar" | "Premium";
 
-  // Campos automáticos de Sequelize
+  public installments!: number;   // Cantidad de cuotas en las que se divide el plan
+  public installmentPrice?: number;  // Precio de cada cuota
+
+  public saveInMp!: boolean; // Indica si se guarda en el plan de subscripcion en la api de mercadopago
+
+  public mpSubPlan?: MPSubPlan; // Relacion con el modelo de MPSubPlan
+
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-// Inicializamos el modelo
 Plan.init(
   {
     id: {
@@ -28,85 +34,98 @@ Plan.init(
       primaryKey: true,
     },
     name: {
-      type: DataTypes.STRING(100), // Longitud limitada para nombres
+      type: DataTypes.STRING(100),
       allowNull: false,
       unique: true,
       validate: {
-        notEmpty: true, // El nombre no puede estar vacío
-        len: [3, 100], // Longitud entre 3 y 100 caracteres
+        notEmpty: true,
+        len: [3, 100],
       },
     },
     description: {
-      type: DataTypes.STRING, // Longitud limitada para descripciones
+      type: DataTypes.STRING,
       allowNull: false,
     },
-    price: {
-      type: DataTypes.DECIMAL(10, 2), // Precio con 2 decimales
+    totalPrice: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       validate: {
-        isDecimal: true, // Asegura que sea un número decimal
-        min: 0, // El precio no puede ser negativo
+        isDecimal: true,
+        min: 0,
       },
     },
     duration: {
-      type: DataTypes.STRING(50), // Longitud limitada para la duración
-      allowNull: false,
+      type: DataTypes.INTEGER,
       validate: {
-        is: /^(\d+\s+((segundo|minuto|hora|día|semana|mes|año)s?|(segundos|minutos|horas|días|semanas|meses|años)))+$/i,
+        min: 1,
       },
     },
+    
+    durationType: {
+      type: DataTypes.ENUM("días", "meses"),
+      allowNull: false,
+    },
     features: {
-      type: DataTypes.ARRAY(DataTypes.STRING), // Array de características
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
       validate: {
-        notEmpty: true, // El array no puede estar vacío
+        notEmpty: true,
       },
     },
     isActive: {
       type: DataTypes.BOOLEAN,
-      defaultValue: true, // Valor por defecto
+      defaultValue: true,
     },
-    supportLevel: {
-      type: DataTypes.ENUM('Básico', 'Estándar', 'Premium'),
+    accessLevel: {
+      type: DataTypes.ENUM("Básico", "Estándar", "Premium"),
       allowNull: false,
-      defaultValue: 'Básico', // Valor por defecto
+      defaultValue: "Básico",
     },
     installments: {
       type: DataTypes.INTEGER,
-      defaultValue: 1, // Valor por defecto
-      allowNull: true,
+      defaultValue: 1,
+      allowNull: false,
       validate: {
-        min: 1, // El número de cuotas no puede ser menor que 1
+        min: 1,
       },
     },
     installmentPrice: {
-      type: DataTypes.DECIMAL(10, 2), // Precio por cuota con 2 decimales
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
       validate: {
-        isDecimal: true, // Asegura que sea un número decimal
-        min: 0, // El precio por cuota no puede ser negativo
+        isDecimal: true,
+        min: 0,
       },
+    },
+    saveInMp: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
     },
   },
   {
     sequelize,
-    tableName: 'Plans',
+    tableName: "Plans",
     timestamps: true,
     paranoid: true, // Habilita el borrado lógico (soft delete)
     hooks: {
       // Hook para calcular el precio por cuota
       beforeCreate: (plan: Plan) => {
         if (plan.installments === 1) {
-          plan.installmentPrice = plan.price;
+          plan.installmentPrice = plan.totalPrice;
         } else if (plan.installments && plan.installments > 1) {
-          plan.installmentPrice = parseFloat((plan.price / plan.installments).toFixed(2));
+          plan.installmentPrice = parseFloat(
+            (plan.totalPrice / plan.installments).toFixed(2)
+          );
         }
       },
       beforeUpdate: (plan: Plan) => {
         if (plan.installments === 1) {
-          plan.installmentPrice = plan.price;
+          plan.installmentPrice = plan.totalPrice;
         } else if (plan.installments && plan.installments > 1) {
-          plan.installmentPrice = parseFloat((plan.price / plan.installments).toFixed(2));
+          plan.installmentPrice = parseFloat(
+            (plan.totalPrice / plan.installments).toFixed(2)
+          );
         }
       },
     },

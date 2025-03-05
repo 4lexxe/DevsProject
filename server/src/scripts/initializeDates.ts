@@ -7,8 +7,6 @@ import Course from "../modules/course/Course";
 import Section from "../modules/section/Section";
 import Content from "../modules/content/Content";
 import HeaderSection from "../modules/headerSection/HeaderSection";
-import { link } from "fs";
-import { text } from "stream/consumers";
 
 import Plan from "../modules/Membership/models/Plan";
 import Discount from "../modules/Membership/models/Discount";
@@ -16,36 +14,45 @@ import Discount from "../modules/Membership/models/Discount";
 // Carga las variables de entorno del archivo .env
 dotenv.config();
 
-//Datos para los planes de membresia
+/// Datos para los planes de membresía
 const plansToInsert = [
   {
     name: "Plan Básico",
     description: "Plan ideal para usuarios que recién comienzan",
-    price: 10000,
-    duration: "1 mes",
+    totalPrice: 10000,
+    durationType: "meses",
+    duration: 1, // Duración total del ciclo de pago en meses
     features: ["Acceso básico", "Soporte Básico", "Actualizaciones mensuales"],
     isActive: true,
-    supportLevel: "Básico",
+    accessLevel: "Básico",
+    installments: 1,
+    installmentPrice: 10000,
+    saveInMp: false,
   },
   {
     name: "Plan Estándar",
     description: "Plan para usuarios que necesitan más funcionalidades",
-    price: 10000,
-    duration: "1 mes",
+    totalPrice: 10000,
+    durationType: "meses",
+    duration: 1, // Duración total del ciclo de pago en meses
     features: [
       "Acceso completo",
       "Soporte Estándar",
       "Actualizaciones semanales",
     ],
     isActive: true,
-    supportLevel: "Estándar",
+    accessLevel: "Estándar",
+    installments: 1,
+    installmentPrice: 10000,
+    saveInMp: false,
   },
   {
     name: "Plan Premium",
     description:
       "Plan para usuarios avanzados que requieren soporte prioritario",
-    price: 24000,
-    duration: "3 meses",
+    totalPrice: 24000,
+    durationType: "meses",
+    duration: 3, // Duración total del ciclo de pago en meses
     features: [
       "Acceso completo",
       "Soporte Premium",
@@ -53,9 +60,26 @@ const plansToInsert = [
       "Acceso anticipado a nuevas funciones",
     ],
     isActive: true,
-    supportLevel: "Premium",
+    accessLevel: "Premium",
     installments: 3,
     installmentPrice: 8000,
+    saveInMp: false,
+  },
+  {
+    "name": "Este plan se guarda En mercado pago con estado analitico",
+    "description": "Plan para usuarios que necesitan más funcionalidades",
+    "totalPrice": 10000,
+    "durationType": "días",
+    "duration": 1, // Duración total del ciclo de pago en meses
+    "features": [
+      "Acceso completo",
+      "Soporte Estándar",
+      "Actualizaciones semanales"
+    ],
+    "isActive": true,
+    "accessLevel": "Estándar",
+    "installments": 1,
+    "saveInMp": true
   },
 ];
 

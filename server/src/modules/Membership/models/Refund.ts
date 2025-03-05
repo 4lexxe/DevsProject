@@ -3,8 +3,8 @@ import sequelize from "../../../infrastructure/database/db";
 import Payment from "./Payment";
 
 class Refund extends Model {
-  public id!: number;
-  public paymentId!: number;
+  public id!: bigint;
+  public paymentId!: string;
   public refundDate!: Date;
   public amount!: number;
   public reason!: string | null;
@@ -19,7 +19,7 @@ Refund.init(
       primaryKey: true,
     },
     paymentId: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING,
       allowNull: false,
       references: { model: "Payments", key: "id" },
     },

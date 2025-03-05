@@ -23,10 +23,13 @@ import Content from "./modules/content/Content";
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
 import Discount from "./modules/Membership/models/Discount";
 import Invoice from "./modules/Membership/models/Invoice";
-import Membership from "./modules/Membership/models/Membership";
+import Subscription from "./modules/Membership/models/Subscription";
+import MPSubscription from "./modules/Membership/models/MPSubscription";
+import MPSubPlan from "./modules/Membership/models/MPSubPlan";
 import Payment from "./modules/Membership/models/Payment";
 import Plan from "./modules/Membership/models/Plan";
 import Refund from "./modules/Membership/models/Refund";
+import WebhookEvent from "./modules/Membership/models/WebhookEvent";
 
 // sync.ts
 async function syncDatabase() {
@@ -63,12 +66,15 @@ async function syncDatabase() {
     await Section.sync({ force: true });
     await Content.sync({ force: true });
 
-    /* Sincronización de modelos en el orden correcto */
+    // Area de pagos
+    await WebhookEvent.sync({ force: true })
     await Plan.sync({ force: true });
-    await Membership.sync({ force: true }); 
+    await Discount.sync({ force: true });
+    await Subscription.sync({ force: true }); 
+    await MPSubscription.sync({ force: true });
+    await MPSubPlan.sync({ force: true });
     await Payment.sync({ force: true });
     await Invoice.sync({ force: true });
-    await Discount.sync({ force: true });
     await Refund.sync({ force: true });
 
     console.log("¡Sincronización exitosa!");

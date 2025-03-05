@@ -1,20 +1,30 @@
-import { Request, Response, RequestHandler } from "express";
-import { PreApproval, PreApprovalPlan, MercadoPagoConfig } from "mercadopago";
+import e, { Request, Response, RequestHandler } from "express";
+import { PreApproval, PreApprovalPlan, Payment, Invoice } from "mercadopago";
+import axios from "axios"; // Para hacer solicitudes HTTP
 
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
 import { MP_BACK_URL } from "../../../infrastructure/config/mercadopagoConfig";
 
-import JsonFileHandler from "../../../infrastructure/config/ficheroJSON";
+import WebhookEvent from "../models/WebhookEvent";
+import MPSubscription from "../models/MPSubscription"; // Asegúrate de importar el modelo MPSubscriptions
+import MPSubPlan from "../models/MPSubPlan";
+import Subscription from "../models/Subscription";
+import PaymentModel from "../models/Payment";
+
+import PaymentController from "./paymentController";
+import MPSubscriptionController from "./mpSubscriptionController";
+import InvoiceController from "./invoiceController";
+import SubscriptionController from "./subscriptionController";
 
 class MercadoPagoController {
-  // Instancia de las clases de suscripcion y suscripcionPlan
-  
-  
+  // Instancias de las clases de MercadoPago
   private static preApproval = new PreApproval(MpConfig);
-  
+  private static preApprovalPlan = new PreApprovalPlan(MpConfig);
+  private static payment = new Payment(MpConfig);
+  private static invoice = new Invoice(MpConfig);
 
   // Función para generar metadata
-  static metadata(req: Request, res: Response) {
+  static generateMetadata(req: Request, res: Response) {
     return {
       statusCode: res.statusCode,
       url: req.protocol + "://" + req.get("host") + req.originalUrl,
@@ -31,7 +41,7 @@ class MercadoPagoController {
   ) {
     console.error(message, error);
     res.status(500).json({
-      ...this.metadata(req, res),
+      ...this.generateMetadata(req, res),
       status: "error",
       message,
       error: error.message,
@@ -39,99 +49,263 @@ class MercadoPagoController {
     });
   }
 
-  // Método estático para crear un plan de suscripción
-  static createSubscriptionPlan: RequestHandler = async(req, res) => {
-    const preApprovalPlan = new PreApprovalPlan(MpConfig);
-
-    const planData = {
-      reason: "Plan de papitas",
-      autoRecurring: {
-        frequency: 1,
-        frequency_type: "days",
-        transaction_amount: 100,
-        repetitions: 3,
-        currency_id: "ARS",
-      },
-      backUrl: MP_BACK_URL,
-    };
-
+  // Método para manejar webhooks
+  static handleWebhook: RequestHandler = async (req, res) => {
     try {
-      // Crear el plan en Mercado Pago
-      const plan = await preApprovalPlan.create({
-        body: {
-          reason: planData.reason,
-          auto_recurring: planData.autoRecurring,
-          back_url: planData.backUrl
-        },
-      });
+      const eventData = req.body; // Obtiene el JSON del cuerpo de la solicitud
+      console.log("Webhook recibido:", JSON.stringify(eventData, null, 2));
 
-      // Respuesta exitosa
-      res.status(201).json({
-        status: "success",
-        message: "Plan de suscripción creado exitosamente",
-        data: plan,
-        metadata: this.metadata(req, res),
+      // Extrae los campos relevantes (manejando casos donde no estén presentes)
+      const { action, type, data } = eventData;
+      const eventId = data?.id || null;
+
+      // Guarda el evento en la base de datos
+      const newEvent = await WebhookEvent.create({
+        action,
+        type,
+        eventId,
+        payload: eventData, // Guarda el JSON completo
       });
+      console.log(`Evento guardado con ID: ${newEvent.id}`);
+
+      try {
+        // Manejar eventos según su tipo
+        switch (type) {
+          case "subscription_preapproval":
+            await this.handleSubscriptionEvent(action, eventId, BigInt(1));
+            break;
+
+          case "payment":
+            await this.handlePaymentEvent(action, eventId);
+            break;
+
+          case "subscription_authorized_payment":
+            await this.handleAuthorizedPaymentEvent(action, eventId);
+            break;
+
+          default:
+            console.log(`Tipo de evento desconocido: ${type}`);
+        }
+
+        // Respuesta exitosa
+        res.status(200).json({
+          ...this.generateMetadata(req, res),
+          status: "success",
+          message: "Evento procesado correctamente",
+          event: newEvent,
+        });
+      } catch (processingError) {
+        console.error("Error procesando el evento:", processingError);
+
+        // Actualizar el evento con información del error
+        await WebhookEvent.update(
+          {
+            status: "error",
+            processingError:
+              processingError instanceof Error
+                ? processingError.message
+                : String(processingError),
+          },
+          { where: { id: newEvent.id } }
+        );
+
+        // Aunque hubo un error procesando el evento, respondemos 200 para que MercadoPago no reintente
+        res.status(200).json({
+          ...this.generateMetadata(req, res),
+          status: "warning",
+          message: "Evento guardado pero con errores en el procesamiento",
+          event: newEvent,
+        });
+      }
     } catch (error) {
-      this.handleServerError(res, req, error, "Error al crear la suscripción");
+      this.handleServerError(res, req, error, "Error al procesar el webhook");
+    }
+  };
+
+  // Método para manejar eventos de suscripción
+  private static async handleSubscriptionEvent(
+    action: string,
+    eventId: string,
+    userId: bigint
+  ) {
+    console.log(
+      `Procesando evento de suscripción. Acción: ${action}, ID: ${eventId}`
+    );
+
+    if (!eventId) {
+      throw new Error("ID de evento no proporcionado para suscripción");
+    }
+
+    if (action === "created") {
+      const subscriptionData = await this.preApproval.get({ id: eventId });
+      console.log("Datos de suscripción obtenidos:", subscriptionData?.id);
+
+      // También crear una suscripción en nuestro sistema
+      try {
+        // Buscar el plan asociado con esta suscripción
+        let planId;
+        if (subscriptionData?.preapproval_plan_id) {
+          // Buscar el plan por el ID del plan de preaprobación
+          const mpSubPlan = await MPSubPlan.findOne({
+            where: { id: subscriptionData.preapproval_plan_id },
+          });
+          if (mpSubPlan) {
+            planId = mpSubPlan.planId;
+          }
+        }
+
+        if (!planId) {
+          throw new Error(
+            "No se pudo determinar el plan asociado a la suscripción"
+          );
+        }
+
+        if (!userId) {
+          throw new Error(
+            "No se pudo determinar el usuario asociado a la suscripción"
+          );
+        }
+
+        const paymentp = await PaymentModel.findOne({
+          where: { preApprovalId: subscriptionData.id },
+        });
+        if (!paymentp) {
+          throw new Error(
+            "No se pudo determinar el pago asociado a la suscripción"
+          );
+        }
+
+        // Calcular fechas de inicio y fin
+        const startDate = new Date();
+        if (subscriptionData.auto_recurring?.start_date) {
+          startDate.setTime(
+            new Date(subscriptionData.auto_recurring.start_date).getTime()
+          );
+        }
+
+        const endDate = new Date();
+        if (subscriptionData.auto_recurring?.end_date) {
+          endDate.setTime(
+            new Date(subscriptionData.auto_recurring.end_date).getTime()
+          );
+        }
+        // Crear la suscripción en nuestro sistema
+        const subscription = await SubscriptionController.createSubscription({
+          userId,
+          paymentId: paymentp.id,
+          planId,
+          startDate,
+          endDate,
+          status:
+            subscriptionData?.status === "authorized" ? "active" : "inactive",
+        });
+
+        if (subscription) {
+          // Crear la suscripción en MercadoPago DB
+          const mpSubscription =
+            await MPSubscriptionController.createSubscriptionInDB(
+              subscriptionData,
+              subscription?.id
+            );
+        }
+
+        console.log(
+          `Suscripción creada en el sistema con ID: ${subscription?.id}`
+        );
+      } catch (error) {
+        console.error("Error al crear la suscripción en el sistema:", error);
+        // No lanzamos el error para que no interrumpa el flujo principal
+      }
+    } else if (action === "updated") {
+      const subscriptionData = await this.preApproval.get({ id: eventId });
+      console.log("Datos de suscripción actualizados:", subscriptionData?.id);
+
+      // También actualizar en nuestro sistema
+      try {
+        const mpSubscription =
+          await MPSubscriptionController.updateSubscriptionInDB(
+            subscriptionData,
+            eventId
+          );
+
+        if (mpSubscription?.subscriptionId) {
+          // Actualizar estado de la suscripción en nuestro sistema
+          await SubscriptionController.updateSubscription(
+            mpSubscription.subscriptionId,
+            {
+              status:
+                subscriptionData?.status === "authorized"
+                  ? "active"
+                  : subscriptionData?.status === "cancelled"
+                  ? "cancelled"
+                  : "inactive",
+            }
+          );
+          console.log(
+            `Suscripción actualizada en el sistema con ID: ${mpSubscription.subscriptionId}`
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error al actualizar la suscripción en el sistema:",
+          error
+        );
+        // No lanzamos el error para que no interrumpa el flujo principal
+      }
+    } else {
+      console.log(`Acción de suscripción no manejada: ${action}`);
     }
   }
 
-  // Crear una suscripción
-  static createSubscription: RequestHandler = async (req, res) => {
-    const {} = req.body;
+  // Método para manejar eventos de pago
+  private static async handlePaymentEvent(action: string, eventId: string) {
+    console.log(`Procesando evento de pago. Acción: ${action}, ID: ${eventId}`);
 
-    const suscripcion = {
-      preApprovalPlanId: "2c938084953dde16019544c8aca20401",
-      reason: "Plan de papitas con chocolate",
-      externalReference: "",
-      payerEmail: "test_user_437832978@testuser.com",
-      cardTokenId: "",
-      autoRecurring: {
-        frequency: 1,
-        frequency_type: "days",
-        transaction_amount: 100,
-        currency_id: "ARS",
-        /* startDate: "",
-        endDate: "", */
-      },
-      status: "pending",
-      backUrl: MP_BACK_URL,
-    };
-
-    try {
-      // Crear la suscripción en Mercado Pago
-      const subscription = await this.preApproval.create({
-        body: {
-          /* preapproval_plan_id: suscripcion.preApprovalPlanId, */
-          reason: suscripcion.reason,
-          payer_email: suscripcion.payerEmail,
-          auto_recurring: suscripcion.autoRecurring,
-          back_url: suscripcion.backUrl,
-        },
-      });
-
-      // Respuesta exitosa
-      res.status(201).json({
-        status: "success",
-        message: "Suscripción creada exitosamente",
-        data: subscription,
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al crear la suscripción");
+    if (!eventId) {
+      throw new Error("ID de evento no proporcionado para pago");
     }
-  };
 
-  static weebhook: RequestHandler = async (req, res) => {
-    const body = req.body;
-    JsonFileHandler.insertRecord(body);
+    if (action === "payment.created") {
+      const paymentData = await this.payment.get({ id: eventId });
 
-    console.log("Esto es lo recibido del weebhook para mercado pago: ");
-    console.log(body);
+      console.log("Datos de pago obtenidos:", paymentData?.id);
 
-    res.status(200).json({ message: "Webhook received" });
-  };
+      await PaymentController.createPaymentInDB(paymentData);
+    } else if (action === "payment.updated") {
+      const paymentData = await this.payment.get({ id: eventId });
+      console.log("Datos de pago actualizados:", paymentData?.id);
+      await PaymentController.updatePaymentInDB(paymentData, eventId);
+    } else {
+      console.log(`Acción de pago no manejada: ${action}`);
+    }
+  }
+
+  // Método para manejar eventos de pago autorizado de suscripción
+  private static async handleAuthorizedPaymentEvent(
+    action: string,
+    eventId: string
+  ) {
+    console.log(
+      `Procesando evento de pago autorizado. Acción: ${action}, ID: ${eventId}`
+    );
+
+    if (!eventId) {
+      throw new Error("ID de evento no proporcionado para pago autorizado");
+    }
+
+    if (action === "created" || action === "updated") {
+      const invoiceData = await this.invoice.get({ id: eventId });
+      console.log("Datos de factura obtenidos:", invoiceData?.id);
+
+      if (action === "created") {
+        await InvoiceController.createInvoiceInDB(invoiceData);
+      } else if (action === "updated") {
+        await InvoiceController.updateInvoiceInDB(invoiceData, eventId);
+      }
+    } else {
+      console.log(`Acción de pago autorizado no manejada: ${action}`);
+    }
+  }
 }
 
-export default MercadoPagoController; // Exporta la clase directamente
+export default MercadoPagoController;
