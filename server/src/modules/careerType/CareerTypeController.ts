@@ -80,10 +80,11 @@ export default class CareerTypeController {
   // Crear un nuevo CareerType
   static create: RequestHandler = async (req, res) => {
     try {
-      const { name, description, isActive } = req.body;
+      const { name, description, isActive, icon } = req.body;
       const newCareerType = await CareerType.create({
         name,
         description,
+        icon,
         isActive,
       });
       res.status(201).json({
@@ -106,7 +107,7 @@ export default class CareerTypeController {
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, description, isActive } = req.body;
+      const { name, description, isActive, icon } = req.body;
       const careerType = await CareerType.findByPk(id);
       if (!careerType) {
         res
@@ -114,7 +115,7 @@ export default class CareerTypeController {
           .json({ status: "error", message: "Tipo de carrera no encontrado" });
         return;
       }
-      await careerType.update({ name, description, isActive });
+      await careerType.update({ name, description, isActive, icon });
       res.status(200).json({
         ...metadata(req, res),
         message: "Tipo de carrera actualizado correctamente",

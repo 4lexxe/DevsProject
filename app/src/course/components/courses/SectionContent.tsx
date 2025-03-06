@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getContentBySection } from '../../services/contentServices';
-import ContentViewer from './contentViewner/ContentViewer';
+import ContentViewer from '../contentViewner/ContentViewer';
 import { Loader2 } from 'lucide-react';
 import { Content } from '@/course/interfaces/viewnerCourseInterface';
 

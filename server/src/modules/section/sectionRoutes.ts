@@ -1,26 +1,29 @@
 import { Router } from 'express';
-import SectionController from '../section/sectionContentController';
+import SectionController from './controller/sectionController';
+import SectionGetController from './controller/sectionGetController';
+import { validateSectionAndContents } from './SectionValidation';
 
 const router = Router();
 
-router.get('/sections', SectionController.getAll)
+router.get('/sections', SectionGetController.getAll)
 
 
-router.get('/sections/count', SectionController.getSectionCount)
+router.get('/sections/count', SectionGetController.getSectionCount)
 
 // Ruta para obtener una sección por ID (sin autenticación)
-router.get('/section/:id', SectionController.getById);
+router.get('/sections/:id', SectionGetController.getById);
 
 // Ruta para obtener todas las secciones de un curso (sin autenticación)
-router.get('/course/sections/:courseId', SectionController.getByCourseId);
+router.get('/sections/course/:courseId', SectionGetController.getByCourseId);
 
 // Ruta para crear una nueva sección (requiere autenticación)
-router.post('/section', SectionController.create);
+router.post('/sections', SectionController.create);
 
-// Ruta para crear varias secciones y que cada seccion tenga varios contenidos
-router.post('/sections', SectionController.createSectionsAndContents);
+// Ruta para crear una seccion con sus contenidos
+router.post('/sections/contents', validateSectionAndContents, SectionController.createSectionAndContents);
 
-/* router.post('/sections/contents') */
+// Ruta para actualizar una seccion con sus contenidos
+router.put('/sections/:id/contents', validateSectionAndContents, SectionController.updateSectionAndContents);
 
 // Ruta para actualizar una sección por ID (requiere autenticación)
 router.put('/sections/:id', SectionController.update);

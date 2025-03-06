@@ -1,22 +1,21 @@
-import type React from "react"
-import { useState } from "react"
-import type { Control } from "react-hook-form"
-import { useController } from "react-hook-form"
-import { Loader2, X } from "lucide-react"
+import React, { useEffect, useState } from "react";
+import type { Control } from "react-hook-form";
+import { useController } from "react-hook-form";
+import { Loader2, X } from "lucide-react";
 
 interface Option {
-  value: string
-  label: string
+  value: string;
+  label: string;
 }
 
 interface MultiSelectInputProps {
-  name: string
-  labelText: string
-  control: Control<any>
-  error?: string
-  options: Option[]
-  placeholder?: string
-  isLoading?: boolean
+  name: string;
+  labelText: string;
+  control: Control<any>;
+  error?: string;
+  options: Option[];
+  placeholder?: string;
+  isLoading?: boolean;
 }
 
 export default function MultiSelectInput({
@@ -33,25 +32,34 @@ export default function MultiSelectInput({
   } = useController({
     name,
     control,
-  })
+  });
 
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>(value || [])
+  // Convierte el valor recibido (string[]) a la lista de opciones seleccionadas
+  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
+
+  useEffect(() => {
+    if (Array.isArray(value)) {
+      const selected = options.filter((option) => value.includes(option.value));
+      setSelectedOptions(selected);
+    }
+  }, [value, options]);
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value
-    const selectedOption = options.find((option) => option.value === selectedValue)
+    const selectedValue = e.target.value;
+    const selectedOption = options.find((option) => option.value === selectedValue);
+
     if (selectedOption && !selectedOptions.some((option) => option.value === selectedValue)) {
-      const newSelectedOptions = [...selectedOptions, selectedOption]
-      setSelectedOptions(newSelectedOptions)
-      onChange(newSelectedOptions.map((option) => option.value))
+      const newSelectedOptions = [...selectedOptions, selectedOption];
+      setSelectedOptions(newSelectedOptions);
+      onChange(newSelectedOptions.map((option) => option.value));
     }
-  }
+  };
 
   const removeOption = (optionToRemove: Option) => {
-    const newSelectedOptions = selectedOptions.filter((option) => option.value !== optionToRemove.value)
-    setSelectedOptions(newSelectedOptions)
-    onChange(newSelectedOptions.map((option) => option.value))
-  }
+    const newSelectedOptions = selectedOptions.filter((option) => option.value !== optionToRemove.value);
+    setSelectedOptions(newSelectedOptions);
+    onChange(newSelectedOptions.map((option) => option.value));
+  };
 
   return (
     <div className="space-y-1">
@@ -102,6 +110,5 @@ export default function MultiSelectInput({
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
-  )
+  );
 }
-

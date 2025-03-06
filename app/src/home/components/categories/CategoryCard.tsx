@@ -1,29 +1,42 @@
-import { Link } from 'react-router-dom';
-import { ReactNode } from 'react';
+import { Link } from "react-router-dom";
 
 interface CategoryCardProps {
+  id: string;
   name: string;
-  icon: ReactNode;
-  count: number;
-  color: string;
+  icon: string;
+  coursesCount: number;
 }
 
-export default function CategoryCard({ name, icon, count, color }: CategoryCardProps) {
+export default function CategoryCard({
+  id,
+  name,
+  icon,
+  coursesCount,
+}: CategoryCardProps) {
+
   return (
-    <div 
-      className="group relative aspect-square rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg"
-      style={{ backgroundColor: color }}
-    >
-      <Link 
-        to={`/cursos/${name.toLowerCase()}`} 
-        className="absolute inset-0 p-6 flex flex-col items-center justify-center text-center"
-      >
-        <span className="w-12 h-12 flex items-center justify-center mb-3 transform transition-transform group-hover:scale-110 duration-300">
-          {icon} {/* Renderiza el ícono directamente */}
-        </span>
-        <h3 className="font-semibold text-black/90 mb-1 text-lg">{name}</h3>
-        <span className="text-sm text-black/70">{count} cursos</span>
-      </Link>
-    </div>
+    <Link to={`/courses/category/${id}`} >
+      <div className="group relative aspect-[4/5]   min-h-[225px]  rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-lg bg-gradient-to-b from-white to-gray-50 border border-gray-100">
+        <div className="absolute inset-0 p-2 flex flex-col items-center justify-around text-center">
+          <div className=" ">
+            <img
+              src={icon || "/placeholder.svg"}
+              alt={`Icono de ${name}`}
+              className="w-[80px] object-contain group-hover:text-blue-600"
+            />
+          </div>
+
+          <div className="w-full space-y-2">
+            <h3 className="text-base font-semibold text-gray-800 group-hover:text-blue-600 transition-colors duration-300 line-clamp-2 category-card-title">
+              {name}
+            </h3>
+            <span className="inline-block text-sm font-medium text-gray-600 bg-white px-3 py-1 rounded-full shadow-sm group-hover:bg-blue-50 group-hover:text-blue-600 transition-all duration-300 border border-gray-100">
+              {coursesCount} {coursesCount === 1 ? "curso" : "cursos"}
+            </span>
+          </div>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-50/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      </div>
+    </Link>
   );
 }

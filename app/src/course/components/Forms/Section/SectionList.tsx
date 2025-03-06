@@ -1,135 +1,202 @@
-import React from "react";
-import { Edit, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Edit, Trash2, Loader2, BookOpen, FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import ContentForm from "@/course/components/forms/content/ContentForm";
-import { createSections } from "@/course/services/courseFormService";
+import ContentForm from "@/course/components/Forms/Content/ContentForm";
+import { createSection } from "@/course/services/courseFormService";
+import DraggableContentList from "@/course/components/Forms/Content/DraggableContentList";
+import { useSectionContext } from "@/course/context/SectionFormContext";
+import { updateSection } from "@/course/services/sectionServices";
 
-import DraggableContentList from "@/course/components/forms/content/DraggableContentList";
-import { useCourseContext } from "@/course/context/CourseFormContext";
-
-export default function SectionList() {
+export default function SectionList({
+  courseId,
+  sectionId,
+}: {
+  courseId: string;
+  sectionId?: string;
+}) {
   const {
     state: sectionState,
-    addSection,
-    editSection,
+    startEditingSection,
     deleteSection,
-  } = useCourseContext();
+  } = useSectionContext();
 
-  const handleCreateSections = async(data: any) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<"success" | "error" | undefined>(undefined);
+  const [message, setMessage] = useState<string>();
+  const [errors2, setErrors2] = useState<string[]>();
+  const navigate = useNavigate();
+
+  const handleCreateSection = async (data: any) => {
+    setIsLoading(true);
     try {
-          const newCourse = await createSections(data);
-          console.log("Secciones con sus contenidos insertadas", newCourse);
-          // Aquí podrías redirigir a otra página o limpiar el formulario
-        } catch (err) {
-          console.log("Error al crear el curso. Inténtalo nuevamente.", err);
-        }
-  }
+      const response = sectionId
+        ? await updateSection(sectionId, data)
+        : await createSection(data);
+      setStatus(response.status);
+      setMessage(response.message);
 
-  const courseId = 3;
-
-  const onSubmit = () => {
-    let data = sectionState.sections;
-    let data2 = data.map((section: any) => {
-      let {id, ...resto} = section;
-      
-      resto.contents = resto.contents.map((content: any) => {
-        const {id, sectionId,  ...resto2} = content;
-        return resto2;
-      } )
-
-      return resto;
-    })
-
-    /* data2 = {...data2, courseId: courseId}; */
-    let data3 = {sections: data2, courseId: courseId}
-
-    handleCreateSections(data3);
+      if (response.statusCode === (sectionId ? 200 : 201)) {
+        setTimeout(() => {
+          navigate(`/course/${response.data.courseId}`);
+        }, 500);
+      }
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "Error desconocido");
+      setStatus("error");
+      if (err.response?.data?.errors) {
+        setErrors2(err.response.data.errors.map((error: any) => error.msg));
+      }
+      console.log("Error al crear la sección. Inténtalo nuevamente.", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <div className="space-y-4 p-4 sm:p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold text-gray-900">Secciones</h1>
-        <button
-          onClick={addSection}
-          className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 w-full sm:w-auto justify-center sm:justify-start"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Añadir sección
-        </button>
-      </div>
+  const getButtonClasses = () => {
+    const baseClasses = "inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2";
 
-      {sectionState.sections.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">Sin secciones añadidas</p>
-      ) : (
-        <div className="grid gap-6">
-          {sectionState.sections.map((section: any) => (
-            <div
-              key={section.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200"
-            >
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  {section.coverImage && (
-                    <img
-                      src={section.coverImage || "/placeholder.svg"}
-                      alt={section.title}
-                      className="w-full sm:w-48 h-48 object-cover rounded-md"
-                    />
-                  )}
-                  <div className="flex-grow">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-800">
-                          {section.title}
-                        </h3>
-                        <p className="text-gray-600 mt-1">
-                          {section.description}
-                        </p>
-                        <p className="text-sm text-gray-500 mt-2">
-                          Tipo: {section.moduleType}
-                        </p>
-                      </div>
-                      <div className="flex space-x-2 w-full sm:w-auto justify-end">
-                        <button
-                          onClick={() => editSection(section)}
-                          className="flex items-center px-3 py-1 text-sm text-gray-600 hover:text-blue-600"
-                        >
-                          <Edit className="w-6 h-6 mr-2" />
-                          <span className="hidden sm:inline">Edit</span>
-                        </button>
-                        <button
-                          onClick={() => deleteSection(section.id)}
-                          className="flex items-center px-3 py-1 text-sm text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-6 h-6 mr-2" />
-                          <span className="hidden sm:inline">Delete</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+    switch (status) {
+      case "success":
+        return `${baseClasses} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500`;
+      case "error":
+        return `${baseClasses} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500`;
+      default:
+        return `${baseClasses} bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500`;
+    }
+  };
+
+  const onSubmit = () => {
+    if (!sectionState.section) return;
+
+    const sectionData = {
+      ...sectionState.section,
+      contents: sectionState.section.contents.map(({ id, ...rest }) => rest),
+    };
+
+    console.log(sectionData)
+
+    const dataToSend = { section: sectionData, courseId };
+    handleCreateSection(dataToSend);
+  };
+
+  if (!sectionState.section) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+        <div className="text-center">
+          <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">Sin secciones añadidas</h3>
+          <p className="mt-1 text-sm text-gray-500">Comience añadiendo una nueva sección</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {sectionState.section.coverImage && (
+              <div className="lg:w-1/4 flex-shrink-0">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                  <img
+                    src={sectionState.section.coverImage}
+                    alt={sectionState.section.title}
+                    className="object-cover w-full h-full"
+                  />
                 </div>
               </div>
-
-              {sectionState.isAddingContent || sectionState.editingContent ? (
-                <ContentForm sectionId={section.id} />
-              ) : (
-                <DraggableContentList sectionId={section.id} />
-              )}
+            )}
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 truncate">
+                    {sectionState.section.title}
+                  </h2>
+                  <div className="mt-1 flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm text-gray-500">{sectionState.section.moduleType}</span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2 self-start">
+                  <button
+                    onClick={() => startEditingSection()}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Editar</span>
+                  </button>
+                  <button
+                    onClick={() => deleteSection()}
+                    className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Eliminar</span>
+                  </button>
+                </div>
+              </div>
+              
+              <p className="text-gray-500 text-sm line-clamp-3">
+                {sectionState.section.description}
+              </p>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {sectionState.isAddingContent || sectionState.editingContent ? (
+          <div className="border-t border-gray-200">
+            <ContentForm />
+          </div>
+        ) : (
+          <div className="border-t border-gray-200">
+            <DraggableContentList />
+          </div>
+        )}
+      </div>
+
+      {errors2 && errors2.length > 0 && (
+        <div className="mt-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Trash2 className="h-5 w-5 text-red-400" />
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">
+                Se encontraron los siguientes errores:
+              </h3>
+              <div className="mt-2 text-sm text-red-700">
+                <ul className="list-disc list-inside space-y-1">
+                  {errors2.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="flex justify-end ">
-        <button
-          onClick={onSubmit}
-          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-lg rounded-lg shadow-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105"
-        >
-          Enviar
-        </button>
-
-      </div>
+      {!sectionState.isAddingContent && !sectionState.isEditingSection && !sectionState.isEditingContent && (
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={onSubmit}
+            disabled={isLoading}
+            className={getButtonClasses()}
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <Loader2 className="animate-spin -ml-1 mr-2 h-4 w-4" />
+                <span>Procesando...</span>
+              </div>
+            ) : (
+              <span>{message || "Guardar cambios"}</span>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

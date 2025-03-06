@@ -8,12 +8,13 @@ class Section extends Model {
   public description!: string;
   public courseId!: bigint;
   public coverImage!: string;
-  public moduleType!: 'Introductorio'| 'Principiante'| 'Intermedio'| 'Avanzado' | 'Experto' | 'Insano Hardcore';
+  public moduleType!: 'Introductorio' | 'Principiante' | 'Intermedio' | 'Avanzado' | 'Experto' | 'Insano Hardcore';
+  public colorGradient!: string[];
   
-  public readonly createdAt!: Date; 
-  public readonly updatedAt!: Date; 
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
- 
+
 Section.init(
   {
     id: {
@@ -37,17 +38,22 @@ Section.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    moduleType: { 
-      type: DataTypes.ENUM('Introductorio', 'Principiante', 'Intermedio', 'Avanzado', 'Experto', 'Insano Hardcore'), 
-      allowNull: false, 
-      defaultValue: 'Introductorio' 
-    }
+    moduleType: {
+      type: DataTypes.ENUM('Introductorio', 'Principiante', 'Intermedio', 'Avanzado', 'Experto', 'Insano Hardcore'),
+      allowNull: false,
+      defaultValue: 'Introductorio',
+    },
+    colorGradient: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: false,
+      defaultValue: ['#000000', '#FFFFFF'],
+    },
   },
   {
     sequelize,
     modelName: "Section",
     tableName: "Sections",
-    timestamps: true, 
+    timestamps: true,
   }
 );
 

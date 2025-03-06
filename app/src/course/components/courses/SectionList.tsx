@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { getSectionsByCourse } from '../../services/sectionServices';
-import SectionModule from './SectionModule';
-import { Section } from '@/course/interfaces/viewnerCourseInterface';
+// components/courses/SectionList.tsx
+import React, { useEffect, useState } from "react";
+import { getSectionsByCourse } from "../../services/sectionServices";
+import SectionModule from "./SectionModule";
+import { Section } from "@/course/interfaces/ViewnerCourse";
 
 interface SectionListProps {
   courseId: string;
@@ -11,25 +12,20 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sectionCount, setSectionCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchSections = async () => {
       try {
         setLoading(true);
         const response = await getSectionsByCourse(courseId);
-        console.log("Holanda", response)
-        
         setSections(response);
-        setSectionCount(response.length);
       } catch (err) {
-        console.error('Error fetching sections:', err);
-        setError('No se pudieron cargar las secciones del curso');
+        console.error("Error fetching sections:", err);
+        setError("No se pudieron cargar las secciones del curso");
       } finally {
         setLoading(false);
       }
     };
-
     fetchSections();
   }, [courseId]);
 
@@ -62,24 +58,21 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
   if (sections.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">No hay secciones disponibles para este curso.</p>
+        <p className="text-gray-500">
+          No hay secciones disponibles para este curso.
+        </p>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Módulos del Curso
-        </h2>
-        <span className="text-sm text-gray-500">
-          {sectionCount} {sectionCount === 1 ? 'módulo' : 'módulos'} en total
-        </span>
-      </div>
+      {/* Lista de secciones */}
       <div className="grid grid-cols-1 gap-4">
         {sections.map((section) => (
-          <SectionModule key={section.id} section={section} />
+          <div key={section.id}>
+            <SectionModule section={section} />
+          </div>
         ))}
       </div>
     </div>

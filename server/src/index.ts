@@ -75,7 +75,7 @@ declare module 'geoip-lite' {
 // Configuración inicial de la aplicación
 // ==================================================
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = /* process.env.PORT || */ 3000;
 
 // ==================================================
 // 1. Middlewares de seguridad básicos

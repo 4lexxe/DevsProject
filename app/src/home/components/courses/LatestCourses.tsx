@@ -13,7 +13,7 @@ interface Course {
   image: string;
   createdAt: string; // Asegúrate de que la API retorne este campo
   category: string; // Añadir la categoría
-  relatedCareerType: string; // Añadir el tipo de carrera relacionada
+  careerType: string; // Añadir el tipo de carrera relacionada
 }
 
 export default function LatestCourses() {
@@ -35,6 +35,10 @@ export default function LatestCourses() {
 
     fetchCourses();
   }, []);
+
+  /* useEffect(() => {
+    console.log(courses)
+  }, [courses]) */
 
   return (
     <section className="py-16 px-6">
@@ -59,7 +63,7 @@ export default function LatestCourses() {
             summary={course.summary}
             courseName={course.category} // Muestra la categoría
             image={course.image}
-            relatedCareerType={course.relatedCareerType} // Muestra el tipo de carrera relacionada
+            careerType={course.careerType.name} // Muestra el tipo de carrera relacionada
           />          
           ))}
         </div>

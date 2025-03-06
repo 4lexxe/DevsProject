@@ -8,14 +8,14 @@ import CollaboratorsSection from './components/developers/CollaboratorsSection';
 
 export default function Home() {
   return (
-    <main className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="w-full mx-auto ">
       {/* Hero ocupa toda la anchura de la pantalla */}
       <section className="w-full">
         <Hero />
       </section>
       
       {/* El resto del contenido tiene un ancho limitado */}
-      <section className="max-w-7xl mx-auto">
+      <section className=" mx-auto">
         <Features />
         <CourseCategories />
         <LatestCourses />

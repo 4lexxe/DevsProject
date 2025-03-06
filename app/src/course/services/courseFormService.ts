@@ -1,8 +1,8 @@
 import api from "@/api/axios"; // Importa la instancia de axios
 
-const CATEGORY_ENDPOINT = "/category/actives";
-const CAREERTYPE_ENPOINT = "/careerType/actives"
-const COURSES_ENDPOINT = "/course"
+const CATEGORY_ENDPOINT = "/categories/actives";
+const CAREERTYPE_ENPOINT = "/careerTypes/actives"
+const COURSES_ENDPOINT = "/courses"
 const SECTIONS_ENDPOINT = '/sections';
 
 
@@ -40,10 +40,22 @@ export const createFullCourse = async (courseData: any) => {
   }
 };
 
-// Crear una nueva sección
-export const createSections = async (sectionData: any) => {
+
+export const editFullCourse = async (id:string, courseData: any) => {
   try {
-    const response = await api.post(SECTIONS_ENDPOINT, sectionData);
+    const response = await api.put(`${COURSES_ENDPOINT}/${id}`, courseData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear el curso cons sus categorias y tipo de carrera desde el service:', error);
+    throw error;
+  }
+};
+
+
+// Crear una nueva sección con contenidos
+export const createSection = async (sectionData: any) => {
+  try {
+    const response = await api.post(SECTIONS_ENDPOINT + "/contents", sectionData);
     return response.data;
   } catch (error) {
     console.error('Error al crear las secciones con sus contenidos:', error);
@@ -51,3 +63,13 @@ export const createSections = async (sectionData: any) => {
   }
 };
 
+// actualizar una sección con contenidos
+export const editSection = async (sectionData: any) => {
+  try {
+    const response = await api.put(SECTIONS_ENDPOINT + "/contents", sectionData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear las secciones con sus contenidos:', error);
+    throw error;
+  }
+};

@@ -4,6 +4,7 @@ import sequelize from "../../infrastructure/database/db";
 class CareerType extends Model {
   public id!: number;
   public name!: string;
+  public icon?: string;
   public description!: string;
   public isActive!: boolean;
 
@@ -22,6 +23,10 @@ CareerType.init(
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    icon: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     description: {
       type: DataTypes.TEXT,

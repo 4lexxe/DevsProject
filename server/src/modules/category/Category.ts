@@ -4,7 +4,7 @@ import sequelize from "../../infrastructure/database/db";
 class Category extends Model {
   public id!: bigint;
   public name!: string;
-  public image?: string;
+  public icon?: string;
   public description!: string;
   public isActive!: boolean;
 
@@ -24,7 +24,7 @@ Category.init(
       allowNull: false,
       unique: true,
     },
-    image: {
+    icon: {
       type: DataTypes.STRING,
       allowNull: true,
     },

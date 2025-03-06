@@ -57,6 +57,32 @@ export default class ContentController {
     }
   };
 
+  static getQuizById: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const content = await Content.findByPk(id, {
+          attributes: ['quiz', "id"], // Solo traer el campo 'quiz'
+      });
+
+      if (!content) {
+          res.status(404).json({ status: "error", message: "Contenido no encontrado" });
+          return;
+      }
+
+      res.status(200).json({
+          ...metadata(req, res),
+          message: content.quiz ? "Quiz obtenido correctamente" : "No hay quiz disponible para este contenido",
+          data: content, // Si es null, se mantiene explícitamente
+      });
+  } catch (error) {
+      res.status(500).json({
+          status: "error",
+          message: "Error al obtener el quiz",
+          error,
+      });
+  }
+};
+
   // Obtener contenidos por sectionId
   static getBySectionId: RequestHandler = async (req, res) => {
     try {
@@ -81,14 +107,15 @@ export default class ContentController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
+    
       const content = await Content.create({
         title,
         text,
         markdown,
         linkType,
         link,
-        quiz: quiz ? JSON.stringify(quiz) : null,
-        resources: resources ? JSON.stringify(resources) : null,
+        quiz,
+        resources,
         duration,
         position,
         sectionId,
@@ -128,8 +155,8 @@ export default class ContentController {
         markdown,
         linkType,
         link,
-        quiz: quiz ? JSON.stringify(quiz) : null,
-        resources: resources ? JSON.stringify(resources) : null,
+        quiz,
+        resources,
         duration,
         position,
         sectionId,

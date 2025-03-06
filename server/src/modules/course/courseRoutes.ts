@@ -1,43 +1,42 @@
 import {Router} from 'express';
 
-import { CourseController } from './courseController';
+import CourseController from './Controller/courseController';
+import CourseGetController from './Controller/courseGetController';
+import { validateCourse } from './courseValidation';
 
 const router = Router();
 
 // Ruta para obtener todos los cursos (público)
-router.get('/course', CourseController.getAll);
+router.get('/courses', CourseGetController.getAll);
 
 // Obtener todos los curso activos
-router.get('/course/actives', CourseController.getActiveCourses)
+router.get('/courses/actives', CourseGetController.getActiveCourses)
 
 // Obtener todos los cursos en desarrollo
-router.get('/course/development', CourseController.getInDevelopmentCourses)
+router.get('/courses/development', CourseGetController.getInDevelopmentCourses)
 
 // Obtener conteo de todos los cursos
-router.get('/course/count', CourseController.getTotalCount)
+router.get('/courses/count', CourseGetController.getTotalCount)
 
 // Obtener todos los cursos por categoria
-router.get('/category/courses', CourseController.getByCategory)
+router.get('/courses/category/actives/:categoryId', CourseGetController.getByCategory)
 
 // Obtener todos los cursos por tipo de carrera
-router.get('/carrerType/courses', CourseController.getByCareerType)
+router.get('/courses/careerType', CourseGetController.getByCareerType)
 
 // Obtener los cursos por admin
-router.get('/course/admin/:id', CourseController.getByAdminId)
+router.get('/courses/admin/:id', CourseGetController.getByAdminId)
 
 // Ruta para obtener un curso por ID (público)
-router.get('/course/:id', CourseController.getById);
+router.get('/courses/:id', CourseGetController.getById);
 
 // Ruta para crear un curso (solo Admin y SuperAdmin)
-router.post('/course', CourseController.create);
-
-// Ruta para obtener el conteo de módulos de un curso (público)
-/* router.get('/course/:courseId/modules/count', getSectionsByCourse); */
+router.post('/courses', validateCourse, CourseController.create);
 
 // Ruta para actualizar un curso (solo Admin y SuperAdmin)
-router.put('/course/:id', CourseController.update);
+router.put('/courses/:id', validateCourse, CourseController.update);
 
 // Ruta para eliminar un curso (solo Admin y SuperAdmin)
-router.delete('/course/:id', CourseController.delete);
+router.delete('/courses/:id', CourseController.delete);
 
 export default router;
