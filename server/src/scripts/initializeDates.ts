@@ -8,8 +8,8 @@ import Section from "../modules/section/Section";
 import Content from "../modules/content/Content";
 import HeaderSection from "../modules/headerSection/HeaderSection";
 
-import Plan from "../modules/Membership/models/Plan";
-import Discount from "../modules/Membership/models/Discount";
+import Plan from "../modules/subscription/models/Plan";
+import Discount from "../modules/subscription/models/Discount";
 
 // Carga las variables de entorno del archivo .env
 dotenv.config();

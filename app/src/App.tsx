@@ -33,7 +33,7 @@ import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
-import { PlansPage } from "./Membership/index";
+import { PlansPage } from "./subscription/index";
 
 const queryClient = new QueryClient({
   defaultOptions: {
