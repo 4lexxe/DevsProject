@@ -21,7 +21,10 @@ interface NotificationAttributes {
   metadata?: Record<string, unknown>;
 }
 
-class Notification extends Model<NotificationAttributes> implements NotificationAttributes {
+// Creation attributes interface - makes id optional and provides defaults
+interface NotificationCreationAttributes extends Optional<NotificationAttributes, 'id' | 'read'> {}
+
+class Notification extends Model<NotificationAttributes, NotificationCreationAttributes> implements NotificationAttributes {
   public id!: number;
   public userId!: number;
   public type!: NotificationType;
