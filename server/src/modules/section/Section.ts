@@ -46,7 +46,7 @@ Section.init(
     colorGradient: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: false,
-      defaultValue: ['#000000', '#FFFFFF'],
+      defaultValue: ['#41d6c6', '#478bdc'],
     },
   },
   {

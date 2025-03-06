@@ -15,13 +15,29 @@ export interface Comment {
   };
 }
 
+// Interfaz para el error de Axios
+interface AxiosError {
+  response?: {
+    status?: number;
+    data?: {
+      error?: string;
+    };
+  };
+  message?: string;
+}
+
 // Crear un nuevo comentario
 export const createComment = async (commentData: { resourceId: number; content: string }): Promise<Comment> => {
   try {
     const response = await api.post('/comment', commentData); // Prefijo /api/comment
     return response.data;
   } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
+    const err = error as AxiosError;
+    
+    if (err.response?.status === 403) {
+      throw new Error('No tienes permisos para comentar en recursos');
+    }
+    
     throw new Error(err.response?.data?.error || 'Error al crear el comentario');
   }
 };
@@ -32,7 +48,7 @@ export const getCommentsByResource = async (resourceId: number): Promise<Comment
     const response = await api.get(`/comment/resource/${resourceId}`); // Prefijo /api/comment
     return response.data;
   } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
+    const err = error as AxiosError;
     throw new Error(err.response?.data?.error || 'Error al obtener los comentarios');
   }
 };
@@ -43,7 +59,12 @@ export const updateComment = async (id: number, commentData: Partial<Comment>): 
     const response = await api.put(`/comment/${id}`, commentData); // Prefijo /api/comment
     return response.data;
   } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
+    const err = error as AxiosError;
+    
+    if (err.response?.status === 403) {
+      throw new Error('No tienes permisos para editar comentarios');
+    }
+    
     throw new Error(err.response?.data?.error || 'Error al actualizar el comentario');
   }
 };
@@ -53,7 +74,12 @@ export const deleteComment = async (id: number): Promise<void> => {
   try {
     await api.delete(`/comment/${id}`); // Prefijo /api/comment
   } catch (error: unknown) {
-    const err = error as { response?: { data?: { error?: string } } };
+    const err = error as AxiosError;
+    
+    if (err.response?.status === 403) {
+      throw new Error('No tienes permisos para eliminar comentarios');
+    }
+    
     throw new Error(err.response?.data?.error || 'Error al eliminar el comentario');
   }
 };

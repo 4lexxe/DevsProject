@@ -172,19 +172,26 @@ const ResourceForm: React.FC = () => {
         await ResourceService.updateResource(resourceId, data);
         toast.success('Recurso actualizado correctamente');
       } else {
-        const userId = 1; // Obtener de autenticación en producción
-        const createdResource = await ResourceService.createResource({ ...data, userId });
-        navigate(`/resources/${createdResource.id}`);
+        if (!user?.id) {
+          throw new Error('Usuario no autenticado');
+        }
+        const createdResource = await ResourceService.createResource({ ...data, userId: user.id });
         toast.success('Recurso creado correctamente');
+        navigate(`/resources/${createdResource.id}`);
         return;
       }
 
       navigate(`/resources/${resourceId}`);
     } catch (error) {
-      console.error('Error al guardar:', error);
-      toast.error(error instanceof Error ? error.message : 'Error al guardar el recurso');
+      const errorMessage = error instanceof Error ? error.message : 'Error al guardar el recurso';
+      toast.error(errorMessage);
+      
+      // Si es un error de permisos, redirigir inmediatamente
+      if (errorMessage.includes('No tienes permisos')) {
+        navigate('/recursos', { replace: true });
+      }
     }
-  }, [isEditMode, resourceId, navigate, type]);
+  }, [isEditMode, resourceId, navigate, type, user]);
 
   // Resetear formulario
   const handleReset = useCallback(() => {

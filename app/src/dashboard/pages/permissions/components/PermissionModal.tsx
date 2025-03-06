@@ -175,20 +175,22 @@ const PermissionModal: React.FC<PermissionModalProps> = ({ isOpen, onClose, user
                 {permissionsData?.availablePermissions
                   .filter(p => p.source === 'role')
                   .map((permission) => (
-                    <div key={permission.id} className="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
-                      <div className="flex-1 mr-2">
+                    <div key={permission.id} className="flex flex-col p-3 border rounded-lg bg-gray-50">
+                      <div className="flex-1 mb-2">
                         <div className="font-medium truncate">{permission.name}</div>
                         <div className="text-xs text-gray-500 truncate">{permission.description}</div>
                         <div className="inline-flex items-center mt-1 text-xs bg-blue-100 text-blue-800 rounded-full px-2 py-0.5">
                           <Shield className="h-3 w-3 mr-1" /> Rol
                         </div>
                       </div>
-                      <button 
-                        onClick={() => blockPermissionMutation.mutate(permission.id)}
-                        className="bg-red-100 text-red-800 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors whitespace-nowrap"
-                      >
-                        Bloquear
-                      </button>
+                      <div className="self-end">
+                        <button 
+                          onClick={() => blockPermissionMutation.mutate(permission.id)}
+                          className="bg-red-100 text-red-800 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors"
+                        >
+                          Bloquear
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -198,20 +200,22 @@ const PermissionModal: React.FC<PermissionModalProps> = ({ isOpen, onClose, user
                 {permissionsData?.availablePermissions
                   .filter(p => p.source === 'custom')
                   .map(permission => (
-                    <div key={permission.id} className="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
-                      <div className="flex-1 mr-2">
+                    <div key={permission.id} className="flex flex-col p-3 border rounded-lg bg-gray-50">
+                      <div className="flex-1 mb-2">
                         <div className="font-medium truncate">{permission.name}</div>
                         <div className="text-xs text-gray-500 truncate">{permission.description}</div>
                         <div className="inline-flex items-center mt-1 text-xs bg-purple-100 text-purple-800 rounded-full px-2 py-0.5">
                           <Shield className="h-3 w-3 mr-1" /> Personal
                         </div>
                       </div>
-                      <button 
-                        onClick={() => blockPermissionMutation.mutate(permission.id)}
-                        className="bg-red-100 text-red-800 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors whitespace-nowrap"
-                      >
-                        Bloquear
-                      </button>
+                      <div className="self-end">
+                        <button 
+                          onClick={() => blockPermissionMutation.mutate(permission.id)}
+                          className="bg-red-100 text-red-800 px-3 py-1 rounded-md text-sm hover:bg-red-200 transition-colors"
+                        >
+                          Bloquear
+                        </button>
+                      </div>
                     </div>
                   ))}
               </div>
@@ -233,20 +237,22 @@ const PermissionModal: React.FC<PermissionModalProps> = ({ isOpen, onClose, user
               <h4 className="font-medium text-gray-900">Permisos Bloqueados</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {permissionsData?.blockedPermissions?.map(permission => (
-                  <div key={permission.id} className="flex justify-between items-center p-3 border rounded-lg bg-gray-50">
-                    <div className="flex-1 mr-2">
+                  <div key={permission.id} className="flex flex-col p-3 border rounded-lg bg-gray-50">
+                    <div className="flex-1 mb-2">
                       <div className="font-medium truncate">{permission.name}</div>
                       <div className="text-xs text-gray-500 truncate">{permission.description}</div>
                       <div className="inline-flex items-center mt-1 text-xs bg-red-100 text-red-800 rounded-full px-2 py-0.5">
                         <LockIcon className="h-3 w-3 mr-1" /> Bloqueado
                       </div>
                     </div>
-                    <button 
-                      onClick={() => unblockPermissionMutation.mutate(permission.id)}
-                      className="bg-green-100 text-green-800 px-3 py-1 rounded-md text-sm hover:bg-green-200 transition-colors whitespace-nowrap"
-                    >
-                      Desbloquear
-                    </button>
+                    <div className="self-end">
+                      <button 
+                        onClick={() => unblockPermissionMutation.mutate(permission.id)}
+                        className="bg-green-100 text-green-800 px-3 py-1 rounded-md text-sm hover:bg-green-200 transition-colors"
+                      >
+                        Desbloquear
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -318,7 +324,7 @@ const PermissionModal: React.FC<PermissionModalProps> = ({ isOpen, onClose, user
                             <div className="font-medium truncate">{permission.name}</div>
                             <div className="text-xs text-gray-500 truncate">{permission.description}</div>
                           </div>
-                          <div className={`p-1 rounded-full ${
+                          <div className={`p-1 rounded-full flex-shrink-0 ${
                             selectedPermissionIds.includes(permission.id) 
                               ? 'bg-blue-500 text-white' 
                               : 'bg-gray-200'

@@ -1,5 +1,6 @@
 // resource.service.ts
 import api from '../../api/axios'; // Importa la instancia de axios configurada
+import { AxiosError } from 'axios';
 
 export const ResourceService = {
   // Crear un nuevo recurso
@@ -16,7 +17,9 @@ export const ResourceService = {
       const response = await api.post('/resources', data);
       return response.data;
     } catch (error) {
-      console.error('Error creating resource:', error);
+      if (error instanceof AxiosError && error.response?.status === 403) {
+        throw new Error('No tienes permisos para crear recursos');
+      }
       throw error;
     }
   },

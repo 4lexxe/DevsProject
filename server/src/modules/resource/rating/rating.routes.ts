@@ -18,7 +18,9 @@ router.get(
 router.post(
   "/rate",
    // Requiere autenticación
+  authMiddleware,
   RatingController.rateResource as RequestHandler
+  
 );
 
 // Ruta para eliminar una calificación

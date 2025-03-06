@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePermissionsPage } from '@/dashboard/pages/permissions/hooks/usePermissions';
-import UserListSection from '@/dashboard/pages/permissions/components/userListSection';
+import UserListSection from '@/dashboard/pages/permissions/components/UserListSection';
 import RoleListSection from '@/dashboard/pages/permissions/components/RolesListSection';
 import PermissionModal from '@/dashboard/pages/permissions/components/PermissionModal';
 import RoleModal from '@/dashboard/pages/permissions/components/RoleModal';

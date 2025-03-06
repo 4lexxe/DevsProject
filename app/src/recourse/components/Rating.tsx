@@ -9,6 +9,11 @@ interface RatingProps {
   mode: 'view' | 'interactive';
 }
 
+interface Rating {
+  userId: number;
+  star: boolean;
+}
+
 const RatingComponent: React.FC<RatingProps> = ({ resourceId, mode }) => {
   const [totalStars, setTotalStars] = useState<number>(0);
   const [userRating, setUserRating] = useState<boolean | null>(null);
@@ -19,18 +24,21 @@ const RatingComponent: React.FC<RatingProps> = ({ resourceId, mode }) => {
     const fetchRatings = async () => {
       try {
         const ratings = await RatingService.getRatingsByResource(resourceId);
-        const stars = ratings.filter((rating: { star: boolean }) => rating.star).length;
+        const stars = ratings.filter((rating: Rating) => rating.star).length;
         setTotalStars(stars);
 
         if (mode === 'interactive' && user) {
           const userRating = ratings.find(
-            (rating: { userId: number; star: boolean }) => rating.userId === user.id
+            (rating: Rating) => rating.userId === user.id
           )?.star || null;
           setUserRating(userRating);
         }
-      } catch (error) {
-        console.error('Error fetching ratings:', error);
-        toast.error('Error al cargar las calificaciones');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error('Error al cargar las calificaciones');
+        }
       }
     };
 
@@ -50,14 +58,25 @@ const RatingComponent: React.FC<RatingProps> = ({ resourceId, mode }) => {
         await RatingService.rateResource({ resourceId, star: true });
         setTotalStars(prev => prev + 1);
         setUserRating(true);
+        toast.success('Recurso calificado exitosamente');
       } else {
         await RatingService.deleteRating(resourceId);
         setTotalStars(prev => Math.max(0, prev - 1));
         setUserRating(null);
+        toast.success('Calificación eliminada exitosamente');
       }
-    } catch (error) {
-      console.error('Error handling star click:', error);
-      toast.error('Error al procesar la calificación');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Error al procesar la calificación');
+      }
+      // Revertir el estado visual si hay un error
+      if (userRating === null) {
+        setUserRating(null);
+      } else {
+        setUserRating(true);
+      }
     } finally {
       setLoading(false);
     }

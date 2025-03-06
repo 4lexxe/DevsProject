@@ -8,16 +8,14 @@ import {
   Settings, 
   LogOut,
   Menu,
-  X,
   HelpCircle,
   MessageSquare,
   FileText,
   Bell,
-  Shield, // Icono para Moderadores
-  UserCog, // Icono para Administradores
-  Lock, // Icono para Permisos
-  Layers, // Icono para separador
-  // Nuevos iconos para secciones adicionales
+  Shield,
+  UserCog,
+  Lock,
+  Layers,
   PieChart,
   Download,
   DollarSign,
@@ -39,7 +37,6 @@ import {
   RefreshCw,
   AlertTriangle,
   CloudOff,
-  // Nuevos iconos para desarrolladores
   Code,
   GitBranch,
   Terminal,
@@ -48,7 +45,10 @@ import {
   Webhook,
   FileCode,
   GitPullRequest,
-  Bug
+  Bug,
+  PanelLeftClose,
+  PanelLeftOpen,
+  EyeOff
 } from 'lucide-react';
 
 // Definir las propiedades del componente para aceptar el usuario
@@ -63,6 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   // Siempre iniciamos en estado colapsado (forzado)
   const [collapsed, setCollapsed] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [tooltipInfo, setTooltipInfo] = useState<{ visible: boolean, text: string, position: { top: number, left: number } }>({
     visible: false,
     text: '',
@@ -257,6 +258,37 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
 
   const categoryGroups = groupNavItemsByCategory();
 
+  // Función para obtener el icono y comportamiento del botón de colapsar/expandir
+  const getCollapseButton = () => {
+    if (collapsed) {
+      return {
+        icon: <PanelLeftOpen size={iconSize} className="text-gray-500" />,
+        onClick: toggleSidebar,
+        label: "Expandir panel"
+      };
+    }
+    return {
+      icon: <PanelLeftClose size={iconSize} className="text-gray-500" />,
+      onClick: toggleSidebar,
+      label: "Colapsar panel"
+    };
+  };
+
+  // Función para obtener el icono y comportamiento del botón de ocultar
+  const getHideButton = () => {
+    if (!collapsed) {
+      return {
+        icon: <EyeOff size={iconSize} className="text-black" />,
+        onClick: () => setIsHidden(true),
+        label: "Ocultar panel"
+      };
+    }
+    return null;
+  };
+
+  const collapseButton = getCollapseButton();
+  const hideButton = getHideButton();
+
   const sidebarContent = (
     <>
       {/* Cabecera fija */}
@@ -267,31 +299,46 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
           )}
         </div>
 
-        <button 
-          onClick={toggleSidebar} 
-          className="flex items-center justify-center w-10 h-10 rounded-md text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <Menu size={iconSize} /> : <X size={iconSize} />}
-        </button>
+        {/* Botones de control del sidebar */}
+        <div className="flex items-center gap-1">
+          {/* Botón para colapsar/expandir */}
+          <button 
+            onClick={collapseButton.onClick}
+            className="flex items-center justify-center w-10 h-10 rounded-md transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+            aria-label={collapseButton.label}
+          >
+            {collapseButton.icon}
+          </button>
+
+          {/* Botón para ocultar - solo visible cuando el panel está expandido */}
+          {hideButton && (
+            <button 
+              onClick={hideButton.onClick}
+              className="flex items-center justify-center w-10 h-10 rounded-md transition-colors text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+              aria-label={hideButton.label}
+            >
+              {hideButton.icon}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Área de navegación con scroll usando listas */}
       <div className="flex-grow overflow-y-auto">
-        <nav className={`p-3 ${collapsed ? 'p-3' : 'p-3'}`}>
-          <ul className="space-y-6">
+        <nav className={`${collapsed ? 'px-2 py-4' : 'p-3'}`}>
+          <ul className="space-y-4">
             {categoryGroups.map((group, groupIndex) => (
               <li key={`group-${groupIndex}`} className="space-y-1">
                 {/* Título de la sección como encabezado de lista */}
                 {groupIndex > 0 && (
-                  <div className={`mt-2 mb-2 ${collapsed ? 'px-2' : 'px-3'}`}>
+                  <div className={`${collapsed ? 'px-2 mb-3' : 'px-3 mb-2'}`}>
                     {!collapsed && (
                       <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         {group.header}
                       </h3>
                     )}
                     {collapsed && (
-                      <div className="border-b border-gray-200 mb-1"></div>
+                      <div className="border-b border-gray-200"></div>
                     )}
                   </div>
                 )}
@@ -302,7 +349,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
                     <li key={`item-${groupIndex}-${itemIndex}`}>
                       <a
                         href="#"
-                        className={`flex items-center ${collapsed ? 'py-2.5 px-3' : 'py-2 px-3'} rounded-lg transition-colors ${
+                        className={`flex items-center ${collapsed ? 'py-2.5 px-2' : 'py-2 px-3'} rounded-lg transition-all duration-200 ${
                           item.active 
                             ? 'bg-blue-50 text-blue-700 shadow-sm' 
                             : 'text-gray-700 hover:bg-gray-100'
@@ -330,7 +377,7 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
           <li>
             <a
               href="#"
-              className={`flex items-center ${collapsed ? 'py-2.5 px-3' : 'py-2 px-3'} text-gray-700 rounded-lg hover:bg-gray-100 transition-colors`}
+              className={`flex items-center ${collapsed ? 'py-2.5 px-2' : 'py-2 px-3'} text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200`}
               onMouseEnter={(e) => showTooltip(e, 'Logout')}
               onMouseLeave={hideTooltip}
             >
@@ -363,31 +410,41 @@ const Sidebar: React.FC<SidebarProps> = ({ user }) => {
         onClick={toggleMobileSidebar}
       ></div>
 
-      {/* Sidebar móvil - ahora es más ancho cuando está colapsado */}
+      {/* Sidebar móvil */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 bg-white shadow-lg flex flex-col transform transition-transform md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        style={{ width: collapsed ? '90px' : '250px' }}
+        style={{ width: collapsed ? '100px' : '280px' }}
       >
         {sidebarContent}
       </aside>
 
-      {/* Sidebar desktop - ahora es más ancho cuando está colapsado */}
+      {/* Sidebar desktop */}
       <aside
-        className={`hidden md:flex flex-col h-screen bg-white border-r border-gray-200 shadow-sm transition-all max-h-screen ${
-          collapsed ? 'w-20' : 'w-64'
-        }`}
+        className={`hidden md:flex flex-col h-screen bg-white border-r border-gray-200 shadow-sm transition-all duration-300 max-h-screen ${
+          collapsed ? 'w-20' : 'w-72'
+        } ${isHidden ? 'md:hidden' : ''}`}
         data-state={collapsed ? 'collapsed' : 'expanded'}
       >
         {sidebarContent}
       </aside>
 
-      {/* Tooltip - Renderizado en el body usando portal para evitar problemas con el layout */}
+      {/* Botón para mostrar sidebar cuando está oculto */}
+      {isHidden && (
+        <button
+          onClick={() => setIsHidden(false)}
+          className="fixed top-16 left-4 z-50 hidden md:flex items-center justify-center w-11 h-11 rounded-md bg-white shadow-md text-black hover:text-gray-900 hover:bg-gray-100 transition-colors"
+        >
+          <PanelLeftOpen size={iconSize} />
+        </button>
+      )}
+
+      {/* Tooltip */}
       {tooltipInfo.visible && collapsed && (
         <div 
           id="sidebar-tooltip"
-          className="fixed z-[9999] bg-gray-800 text-white text-sm py-1 px-2.5 rounded shadow-lg pointer-events-none"
+          className="fixed z-[9999] bg-gray-800 text-white text-sm py-2 px-3 rounded-lg shadow-lg pointer-events-none transition-all duration-200"
           style={{
             top: `${tooltipInfo.position.top}px`,
             left: `${tooltipInfo.position.left}px`,

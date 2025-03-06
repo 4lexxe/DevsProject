@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ResourceService } from '../../services/resource.service';
 import { UserService } from '../../../profile/services/user.service';
-import { toast } from 'react-hot-toast';
 import { Resource, UserInfo } from '../../types/resource';
 import ResourceHeader from '../../navigation/ResourceDetailHeader';
 import ResourceContent from '../../components/ResourceContent';
@@ -37,16 +36,6 @@ const ResourceDetailsPage: React.FC = () => {
     }
   }, [id]);
 
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success('Enlace copiado al portapapeles');
-    } catch (err) {
-      console.error('Error al copiar el enlace:', err);
-      toast.error('Error al copiar el enlace');
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
@@ -58,7 +47,7 @@ const ResourceDetailsPage: React.FC = () => {
   if (error || !resource) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
             <p className="text-red-700">{error || 'Recurso no encontrado'}</p>
           </div>
@@ -68,23 +57,49 @@ const ResourceDetailsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Encabezado del recurso */}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ResourceHeader resource={resource} />
-        {/* Contenido principal del recurso */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <ResourceContent resource={resource} />
-          <ResourceInfo resource={resource} user={resourceUser} />
-          {resource.id !== undefined && resource.userId !== undefined && (
-            <ResourceActions resourceId={resource.id} ownerId={resource.userId} onShare={handleShare} />
-          )}
-          {/* Componente de Comentarios */}
-          {resource.id !== undefined && (
-            <div className="p-6">
-              <Comment resourceId={resource.id} />
+        
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Columna principal - Contenido y comentarios */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Contenido del recurso */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <ResourceContent resource={resource} />
             </div>
-          )}
+
+            {/* Información del recurso - Visible en móvil */}
+            <div className="lg:hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <ResourceInfo resource={resource} user={resourceUser} />
+              </div>
+            </div>
+
+            {/* Comentarios */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <Comment resourceId={resource.id!} />
+            </div>
+          </div>
+
+          {/* Sidebar - Información y acciones */}
+          <div className="lg:col-span-1 space-y-8">
+            {/* Información del recurso - Visible en desktop */}
+            <div className="hidden lg:block">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
+                <ResourceInfo resource={resource} user={resourceUser} />
+              </div>
+            </div>
+
+            {/* Acciones del recurso */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-[400px]">
+              <ResourceActions 
+                resourceId={resource.id!} 
+                ownerId={resource.userId!} 
+                onShare={() => navigator.clipboard.writeText(window.location.href)} 
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
