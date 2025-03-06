@@ -30,7 +30,14 @@ export const validateSectionAndContents = [
 
   // 📌 Validar el tipo de módulo
   body("section.moduleType")
-    .isIn(["Introductorio", "Principiante", "Intermedio", "Avanzado", "Experto", "Insano Hardcore"])
+    .isIn([
+      "Introductorio",
+      "Principiante",
+      "Intermedio",
+      "Avanzado",
+      "Experto",
+      "Insano Hardcore",
+    ])
     .withMessage("El tipo de módulo debe ser un valor válido"),
 
   // 📌 Validar que los contenidos sean un array
@@ -51,7 +58,9 @@ export const validateSectionAndContents = [
     .notEmpty()
     .withMessage("El texto del contenido es obligatorio")
     .isLength({ min: 10, max: 1000 })
-    .withMessage("El texto del contenido debe tener entre 10 y 1000 caracteres"),
+    .withMessage(
+      "El texto del contenido debe tener entre 10 y 1000 caracteres"
+    ),
 
   body("section.contents.*.markdown")
     .optional()
@@ -69,13 +78,20 @@ export const validateSectionAndContents = [
 
   body("section.contents.*.link")
     .optional()
+    .if((value) => value !== "") // Solo aplica la validación de URL si el valor no es un string vacío
     .isURL()
     .withMessage("El campo link debe ser una URL válida"),
 
   // 📌 Validar el quiz si existe
   body("section.contents.*.quiz")
     .optional()
-    .isArray()
+    .custom((value) => {
+      // Acepta null o un array
+      if (value === null || Array.isArray(value)) {
+        return true;
+      }
+      throw new Error("El campo quiz debe ser un array o null");
+    })
     .withMessage("El campo quiz debe ser un array"),
 
   body("section.contents.*.quiz.*.question")
@@ -107,7 +123,13 @@ export const validateSectionAndContents = [
   // 📌 Validar recursos si existen
   body("section.contents.*.resources")
     .optional()
-    .isArray()
+    .custom((value) => {
+      // Acepta null o un array
+      if (value === null || Array.isArray(value)) {
+        return true;
+      }
+      throw new Error("El campo resources debe ser un array o null");
+    })
     .withMessage("El campo resources debe ser un array"),
 
   body("section.contents.*.resources.*.title")
@@ -124,9 +146,13 @@ export const validateSectionAndContents = [
   // 📌 Validar duración y posición
   body("section.contents.*.duration")
     .isInt({ gt: 0 })
-    .withMessage("La duración del contenido debe ser un número entero positivo"),
+    .withMessage(
+      "La duración del contenido debe ser un número entero positivo"
+    ),
 
   body("section.contents.*.position")
     .isInt({ gt: 0 })
-    .withMessage("La posición del contenido debe ser un número entero positivo"),
+    .withMessage(
+      "La posición del contenido debe ser un número entero positivo"
+    ),
 ];

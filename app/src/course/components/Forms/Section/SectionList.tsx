@@ -74,6 +74,8 @@ export default function SectionList({
       contents: sectionState.section.contents.map(({ id, ...rest }) => rest),
     };
 
+    console.log(sectionData)
+
     const dataToSend = { section: sectionData, courseId };
     handleCreateSection(dataToSend);
   };

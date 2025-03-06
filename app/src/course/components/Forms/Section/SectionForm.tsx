@@ -116,7 +116,7 @@ export default function SectionForm() {
     } else {
       editSection(data);
     }
-    handleCancel();
+    /* handleCancel(); */
   };
 
   if (isLoading) {

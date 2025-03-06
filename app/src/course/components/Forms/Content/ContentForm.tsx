@@ -30,7 +30,7 @@ export default function ContentForm() {
       markdown: initialData?.markdown || undefined,
       linkType: initialData?.linkType || undefined,
       link: initialData?.link || undefined,
-      resources: initialData?.resources || undefined,
+      resources: initialData?.resources || [],
       duration: initialData?.duration || undefined,
       position: initialData?.position || 0,
     },
