@@ -142,7 +142,7 @@ export class ForumThreadController {
           return;
         }
   
-        const { title, categoryId, firstPostContent, isPinned, isLocked, isAnnouncement } = req.body;
+        const { title, categoryId, firstPostContent, isPinned, isLocked, isAnnouncement, isNSFW, isSpoiler, coverImage } = req.body;
         const userId = (req.user as User)?.id;
   
         if (!userId) {
@@ -169,8 +169,9 @@ export class ForumThreadController {
           authorId: userId,
           content: firstPostContent,
           status: PostStatus.PUBLISHED,
-          isNSFW: false,
-          isSpoiler: false
+          isNSFW: isNSFW,
+          isSpoiler: isSpoiler,
+          coverImage: coverImage
         }, { transaction });
         
         await transaction.commit();

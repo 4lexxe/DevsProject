@@ -1,16 +1,42 @@
 import { Router } from 'express';
 import { ForumReplyController } from '../controllers/ForumReplyController';
-import { authMiddleware } from '../../../shared/middleware/authMiddleware'; // Import your auth middleware
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
 
 const router = Router();
 
-// Define routes for ForumReplyController
-// Obtener las respuestas populares
+// Rutas principales para replies
+router.post(
+  '/posts/:postId/replies', 
+  authMiddleware, 
+  ForumReplyController.replyValidations, 
+  ForumReplyController.createReply
+);
+
+// Obtener respuestas paginadas y anidadas de un post
+router.get(
+  '/posts/:postId/replies',
+  ForumReplyController.getPaginatedNestedReplies // Reemplaza getAllReplies
+);
+
+// Carga bajo demanda de respuestas hijas
+router.get(
+  '/replies/:parentReplyId/children',
+  ForumReplyController.getMoreChildren // Nueva ruta para hijos adicionales
+);
+
+// Resto de rutas
 router.get('/replies/popular', ForumReplyController.getPopularReplies);
-router.get('/replies', ForumReplyController.getAllReplies); // Get all replies
-router.post('/replies', authMiddleware, ForumReplyController.createReply); // Create a new reply
-router.get('/replies/:replyId', ForumReplyController.getReplyById); // Get a specific reply by ID
-router.put('/replies/:replyId', authMiddleware, ForumReplyController.replyValidations, ForumReplyController.updateReply); // Update a specific reply
-router.delete('/replies/:replyId', authMiddleware, ForumReplyController.deleteReply); // Delete a specific reply
+router.get('/replies/:replyId', ForumReplyController.getReplyById);
+router.put(
+  '/replies/:replyId', 
+  authMiddleware, 
+  ForumReplyController.replyValidations, 
+  ForumReplyController.updateReply
+);
+router.delete(
+  '/replies/:replyId', 
+  authMiddleware, 
+  ForumReplyController.deleteReply
+);
 
 export default router;

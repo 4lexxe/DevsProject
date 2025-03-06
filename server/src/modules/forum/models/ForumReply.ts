@@ -4,19 +4,15 @@ import sequelize from "../../../infrastructure/database/db";
 import  ForumPost  from "./ForumPost";
 import ForumVote, { VoteType } from "./ForumVotePost";
 import ForumReactionReply from "./ForumReactionReply";
-/**
- * @enum {string} ReplyStatus
- * @description Estados posibles para una respuesta
- * @property {string} ACTIVE - Respuesta visible
- * @property {string} HIDDEN - Respuesta ocultada por moderación
- */
+
 
 interface ForumReplyAttributes {
   id: number;
   postId: number;
   authorId: number;
   content: string;
-  parentReplyId?: number;
+  parentReplyId?: number | null;
+  depth: number;                  // Nuevo campo para nivel de anidación
   isAcceptedAnswer: boolean; // true aceptada, false no aceptada
   isNSFW: boolean;
   isSpoiler: boolean;
@@ -36,6 +32,7 @@ class ForumReply extends Model<ForumReplyAttributes, ForumReplyCreationAttribute
   public authorId!: number;
   public content!: string;
   public parentReplyId?: number;
+  public depth!: number;
   public isAcceptedAnswer!: boolean;
   public coverImage?: string;
   public isNSFW!: boolean;
@@ -94,6 +91,14 @@ ForumReply.init(
         key: "id",
       },
     },
+    depth: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+      validate: {
+        max: 50 // Limitar profundidad máxima
+      }
+    },
     isAcceptedAnswer: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -133,6 +138,11 @@ ForumReply.init(
     modelName: "ForumReply",
     tableName: "ForumReplies",
     timestamps: true,
+    indexes: [
+      {
+        fields: ['postId', 'parentReplyId'] // Mejorará las consultas anidadas
+      }
+    ],
     hooks: {
       /**
        * @hook afterCreate

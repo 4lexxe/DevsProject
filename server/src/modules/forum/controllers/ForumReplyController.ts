@@ -5,51 +5,13 @@ import ForumPost from '../models/ForumPost';
 import User from '../../user/User';
 import sequelize from '../../../infrastructure/database/db';
 import { replyValidations } from '../validators/reply.validator';
+import { ForumThread } from '../models';
 
 export class ForumReplyController {
   // Validaciones para los datos de entrada
   static replyValidations = replyValidations;
 
-  /**
-   * @function getAllReplies
-   * @description Obtiene todas las respuestas
-   */
-  static async getAllReplies(req: Request, res: Response): Promise<void> {
-    try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      const offset = parseInt(req.query.offset as string) || 0;
-
-      const replies = await ForumReply.findAll({
-        include: [
-          {
-            model: User,
-            as: 'author',
-            attributes: ['id', 'username', 'avatar']
-          },
-          {
-            model: ForumPost,
-            as: 'post',
-            attributes: ['id', 'title']
-          }
-        ],
-        limit,
-        offset,
-        order: [['createdAt', 'DESC']]
-      });
-
-      res.status(200).json({
-        success: true,
-        data: replies
-      });
-    } catch (error) {
-      console.error('Error al obtener todas las respuestas:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Error al obtener todas las respuestas',
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-  }
+  
 
   /**
    * @function createReply
@@ -57,65 +19,197 @@ export class ForumReplyController {
    */
   static async createReply(req: Request, res: Response): Promise<void> {
     const transaction = await sequelize.transaction();
-    
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            res.status(400).json({ errors: errors.array() });
+            return;
+        }
 
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
-        return;
-      }
-      const { postId } = req.params;
-      const {content, isNSFW = false, isSpoiler = false } = req.body;
-      const userId = (req.user as User)?.id;
+        const { postId } = req.params;
+        const { content, parentReplyId, isNSFW = false, isSpoiler = false } = req.body;
+        const userId = (req.user as User)?.id;
 
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
-        return;
-      }
+        // Validar existencia del post padre
+        const parentPost = await ForumPost.findByPk(postId);
+        if (!parentPost) {
+            res.status(404).json({ success: false, message: 'Post no encontrado' });
+            return;
+        }
 
-      // Verificar si el post existe
-      const post = await ForumPost.findByPk(postId);
-      if (!post) {
-        res.status(404).json({ success: false, message: 'Post no encontrado' });
-        return;
-      }
-      // Crear la respuesta
-      const reply = await ForumReply.create({
-        postId: Number(postId),
-        authorId: userId,
-        content,
-        isNSFW,
-        isSpoiler,
-        voteScore: 0,
-        upvoteCount: 0,
-        downvoteCount: 0
-      }, { transaction });
+        let depth = 0;
+        let parentReply: ForumReply | null = null;
 
-      await transaction.commit();
-      res.status(201).json({
-        success: true,
-        message: 'Respuesta creada exitosamente',
-        data: reply
-      });
+        // Si es respuesta a otro reply
+        if (parentReplyId) {
+            parentReply = await ForumReply.findByPk(parentReplyId);
+            if (!parentReply || parentReply.postId !== parseInt(postId)) {
+                res.status(400).json({ 
+                    success: false, 
+                    message: 'Respuesta padre inválida o no pertenece al post' 
+                });
+                return;
+            }
+            depth = parentReply.depth + 1;
+        }
+
+        // Crear reply
+        const reply = await ForumReply.create({
+            postId: Number(postId),
+            authorId: userId,
+            content,
+            parentReplyId: parentReplyId || null,
+            depth,
+            isNSFW,
+            isSpoiler,
+            voteScore: 0,
+            upvoteCount: 0,
+            downvoteCount: 0
+        }, { transaction });
+
+        // Actualizar actividad del hilo
+        await ForumThread.update(
+            { lastActivityAt: new Date() },
+            { where: { id: parentPost.threadId }, transaction }
+        );
+
+        await transaction.commit();
+        res.status(201).json({
+            success: true,
+            message: 'Respuesta creada exitosamente',
+            data: reply
+        });
     } catch (error) {
-      await transaction.rollback();
-      console.error('Error al crear la respuesta:', error);
+        await transaction.rollback();
+        console.error('Error al crear la respuesta:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al crear la respuesta',
+            error: error instanceof Error ? error.message : String(error)
+        });
+    }
+}
+
+// Nuevo método para obtener estructura anidada
+static async getPaginatedNestedReplies(req: Request, res: Response): Promise<void> {
+  try {
+      const { postId } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 25;
+      const offset = (page - 1) * limit;
+
+      // Obtener respuestas raíz (parentReplyId = null) paginadas
+      const { count, rows: rootReplies } = await ForumReply.findAndCountAll({
+          where: { 
+              postId: Number(postId),
+              parentReplyId: null 
+          },
+          include: [
+              {
+                  model: User,
+                  as: 'author',
+                  attributes: ['id', 'username', 'avatar']
+              }
+          ],
+          limit,
+          offset,
+          order: [['createdAt', 'DESC']]
+      });
+
+      // Función recursiva para cargar primeros niveles de hijos
+      const loadInitialChildren = async (reply: ForumReply) => {
+          const children = await ForumReply.findAll({
+              where: { parentReplyId: reply.id },
+              include: [
+                  {
+                      model: User,
+                      as: 'author',
+                      attributes: ['id', 'username', 'avatar']
+                  }
+              ],
+              limit: 3, // Carga inicial de 3 hijos por nivel
+              order: [['createdAt', 'DESC']]
+          });
+          
+          (reply as any).setDataValue('replies', children);
+      };
+
+      // Cargar primeros hijos para cada raíz
+      await Promise.all(rootReplies.map(loadInitialChildren));
+
+      res.status(200).json({
+          success: true,
+          data: {
+              totalRootReplies: count,
+              currentPage: page,
+              totalPages: Math.ceil(count / limit),
+              replies: rootReplies
+          }
+      });
+  } catch (error) {
+      console.error('Error al obtener respuestas paginadas:', error);
       res.status(500).json({
-        success: false,
-        message: 'Error al crear la respuesta',
-        error: error instanceof Error ? error.message : String(error)
+          success: false,
+          message: 'Error al obtener respuestas',
+          error: error instanceof Error ? error.message : String(error)
+      });
+  }
+}
+
+  // Carga bajo demanda de más hijos
+static async getMoreChildren(req: Request, res: Response): Promise<void> {
+  try {
+      const { parentReplyId } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      const offset = (page - 1) * limit;
+
+      const { count, rows: children } = await ForumReply.findAndCountAll({
+          where: { parentReplyId: Number(parentReplyId) },
+          include: [
+              {
+                  model: User,
+                  as: 'author',
+                  attributes: ['id', 'username', 'avatar']
+              }
+          ],
+          limit,
+          offset,
+          order: [['createdAt', 'DESC']]
+      });
+
+      res.status(200).json({
+          success: true,
+          data: {
+              totalChildren: count,
+              currentPage: page,
+              totalPages: Math.ceil(count / limit),
+              replies: children
+          }
+      });
+  } catch (error) {
+      console.error('Error al obtener hijos adicionales:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Error al obtener respuestas',
+          error: error instanceof Error ? error.message : String(error)
       });
     }
   }
 
   /**
-   * @function getReplyById
-   * @description Obtiene una respuesta por su ID
-   */
+ * @function getReplyById
+ * @description Obtiene una respuesta específica con sus relaciones
+ */
   static async getReplyById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
+  
+      // Validate the ID
+      if (!id || isNaN(Number(id))) {
+        res.status(400).json({ success: false, message: 'ID de respuesta inválido' });
+        return;
+      }
       
       const reply = await ForumReply.findByPk(id, {
         include: [
@@ -162,7 +256,7 @@ export class ForumReplyController {
       }
 
       const { id } = req.params;
-      const { content, isNSFW, isSpoiler } = req.body;
+      const { content, isNSFW, isSpoiler, coverImage } = req.body;
       
       // Buscar la respuesta
       const reply = await ForumReply.findByPk(id);
@@ -176,7 +270,8 @@ export class ForumReplyController {
       await reply.update({
         content: content || reply.content,
         isNSFW: typeof isNSFW === 'boolean' ? isNSFW : reply.isNSFW,
-        isSpoiler: typeof isSpoiler === 'boolean' ? isSpoiler : reply.isSpoiler
+        isSpoiler: typeof isSpoiler === 'boolean' ? isSpoiler : reply.isSpoiler,
+        coverImage: coverImage || reply.coverImage
       }, { transaction });
       
       await transaction.commit();
@@ -184,7 +279,7 @@ export class ForumReplyController {
       res.status(200).json({
         success: true,
         message: 'Respuesta actualizada exitosamente',
-        data: reply
+        data: reply 
       });
     } catch (error) {
       await transaction.rollback();

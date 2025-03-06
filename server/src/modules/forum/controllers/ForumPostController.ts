@@ -24,7 +24,7 @@ export class ForumPostController {
         return;
       }
 
-      const { threadId, content, isNSFW, isSpoiler} = req.body;
+      const { threadId, content, isNSFW, isSpoiler, coverImage } = req.body;
       const userId = (req.user as User)?.id;
 
       if (!userId) {
@@ -50,7 +50,8 @@ export class ForumPostController {
         content,
         status: PostStatus.PUBLISHED,
         isNSFW,
-        isSpoiler
+        isSpoiler,
+        coverImage
       }, { transaction });
 
       await transaction.commit();
@@ -123,7 +124,7 @@ export class ForumPostController {
       }
 
       const { id } = req.params;
-      const { content, isNSFW, isSpoiler } = req.body;
+      const { content, isNSFW, isSpoiler, coverImage } = req.body;
       const userId = (req.user as User)?.id;
 
       if (!userId) {
@@ -150,7 +151,8 @@ export class ForumPostController {
       await post.update({
         content: content || post.content,
         isNSFW: typeof isNSFW === 'boolean' ? isNSFW : post.isNSFW,
-        isSpoiler: typeof isSpoiler === 'boolean' ? isSpoiler : post.isSpoiler
+        isSpoiler: typeof isSpoiler === 'boolean' ? isSpoiler : post.isSpoiler,
+        coverImage: coverImage || post.coverImage
       }, { transaction });
       
       await transaction.commit();
