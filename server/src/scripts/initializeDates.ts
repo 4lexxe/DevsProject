@@ -27,6 +27,7 @@ const plansToInsert = [
     accessLevel: "Básico",
     installments: 1,
     installmentPrice: 10000,
+    position: 1,
     saveInMp: false,
   },
   {
@@ -44,6 +45,7 @@ const plansToInsert = [
     accessLevel: "Estándar",
     installments: 1,
     installmentPrice: 10000,
+    position: 2,
     saveInMp: false,
   },
   {
@@ -63,37 +65,38 @@ const plansToInsert = [
     accessLevel: "Premium",
     installments: 3,
     installmentPrice: 8000,
+    position: 3,
     saveInMp: false,
   },
   {
-    "name": "Este plan se guarda En mercado pago con estado analitico",
-    "description": "Plan para usuarios que necesitan más funcionalidades",
-    "totalPrice": 10000,
-    "durationType": "días",
-    "duration": 1, // Duración total del ciclo de pago en meses
-    "features": [
+    name: "Este plan se guarda En mercado pago con estado analitico",
+    description: "Plan para usuarios que necesitan más funcionalidades",
+    totalPrice: 10000,
+    durationType: "días",
+    duration: 1, // Duración total del ciclo de pago en meses
+    features: [
       "Acceso completo",
       "Soporte Estándar",
-      "Actualizaciones semanales"
+      "Actualizaciones semanales",
     ],
-    "isActive": true,
-    "accessLevel": "Estándar",
-    "installments": 1,
-    "saveInMp": true
+    isActive: false,
+    accessLevel: "Estándar",
+    installments: 1,
+    saveInMp: true,
   },
 ];
 
 // Datos para los descuentos de los planes
 const descuentos = [
   {
-    description: 'Descuento especial para Navidad', // Descripción opcional
+    description: "Descuento especial para Navidad", // Descripción opcional
     value: 25, // 25% de descuento
-    startDate: new Date('2023-12-20'), // Fecha de inicio
-    endDate: new Date('2023-12-31'), // Fecha de fin (posterior a startDate)
+    startDate: new Date("2023-12-20"), // Fecha de inicio
+    endDate: new Date("2023-12-31"), // Fecha de fin (posterior a startDate)
     isActive: true, // Descuento activo
     planId: 1, // ID del plan asociado (debe existir en la tabla Plans)
-    event: 'Navidad 2023', // Evento obligatorio
-  }
+    event: "Navidad 2023", // Evento obligatorio
+  },
 ];
 
 //Datos de ejemplo para las categorias
@@ -459,8 +462,8 @@ async function insertData() {
     for (const plan of plansToInsert) {
       await Plan.create(plan);
     }
-    for(const descuento of descuentos){
-      await Discount.create(descuento)
+    for (const descuento of descuentos) {
+      await Discount.create(descuento);
     }
 
     //Insertar categorias y carreras

@@ -33,6 +33,8 @@ import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
+import { PlansPage } from "./Membership/index";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -61,6 +63,8 @@ function App() {
             <Route path='course/form' element={<CourseFormPage />} />
             <Route path='course/sections/form' element={<SectionsFormPage />} />
             <Route path="/recursos" element={<ResourcePage />} />
+
+            <Route path="/plans" element={<PlansPage />} />
 
             {/* Rutas protegidas */}
             <Route element={<ProtectedRoute />}>

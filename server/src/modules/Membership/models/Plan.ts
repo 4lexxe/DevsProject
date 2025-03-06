@@ -6,18 +6,19 @@ class Plan extends Model {
   public id!: bigint;
   public name!: string;
   public description!: string;
-  public totalPrice!: number;  // Precio total de todo el plan
+  public totalPrice!: number; // Precio total de todo el plan
 
-  public durationType!: string; // dias o meses 
-  public duration!: number; // Duracion total del ciclo de de pago 
+  public durationType!: string; // dias o meses
+  public duration!: number; // Duracion total del ciclo de de pago
 
   public features!: string[];
-  public isActive!: boolean;
   public accessLevel!: "Básico" | "Estándar" | "Premium";
-
-  public installments!: number;   // Cantidad de cuotas en las que se divide el plan
-  public installmentPrice?: number;  // Precio de cada cuota
-
+  
+  public installments!: number; // Cantidad de cuotas en las que se divide el plan
+  public installmentPrice?: number; // Precio de cada cuota
+  
+  public isActive!: boolean; // Solo podran haber tres planes con este campo en true
+  public position!: number; // Indica la posicion en que se mostrara el plan
   public saveInMp!: boolean; // Indica si se guarda en el plan de subscripcion en la api de mercadopago
 
   public mpSubPlan?: MPSubPlan; // Relacion con el modelo de MPSubPlan
@@ -60,7 +61,7 @@ Plan.init(
         min: 1,
       },
     },
-    
+
     durationType: {
       type: DataTypes.ENUM("días", "meses"),
       allowNull: false,
@@ -71,10 +72,6 @@ Plan.init(
       validate: {
         notEmpty: true,
       },
-    },
-    isActive: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
     },
     accessLevel: {
       type: DataTypes.ENUM("Básico", "Estándar", "Premium"),
@@ -95,6 +92,30 @@ Plan.init(
       validate: {
         isDecimal: true,
         min: 0,
+      },
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      validate: {
+        isValidActive(value: boolean) {
+          if (value) {
+            return Plan.count({ where: { isActive: true } }).then((count) => {
+              if (count >= 3) {
+                throw new Error("Solo pueden haber tres planes activos.");
+              }
+            });
+          }
+        },
+      },
+    },
+    position: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+      unique: {
+        name: 'uniquePosition',
+        msg: 'El valor de la posición debe ser único.',
       },
     },
     saveInMp: {

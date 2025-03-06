@@ -59,7 +59,7 @@ class PlanController {
         reason: planData.name,
         auto_recurring: {
           frequency: planData.duration / planData.installments,
-          frequency_type: (planData.durationType === "días") ? "days" : "months",
+          frequency_type: planData.durationType === "días" ? "days" : "months",
           transaction_amount: planData.installmentPrice,
           repetitions: planData.installments,
           currency_id: "ARS",
@@ -103,7 +103,7 @@ class PlanController {
         reason: planData.name,
         auto_recurring: {
           frequency: planData.duration / planData.installments,
-          frequency_type: (planData.durationType) === "días" ? "days" : "months",
+          frequency_type: planData.durationType === "días" ? "days" : "months",
           transaction_amount: planData.installmentPrice,
           repetitions: planData.installmentss,
           currency_id: "ARS",
@@ -171,6 +171,66 @@ class PlanController {
       });
     } catch (error) {
       this.handleServerError(res, req, error, "Error al obtener el plan");
+    }
+  };
+
+  // Obtener tres planes destacados por defecto
+  static getDefaultPlans: RequestHandler = async (req, res) => {
+    try {
+      // Buscar planes que estén marcados como destacados o usar otro criterio
+      // como popularidad, precio más bajo, o una propiedad específica
+      const defaultPlans = await Plan.findAll({
+        where: {
+          isActive: true,
+        },
+        include: [{
+          model: MPSubPlan,
+          as: 'mpSubPlan', // Especificar el alias
+          attributes: ['initPoint']
+        }],
+        order: [["position", "ASC"]],
+        limit: 3,
+      });
+
+      if (defaultPlans.length === 0) {
+        // Si no hay planes destacados, obtener los 3 primeros planes activos
+        const fallbackPlans = await Plan.findAll({
+          where: {
+            isActive: true,
+          },
+          include: [{
+            model: MPSubPlan,
+            as: 'mpSubPlan', // Especificar el alias
+            attributes: ['initPoint']
+          }],
+          order: [["id", "ASC"]],
+          limit: 3,
+        });
+
+        this.sendSuccessResponse(
+          res,
+          200,
+          "Planes por defecto obtenidos exitosamente",
+          fallbackPlans,
+          req
+        );
+        return;
+      }
+
+      this.sendSuccessResponse(
+        res,
+        200,
+        "Planes por defecto obtenidos exitosamente",
+        defaultPlans,
+        req
+      );
+    } catch (error) {
+      this.handleServerError(
+        res,
+        req,
+        error,
+        "Error al obtener los planes por defecto"
+      );
     }
   };
 

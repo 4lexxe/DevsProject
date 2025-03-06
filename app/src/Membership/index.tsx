@@ -1,0 +1,1 @@
+export { default as PlansPage } from './pages/PlansPage';

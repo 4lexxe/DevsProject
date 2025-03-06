@@ -30,9 +30,6 @@ export const validatePlan = [
     .withMessage("Las características deben ser un arreglo")
     .notEmpty()
     .withMessage("Las características no pueden estar vacías"),
-  body("isActive")
-    .isBoolean()
-    .withMessage("El estado activo debe ser un valor booleano"),
   body("accessLevel")
     .isIn(["Básico", "Estándar", "Premium"])
     .withMessage(
@@ -62,4 +59,29 @@ export const validatePlan = [
   body("saveInMp")
     .isBoolean()
     .withMessage("El campo saveInMp debe ser un valor booleano"),
+  body("isActive")
+    .isBoolean()
+    .withMessage("El estado activo debe ser un valor booleano")
+    .custom(async (value) => {
+      if (value) {
+        const Plan = require("../models/Plan").default;
+        const count = await Plan.count({ where: { isActive: true } });
+        if (count >= 3) {
+          throw new Error("Solo pueden haber tres planes activos.");
+        }
+      }
+      return true;
+    }),
+  body("position")
+    .optional()
+    .isInt()
+    .withMessage("El campo position debe ser un número entero")
+    .custom(async (value) => {
+      const Plan = require("../models/Plan").default;
+      const plan = await Plan.findOne({ where: { position: value } });
+      if (plan) {
+        throw new Error("El valor de la posición debe ser único.");
+      }
+      return true;
+    }),
 ];
