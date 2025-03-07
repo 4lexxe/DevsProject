@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Edit, Trash2, Loader2, BookOpen, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import ContentForm from "@/course/components/Forms/Content/ContentForm";
+import ContentForm from "@/course/components/forms/content/ContentForm";
 import { createSection } from "@/course/services/courseFormService";
-import DraggableContentList from "@/course/components/Forms/Content/DraggableContentList";
+import DraggableContentList from "@/course/components/forms/content/DraggableContentList";
 import { useSectionContext } from "@/course/context/SectionFormContext";
 import { updateSection } from "@/course/services/sectionServices";
 

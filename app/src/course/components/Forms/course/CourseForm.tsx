@@ -24,7 +24,7 @@ import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
-import ImagePreview from "@/course/components/Forms/Previews/ImagePreview";
+import ImagePreview from "@/course/components/forms/previews/ImagePreview";
 
 import { ICourseInput, ICourse } from "@/course/interfaces/CourseForm";
 import { courseSchema } from "@/course/validations/courseSchema";
