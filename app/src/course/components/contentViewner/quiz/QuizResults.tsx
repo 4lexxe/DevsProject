@@ -75,11 +75,11 @@ const QuizResults: React.FC<QuizResultsProps> = ({
         const correctAnswer = quiz.answers.find(a => a.isCorrect)?.answer || '';
         return (
           <div className="space-y-3">
-            <div className={`p-3 rounded-lg ${isAnswerCorrect(quiz, quizIndex) ? 'bg-green-100' : 'bg-red-100'}`}>
+            <div className={`p-3 rounded-lg ${isAnswerCorrect(quiz, quizIndex) ? 'bg-teal-100' : 'bg-red-100'}`}>
               <p className="font-medium">Tu respuesta:</p>
               <p className="mt-1">{userAnswer || '(Sin respuesta)'}</p>
             </div>
-            <div className="p-3 rounded-lg bg-gray-50">
+            <div className="p-3 rounded-lg bg-slate-50">
               <p className="font-medium">Respuesta correcta:</p>
               <p className="mt-1">{correctAnswer}</p>
             </div>
@@ -107,19 +107,19 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                           key={value.toString()}
                           className={`flex-1 p-3 rounded-lg flex items-center justify-center gap-2 ${
                             isCorrectValue
-                              ? 'bg-green-100'
+                              ? 'bg-teal-100'
                               : isSelected && !isCorrectValue
                               ? 'bg-red-100'
-                              : 'bg-gray-50'
+                              : 'bg-slate-50'
                           }`}
                         >
-                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-200">
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-200">
                             {icon}
                           </span>
                           <span className="font-medium">{label}</span>
-                          {isSelected && <CircleDot className="w-5 h-5 text-blue-600 ml-2" />}
+                          {isSelected && <CircleDot className="w-5 h-5 text-cyan-600 ml-2" />}
                           {isCorrectValue ? (
-                            <CheckCircle className="w-5 h-5 text-green-600 ml-2" />
+                            <CheckCircle className="w-5 h-5 text-teal-600 ml-2" />
                           ) : isSelected && !isCorrectValue ? (
                             <XCircle className="w-5 h-5 text-red-600 ml-2" />
                           ) : null}
@@ -143,20 +143,20 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                   key={answerIndex}
                   className={`flex items-center p-3 rounded-lg ${
                     answer.isCorrect
-                      ? 'bg-green-100'
+                      ? 'bg-teal-100'
                       : isSelected && !answer.isCorrect
                       ? 'bg-red-100'
                       : 'bg-white'
                   }`}
                 >
-                  <span className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 mr-3">
+                  <span className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-200 mr-3">
                     {letters[answerIndex]})
                   </span>
                   <span className="flex-grow">{answer.answer}</span>
                   <div className="flex items-center space-x-2">
-                    {isSelected && <CircleDot className="w-5 h-5 text-blue-600 mr-2" />}
+                    {isSelected && <CircleDot className="w-5 h-5 text-cyan-600 mr-2" />}
                     {answer.isCorrect ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <CheckCircle className="w-5 h-5 text-teal-600" />
                     ) : isSelected && !answer.isCorrect ? (
                       <XCircle className="w-5 h-5 text-red-600" />
                     ) : null}
@@ -172,32 +172,32 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   const score = calculateScore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+          <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6 text-white">
             <h2 className="text-3xl font-bold mb-2">Resultados del Quiz</h2>
             <p className="text-lg opacity-90">Has completado todas las preguntas</p>
           </div>
 
           <div className="p-6">
             <div className="text-center mb-8">
-              <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              <div className="text-6xl font-bold bg-gradient-to-r from-cyan-600 to-blue-900 bg-clip-text text-transparent mb-4">
                 {score.percentage}%
               </div>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-slate-600">
                 Has acertado {score.score} de {score.total} preguntas
               </p>
             </div>
 
             <div className="space-y-6">
               {quizzes.map((quiz, quizIndex) => (
-                <div key={quizIndex} className="bg-gray-50 rounded-xl p-6">
+                <div key={quizIndex} className="bg-slate-50 rounded-xl p-6">
                   <h3 className="font-semibold text-lg mb-4">
                     {quizIndex + 1}. {quiz.question}
                   </h3>
                   {renderResultAnswer(quiz, quizIndex)}
-                  <div className="mt-4 text-sm text-gray-600">
+                  <div className="mt-4 text-sm text-slate-600">
                     <p>
                       {quiz.type === 'Single' && 'Pregunta de respuesta única'}
                       {quiz.type === 'MultipleChoice' && 'Pregunta de respuesta múltiple'}
@@ -212,7 +212,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
             <div className="mt-8 flex justify-center">
               <button
                 onClick={onRestart}
-                className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+                className="flex items-center space-x-2 bg-gradient-to-r from-cyan-600 to-blue-900 text-white px-6 py-3 rounded-lg hover:from-cyan-700 hover:to-blue-950 transition-all duration-300"
               >
                 <RotateCcw className="w-5 h-5" />
                 <span>Reintentar Quiz</span>

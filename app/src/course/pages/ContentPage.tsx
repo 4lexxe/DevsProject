@@ -31,7 +31,7 @@ const ContentPage: React.FC = () => {
     );
   }
 
-  return <ContentDetail content={content} />;
+  return <ContentDetail content={content} />; 
 };
 
 export default ContentPage;
