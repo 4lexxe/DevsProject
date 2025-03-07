@@ -94,6 +94,44 @@ class ForumFlair extends Model<ForumFlairAttributes, ForumFlairCreationAttribute
       }
     }
   }
+
+  // Agregar estos métodos a la clase ForumFlair
+public async assignToPost(postId: number): Promise<void> {
+  const transaction = await sequelize.transaction();
+  const PostFlair = sequelize.models.PostFlairs;
+  try {
+    await PostFlair.create({ 
+      postId, 
+      flairId: this.id 
+    }, { transaction });
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+}
+
+public async removeFromPost(postId: number): Promise<void> {
+  const transaction = await sequelize.transaction();
+  const PostFlair = sequelize.models.PostFlairs;
+  try {
+    await PostFlair.destroy({
+      where: {
+        postId,
+        flairId: this.id
+      },
+      transaction
+    });
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    if (error instanceof Error) {
+      throw new Error(`Error removing flair from post: ${error.message}`);
+    } else {
+      throw new Error('Error removing flair from post');
+    }
+  }
+}
 }
 
 ForumFlair.init(

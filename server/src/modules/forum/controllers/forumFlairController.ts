@@ -2,14 +2,16 @@ import { Request, Response } from 'express';
 import ForumFlair, { FlairType } from '../models/ForumFlair';
 import User from '../../user/User';
 import sequelize from '../../../infrastructure/database/db';
+import ForumPost from '../models/ForumPost';
 
+export class ForumFlairController {
 /**
  * @function getAllFlairs
  * @description Obtiene todos los distintivos disponibles
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const getAllFlairs = async (req: Request, res: Response): Promise<void> => {
+static async getAllFlairs (req: Request, res: Response): Promise<void> {
   try {
     const flairs = await ForumFlair.findAll({
       where: { isActive: true }
@@ -32,7 +34,7 @@ export const getAllFlairs = async (req: Request, res: Response): Promise<void> =
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const getFlairById = async (req: Request, res: Response): Promise<void> => {
+static async getFlairById (req: Request, res: Response): Promise<void> {
   try {
     const { id } = req.params;
     
@@ -60,7 +62,7 @@ export const getFlairById = async (req: Request, res: Response): Promise<void> =
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const createFlair = async (req: Request, res: Response): Promise<void> => {
+static async createFlair (req: Request, res: Response): Promise<void> {
   const transaction = await sequelize.transaction();
   
   try {
@@ -79,6 +81,14 @@ export const createFlair = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({ 
         success: false, 
         message: 'El nombre y la descripción son obligatorios' 
+      });
+      return;
+    }
+
+    if (type && !Object.values(FlairType).includes(type)) {
+      res.status(400).json({ 
+        success: false, 
+        message: 'Tipo de distintivo no válido' 
       });
       return;
     }
@@ -118,7 +128,7 @@ export const createFlair = async (req: Request, res: Response): Promise<void> =>
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const updateFlair = async (req: Request, res: Response): Promise<void> => {
+static async updateFlair (req: Request, res: Response): Promise<void> {
   const transaction = await sequelize.transaction();
   
   try {
@@ -174,7 +184,7 @@ export const updateFlair = async (req: Request, res: Response): Promise<void> =>
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const deleteFlair = async (req: Request, res: Response): Promise<void> => {
+static async deleteFlair (req: Request, res: Response): Promise<void> {
   const transaction = await sequelize.transaction();
   
   try {
@@ -214,7 +224,7 @@ export const deleteFlair = async (req: Request, res: Response): Promise<void> =>
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const assignFlairToUser = async (req: Request, res: Response): Promise<void> => {
+static async assignFlairToUser (req: Request, res: Response): Promise<void> {
   const transaction = await sequelize.transaction();
   
   try {
@@ -263,7 +273,7 @@ export const assignFlairToUser = async (req: Request, res: Response): Promise<vo
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const removeFlairFromUser = async (req: Request, res: Response): Promise<void> => {
+static async removeFlairFromUser (req: Request, res: Response): Promise<void> {
   const transaction = await sequelize.transaction();
   
   try {
@@ -312,7 +322,7 @@ export const removeFlairFromUser = async (req: Request, res: Response): Promise<
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const getFlairsByType = async (req: Request, res: Response): Promise<void> => {
+static async getFlairsByType (req: Request, res: Response): Promise<void> {
   try {
     const { type } = req.params;
     
@@ -349,7 +359,7 @@ export const getFlairsByType = async (req: Request, res: Response): Promise<void
  * @param {Request} req - Express request object
  * @param {Response} res - Express response object
  */
-export const getUserFlairs = async (req: Request, res: Response): Promise<void> => {
+static async getUserFlairs (req: Request, res: Response): Promise<void> {
   try {
     const { userId } = req.params;
     
@@ -380,4 +390,146 @@ export const getUserFlairs = async (req: Request, res: Response): Promise<void> 
       error: error instanceof Error ? error.message : String(error)
     });
   }
-}; 
+
+
+  
+};
+
+/**
+ * @function assignFlairToPost
+ * @description Asigna un distintivo a un post (actúa como etiqueta)
+ */
+static async assignFlairToPost(req: Request, res: Response): Promise<void> {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { flairId, postId } = req.params;
+    
+    // Buscar el distintivo
+    const flair = await ForumFlair.findByPk(flairId);
+    
+    if (!flair) {
+      res.status(404).json({ success: false, message: 'Distintivo no encontrado' });
+      return;
+    }
+    
+    // Buscar el post
+    const post = await ForumPost.findByPk(postId);
+    
+    if (!post) {
+      res.status(404).json({ success: false, message: 'Post no encontrado' });
+      return;
+    }
+    
+    // Verificar que el usuario tenga permisos (autor del post o moderador)
+    //Añadir despues**
+    
+    // Usar el método add generado por Sequelize para la asociación belongsToMany
+    // @ts-ignore - Sequelize tiene problemas con el tipado aquí
+    await flair.addPost(post, { transaction });
+    
+    await transaction.commit();
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Etiqueta asignada exitosamente al post' 
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error al asignar la etiqueta al post:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al asignar la etiqueta al post',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+/**
+ * @function removeFlairFromPost
+ * @description Elimina un distintivo de un post
+ */
+static async removeFlairFromPost(req: Request, res: Response): Promise<void> {
+  const transaction = await sequelize.transaction();
+  
+  try {
+    const { flairId, postId } = req.params;
+    
+    // Buscar el distintivo
+    const flair = await ForumFlair.findByPk(flairId);
+    
+    if (!flair) {
+      res.status(404).json({ success: false, message: 'Distintivo no encontrado' });
+      return;
+    }
+    
+    // Buscar el post
+    const post = await ForumPost.findByPk(postId);
+    
+    if (!post) {
+      res.status(404).json({ success: false, message: 'Post no encontrado' });
+      return;
+    }
+    
+    // Verificar que el usuario tenga permisos (autor del post o moderador)
+    //Añadir despues**
+    
+    // Usar el método remove generado por Sequelize para la asociación belongsToMany
+    // @ts-ignore - Sequelize tiene problemas con el tipado aquí
+    await flair.removePost(post, { transaction });
+    
+    await transaction.commit();
+    
+    res.status(200).json({ 
+      success: true, 
+      message: 'Etiqueta eliminada exitosamente del post' 
+    });
+  } catch (error) {
+    await transaction.rollback();
+    console.error('Error al eliminar la etiqueta del post:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al eliminar la etiqueta del post',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+/**
+ * @function getPostFlairs
+ * @description Obtiene todos los distintivos de un post
+ */
+static async getPostFlairs(req: Request, res: Response): Promise<void> {
+  try {
+    const { postId } = req.params;
+    
+    // Buscar el post
+    const post = await ForumPost.findByPk(postId, {
+      include: [
+        {
+          model: ForumFlair,
+          as: 'flairs',
+          where: { isActive: true },
+          required: false
+        }
+      ]
+    });
+    
+    if (!post) {
+      res.status(404).json({ success: false, message: 'Post no encontrado' });
+      return;
+    }
+    
+    // @ts-ignore - Sequelize tiene problema con tipado aquí
+    res.status(200).json({ success: true, data: post.flairs || [] });
+  } catch (error) {
+    console.error('Error al obtener las etiquetas del post:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al obtener las etiquetas del post',
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+}
+
+}
