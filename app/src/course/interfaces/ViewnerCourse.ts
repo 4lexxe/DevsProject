@@ -42,5 +42,6 @@ export interface Section {
   course: Course,
   colorGradient: [string, string];
   contents: IContentApi[];
+  courseId: string;
 }
 

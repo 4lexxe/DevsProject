@@ -31,6 +31,19 @@ export const getById = async(id: string) => {
   }
 }
 
+// Obtener navegacion de un curso por su id
+export const getNavegationById = async(id: string) => {
+  if(id){
+    try {
+      const response = await api.get(COURSES_ENDPOINT + `/${id}/navigate`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error al obtener los cursos:', error);
+      throw error;
+    }
+  }
+}
+
 // Agregar más servicios relacionados con cursos aquí
 export const createCourse = async (courseData: any) => {
   try {

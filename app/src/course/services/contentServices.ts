@@ -17,11 +17,11 @@ export const getContentBySection = async (sectionId: string) => {
   }
 };
 
-// Obtiene un contenido específico por ID
+// Obtiene un contenido específico por ID y su navegacion
 export const getContentById = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
-    const response = await api.get(`${CONTENT}/${contentId}`);
+    const response = await api.get(`${CONTENT}/navigate/${contentId}`);
     return response.data.data;
   } catch (error: any) {
     console.error(

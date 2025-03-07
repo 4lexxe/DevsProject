@@ -16,9 +16,10 @@ import { IContentApi } from "@/course/interfaces/Content";
 
 interface ContentViewerProps {
   content: IContentApi;
+  courseId: string;
 }
 
-const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
+const ContentViewer: React.FC<ContentViewerProps> = ({ content, courseId }) => {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -30,7 +31,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ content }) => {
     title: string,
     duration?: number
   ) => (
-    <Link to={`/course/section/content/${content.id}`}>
+    <Link to={`/course/${courseId}/section/content/${content.id}`}>
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           {icon}

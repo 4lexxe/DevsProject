@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Quiz } from '@/course/interfaces/Content';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import SingleChoice from './quiz/SingleChoice';
-import TrueFalse from './quiz/TrueFlase';
-import ShortAnswer from './quiz/ShortAnswer';
-import QuizResults from './quiz/QuizResults';
+import SingleChoice from './SingleChoice';
+import TrueFalse from './TrueFlase';
+import ShortAnswer from './ShortAnswer';
+import QuizResults from './QuizResults';
 
 interface QuizComponentProps {
   quizzes: Quiz[];

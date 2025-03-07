@@ -4,7 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import ContentViewer from "../contentViewner/ContentViewer";
+import ContentViewer from "./ContentViewer";
 import { Section } from "@/course/interfaces/ViewnerCourse";
 import EditSectionButton from "./EditSectionButton";
 
@@ -85,7 +85,7 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
           <div className="space-y-4">
             {section.contents &&
               section.contents.map((content) => (
-                <ContentViewer key={content.id} content={content} />
+                <ContentViewer courseId={section.courseId} key={content.id} content={content} />
               ))}
           </div>
         </div>

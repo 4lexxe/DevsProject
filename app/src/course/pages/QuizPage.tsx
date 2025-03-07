@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getQuizById } from "../services/contentServices";
 import { useParams } from "react-router-dom";
 
-import QuizComponent from "../components/contentViewner/PaginationQuiz";
+import QuizComponent from "../components/contentViewner/quiz/PaginationQuiz";
 
 function QuizPage() {
   const { contentId } = useParams<{ contentId: string }>();
