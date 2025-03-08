@@ -93,8 +93,8 @@ export default function SectionList({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="">
+      <div className="bg-white  overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {sectionState.section.coverImage && (
