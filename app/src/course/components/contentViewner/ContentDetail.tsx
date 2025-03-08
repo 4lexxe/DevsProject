@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 function ContentDetail({ content, courseId }: { content: IContentApi, courseId: string }) {
   return (
-    <div className="bg-white rounded-lg shadow-xl overflow-hidden transform hover:shadow-2xl">
+    <div className="bg-white rounded-lg border overflow-hidden">
       <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6 text-white">
         <h1 className="text-3xl font-bold mb-4">{content.title}</h1>
         <div className="flex items-center text-sm">

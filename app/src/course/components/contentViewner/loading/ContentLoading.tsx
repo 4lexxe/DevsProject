@@ -58,7 +58,7 @@ function ContentLoading({
         </div>
 
         {/* Loading Content Detail */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden transform hover:shadow-2xl">
+        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6 text-white">
             <div className="h-10 w-3/4 bg-white bg-opacity-30 rounded animate-pulse mb-4"></div>
