@@ -112,10 +112,6 @@ ForumReactionReply.init(
   }
 );
 
-ForumReactionReply.belongsTo(User, { foreignKey: "userId", as: "user" });
-ForumReactionReply.belongsTo(ForumReply, { foreignKey: "replyId", as: "reply" });
-
-User.hasMany(ForumReactionReply, { foreignKey: "userId", as: "reactions" });
 
 
 export default ForumReactionReply;

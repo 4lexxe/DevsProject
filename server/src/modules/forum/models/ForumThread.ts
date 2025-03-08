@@ -110,24 +110,5 @@ ForumThread.init(
   }
 );
 
-// Establecer relación con ForumPost
-ForumThread.hasMany(ForumPost, {
-  sourceKey: "id",
-  foreignKey: "threadId",
-  as: "posts",
-});
-
-// Relación con el autor
-ForumThread.belongsTo(User, {
-    foreignKey: "authorId",
-    as: "author",
-  });
-
-
-// Ejemplo en ForumThread
-ForumThread.belongsTo(ForumCategory, {
-  foreignKey: 'categoryId',
-  onUpdate: 'CASCADE'
-});
 
 export default ForumThread; 

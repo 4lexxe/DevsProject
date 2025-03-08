@@ -190,33 +190,7 @@ ForumPost.init(
   }
 );
 
-//Relaciones 
-ForumPost.belongsTo(ForumThread, {
-  foreignKey: "threadId",
-  as: "thread",
-});
 
-ForumPost.hasMany(ForumReply, {
-    sourceKey: "id",
-    foreignKey: "postId",
-    as: "replies",
-  });
-
-ForumPost.belongsTo(User, {
-  foreignKey: "authorId",
-  as: "author",
-})
-
-ForumPost.hasMany(ForumVotePost, {
-    foreignKey: "postId",
-    as: "votes",
-  });
-
-// Relaciones con ForumReactionPost
-ForumPost.hasMany(ForumReactionPost, {
-    foreignKey: "postId",
-    as: "reactions",
-});
 
 export default ForumPost;
 

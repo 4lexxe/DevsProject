@@ -14,9 +14,27 @@ import Report from './Report';
 import ForumReactionPost from './ForumReactionPost';
 import ForumReactionReply from './ForumReactionReply';
 import ForumVoteReply, { VoteType as ReplyVoteType } from './ForumVoteReply';
+import User from "../../user/User";
+import { initForumRelations } from './initRelations';
+
+// Crear un objeto con todos los modelos
+const models = {
+  ForumCategory,
+  ForumThread,
+  ForumPost,
+  ForumReply,
+  ForumVotePost,
+  ForumFlair,
+  Report,
+  ForumReactionPost,
+  ForumReactionReply,
+  ForumVoteReply,
+  User,
+};
 
 
-
+// Inicializar todas las relaciones
+initForumRelations(models);
 /**
  * Exportación de todos los modelos y enumeraciones
  * Esto permite importar elementos específicos cuando sea necesario
@@ -42,16 +60,4 @@ export {
  * Exportación por defecto de todos los modelos como un objeto único
  * Útil para importar todos los modelos de una vez
  */
-export default {
-  ForumCategory,
-  ForumThread,
-  ForumPost,
-  ForumReply,
-  ForumVotePost,
-  ForumFlair,
-  Report,
-  ForumReactionPost,
-  ForumReactionReply,
-  ForumVoteReply,
-  predefinedFlairs,
-};
+export default models;

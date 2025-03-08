@@ -128,25 +128,7 @@ ForumVotePost.init(
   }
 );
 
-/**
- * Relaciones del modelo
- */
 
-ForumVotePost.belongsTo(ForumPost, {
-  foreignKey: "postId",
-  as: "post",
-  onDelete: 'CASCADE'
-});
-
-ForumVotePost.belongsTo(User, {
-  foreignKey: "userId",
-  as: "user",
-});
-
-User.hasMany(ForumVotePost, {
-  foreignKey: "userId",
-  as: "votes",
-});
 
 /**
  * Métodos estáticos para consultas comunes

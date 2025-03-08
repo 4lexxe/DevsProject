@@ -127,24 +127,7 @@ ForumVoteReply.init(
   }
 );
 
-/**
- * Relaciones del modelo
- */
-ForumVoteReply.belongsTo(ForumReply, {
-  foreignKey: "replyId",
-  as: "reply",
-  onDelete: 'CASCADE'
-});
 
-ForumVoteReply.belongsTo(User, {
-  foreignKey: "userId",
-  as: "user",
-});
-
-User.hasMany(ForumVoteReply, {
-  foreignKey: "userId",
-  as: "replyVotes",
-});
 
 
 

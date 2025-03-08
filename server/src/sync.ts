@@ -22,8 +22,7 @@ import Content from './modules/content/Content';
 
 /* Modelos relacionados con el foro */
 
-
-import { ForumCategory, ForumThread, ForumPost, ForumReply, ForumFlair, ForumReactionPost, ForumReactionReply, ForumVotePost, ForumVoteReply, Report, predefinedFlairs } from './modules/forum/models';
+import {ForumCategory, ForumThread, ForumPost, ForumReply, ForumVotePost, ForumVoteReply, ForumFlair, Report, ForumReactionPost, ForumReactionReply, predefinedFlairs} from './modules/forum/models/index';
 
 // sync.ts
 async function syncDatabase() {

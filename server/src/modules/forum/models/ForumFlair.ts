@@ -199,57 +199,6 @@ ForumFlair.init(
   }
 );
 
-// Relaciones
-// Relación con el creador del distintivo
-ForumFlair.belongsTo(User, {
-  foreignKey: "createdBy",
-  as: "creator",
-});
-
-// Relación muchos a muchos con User (un usuario puede tener múltiples distintivos)
-ForumFlair.belongsToMany(User, {
-  through: "UserFlairs",
-  foreignKey: "flairId",
-  otherKey: "userId",
-  as: "users",
-});
-
-User.belongsToMany(ForumFlair, {
-  through: "UserFlairs",
-  foreignKey: "userId",
-  otherKey: "flairId",
-  as: "flairs",
-});
-
-// Relación muchos a muchos con Post (para mostrar distintivos en posts)
-ForumFlair.belongsToMany(ForumPost, {
-  through: "PostFlairs",
-  foreignKey: "flairId",
-  otherKey: "postId",
-  as: "posts",
-});
-
-ForumPost.belongsToMany(ForumFlair, {
-  through: "PostFlairs",
-  foreignKey: "postId",
-  otherKey: "flairId",
-  as: "flairs",
-});
-
-// Relación muchos a muchos con Reply (para mostrar distintivos en respuestas)
-ForumFlair.belongsToMany(ForumReply, {
-  through: "ReplyFlairs",
-  foreignKey: "flairId",
-  otherKey: "replyId",
-  as: "replies",
-});
-
-ForumReply.belongsToMany(ForumFlair, {
-  through: "ReplyFlairs",
-  foreignKey: "replyId",
-  otherKey: "flairId",
-  as: "flairs",
-});
 
 // Hooks
 ForumFlair.addHook('afterCreate', async (flair: ForumFlair) => {

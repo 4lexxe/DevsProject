@@ -57,11 +57,6 @@ ForumCategory.init(
   }
 );
 
-// Establecer relación con ForumThread
-ForumCategory.hasMany(ForumThread, {
-  sourceKey: "id",
-  foreignKey: "categoryId",
-  as: "threads",
-});
+
 
 export default ForumCategory; 

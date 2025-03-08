@@ -172,39 +172,7 @@ ForumReply.init(
   }
 );
 
-// Establecer relación con ForumPost
 
-ForumReply.belongsTo(ForumPost, {
-  foreignKey: "postId",
-  as: "post",
-});
-
-// Establecer relación jerárquica (respuestas anidadas) MAL polymorphic association
-ForumReply.hasMany(ForumReply, {
-  sourceKey: "id",
-  foreignKey: "parentReplyId",
-  as: "childReplies",
-});
-
-ForumReply.belongsTo(ForumReply, {
-  foreignKey: "parentReplyId",
-  as: "parentReply",
-});
-
-    ForumReply.hasMany(ForumReactionReply, {
-      foreignKey: "replyId",
-      as: "reactions",
-    });
-
-ForumReply.hasMany(ForumVoteReply, {
-  foreignKey: "replyId",
-  as: "votes",
-});
-
-ForumReply.belongsTo(User, {
-  foreignKey: "authorId",
-  as: "author",
-});
 
 
 /**

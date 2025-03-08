@@ -4,6 +4,8 @@
  */
 
 // NO importar los modelos directamente para evitar ciclos
+
+
 export function initForumRelations(models: any) {
     const {
       User,
