@@ -33,6 +33,9 @@ import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
+//Importación de las rutas del foro
+import LeftPanel from "./forum/components/LeftPanel";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -66,6 +69,9 @@ function App() {
               <Route path='/course/section/content/:contentId' element={<ContentPage />} />
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
+
+              {/* Rutas del foro */}
+              <Route path="/forum" element={<LeftPanel />} />
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>

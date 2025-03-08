@@ -227,7 +227,7 @@ export class ForumPostController {
  * @function toggleNSFWStatus
  * @description Cambia el estado de NSFW de un post
  */
-    static async toggleNSFWStatus(req: Request, res: Response): Promise<void> {
+    /*static async toggleNSFWStatus(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { isNSFW } = req.body;
@@ -262,13 +262,13 @@ export class ForumPostController {
         error: error instanceof Error ? error.message : String(error)
       });
     }
-  }
+  }*/
 
   /**
  * @function toggleSpoilerStatus
  * @description Cambia el estado de spoiler de un post
  */
-    static async toggleSpoilerStatus(req: Request, res: Response): Promise<void> {
+    /*static async toggleSpoilerStatus(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const { isSpoiler } = req.body;
@@ -303,7 +303,7 @@ export class ForumPostController {
         error: error instanceof Error ? error.message : String(error)
       });
     }
-  }
+  }*/
 
     /**
     * @function getPopularPosts
@@ -352,6 +352,43 @@ export class ForumPostController {
       res.status(500).json({
         success: false,
         message: 'Error al obtener los posts populares',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  /**
+   * @function getPostsByThread
+   * @description Obtiene todas las publicaciones de un hilo específico
+   */
+  static async getPostsByThread(req: Request, res: Response): Promise<void> {
+    try {
+      const { threadId } = req.params;
+
+      // Validar el ID del hilo
+      if (!threadId || isNaN(Number(threadId))) {
+        res.status(400).json({ success: false, message: 'ID de hilo inválido' });
+        return;
+      }
+
+      const posts = await ForumPost.findAll({
+        where: { threadId: Number(threadId) },
+        include: [
+          {
+            model: User,
+            as: 'author',
+            attributes: ['id', 'username', 'avatar']
+          }
+        ],
+        order: [['createdAt', 'ASC']] // Ordenar por fecha de creación ascendente
+      });
+
+      res.status(200).json({ success: true, data: posts });
+    } catch (error) {
+      console.error('Error al obtener las publicaciones del hilo:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener las publicaciones del hilo',
         error: error instanceof Error ? error.message : String(error)
       });
     }

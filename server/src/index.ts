@@ -41,6 +41,20 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 // Rutas de Roadmap
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
+// Rutas de Foro
+import forumCategoryRoutes from './modules/forum/routes/forumcategory.routes';
+import forumThreadRoutes from './modules/forum/routes/forumthread.routes';
+import forumPostRoutes from './modules/forum/routes/forumpost.routes';
+import forumReplyRoutes from './modules/forum/routes/forumreply.routes';
+import forumReactionPostRoutes from './modules/forum/routes/forumreactionpost.routes';
+import forumReactionReplyRoutes from './modules/forum/routes/forumreactionreply.routes';
+import forumVotePostRoutes from './modules/forum/routes/forumvotepost.routes';
+import forumVoteReplyRoutes from './modules/forum/routes/forumvotereply.routes';
+import forumFlairRoutes from './modules/forum/routes/forumflairs.routes';
+import forumReportRoutes from './modules/forum/routes/report.routes';
+
+
+
 // ==================================================
 // Importaciones de utilidades y configuraciones
 // ==================================================
@@ -255,6 +269,18 @@ app.use('/api', contentRoutes);
 
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);
+
+// Rutas de Foro
+app.use('/api/forum', forumCategoryRoutes);
+app.use('/api/forum', forumThreadRoutes);
+app.use('/api/forum', forumPostRoutes);
+app.use('/api/forum', forumReplyRoutes);
+app.use('/api/forum', forumReactionPostRoutes);
+app.use('/api/forum', forumReactionReplyRoutes);
+app.use('/api/forum', forumVotePostRoutes);
+app.use('/api/forum', forumVoteReplyRoutes);
+app.use('/api/forum', forumFlairRoutes);
+app.use('/api/forum', forumReportRoutes);
 
 // Endpoint de estado del sistema
 app.get('/api/status', (req: Request, res) => {

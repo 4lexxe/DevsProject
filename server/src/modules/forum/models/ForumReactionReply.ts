@@ -3,8 +3,8 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
-import ForumReply from "./ForumReply";
 import ForumPost from "./ForumPost";
+import ForumReply from "./ForumReply";
 import ForumThread from "./ForumThread";
 
 interface ForumReactionReplyAttributes {
@@ -114,6 +114,8 @@ ForumReactionReply.init(
 
 ForumReactionReply.belongsTo(User, { foreignKey: "userId", as: "user" });
 ForumReactionReply.belongsTo(ForumReply, { foreignKey: "replyId", as: "reply" });
+
+User.hasMany(ForumReactionReply, { foreignKey: "userId", as: "reactions" });
 
 
 export default ForumReactionReply;

@@ -6,6 +6,8 @@ import User from '../../user/User';
 import sequelize from '../../../infrastructure/database/db';
 import { replyValidations } from '../validators/reply.validator';
 import { ForumThread } from '../models';
+import { NotificationType } from '../models/Notification';
+import NotificationService from '../services/notification.service';
 
 export class ForumReplyController {
   // Validaciones para los datos de entrada
@@ -72,6 +74,8 @@ export class ForumReplyController {
             { lastActivityAt: new Date() },
             { where: { id: parentPost.threadId }, transaction }
         );
+
+
 
         await transaction.commit();
         res.status(201).json({

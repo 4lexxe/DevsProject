@@ -21,15 +21,9 @@ import Section from './modules/section/Section';
 import Content from './modules/content/Content';
 
 /* Modelos relacionados con el foro */
-import ForumCategory from './modules/forum/models/ForumCategory';
-import ForumThread from './modules/forum/models/ForumThread';
-import ForumPost from './modules/forum/models/ForumPost';
-import ForumReply from './modules/forum/models/ForumReply';
-import ForumVote from './modules/forum/models/ForumVotePost';
-import ForumFlair from './modules/forum/models/ForumFlair';
-import { predefinedFlairs } from './modules/forum/models/ForumFlair';
-import Report from './modules/forum/models/Report';
-import ForumReaction from './modules/forum/models/ForumReaction';
+
+
+import { ForumCategory, ForumThread, ForumPost, ForumReply, ForumFlair, ForumReactionPost, ForumReactionReply, ForumVotePost, ForumVoteReply, Report, predefinedFlairs } from './modules/forum/models';
 
 // sync.ts
 async function syncDatabase() {
@@ -68,14 +62,18 @@ async function syncDatabase() {
     await RoadMap.sync({ force: true });
     
     // Sincronizar modelos del foro
-    await ForumCategory.sync({ force: true });
-    await ForumThread.sync({ force: true });
-    await ForumPost.sync({ force: true });
-    await ForumReply.sync({ force: true });
-    await ForumVote.sync({ force: true });
-    await ForumFlair.sync({ force: true });
-    await Report.sync({ force: true });
-    await ForumReaction.sync({ force: true });
+    // Sincronizar modelos del foro en el orden correcto
+await ForumCategory.sync({ force: true });
+await ForumThread.sync({ force: true });
+await ForumPost.sync({ force: true });
+await ForumReply.sync({ force: true });
+// Sincronizar modelos dependientes después
+await ForumVotePost.sync({ force: true });
+await ForumVoteReply.sync({ force: true });
+await ForumFlair.sync({ force: true });
+await Report.sync({ force: true });
+await ForumReactionPost.sync({ force: true });
+await ForumReactionReply.sync({ force: true });
     
     console.log('¡Sincronización exitosa!');
   } catch (error) {

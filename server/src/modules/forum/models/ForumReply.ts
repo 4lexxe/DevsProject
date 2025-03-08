@@ -2,7 +2,8 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 // Mejorar importaciones para evitar ciclos
 import  ForumPost  from "./ForumPost";
-import ForumVote, { VoteType } from "./ForumVotePost";
+import ForumVoteReply,{ VoteType } from "./ForumVoteReply";
+import User from "../../user/User";
 import ForumReactionReply from "./ForumReactionReply";
 
 
@@ -45,12 +46,12 @@ class ForumReply extends Model<ForumReplyAttributes, ForumReplyCreationAttribute
   public readonly updatedAt!: Date;
 
   // Método estático para obtener los conteos de votos de un reply
-  public static async getVoteCounts(postId: number): Promise<{ upvotes: number; downvotes: number }> {
-    const upvotes = await ForumVote.count({
-      where: { postId, voteType: VoteType.UPVOTE }
+  public static async getVoteCounts(replyId: number): Promise<{ upvotes: number; downvotes: number }> {
+    const upvotes = await ForumVoteReply.count({
+      where: { replyId, voteType: VoteType.UPVOTE }
     });
-    const downvotes = await ForumVote.count({
-      where: { postId, voteType: VoteType.DOWNVOTE }
+    const downvotes = await ForumVoteReply.count({
+      where: { replyId, voteType: VoteType.DOWNVOTE }
     });
     return { upvotes, downvotes };
   }
@@ -190,10 +191,21 @@ ForumReply.belongsTo(ForumReply, {
   as: "parentReply",
 });
 
-ForumReply.hasMany(ForumReactionReply, {
+    ForumReply.hasMany(ForumReactionReply, {
+      foreignKey: "replyId",
+      as: "reactions",
+    });
+
+ForumReply.hasMany(ForumVoteReply, {
   foreignKey: "replyId",
-  as: "reactions",
+  as: "votes",
 });
+
+ForumReply.belongsTo(User, {
+  foreignKey: "authorId",
+  as: "author",
+});
+
 
 /**
  * @function updatePostReplyCount

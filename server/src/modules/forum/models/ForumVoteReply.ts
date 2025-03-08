@@ -146,10 +146,7 @@ User.hasMany(ForumVoteReply, {
   as: "replyVotes",
 });
 
-ForumReply.hasMany(ForumVoteReply, {
-  foreignKey: "replyId",
-  as: "votes",
-});
+
 
 /**
  * Métodos estáticos para consultas comunes

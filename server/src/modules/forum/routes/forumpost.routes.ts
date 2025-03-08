@@ -1,4 +1,5 @@
-// server/src/modules/forum/routes/ForumPostRoutes.ts
+// server/src/modules/forum/routes/forumpost.routes.ts
+
 import { Router, RequestHandler } from "express";
 import { ForumPostController } from '../controllers/ForumPostController';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
@@ -8,6 +9,9 @@ const router = Router();
 // Rutas públicas
 router.get('/posts/popular', ForumPostController.getPopularPosts);
 router.get('/posts/:id', ForumPostController.getPostById);
+
+// Nueva ruta para obtener publicaciones por hilo
+router.get('/threads/:threadId/posts', ForumPostController.getPostsByThread);
 
 // Rutas autenticadas con validaciones
 router.post('/posts',
@@ -25,17 +29,6 @@ router.put('/posts/:id',
 router.delete('/posts/:id',
   authMiddleware,
   ForumPostController.deletePost as RequestHandler
-);
-
-// Rutas para modificar estados específicos
-router.patch('/posts/:id/nsfw',
-  authMiddleware,
-  ForumPostController.toggleNSFWStatus as RequestHandler
-);
-
-router.patch('/posts/:id/spoiler',
-  authMiddleware,
-  ForumPostController.toggleSpoilerStatus as RequestHandler
 );
 
 export default router;

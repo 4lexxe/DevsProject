@@ -77,8 +77,8 @@ ForumVotePost.init(
   },
   {
     sequelize,
-    modelName: "ForumVote",
-    tableName: "ForumVotes",
+    modelName: "ForumVotePost",
+    tableName: "ForumVotesPost",
     timestamps: true,
     indexes: [
       {
@@ -131,6 +131,7 @@ ForumVotePost.init(
 /**
  * Relaciones del modelo
  */
+
 ForumVotePost.belongsTo(ForumPost, {
   foreignKey: "postId",
   as: "post",
