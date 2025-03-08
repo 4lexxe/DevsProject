@@ -22,9 +22,8 @@ function SideNavigationLoading({
       if (!courseId) return; // Evita hacer la petición si no hay un ID válido
       try {
         const data = await getNavegationById(courseId);
-        console.log(data)
+        console.log(data);
         setTimeout(() => {
-          
           setNavigate(data);
         }, 500);
       } catch (err) {
@@ -38,8 +37,8 @@ function SideNavigationLoading({
   if (!navigate) {
     return (
       <div
-        className={`transition-all duration-300 ease-in-out rounded-lg max-w-sm w-full  `}
-        style={{ backgroundColor: "#f2f6f9", height: "60vh" }}
+        className={`transition-all duration-500 ease-in-out rounded-lg md:w-1/3 lg:w-1/4 h-full hidden md:block `}
+        style={{ backgroundColor: "#f2f6f9" }}
       >
         <div className="p-4">
           {/* Header with logo and title placeholders */}
@@ -78,9 +77,10 @@ function SideNavigationLoading({
   }
   return (
     <div
-      className={`transition-all duration-300 ${
-        sidebarExpanded ? "lg:w-1/4" : "lg:w-auto"
-      } mt-8 lg:mt-0`}
+      className={`transition-all duration-500 ease-in-out rounded-lg mt-0 h-full hidden md:block ${
+        sidebarExpanded ? "md:w-1/3 lg:w-1/4" : "md:w-16"
+      }`}
+      style={{ backgroundColor: "#f2f6f9" }}
     >
       <SideNavigation
         currentId={contentId}

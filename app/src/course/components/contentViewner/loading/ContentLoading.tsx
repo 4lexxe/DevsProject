@@ -6,11 +6,9 @@ import { getContentById } from "../../../services/contentServices";
 function ContentLoading({
   contentId,
   courseId,
-  sidebarExpanded,
 }: {
   contentId: string;
   courseId: string;
-  sidebarExpanded: boolean;
 }) {
   const [content, setContent] = useState<any>(null);
 
@@ -27,7 +25,7 @@ function ContentLoading({
             if (isMounted) {
               setContent(data);
             }
-          }, 1000);
+          }, 500);
         }
       } catch (err) {
         if (isMounted) {
@@ -46,11 +44,7 @@ function ContentLoading({
 
   if (!content) {
     return (
-      <div
-        className={`flex-1 mx-8 transition-all duration-300 ${
-          sidebarExpanded ? "w-3/4" : "w-11/12"
-        }`}
-      >
+      <div className="flex-1 transition-all duration-500 ease-in-out">
         {/* Loading TopBar */}
         <div className="mb-8">
           <div
@@ -113,14 +107,9 @@ function ContentLoading({
   }
 
   return (
-    <div
-      className={`flex-1 mx-8 transition-all duration-300 ${
-        sidebarExpanded ? "w-3/4" : "w-11/12"
-      }`}
-    >
+    <div className={`flex-1 transition-all duration-500 ease-in-out`}>
       <div className="mb-8">
         <TopBar
-          
           courseId={courseId}
           prev={content.previousContentId}
           next={content.nextContentId}
