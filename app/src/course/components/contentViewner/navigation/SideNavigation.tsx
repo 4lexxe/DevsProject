@@ -115,36 +115,40 @@ export default function Sidebar({
               </div>
             </button>
 
-            {expandedSections.includes(section.id) && section.contents && (
-              <div className="px-4 pb-4 transition-all duration-300 overflow-hidden">
-                {section.contents.map((content) => (
-                  <Link
-                    to={`/course/${navigate.id}/section/content/${content.id}`}
-                    className="w-full"
-                    key={content.id}
+            <div 
+              className={`px-4 transition-all duration-400 overflow-hidden ${
+                expandedSections.includes(section.id) 
+                  ? "max-h-96 opacity-100 pb-4" 
+                  : "max-h-0 opacity-0 pb-0"
+              }`}
+            >
+              {section.contents.map((content) => (
+                <Link
+                  to={`/course/${navigate.id}/section/content/${content.id}`}
+                  className="w-full"
+                  key={content.id}
+                >
+                  <div
+                    className={`flex items-center gap-2 p-2 rounded ${
+                      currentId === content.id
+                        ? "bg-gray-300"
+                        : "hover:bg-gray-300"
+                    }`}
                   >
-                    <div
-                      className={`flex items-center gap-2 p-2 rounded ${
-                        currentId === content.id
-                          ? "bg-gray-300"
-                          : "hover:bg-gray-300"
+                    {currentId === content.id && (
+                      <CircleDot className="w-5 h-5 text-cyan-600 ml-2" />
+                    )}
+                    <span
+                      className={`font-medium ${
+                        currentId === content.id ? "font-bold" : ""
                       }`}
                     >
-                      {currentId === content.id && (
-                        <CircleDot className="w-5 h-5 text-cyan-600 ml-2" />
-                      )}
-                      <span
-                        className={`font-medium ${
-                          currentId === content.id ? "font-bold" : ""
-                        }`}
-                      >
-                        {content.title}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+                      {content.title}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         ))}
       </div>
