@@ -14,8 +14,8 @@ interface MenuSection {
 
 const Sidebar: React.FC = () => {
     const [collapsed, setCollapsed] = useState(false);
+    const [activeItem, setActiveItem] = useState<string | null>(null);
 
-    // Organize items into sections
     const menuSections: MenuSection[] = [
         {
             title: "General",
@@ -39,16 +39,20 @@ const Sidebar: React.FC = () => {
         setCollapsed(!collapsed);
     };
 
+    const handleItemClick = (label: string) => {
+        setActiveItem(label === activeItem ? null : label);
+    };
+
     return (
         <div 
-            className={`bg-gray-800 text-white transition-all duration-300 ease-in-out h-screen ${
+            className={`blue-50  transition-all duration-300 ease-in-out h-screen ${
                 collapsed ? 'w-16' : 'w-64'
-            } flex flex-col`}
+            } flex flex-col border-r border-gray-200`}
         >
             <div className="flex justify-end p-2">
                 <button 
                     onClick={toggleSidebar}
-                    className="p-2 rounded-full hover:bg-gray-700 text-gray-400"
+                    className="p-2 rounded-full hover:bg-blue-400/30 text-gray-600 hover:text-blue-400 transition-colors"
                 >
                     {collapsed ? <IoChevronForwardOutline /> : <IoChevronBackOutline />}
                 </button>
@@ -58,24 +62,29 @@ const Sidebar: React.FC = () => {
                 {menuSections.map((section, sectionIndex) => (
                     <div key={sectionIndex} className="mb-6">
                         {!collapsed && (
-                            <h3 className="uppercase text-xs font-bold text-gray-400 px-4 mb-2">
+                            <h3 className="uppercase text-xs font-bold text-gray-500 px-4 mb-2 tracking-wider">
                                 {section.title}
                             </h3>
                         )}
                         <ul>
                             {section.items.map((item, itemIndex) => {
                                 const IconComponent = item.icon;
+                                const isActive = activeItem === item.label;
                                 return (
                                     <li key={itemIndex}>
-                                        <a 
-                                            href="#" 
-                                            className={`flex items-center py-2 px-4 hover:bg-gray-700 rounded-lg mx-2 text-gray-300 hover:text-white ${
+                                        <button
+                                            onClick={() => handleItemClick(item.label)}
+                                            className={`w-full flex items-center py-2.5 px-4 rounded-lg mx-2 transition-all duration-200 ${
                                                 collapsed ? 'justify-center' : ''
+                                            } ${
+                                                isActive 
+                                                    ? 'bg-blue-600 text-white shadow-lg'
+                                                    : 'text-gray-500 hover:bg-blue-400/30 hover:text-blue-500'
                                             }`}
                                         >
-                                            <IconComponent className={`${collapsed ? 'text-xl' : 'mr-3'}`} />
-                                            {!collapsed && <span>{item.label}</span>}
-                                        </a>
+                                            <IconComponent className={`${collapsed ? 'text-xl' : 'mr-3'} ${isActive ? 'text-blue-400' : ''}`} />
+                                            {!collapsed && <span className="text-sm">{item.label}</span>}
+                                        </button>
                                     </li>
                                 );
                             })}
