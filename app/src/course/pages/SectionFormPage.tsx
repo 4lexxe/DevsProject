@@ -53,6 +53,7 @@ function SectionManager() {
       description: section.description,
       moduleType: section.moduleType,
       coverImage: section.coverImage,
+      colorGradient: section.colorGradient,
       contents: section.contents.map((content: IContent) => {
         return {
           id: content.id,
@@ -80,7 +81,7 @@ function SectionManager() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-4/5 p-5 border rounded-md shadow-md bg-white mt-20 mb-20">
+      <div className="w-4/5 p-5 border rounded-xl shadow-md bg-white mt-20 mb-20">
         
         {isAddingQuiz || isEditingQuiz ? (
           <QuizForm />

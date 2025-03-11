@@ -83,6 +83,46 @@ export default class ContentController {
   }
 };
 
+  // Obtener un contenido por ID con IDs del siguiente y anterior contenido en la misma sección
+  static getByIdWithNavigation: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const content = await Content.findByPk(id, {
+        include: [{ model: Section, as: "section" }],
+      });
+
+      if (!content) {
+        res.status(404).json({ status: "error", message: "Contenido no encontrado" });
+        return;
+      }
+
+      const sectionContents = await Content.findAll({
+        where: { sectionId: content.sectionId },
+        order: [["position", "ASC"]],
+      });
+
+      const currentIndex = sectionContents.findIndex(c => c.id === content.id);
+      const previousContentId = currentIndex > 0 ? sectionContents[currentIndex - 1].id : null;
+      const nextContentId = currentIndex < sectionContents.length - 1 ? sectionContents[currentIndex + 1].id : null;
+
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Contenido obtenido correctamente",
+        data: {
+          content,
+          previousContentId,
+          nextContentId,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Error al obtener el contenido",
+        error,
+      });
+    }
+  };
+
   // Obtener contenidos por sectionId
   static getBySectionId: RequestHandler = async (req, res) => {
     try {

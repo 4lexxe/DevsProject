@@ -2,8 +2,8 @@ import { Request, Response, RequestHandler } from "express";
 import Course, { CourseCategory } from "../Course";
 import Category from "../../category/Category";
 import CareerType from "../../careerType/CareerType";
-import { validationResult } from "express-validator";
 import Section from "../../section/Section";
+import Content from "../../content/Content";
 
 // Función para generar metadata
 const metadata = (req: Request, res: Response) => {
@@ -141,6 +141,51 @@ export default class CourseGetController{
       });
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener el curso");
+    }
+  };
+
+  // Obtener un curso por ID con secciones y contenidos para navegación
+  static getCourseNavigation: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = await Course.findByPk(id, {
+        attributes: ['id', 'title'],
+        include: [
+          {
+            model: Section,
+            as: "sections",
+            attributes: ['id', 'title'],
+            include: [
+              {
+                model: Content,
+                as: "contents",
+                attributes: ['id', 'title'],
+              },
+            ],
+          },
+        ],
+        order: [
+          [{ model: Section, as: "sections" }, 'id', 'ASC'],
+          [{ model: Section, as: "sections" }, { model: Content, as: "contents" }, 'id', 'ASC'],
+        ],
+      });
+
+      if (!course) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "Curso no encontrado",
+        });
+        return;
+      }
+
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Curso obtenido correctamente",
+        data: course,
+      });
+    } catch (error) {
+      handleServerError(res, req, error, "Error al obtener el curso para navegación");
     }
   };
 

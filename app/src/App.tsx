@@ -63,7 +63,7 @@ function App() {
               <Route path='course/:courseId/section/form' element={<SectionFormPage />} />
               <Route path='course/:courseId/section/:sectionId/form' element={<SectionFormPage />} />
               <Route path="/recursos" element={<ResourcePage />} />
-              <Route path='/course/section/content/:contentId' element={<ContentPage />} />
+              <Route path='/course/:courseId/section/content/:contentId' element={<ContentPage />} />
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
 

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Edit, Trash2, Loader2, BookOpen, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import ContentForm from "@/course/components/Forms/Content/ContentForm";
+import ContentForm from "@/course/components/forms/content/ContentForm";
 import { createSection } from "@/course/services/courseFormService";
-import DraggableContentList from "@/course/components/Forms/Content/DraggableContentList";
+import DraggableContentList from "@/course/components/forms/content/DraggableContentList";
 import { useSectionContext } from "@/course/context/SectionFormContext";
 import { updateSection } from "@/course/services/sectionServices";
 
@@ -93,8 +93,8 @@ export default function SectionList({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="">
+      <div className="bg-white  overflow-hidden">
         <div className="p-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {sectionState.section.coverImage && (

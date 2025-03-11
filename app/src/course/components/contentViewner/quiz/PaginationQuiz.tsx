@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Quiz } from '@/course/interfaces/Content';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-import SingleChoice from './quiz/SingleChoice';
-import TrueFalse from './quiz/TrueOrFlase';
-import ShortAnswer from './quiz/ShortAnswer';
-import QuizResults from './quiz/QuizResults';
+import SingleChoice from './SingleChoice';
+import TrueFalse from './TrueFlase';
+import ShortAnswer from './ShortAnswer';
+import QuizResults from './QuizResults';
 
 interface QuizComponentProps {
   quizzes: Quiz[];
-} 
+}
 
 const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -117,9 +116,9 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6">
+        <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6">
           <h2 className="text-2xl font-bold text-white mb-2">Pregunta {currentPage + 1} de {quizzes.length}</h2>
           <div className="w-full bg-white/30 rounded-full h-2">
             <div 
@@ -132,7 +131,7 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
         <div className="p-6">
           <div className="mb-8">
             <h3 className="text-xl font-semibold mb-4">{currentQuiz.question}</h3>
-            <p className="text-gray-600 mb-4">{currentQuiz.text}</p>
+            <p className="text-slate-600 mb-4">{currentQuiz.text}</p>
             {currentQuiz.image && (
               <img 
                 src={currentQuiz.image} 
@@ -150,8 +149,8 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
               disabled={currentPage === 0}
               className={`flex items-center space-x-2 px-6 py-2 rounded-lg transition-all duration-300 ${
                 currentPage === 0
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700'
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-cyan-600 to-blue-900 text-white hover:from-cyan-700 hover:to-blue-950'
               }`}
             >
               <ChevronLeft className="w-5 h-5" />
@@ -160,7 +159,7 @@ const QuizComponent: React.FC<QuizComponentProps> = ({ quizzes }) => {
 
             <button
               onClick={handleNext}
-              className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300"
+              className="flex items-center space-x-2 bg-gradient-to-r from-cyan-600 to-blue-900 text-white px-6 py-2 rounded-lg hover:from-cyan-700 hover:to-blue-950 transition-all duration-300"
             >
               <span>{currentPage === quizzes.length - 1 ? 'Ver Resultados' : 'Siguiente'}</span>
               <ChevronRight className="w-5 h-5" />

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { getContentBySection } from '../../services/contentServices';
-import ContentViewer from '../contentViewner/ContentViewer';
+import ContentViewer from './ContentViewer';
 import { Loader2 } from 'lucide-react';
-import { Content } from '@/course/interfaces/viewnerCourseInterface';
+import { IContentApi } from '@/course/interfaces/Content';
 
 interface SectionContentProps {
   sectionId: string;
 }
 
 const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
-  const [contents, setContents] = useState<Content[]>([]);
+  const [contents, setContents] = useState<IContentApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

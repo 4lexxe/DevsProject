@@ -13,7 +13,7 @@ const ShortAnswer: React.FC<ShortAnswerProps> = ({ value, onChange }) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Escribe tu respuesta aquí..."
-        className="w-full p-4 rounded-lg border-2 border-gray-200 focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all duration-300"
+        className="w-full p-4 rounded-lg border-2 border-slate-200 focus:border-cyan-500 focus:ring focus:ring-cyan-200 transition-all duration-300"
       />
     </div>
   );

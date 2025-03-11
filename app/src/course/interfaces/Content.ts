@@ -66,10 +66,7 @@ export interface IContentApi {
   linkType?: string;
   link?: string;
   quiz?: Quiz[];
-  resources?: Array<{
-    title: string;
-    url: string;
-  }>;
+  resources?: Resource[];
   duration: number;
   position: number;
   section: any;
