@@ -4,7 +4,7 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumPost from "./ForumPost";
-import ForumThread from "./ForumThread";
+import ForumThread from "./ForumPost";
 
 interface ForumReactionPostAttributes {
   id: number;

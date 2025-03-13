@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import sequelize from '../../../infrastructure/database/db';
 import ForumCategory from '../models/ForumCategory';
-import ForumThread from '../models/ForumThread';
+import ForumThread from '../models/ForumPost';
 import { AuthRequest } from '../../auth/controllers/verify.controller';
 import { categoryValidations } from '../validators/category.validator';
 

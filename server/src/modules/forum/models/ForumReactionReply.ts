@@ -5,7 +5,7 @@ import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumPost from "./ForumPost";
 import ForumReply from "./ForumReply";
-import ForumThread from "./ForumThread";
+import ForumThread from "./ForumPost";
 
 interface ForumReactionReplyAttributes {
   id: number;

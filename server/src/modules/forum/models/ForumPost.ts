@@ -1,10 +1,8 @@
+// ForumThread.ts (Modelo Unificado)
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
-import ForumThread from "./ForumThread";
-import ForumReply from "./ForumReply";
-import ForumReactionPost from "./ForumReactionPost";
-import ForumVotePost from "./ForumVotePost";
+import ForumCategory from "./ForumCategory";
 
 export enum PostStatus {
     DRAFT = "draft",
@@ -13,50 +11,58 @@ export enum PostStatus {
 
 interface ForumPostAttributes {
   id: number;
-  threadId: number;
+  title: string;
+  content: string; // Movido desde ForumPost
+  categoryId: number;
   authorId: number;
-  content: string;
-  status: PostStatus;
-  isNSFW: boolean;
-  isSpoiler: boolean;
-  coverImage?: string;
-  voteScore: number;
-  upvoteCount: number;
-  downvoteCount: number;
-  replyCount: number;
+  status: PostStatus; // Movido desde ForumPost
+  isNSFW: boolean; // Movido desde ForumPost
+  isSpoiler: boolean; // Movido desde ForumPost
+  coverImage?: string; // Movido desde ForumPost
+  isPinned?: boolean;
+  isLocked?: boolean;
+  isAnnouncement?: boolean;
+  viewCount: number;
+  replyCount: number; // Antes en ForumPost
+  voteScore: number; // Antes en ForumPost
+  upvoteCount: number; // Antes en ForumPost
+  downvoteCount: number; // Antes en ForumPost
+  lastActivityAt: Date;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-interface ForumPostCreationAttributes extends Optional<ForumPostAttributes, "id" | "voteScore" | "upvoteCount" | "downvoteCount" | "replyCount"> {}
+interface ForumPostCreationAttributes extends Optional<ForumPostAttributes, 
+  "id" | "viewCount" | "replyCount" | "voteScore" | "upvoteCount" | "downvoteCount" | "lastActivityAt"> {}
 
-/**
- * @class ForumPost
- * @description Modelo para gestionar las publicaciones en hilos del foro
- * @extends Model<ForumPostAttributes, ForumPostCreationAttributes>
- */
-class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes> implements ForumPostAttributes {
+class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes> 
+  implements ForumPostAttributes {
+  
+  // Atributos del Thread
   public id!: number;
-  public threadId!: number;
+  public title!: string;
+  public categoryId!: number;
   public authorId!: number;
+  public isPinned?: boolean;
+  public isLocked?: boolean;
+  public isAnnouncement?: boolean;
+  public viewCount!: number;
+  public lastActivityAt!: Date;
+
+  // Atributos del Post (integrados)
   public content!: string;
   public status!: PostStatus;
   public isNSFW!: boolean;
   public isSpoiler!: boolean;
   public coverImage?: string;
+  public replyCount!: number;
   public voteScore!: number;
   public upvoteCount!: number;
   public downvoteCount!: number;
-  public replyCount!: number;
+
+  // Timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-
-  // Métodos de asociación generados por Sequelize
-  public getThread!: () => Promise<ForumThread>;
-  public getReplies!: () => Promise<ForumReply[]>;
-  public getAuthor!: () => Promise<User>;
-  public getVotes!: () => Promise<ForumVotePost[]>;
-  public getReactions!: () => Promise<ForumReactionPost[]>;
 }
 
 ForumPost.init(
@@ -66,11 +72,19 @@ ForumPost.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    threadId: {
+    title: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    content: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    categoryId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "ForumThreads",
+        model: "ForumCategories",
         key: "id",
       },
     },
@@ -82,49 +96,58 @@ ForumPost.init(
         key: "id",
       },
     },
-    content: {
-      type: DataTypes.TEXT,
-      allowNull: false,
-    },
     status: {
       type: DataTypes.ENUM(...Object.values(PostStatus)),
-      allowNull: false,
-      defaultValue: PostStatus.DRAFT, // Añadir valor por defecto
+      defaultValue: PostStatus.DRAFT,
     },
     isNSFW: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
+      defaultValue: false,
     },
     isSpoiler: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
       defaultValue: false,
     },
     coverImage: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    voteScore: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
+    isPinned: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
-    upvoteCount: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0,
+    isLocked: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
-    downvoteCount: {
+    isAnnouncement: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    viewCount: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
     },
     replyCount: {
       type: DataTypes.INTEGER,
-      allowNull: false,
       defaultValue: 0,
-    }
+    },
+    voteScore: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    upvoteCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    downvoteCount: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    lastActivityAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     sequelize,
@@ -132,65 +155,17 @@ ForumPost.init(
     tableName: "ForumPosts",
     timestamps: true,
     indexes: [
-      { fields: ['status'] }, 
-      { fields: ['authorId'] }
+      { fields: ["categoryId"] },
+      { fields: ["lastActivityAt"] },
+      { fields: ["authorId"] },
+      { fields: ["status"] },
     ],
     hooks: {
-      /**
-       * @hook afterCreate
-       * @description Actualiza campos relacionados cuando se crea un nuevo post
-       */
       afterCreate: async (post: ForumPost) => {
-        try {
-          // Actualizar lastActivityAt del hilo
-          const thread = await ForumThread.findByPk(post.threadId);
-          if (thread) {
-            await ForumThread.increment('postCount', { where: { id: post.threadId } })
-            await thread.update({ lastActivityAt: new Date() })
-          }
-        } catch (error) {
-          console.error('Error updating thread after post creation:', error);
-        }
-      },
-      
-      /**
-       * @hook afterDestroy
-       * @description Actualiza el contador de posts en el hilo cuando se elimina un post
-       */
-      afterDestroy: async (post: ForumPost) => {
-        const transaction = await sequelize.transaction();
-        try {
-          // Decrementar el contador de posts de forma atómica
-          await ForumThread.decrement('postCount', { 
-            where: { id: post.threadId }, 
-            transaction 
-          });
-      
-          // Obtener el último post para actualizar lastActivityAt
-          const latestPost = await ForumPost.findOne({
-            where: { threadId: post.threadId },
-            order: [['createdAt', 'DESC']],
-            transaction
-          });
-      
-          // Obtener el hilo y actualizar lastActivityAt en función del último post encontrado
-          const thread = await ForumThread.findByPk(post.threadId, { transaction });
-          if (thread) {
-            const lastActivityAt = latestPost ? latestPost.createdAt : thread.createdAt;
-            await thread.update({ lastActivityAt }, { transaction });
-          }
-          
-          await transaction.commit();
-        } catch (error) {
-          await transaction.rollback();
-          console.error('Error updating thread after post deletion:', error);
-        }
+        // Lógica para notificaciones o actualizaciones adicionales
       }
     }
   }
 );
 
-
-
 export default ForumPost;
-

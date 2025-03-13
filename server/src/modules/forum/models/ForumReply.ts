@@ -145,30 +145,59 @@ ForumReply.init(
       }
     ],
     hooks: {
-      /**
-       * @hook afterCreate
-       * @description Actualiza el contador de respuestas en el post cuando se crea una nueva respuesta
-       */
       afterCreate: async (reply: ForumReply) => {
-        try {
-          await updatePostReplyCount(reply.postId);
-        } catch (error) {
-          console.error('Error updating post reply count after create:', error);
-        }
+          const transaction = await sequelize.transaction();
+          try {
+              // Actualizar directamente el Post asociado
+              await ForumPost.increment('replyCount', {
+                  where: { id: reply.postId },
+                  transaction
+              });
+  
+              await ForumPost.update({
+                  lastActivityAt: new Date()
+              }, {
+                  where: { id: reply.postId },
+                  transaction
+              });
+  
+              await transaction.commit();
+          } catch (error) {
+              await transaction.rollback();
+              console.error('Error en hook afterCreate:', error);
+          }
       },
-      
-      /**
-       * @hook afterDestroy
-       * @description Actualiza el contador de respuestas en el post cuando se elimina una respuesta
-       */
+  
       afterDestroy: async (reply: ForumReply) => {
-        try {
-          await updatePostReplyCount(reply.postId);
-        } catch (error) {
-          console.error('Error updating post reply count after destroy:', error);
-        }
+          const transaction = await sequelize.transaction();
+          try {
+              // Actualizar contador en el Post
+              await ForumPost.decrement('replyCount', {
+                  where: { id: reply.postId },
+                  transaction
+              });
+  
+              // Buscar última actividad real
+              const lastReply = await ForumReply.findOne({
+                  where: { postId: reply.postId },
+                  order: [['createdAt', 'DESC']],
+                  transaction
+              });
+  
+              await ForumPost.update({
+                  lastActivityAt: lastReply ? lastReply.createdAt : new Date()
+              }, {
+                  where: { id: reply.postId },
+                  transaction
+              });
+  
+              await transaction.commit();
+          } catch (error) {
+              await transaction.rollback();
+              console.error('Error en hook afterDestroy:', error);
+          }
       }
-    }
+  }
   }
 );
 

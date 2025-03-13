@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import ForumThread from "./ForumThread";
+import ForumThread from "./ForumPost";
 
 interface ForumCategoryAttributes {
   id: number;

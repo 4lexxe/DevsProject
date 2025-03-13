@@ -1,222 +1,181 @@
-/**
- * Este archivo maneja la inicialización de relaciones entre modelos DESPUÉS
- * de que todos los modelos han sido completamente cargados y definidos.
- */
+import { Model } from "sequelize";
 
-// NO importar los modelos directamente para evitar ciclos
-
-
-export function initForumRelations(models: any) {
+export function initForumRelations(models: any): void {
     const {
-      User,
-      ForumCategory,
-      ForumThread,
-      ForumPost,
-      ForumReply,
-      ForumVotePost,
-      ForumVoteReply,
-      ForumReactionPost,
-      ForumReactionReply,
-      ForumFlair,
-      Report
+        User,
+        ForumCategory,
+        ForumPost,
+        ForumReply,
+        ForumVotePost,
+        ForumVoteReply,
+        ForumReactionPost,
+        ForumReactionReply,
+        ForumFlair,
     } = models;
-  
-    // Relaciones de ForumCategory
-    ForumCategory.hasMany(ForumThread, {
-      sourceKey: "id",
-      foreignKey: "categoryId",
-      as: "threads",
+
+    // 1. Relaciones de Categorías
+    ForumCategory.hasMany(ForumPost, {
+        foreignKey: "categoryId",
+        as: "posts",
+        onDelete: "CASCADE"
     });
-    
-    // Relaciones de ForumThread
-    ForumThread.hasMany(ForumPost, {
-      sourceKey: "id",
-      foreignKey: "threadId",
-      as: "posts",
+
+    ForumPost.belongsTo(ForumCategory, {
+        foreignKey: "categoryId",
+        as: "category"
     });
-    
-    ForumThread.belongsTo(User, {
-      foreignKey: "authorId",
-      as: "author",
+
+    // 2. Relaciones de Usuarios
+    User.hasMany(ForumPost, {
+        foreignKey: "authorId",
+        as: "posts"
     });
-    
-    ForumThread.belongsTo(ForumCategory, {
-      foreignKey: 'categoryId',
-      onUpdate: 'CASCADE'
-    });
-  
-    // Relaciones de ForumPost
-    ForumPost.belongsTo(ForumThread, {
-      foreignKey: "threadId",
-      as: "thread",
-    });
-    
-    ForumPost.hasMany(ForumReply, {
-      sourceKey: "id",
-      foreignKey: "postId",
-      as: "replies",
-    });
-    
+
     ForumPost.belongsTo(User, {
-      foreignKey: "authorId",
-      as: "author",
+        foreignKey: "authorId",
+        as: "author"
     });
-    
-    ForumPost.hasMany(ForumVotePost, {
-      foreignKey: "postId",
-      as: "votes",
+
+    User.hasMany(ForumReply, {
+        foreignKey: "authorId",
+        as: "replies"
     });
-    
-    ForumPost.hasMany(ForumReactionPost, {
-      foreignKey: "postId",
-      as: "reactions",
-    });
-  
-    // Relaciones de ForumReply
-    ForumReply.belongsTo(ForumPost, {
-      foreignKey: "postId",
-      as: "post",
-    });
-    
-    ForumReply.hasMany(ForumReply, {
-      sourceKey: "id",
-      foreignKey: "parentReplyId",
-      as: "childReplies",
-    });
-    
-    ForumReply.belongsTo(ForumReply, {
-      foreignKey: "parentReplyId",
-      as: "parentReply",
-    });
-    
-    ForumReply.hasMany(ForumReactionReply, {
-      foreignKey: "replyId",
-      as: "reactions",
-    });
-    
-    ForumReply.hasMany(ForumVoteReply, {
-      foreignKey: "replyId",
-      as: "votes",
-    });
-    
+
     ForumReply.belongsTo(User, {
-      foreignKey: "authorId",
-      as: "author",
+        foreignKey: "authorId",
+        as: "author"
     });
-  
-    // Relaciones de ForumVotePost
+
+    // 3. Relaciones de Posts y Replies
+    ForumPost.hasMany(ForumReply, {
+        foreignKey: "postId",
+        as: "replies",
+        onDelete: "CASCADE"
+    });
+
+    ForumReply.belongsTo(ForumPost, {
+        foreignKey: "postId",
+        as: "post"
+    });
+
+    // 4. Relaciones Anidadas de Replies
+    ForumReply.hasMany(ForumReply, {
+        foreignKey: "parentReplyId",
+        as: "childReplies",
+        onDelete: "CASCADE"
+    });
+
+    ForumReply.belongsTo(ForumReply, {
+        foreignKey: "parentReplyId",
+        as: "parentReply"
+    });
+
+    // 5. Relaciones de Votos
+    ForumPost.hasMany(ForumVotePost, {
+        foreignKey: "postId",
+        as: "votes",
+        onDelete: "CASCADE"
+    });
+
     ForumVotePost.belongsTo(ForumPost, {
-      foreignKey: "postId",
-      as: "post",
-      onDelete: 'CASCADE'
+        foreignKey: "postId",
+        as: "post"
     });
-    
-    ForumVotePost.belongsTo(User, {
-      foreignKey: "userId",
-      as: "user",
+
+    ForumReply.hasMany(ForumVoteReply, {
+        foreignKey: "replyId",
+        as: "votes",
+        onDelete: "CASCADE"
     });
-    
-    User.hasMany(ForumVotePost, {
-      foreignKey: "userId",
-      as: "votes",
-    });
-  
-    // Relaciones de ForumVoteReply
+
     ForumVoteReply.belongsTo(ForumReply, {
-      foreignKey: "replyId",
-      as: "reply",
-      onDelete: 'CASCADE'
+        foreignKey: "replyId",
+        as: "reply"
     });
-    
-    ForumVoteReply.belongsTo(User, {
-      foreignKey: "userId",
-      as: "user",
+
+    // 6. Relaciones de Reacciones
+    ForumPost.hasMany(ForumReactionPost, {
+        foreignKey: "postId",
+        as: "reactions",
+        onDelete: "CASCADE"
     });
-    
-    User.hasMany(ForumVoteReply, {
-      foreignKey: "userId",
-      as: "replyVotes",
+
+    ForumReactionPost.belongsTo(ForumPost, {
+        foreignKey: "postId",
+        as: "post"
     });
-  
-    // Relaciones de ForumReactionPost
-    ForumReactionPost.belongsTo(User, { 
-      foreignKey: "userId", 
-      as: "user" 
+
+    ForumReply.hasMany(ForumReactionReply, {
+        foreignKey: "replyId",
+        as: "reactions",
+        onDelete: "CASCADE"
     });
-    
-    ForumReactionPost.belongsTo(ForumPost, { 
-      foreignKey: "postId", 
-      as: "post" 
+
+    ForumReactionReply.belongsTo(ForumReply, {
+        foreignKey: "replyId",
+        as: "reply"
     });
-    
-    User.hasMany(ForumReactionPost, { 
-      foreignKey: "userId", 
-      as: "postReactions" 
-    });
-  
-    // Relaciones de ForumReactionReply
-    ForumReactionReply.belongsTo(User, { 
-      foreignKey: "userId", 
-      as: "user" 
-    });
-    
-    ForumReactionReply.belongsTo(ForumReply, { 
-      foreignKey: "replyId", 
-      as: "reply" 
-    });
-    
-    User.hasMany(ForumReactionReply, { 
-      foreignKey: "userId", 
-      as: "replyReactions" 
-    });
-  
-    // Relaciones de ForumFlair
-    ForumFlair.belongsTo(User, {
-      foreignKey: "createdBy",
-      as: "creator",
-    });
-    
-    ForumFlair.belongsToMany(User, {
-      through: "UserFlairs",
-      foreignKey: "flairId",
-      otherKey: "userId",
-      as: "users",
-    });
-    
-    User.belongsToMany(ForumFlair, {
-      through: "UserFlairs",
-      foreignKey: "userId",
-      otherKey: "flairId",
-      as: "flairs",
-    });
-    
-    ForumFlair.belongsToMany(ForumPost, {
-      through: "PostFlairs",
-      foreignKey: "flairId",
-      otherKey: "postId",
-      as: "posts",
-    });
-    
+
+    // 7. Relaciones de Flairs (Etiquetas)
+    // Posts
     ForumPost.belongsToMany(ForumFlair, {
-      through: "PostFlairs",
-      foreignKey: "postId",
-      otherKey: "flairId",
-      as: "flairs",
+        through: "PostFlairs",
+        foreignKey: "postId",
+        otherKey: "flairId",
+        as: "flairs",
+        onDelete: "CASCADE"
     });
-    
-    ForumFlair.belongsToMany(ForumReply, {
-      through: "ReplyFlairs",
-      foreignKey: "flairId",
-      otherKey: "replyId",
-      as: "replies",
+
+    ForumFlair.belongsToMany(ForumPost, {
+        through: "PostFlairs",
+        foreignKey: "flairId",
+        otherKey: "postId",
+        as: "posts",
+        onDelete: "CASCADE"
     });
-    
+
+    // Replies
     ForumReply.belongsToMany(ForumFlair, {
-      through: "ReplyFlairs",
-      foreignKey: "replyId",
-      otherKey: "flairId",
-      as: "flairs",
+        through: "ReplyFlairs",
+        foreignKey: "replyId",
+        otherKey: "flairId",
+        as: "flairs",
+        onDelete: "CASCADE"
     });
-  
-    console.log("✅ Todas las relaciones del foro han sido inicializadas correctamente");
-  }
+
+    ForumFlair.belongsToMany(ForumReply, {
+        through: "ReplyFlairs",
+        foreignKey: "flairId",
+        otherKey: "replyId",
+        as: "replies",
+        onDelete: "CASCADE"
+    });
+
+    // Creador de Flairs
+    ForumFlair.belongsTo(User, {
+        foreignKey: "createdBy",
+        as: "creator"
+    });
+
+    User.hasMany(ForumFlair, {
+        foreignKey: "createdBy",
+        as: "createdFlairs"
+    });
+
+    // 8. Relaciones Usuario-Flairs (Asignación)
+    User.belongsToMany(ForumFlair, {
+        through: "UserFlairs",
+        foreignKey: "userId",
+        otherKey: "flairId",
+        as: "assignedFlairs"
+    });
+
+    ForumFlair.belongsToMany(User, {
+        through: "UserFlairs",
+        foreignKey: "flairId",
+        otherKey: "userId",
+        as: "assignedUsers"
+    });
+
+    console.log("✅ Relaciones actualizadas correctamente");
+}

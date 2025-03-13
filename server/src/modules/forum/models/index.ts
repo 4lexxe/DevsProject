@@ -5,7 +5,7 @@
  */
 
 import ForumCategory from './ForumCategory';
-import ForumThread from './ForumThread';
+import ForumThread from './ForumPost';
 import ForumPost from './ForumPost';
 import ForumReply from './ForumReply';
 import ForumVotePost, { VoteType } from './ForumVotePost';
