@@ -92,23 +92,20 @@ ForumReactionReply.init(
       },
     ],
     hooks: {
-        afterCreate: async (reaction: ForumReactionReply) => {
-          try {
-            const reply = await ForumReply.findByPk(reaction.replyId);
-            if (reply) {
-              const post = await ForumPost.findByPk(reply.postId);
-              if (post) {
-                const thread = await ForumThread.findByPk(post.threadId);
-                if (thread) {
-                  await thread.update({ lastActivityAt: new Date() });
-                }
-              }
+      afterCreate: async (reaction: ForumReactionReply) => {
+        try {
+          const reply = await ForumReply.findByPk(reaction.replyId);
+          if (reply) {
+            const post = await ForumPost.findByPk(reply.postId);
+            if (post) {
+              await post.update({ lastActivityAt: new Date() });
             }
-          } catch (error) {
-            console.error('Error in afterCreate hook for ForumReactionReply:', error);
           }
+        } catch (error) {
+          console.error('Error in afterCreate hook for ForumReactionReply:', error);
         }
-      }
+      },
+    }
   }
 );
 

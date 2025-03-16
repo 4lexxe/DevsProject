@@ -34,7 +34,7 @@ import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
 //Importación de las rutas del foro
-import LeftPanel from "./forum/components/LeftPanel";
+import EditorPost from "./forum/components/EditorPost";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -71,7 +71,7 @@ function App() {
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
 
               {/* Rutas del foro */}
-              <Route path="/forum" element={<LeftPanel />} />
+              <Route path="/forum" element={<EditorPost />} />
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>

@@ -6,9 +6,11 @@ import api from '../../api/axios'; // Importa la instancia de Axios configurada
 export interface ForumCategory {
   id: number;
   name: string;
-  description?: string;
+  description: string;
   icon?: string;
-  displayOrder: number;
+  banner?: string;
+  memberCount: number;
+  slug: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -19,7 +21,8 @@ const ForumCategoryService = {
   async getAllCategories(): Promise<ForumCategory[]> {
     try {
       const response = await api.get('/forum/categories');
-      return response.data;
+      // Extraer el array de categorías de la propiedad data del objeto response.data
+      return response.data.data;
     } catch (error) {
       console.error('Error al obtener las categorías:', error);
       throw new Error('Error al obtener las categorías.');
@@ -30,7 +33,8 @@ const ForumCategoryService = {
   async getCategoryById(id: number): Promise<ForumCategory> {
     try {
       const response = await api.get(`/forum/categories/${id}`);
-      return response.data;
+      // Extraer el objeto categoría de la propiedad data del objeto response.data
+      return response.data.data;
     } catch (error) {
       console.error(`Error al obtener la categoría con id ${id}:`, error);
       throw new Error('Error al obtener la categoría.');
@@ -38,10 +42,11 @@ const ForumCategoryService = {
   },
 
   // Crear una nueva categoría
-  async createCategory(categoryData: Omit<ForumCategory, 'id'>): Promise<ForumCategory> {
+  async createCategory(categoryData: Omit<ForumCategory, 'id' | 'slug' | 'memberCount'>): Promise<ForumCategory> {
     try {
       const response = await api.post('/forum/categories', categoryData);
-      return response.data;
+      // Extraer el objeto categoría creado de la propiedad data del objeto response.data
+      return response.data.data;
     } catch (error) {
       console.error('Error al crear la categoría:', error);
       throw new Error('Error al crear la categoría.');
@@ -52,7 +57,8 @@ const ForumCategoryService = {
   async updateCategory(id: number, categoryData: Partial<ForumCategory>): Promise<ForumCategory> {
     try {
       const response = await api.put(`/forum/categories/${id}`, categoryData);
-      return response.data;
+      // Extraer el objeto categoría actualizado de la propiedad data del objeto response.data
+      return response.data.data;
     } catch (error) {
       console.error(`Error al actualizar la categoría con id ${id}:`, error);
       throw new Error('Error al actualizar la categoría.');
@@ -67,17 +73,7 @@ const ForumCategoryService = {
       console.error(`Error al eliminar la categoría con id ${id}:`, error);
       throw new Error('Error al eliminar la categoría.');
     }
-  },
-
-  // Reordenar categorías
-  async reorderCategories(orderData: { id: number; displayOrder: number }[]): Promise<void> {
-    try {
-      await api.patch('/forum/categories/reorder', orderData);
-    } catch (error) {
-      console.error('Error al reordenar las categorías:', error);
-      throw new Error('Error al reordenar las categorías.');
-    }
-  },
+  }
 };
 
 export default ForumCategoryService;

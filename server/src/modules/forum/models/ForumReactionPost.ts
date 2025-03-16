@@ -95,10 +95,7 @@ ForumReactionPost.init(
           try {
             const post = await ForumPost.findByPk(reaction.postId);
             if (post) {
-              const thread = await ForumThread.findByPk(post.threadId);
-              if (thread) {
-                await thread.update({ lastActivityAt: new Date() });
-              }
+              await post.update({ lastActivityAt: new Date() });
             }
           } catch (error) {
             console.error('Error in afterCreate hook for ForumReactionPost:', error);

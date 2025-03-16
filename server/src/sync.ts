@@ -22,7 +22,7 @@ import Content from './modules/content/Content';
 
 /* Modelos relacionados con el foro */
 
-import {ForumCategory, ForumThread, ForumPost, ForumReply, ForumVotePost, ForumVoteReply, ForumFlair, Report, ForumReactionPost, ForumReactionReply, predefinedFlairs} from './modules/forum/models/index';
+import {ForumCategory, ForumPost, ForumReply, ForumVotePost, ForumVoteReply, ForumFlair, Report, ForumReactionPost, ForumReactionReply, predefinedFlairs, predefinedCategories} from './modules/forum/models/index';
 
 // sync.ts
 async function syncDatabase() {
@@ -34,46 +34,47 @@ async function syncDatabase() {
     await Role.sync({ force: true });
     await RolePermission.sync({ force: true }); // ¡Primero debe existir esta tabla!
 
-    // Poblar datos DESPUÉS de crear todas las tablas
-     await seedInitialData(); 
-
+    
     await User.sync({ force: true });
-
+    
     await Admin.sync({ force: true });
-
+    
     await SectionHeader.sync({ force: true });
-
+    
     await Recourse.sync({ force: true });
-
+    
     await Category.sync({ force: true });
     await CareerType.sync({ force: true })
     await Course.sync({ force: true });
     await CourseCategory.sync({ force: true });
     await Section.sync({ force: true });
-
+    
     await Content.sync({ force: true });
-
+    
     await Rating.sync({ force: true });
 
     await Comment.sync({ force: true });
     await Recourse.sync({ force: true });
-
+    
     await RoadMap.sync({ force: true });
     
     // Sincronizar modelos del foro
     // Sincronizar modelos del foro en el orden correcto
-await ForumCategory.sync({ force: true });
-await ForumThread.sync({ force: true });
-await ForumPost.sync({ force: true });
-await ForumReply.sync({ force: true });
-// Sincronizar modelos dependientes después
-await ForumVotePost.sync({ force: true });
-await ForumVoteReply.sync({ force: true });
-await ForumFlair.sync({ force: true });
-await Report.sync({ force: true });
-await ForumReactionPost.sync({ force: true });
-await ForumReactionReply.sync({ force: true });
+    await ForumCategory.sync({ force: true });
+    await ForumPost.sync({ force: true });
+    await ForumReply.sync({ force: true });
+    // Sincronizar modelos dependientes después
+    await ForumVotePost.sync({ force: true });
+    await ForumVoteReply.sync({ force: true });
+    await ForumFlair.sync({ force: true });
+    await Report.sync({ force: true });
+    await ForumReactionPost.sync({ force: true });
+    await ForumReactionReply.sync({ force: true });
     
+    // Poblar datos DESPUÉS de crear todas las tablas
+     await seedInitialData(); 
+     await initializeForumFlairs();
+     await initializeForumCategories();
     console.log('¡Sincronización exitosa!');
   } catch (error) {
     console.error('Error:', error);
@@ -104,9 +105,6 @@ async function seedInitialData() {
       }));
     }
   }
-  
-  // Inicializar los distintivos predefinidos del foro
-  await initializeForumFlairs();
 } 
 
 /**
@@ -125,6 +123,50 @@ async function initializeForumFlairs(): Promise<void> {
     console.log('Distintivos predefinidos del foro inicializados correctamente.');
   } catch (error) {
     console.error('Error al inicializar los distintivos predefinidos del foro:', error);
+  }
+}
+
+/**
+ * @function initializeForumCategories
+ * @description Inicializa las categorías predefinidas del foro en la base de datos
+ * @returns {Promise<void>}
+ */
+async function initializeForumCategories(): Promise<void> {
+  try {
+    console.log(`Iniciando la carga de ${predefinedCategories.length} categorías predefinidas...`);
+    
+    for (const category of predefinedCategories) {
+      console.log(`Procesando categoría: ${category.name}`);
+      
+      const [categoryInstance, created] = await ForumCategory.findOrCreate({
+        where: { name: category.name },
+        defaults: category
+      });
+      
+      if (created) {
+        console.log(`Categoría "${category.name}" creada con éxito.`);
+      } else {
+        console.log(`Categoría "${category.name}" ya existe, actualizada si es necesario.`);
+        // Actualizar campos si es necesario
+        await categoryInstance.update({
+          description: category.description,
+          icon: category.icon
+        });
+      }
+    }
+    
+    // Verificamos si realmente se crearon las categorías
+    const totalCategories = await ForumCategory.count();
+    console.log(`Total de categorías en la base de datos: ${totalCategories}`);
+    
+    if (totalCategories > 0) {
+      console.log('Categorías predefinidas del foro inicializadas correctamente.');
+    } else {
+      console.error('Advertencia: No se encontraron categorías en la base de datos después de la inicialización.');
+    }
+  } catch (error) {
+    console.error('Error al inicializar las categorías predefinidas del foro:', error);
+    throw error; // Propagamos el error para que la sincronización falle si esto falla
   }
 }
 

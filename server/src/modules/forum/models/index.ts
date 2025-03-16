@@ -4,8 +4,7 @@
  * Exporta todos los modelos, enumeraciones y establece relaciones adicionales
  */
 
-import ForumCategory from './ForumCategory';
-import ForumThread from './ForumPost';
+import ForumCategory, { predefinedCategories } from './ForumCategory';
 import ForumPost from './ForumPost';
 import ForumReply from './ForumReply';
 import ForumVotePost, { VoteType } from './ForumVotePost';
@@ -20,7 +19,6 @@ import { initForumRelations } from './initRelations';
 // Crear un objeto con todos los modelos
 const models = {
   ForumCategory,
-  ForumThread,
   ForumPost,
   ForumReply,
   ForumVotePost,
@@ -41,7 +39,6 @@ initForumRelations(models);
  */
 export {
   ForumCategory,
-  ForumThread,
   ForumPost,
   ForumReply,
   ForumVotePost,
@@ -54,6 +51,7 @@ export {
   ForumVoteReply,
   ReplyVoteType,
   predefinedFlairs,
+  predefinedCategories,
 };
 
 /**

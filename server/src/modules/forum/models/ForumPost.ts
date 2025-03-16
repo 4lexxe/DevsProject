@@ -3,16 +3,24 @@ import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumCategory from "./ForumCategory";
-
+import slugify from "slugify";
 export enum PostStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
+}
+
+export enum ContentType {
+    TEXT = "text",
+    IMAGE = "image",
+    LINK = "link",
 }
 
 interface ForumPostAttributes {
   id: number;
   title: string;
   content: string; // Movido desde ForumPost
+  contentType: ContentType; // Tipo de contenido: texto, imagen o enlace
+  slug: string; // URL para posts de tipo LINK
   categoryId: number;
   authorId: number;
   status: PostStatus; // Movido desde ForumPost
@@ -51,6 +59,8 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes>
 
   // Atributos del Post (integrados)
   public content!: string;
+  public contentType!: ContentType;
+  public slug!: string;
   public status!: PostStatus;
   public isNSFW!: boolean;
   public isSpoiler!: boolean;
@@ -78,6 +88,14 @@ ForumPost.init(
     },
     content: {
       type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    contentType: {
+      type: DataTypes.ENUM(...Object.values(ContentType)),
+      allowNull: false,
+    },
+    slug: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
     categoryId: {
@@ -159,8 +177,28 @@ ForumPost.init(
       { fields: ["lastActivityAt"] },
       { fields: ["authorId"] },
       { fields: ["status"] },
+
+      { fields: ["createdAt"] },
+  { fields: ["updatedAt"] },
+  { fields: ["viewCount"] },
+  { fields: ["replyCount"] },
+  { fields: ["voteScore"] },
+  // Índices compuestos para casos de uso comunes
+  { fields: ["categoryId", "lastActivityAt"] },
+  { fields: ["isNSFW", "isSpoiler"] },
+  { fields: ["isPinned", "isAnnouncement"] }
     ],
     hooks: {
+      beforeValidate: (post: ForumPost) => {
+        // Generar el slug a partir del título
+        post.slug = slugify(post.title, {
+          lower: true,      // convertir a minúsculas
+          strict: true,     // eliminar caracteres especiales
+          trim: true,       // eliminar espacios al inicio y final
+          locale: 'es',     // para manejar caracteres españoles
+          limit: 100        // limitar longitud
+        });
+      },
       afterCreate: async (post: ForumPost) => {
         // Lógica para notificaciones o actualizaciones adicionales
       }

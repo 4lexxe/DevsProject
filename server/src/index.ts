@@ -43,7 +43,6 @@ import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas de Foro
 import forumCategoryRoutes from './modules/forum/routes/forumcategory.routes';
-import forumThreadRoutes from './modules/forum/routes/forumthread.routes';
 import forumPostRoutes from './modules/forum/routes/forumpost.routes';
 import forumReplyRoutes from './modules/forum/routes/forumreply.routes';
 import forumReactionPostRoutes from './modules/forum/routes/forumreactionpost.routes';
@@ -272,7 +271,6 @@ app.use('/api', roadMapRoutes);
 
 // Rutas de Foro
 app.use('/api/forum', forumCategoryRoutes);
-app.use('/api/forum', forumThreadRoutes);
 app.use('/api/forum', forumPostRoutes);
 app.use('/api/forum', forumReplyRoutes);
 app.use('/api/forum', forumReactionPostRoutes);
