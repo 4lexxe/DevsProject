@@ -1,4 +1,5 @@
 import { body } from 'express-validator';
+import Plan from '../models/Plan'; // Importa el modelo del Plan
 
 export const validateDiscount = [
   // Validación para el campo 'description'
@@ -10,7 +11,8 @@ export const validateDiscount = [
   // Validación para el campo 'value'
   body('value')
     .notEmpty().withMessage('El valor del descuento es obligatorio')
-    .isInt({ min: 0, max: 100 }).withMessage('El valor debe ser un entero entre 0 y 100'),
+    
+    .isInt({min: 1, max: 80 }).withMessage('El valor debe ser un entero entre 0 y 100'),
 
   // Validación para el campo 'startDate'
   body('startDate')
@@ -33,7 +35,16 @@ export const validateDiscount = [
   // Validación para el campo 'isActive'
   body('isActive')
     .optional() // El campo es opcional
-    .isBoolean().withMessage('El estado activo debe ser un valor booleano'),
+    .isBoolean().withMessage('El estado activo debe ser un valor booleano')
+    .custom(async (value, { req }) => {
+      if (value) {
+        const plan = await Plan.findByPk(req.body.planId);
+        if (!plan || !plan.isActive) {
+          throw new Error('El plan asociado debe estar activo para que el descuento pueda estar activo');
+        }
+      }
+      return true;
+    }),
 
   // Validación para el campo 'planId'
   body('planId')

@@ -7,6 +7,7 @@ import {
 import sequelize from "../../../infrastructure/database/db"; // Import sequelize instance
 import Plan from "../models/Plan"; // Importa el modelo Plan
 import MPSubPlan from "../models/MPSubPlan"; // Importa el modelo MPSubPlan
+import DiscountEvent from "../models/DiscountEvent";
 import { PreApprovalPlan } from "mercadopago";
 
 class PlanController {
@@ -96,8 +97,8 @@ class PlanController {
   }
 
   // Función para actualizar un plan en Mercado Pago
-  private static async updateMercadoPagoPlan(planData: any, mpPlanId: string) {
-    return await this.preApprovalPlan.update({
+  static async updateMercadoPagoPlan(planData: any, mpPlanId: string) {
+    const response = await this.preApprovalPlan.update({
       id: mpPlanId,
       updatePreApprovalPlanRequest: {
         reason: planData.name,
@@ -105,7 +106,7 @@ class PlanController {
           frequency: planData.duration / planData.installments,
           frequency_type: planData.durationType === "días" ? "days" : "months",
           transaction_amount: planData.installmentPrice,
-          repetitions: planData.installmentss,
+          repetitions: planData.installments,
           currency_id: "ARS",
         },
         payment_methods_allowed: {
@@ -113,11 +114,14 @@ class PlanController {
             { id: "debit_card" },
             { id: "prepaid_card" },
             { id: "account_money" },
+            { id: "credit_card" },
           ],
         },
         back_url: MP_BACK_URL,
       },
     });
+    
+    return response;
   }
 
   // Función para manejar la respuesta exitosa
@@ -139,7 +143,7 @@ class PlanController {
   // Obtener todos los planes
   static getAll: RequestHandler = async (req, res) => {
     try {
-      const plans = await Plan.findAll();
+      const plans = await Plan.findAll({include: [{model: DiscountEvent, as: 'discountEvent'},{ model: MPSubPlan, as: 'mpSubPlan'}]});
       res.status(200).json({
         status: "success",
         message: "Planes obtenidos exitosamente",
@@ -154,7 +158,7 @@ class PlanController {
   // Obtener un plan por ID
   static getById: RequestHandler = async (req, res) => {
     try {
-      const plan = await Plan.findByPk(req.params.id);
+      const plan = await Plan.findByPk(req.params.id, {include: [{model: DiscountEvent, as: 'discountEvent'}, {model: MPSubPlan, as: 'mpSubPlan'}]});
       if (!plan) {
         res.status(404).json({
           status: "error",
@@ -183,39 +187,24 @@ class PlanController {
         where: {
           isActive: true,
         },
-        include: [{
-          model: MPSubPlan,
-          as: 'mpSubPlan', // Especificar el alias
-          attributes: ['initPoint']
-        }],
+        include: [
+          {
+            model: MPSubPlan,
+            as: 'mpSubPlan', // Especificar el alias
+            attributes: ['initPoint'] 
+          },
+          {
+            model: DiscountEvent,
+            as: 'discountEvent',
+            where: {
+              isActive: true,
+            },
+            required: false // Permitir planes sin eventos de descuento activos
+          }
+        ],
         order: [["position", "ASC"]],
         limit: 3,
       });
-
-      if (defaultPlans.length === 0) {
-        // Si no hay planes destacados, obtener los 3 primeros planes activos
-        const fallbackPlans = await Plan.findAll({
-          where: {
-            isActive: true,
-          },
-          include: [{
-            model: MPSubPlan,
-            as: 'mpSubPlan', // Especificar el alias
-            attributes: ['initPoint']
-          }],
-          order: [["id", "ASC"]],
-          limit: 3,
-        });
-
-        this.sendSuccessResponse(
-          res,
-          200,
-          "Planes por defecto obtenidos exitosamente",
-          fallbackPlans,
-          req
-        );
-        return;
-      }
 
       this.sendSuccessResponse(
         res,

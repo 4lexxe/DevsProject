@@ -1,15 +1,12 @@
 import e, { Request, Response, RequestHandler } from "express";
 import { PreApproval, PreApprovalPlan, Payment, Invoice } from "mercadopago";
-import axios from "axios"; // Para hacer solicitudes HTTP
 
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
-import { MP_BACK_URL } from "../../../infrastructure/config/mercadopagoConfig";
 
 import WebhookEvent from "../models/WebhookEvent";
-import MPSubscription from "../models/MPSubscription"; // Asegúrate de importar el modelo MPSubscriptions
 import MPSubPlan from "../models/MPSubPlan";
-import Subscription from "../models/Subscription";
 import PaymentModel from "../models/Payment";
+import Subscription from "../models/Subscription";
 
 import PaymentController from "./paymentController";
 import MPSubscriptionController from "./mpSubscriptionController";
@@ -51,6 +48,7 @@ class MercadoPagoController {
 
   // Método para manejar webhooks
   static handleWebhook: RequestHandler = async (req, res) => {
+
     try {
       const eventData = req.body; // Obtiene el JSON del cuerpo de la solicitud
       console.log("Webhook recibido:", JSON.stringify(eventData, null, 2));
@@ -72,7 +70,7 @@ class MercadoPagoController {
         // Manejar eventos según su tipo
         switch (type) {
           case "subscription_preapproval":
-            await this.handleSubscriptionEvent(action, eventId, BigInt(1));
+            await this.handleSubscriptionEvent(action, eventId);
             break;
 
           case "payment":
@@ -126,7 +124,6 @@ class MercadoPagoController {
   private static async handleSubscriptionEvent(
     action: string,
     eventId: string,
-    userId: bigint
   ) {
     console.log(
       `Procesando evento de suscripción. Acción: ${action}, ID: ${eventId}`
@@ -160,20 +157,9 @@ class MercadoPagoController {
           );
         }
 
-        if (!userId) {
-          throw new Error(
-            "No se pudo determinar el usuario asociado a la suscripción"
-          );
-        }
-
         const paymentp = await PaymentModel.findOne({
           where: { preApprovalId: subscriptionData.id },
         });
-        if (!paymentp) {
-          throw new Error(
-            "No se pudo determinar el pago asociado a la suscripción"
-          );
-        }
 
         // Calcular fechas de inicio y fin
         const startDate = new Date();
@@ -183,21 +169,21 @@ class MercadoPagoController {
           );
         }
 
-        const endDate = new Date();
+        const endDate = new Date(); 
         if (subscriptionData.auto_recurring?.end_date) {
           endDate.setTime(
             new Date(subscriptionData.auto_recurring.end_date).getTime()
           );
         }
         // Crear la suscripción en nuestro sistema
-        const subscription = await SubscriptionController.createSubscription({
-          userId,
-          paymentId: paymentp.id,
+        const subscription = await SubscriptionController.updateSubscription(
+          {planId: planId},
+          {
+          paymentId: paymentp?.id,
           planId,
           startDate,
           endDate,
-          status:
-            subscriptionData?.status === "authorized" ? "active" : "inactive",
+          status: subscriptionData.status === "authorized" ? "authorized": "pending",
         });
 
         if (subscription) {
@@ -229,16 +215,19 @@ class MercadoPagoController {
           );
 
         if (mpSubscription?.subscriptionId) {
-          // Actualizar estado de la suscripción en nuestro sistema
+          const paymentp = await PaymentModel.findOne({
+            where: { preApprovalId: subscriptionData.id },
+          });
+
+          // Obtener la suscripción actual
+          const currentSubscription = await Subscription.findByPk( mpSubscription.subscriptionId);
+
+          // Actualizar estado de la suscripción en nuestro sistema solo si paymentId es null
           await SubscriptionController.updateSubscription(
-            mpSubscription.subscriptionId,
+            {id: mpSubscription.subscriptionId},
             {
-              status:
-                subscriptionData?.status === "authorized"
-                  ? "active"
-                  : subscriptionData?.status === "cancelled"
-                  ? "cancelled"
-                  : "inactive",
+              paymentId: currentSubscription?.paymentId ? currentSubscription.paymentId : paymentp?.id,
+              status: subscriptionData.status,
             }
           );
           console.log(
@@ -256,6 +245,7 @@ class MercadoPagoController {
       console.log(`Acción de suscripción no manejada: ${action}`);
     }
   }
+
 
   // Método para manejar eventos de pago
   private static async handlePaymentEvent(action: string, eventId: string) {
@@ -279,6 +269,7 @@ class MercadoPagoController {
       console.log(`Acción de pago no manejada: ${action}`);
     }
   }
+
 
   // Método para manejar eventos de pago autorizado de suscripción
   private static async handleAuthorizedPaymentEvent(

@@ -3,7 +3,7 @@ import sequelize from '../../../infrastructure/database/db';
 import Plan from './Plan'; // Importamos el modelo Plan
 
 // Definimos el modelo de Sequelize
-class Discount extends Model {
+class DiscountEvent extends Model {
   public id!: number;
   public description?: string;
   public value!: number; // Porcentaje de descuento
@@ -16,10 +16,18 @@ class Discount extends Model {
   // Campos automáticos de Sequelize
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  
+  // Método para chequear si un descuento está vigente
+  public isCurrentlyValid(): boolean {
+    const now = new Date();
+    return this.isActive && 
+           now >= this.startDate && 
+           now <= this.endDate;
+  }
 }
 
 // Inicializamos el modelo
-Discount.init(
+DiscountEvent.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -78,37 +86,59 @@ Discount.init(
   },
   {
     sequelize,
-    tableName: 'Discounts',
+    tableName: 'DiscountEvents',
     timestamps: true,
     paranoid: true, // Habilita el borrado lógico (soft delete)
     hooks: {
       // Hook para validar que endDate sea posterior a startDate
-      beforeCreate: (discount: Discount) => {
+      beforeCreate: (discount: DiscountEvent) => {
         if (discount.endDate <= discount.startDate) {
           throw new Error('endDate debe ser posterior a startDate');
         }
       },
-      beforeUpdate: (discount: Discount) => {
+      beforeUpdate: (discount: DiscountEvent) => {
         if (discount.endDate <= discount.startDate) {
           throw new Error('endDate debe ser posterior a startDate');
         }
+        
+        // Validar si el descuento está dentro de fechas válidas al activarlo
+        if (discount.changed('isActive') && discount.isActive) {
+          const now = new Date();
+          if (now < discount.startDate || now > discount.endDate) {
+            console.warn(`Advertencia: Activando un descuento fuera de su rango de fechas válido (ID: ${discount.id})`);
+          }
+        }
       },
+      
+      // Hook para actualizar automáticamente el estado del descuento basado en la fecha actual
+      beforeFind: (options: any) => {
+        const now = new Date();
+        // Añadir automáticamente condiciones para verificar descuentos expirados
+        // Este hook se activa en consultas de búsqueda
+        // Note: No directamente actualiza registros, solo afecta las consultas
+        return options;
+      },
+      
+      afterUpdate: async (discount: DiscountEvent) => {
+        // Log cuando el estado de activación cambia para debugging
+        if (discount.changed('isActive')) {
+          console.log(`Descuento ID ${discount.id} cambió estado isActive a: ${discount.isActive}`);
+        }
+      }
     },
-    indexes: [
-      {
-        fields: ['planId'], // Índice para mejorar búsquedas por planId
-      },
-      {
-        fields: ['event'], // Índice para mejorar búsquedas por evento
-      },
-    ],
   }
 );
 
 // Definimos la relación con el modelo Plan
-Discount.belongsTo(Plan, {
-  foreignKey: 'planId', // Clave foránea en Discount
+DiscountEvent.belongsTo(Plan, {
+  foreignKey: 'planId', // Clave foránea en DiscountEvent
   as: 'plan', // Alias para la relación
 });
 
-export default Discount;
+// Definimos la relación con el modelo Plan
+Plan.hasOne(DiscountEvent, {
+  foreignKey: 'planId', // Clave foránea en DiscountEvent
+  as: 'discountEvent', // Alias para la relación
+});
+
+export default DiscountEvent;

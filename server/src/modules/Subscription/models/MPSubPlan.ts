@@ -2,7 +2,6 @@ import { Model, DataTypes } from 'sequelize';
 import sequelize from '../../../infrastructure/database/db';
 import Plan from './Plan'; // Import Plan model
 
-
 class MPSubPlan extends Model {
     public id!: string;  // Aca se guarda el id generado en la api de mp
     public planId!: bigint; // Relacion con el modelo de Plan

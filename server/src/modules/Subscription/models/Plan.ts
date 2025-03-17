@@ -13,10 +13,10 @@ class Plan extends Model {
 
   public features!: string[];
   public accessLevel!: "Básico" | "Estándar" | "Premium";
-  
+
   public installments!: number; // Cantidad de cuotas en las que se divide el plan
-  public installmentPrice?: number; // Precio de cada cuota
-  
+  public installmentPrice!: number; // Precio de cada cuota
+
   public isActive!: boolean; // Solo podran haber tres planes con este campo en true
   public position!: number; // Indica la posicion en que se mostrara el plan
   public saveInMp!: boolean; // Indica si se guarda en el plan de subscripcion en la api de mercadopago
@@ -114,8 +114,8 @@ Plan.init(
       allowNull: true,
       defaultValue: null,
       unique: {
-        name: 'uniquePosition',
-        msg: 'El valor de la posición debe ser único.',
+        name: "uniquePosition",
+        msg: "El valor de la posición debe ser único.",
       },
     },
     saveInMp: {
@@ -152,5 +152,6 @@ Plan.init(
     },
   }
 );
+
 
 export default Plan;

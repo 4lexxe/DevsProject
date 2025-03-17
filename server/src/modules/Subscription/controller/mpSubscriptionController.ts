@@ -112,70 +112,79 @@ class MPSubscriptionController {
     }
   };
 
-
-
-
-
-
   // Método para crear una suscripción en la base de datos
-static async createSubscriptionInDB(subscriptionData: any, subscriptionId: bigint) {
-  try {
-    const subscription = await MPSubscription.create({
-      id: subscriptionData.id,
-      subscriptionId: subscriptionId,
-      payerId: subscriptionData.payer_id,
-      status: subscriptionData.status,
-      dateCreated: subscriptionData.date_created,
-      nextPaymentDate: subscriptionData.next_payment_date,
-      initPoint: subscriptionData.init_point,
-      data: subscriptionData,
-    });
-    
-    return subscription;
-  } catch (error: unknown) {
-    console.error(`Error al crear suscripción ${subscriptionData.id}:`, error);
-    
-    if (error instanceof Error) {
-      throw new Error(`Error al crear suscripción: ${error.message}`);
-    } else {
-      throw new Error(`Error al crear suscripción: ${String(error)}`);
+  static async createSubscriptionInDB(
+    subscriptionData: any,
+    subscriptionId: bigint
+  ) {
+    try {
+      const subscription = await MPSubscription.create({
+        id: subscriptionData.id,
+        subscriptionId: subscriptionId,
+        payerId: subscriptionData.payer_id,
+        status: subscriptionData.status,
+        dateCreated: subscriptionData.date_created,
+        nextPaymentDate: subscriptionData.next_payment_date,
+        data: subscriptionData,
+      });
+
+      return subscription;
+    } catch (error: unknown) {
+      console.error(
+        `Error al crear suscripción ${subscriptionData.id}:`,
+        error
+      );
+
+      if (error instanceof Error) {
+        throw new Error(`Error al crear suscripción: ${error.message}`);
+      } else {
+        throw new Error(`Error al crear suscripción: ${String(error)}`);
+      }
     }
   }
-}
 
-// Método para actualizar una suscripción en la base de datos
-static async updateSubscriptionInDB(subscriptionData: any, subscriptionId: string) {
-  try {
-    // Buscar la suscripción existente
-    const subscription = await MPSubscription.findOne({
-      where: { id: subscriptionId }
-    });
+  // Método para actualizar una suscripción en la base de datos
+  static async updateSubscriptionInDB(
+    subscriptionData: any,
+    subscriptionId: string
+  ) {
+    try {
+      // Buscar la suscripción existente
+      const subscription = await MPSubscription.findOne({
+        where: { id: subscriptionId },
+      });
 
-    if (!subscription) {
-      console.error("No se encontró la suscripción para actualizar:", subscriptionId);
-      return null;
-    }
+      if (!subscription) {
+        console.error(
+          "No se encontró la suscripción para actualizar:",
+          subscriptionId
+        );
+        return null;
+      }
 
-    // Actualizar los campos
-    subscription.status = subscriptionData.status;
-    subscription.dateCreated = subscriptionData.date_created;
-    subscription.nextPaymentDate = subscriptionData.next_payment_date;
-    subscription.data = subscriptionData;
+      // Actualizar los campos
+      subscription.status = subscriptionData.status;
+      subscription.dateCreated = subscriptionData.date_created;
+      subscription.nextPaymentDate = subscriptionData.next_payment_date || ""; // Sacar esto cuando actualize la base de datos
+      subscription.data = subscriptionData;
 
-    // Guardar los cambios
-    await subscription.save();
+      // Guardar los cambios
+      await subscription.save();
 
-    return subscription;
-  } catch (error: unknown) {
-    console.error(`Error al actualizar suscripción ${subscriptionId}:`, error);
-    
-    if (error instanceof Error) {
-      throw new Error(`Error al actualizar suscripción: ${error.message}`);
-    } else {
-      throw new Error(`Error al actualizar suscripción: ${String(error)}`);
+      return subscription;
+    } catch (error: unknown) {
+      console.error(
+        `Error al actualizar suscripción ${subscriptionId}:`,
+        error
+      );
+
+      if (error instanceof Error) {
+        throw new Error(`Error al actualizar suscripción: ${error.message}`);
+      } else {
+        throw new Error(`Error al actualizar suscripción: ${String(error)}`);
+      }
     }
   }
-}
 }
 
 export default MPSubscriptionController;

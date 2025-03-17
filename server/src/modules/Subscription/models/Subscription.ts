@@ -1,6 +1,5 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-/* import Customer from "./Customer"; */
 import Plan from "./Plan";
 import User from "../../user/User";
 
@@ -8,10 +7,10 @@ class Subscription extends Model {
   public id!: bigint;
   public userId!: bigint;
   public planId!: bigint;
-  public paymentId!: string;
-  public startDate!: Date;
-  public endDate!: Date;
-  public status!: "active" | "inactive" | "cancelled";
+  public paymentId?: string;
+  public startDate?: Date;
+  public endDate?: Date;
+  public status!: "paused" | "authorized" | "cancelled" | "pending";
 }
 
 Subscription.init(
@@ -27,23 +26,23 @@ Subscription.init(
       allowNull: false,
       references: { model: "Plans", key: "id" },
     },
-    paymentId: { type: DataTypes.STRING, allowNull: false },
-    startDate: { type: DataTypes.DATE, allowNull: false },
-    endDate: { type: DataTypes.DATE, allowNull: false },
+    paymentId: { type: DataTypes.STRING, allowNull: true },
+    startDate: { type: DataTypes.DATE, allowNull: true },
+    endDate: { type: DataTypes.DATE, allowNull: true },
     status: {
-      type: DataTypes.ENUM("active", "inactive", "cancelled"),
+      type: DataTypes.ENUM("authorized", "paused", "cancelled", "pending"),
       allowNull: false,
     },
     
   },
-  { sequelize, tableName: "Subscriptions", timestamps: false }
+  { sequelize, tableName: "Subscriptions", timestamps: true, paranoid: true } 
 );
 
 // Relaciones
-Subscription.belongsTo(User, { foreignKey: "userId", as: "user" });
-User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
+Subscription.belongsTo(User, { foreignKey: "userId", as: "user"});
+User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions"});
 
-Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan" });
-Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
- 
+Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan"});
+Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions"});
+
 export default Subscription;

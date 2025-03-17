@@ -41,10 +41,11 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 // Rutas de Roadmap
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
-// Rutas para las membresias
-import mercadopagoRoutes from './modules/subscription/Routes/mercadopagoRoutes'
-import discountRoutes from './modules/subscription/Routes/discountRoutes'
-import planRoutes from './modules/subscription/Routes/planRoutes'
+// Rutas para las subscripciones
+import mercadopagoRoutes from './modules/subscription/routes/mercadopagoRoutes'
+import discountEventRoutes from './modules/subscription/routes/discountRoutes'
+import planRoutes from './modules/subscription/routes/planRoutes'
+import subscriptionRoutes from './modules/subscription/routes/subscriptionRoutes'
 
 // ==================================================
 // Importaciones de utilidades y configuraciones
@@ -213,8 +214,9 @@ app.use((req, res, next) => {
 
 // Rutas para las membresias
 app.use('/api', mercadopagoRoutes);
-app.use('/api', discountRoutes);
+app.use('/api', discountEventRoutes);
 app.use('/api', planRoutes);
+app.use('/api', subscriptionRoutes);
 
 // --------------------------
 // 7.1 Rutas de Autenticación

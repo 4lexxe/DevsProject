@@ -9,7 +9,8 @@ import Content from "../modules/content/Content";
 import HeaderSection from "../modules/headerSection/HeaderSection";
 
 import Plan from "../modules/subscription/models/Plan";
-import Discount from "../modules/subscription/models/Discount";
+import DiscountEvent from "../modules/subscription/models/DiscountEvent";
+
 
 // Carga las variables de entorno del archivo .env
 dotenv.config();
@@ -19,22 +20,21 @@ const plansToInsert = [
   {
     name: "Plan Básico",
     description: "Plan ideal para usuarios que recién comienzan",
-    totalPrice: 10000,
-    durationType: "meses",
+    totalPrice: 100,
+    durationType: "días",
     duration: 1, // Duración total del ciclo de pago en meses
     features: ["Acceso básico", "Soporte Básico", "Actualizaciones mensuales"],
     isActive: true,
     accessLevel: "Básico",
     installments: 1,
-    installmentPrice: 10000,
     position: 1,
-    saveInMp: false,
+    saveInMp: true,
   },
   {
     name: "Plan Estándar",
     description: "Plan para usuarios que necesitan más funcionalidades",
-    totalPrice: 10000,
-    durationType: "meses",
+    totalPrice: 150,
+    durationType: "días",
     duration: 1, // Duración total del ciclo de pago en meses
     features: [
       "Acceso completo",
@@ -44,16 +44,15 @@ const plansToInsert = [
     isActive: true,
     accessLevel: "Estándar",
     installments: 1,
-    installmentPrice: 10000,
     position: 2,
-    saveInMp: false,
+    saveInMp: true,
   },
   {
     name: "Plan Premium",
     description:
       "Plan para usuarios avanzados que requieren soporte prioritario",
-    totalPrice: 24000,
-    durationType: "meses",
+    totalPrice: 240,
+    durationType: "días",
     duration: 3, // Duración total del ciclo de pago en meses
     features: [
       "Acceso completo",
@@ -64,9 +63,9 @@ const plansToInsert = [
     isActive: true,
     accessLevel: "Premium",
     installments: 3,
-    installmentPrice: 8000,
+    installmentPrice: 80,
     position: 3,
-    saveInMp: false,
+    saveInMp: true,
   },
   {
     name: "Este plan se guarda En mercado pago con estado analitico",
@@ -82,20 +81,20 @@ const plansToInsert = [
     isActive: false,
     accessLevel: "Estándar",
     installments: 1,
-    saveInMp: true,
+    saveInMp: false,
   },
 ];
 
 // Datos para los descuentos de los planes
 const descuentos = [
   {
-    description: "Descuento especial para Navidad", // Descripción opcional
-    value: 25, // 25% de descuento
-    startDate: new Date("2023-12-20"), // Fecha de inicio
-    endDate: new Date("2023-12-31"), // Fecha de fin (posterior a startDate)
-    isActive: true, // Descuento activo
-    planId: 1, // ID del plan asociado (debe existir en la tabla Plans)
-    event: "Navidad 2023", // Evento obligatorio
+    description: "Descuento especial por pascuas",
+    value: 70,
+    startDate: new Date("2025-03-01"),
+    endDate: new Date("2025-04-30"),
+    isActive: true, 
+    event: "Pascuas 2025", 
+    planId: 3, 
   },
 ];
 
@@ -425,143 +424,6 @@ const curso1 = {
   ],
 };
 
-/* const curso2 = {
-  title: "Curso de React.js",
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png",
-  summary: "Aprende React.js desde cero.",
-  about:
-    "Este curso cubre los fundamentos y conceptos avanzados de React.js, incluyendo Hooks y Context API.",
-  careerTypeId: 2,
-  prerequesites: ["Conocimientos básicos de HTML, CSS y JavaScript"],
-  learningOutcomes: [
-    "Manejo de componentes",
-    "Uso de React Router",
-    "Gestión de estado con Redux",
-  ],
-  isActive: true,
-  isInDevelopment: false,
-  adminId: 1,
-  categoryIds: [1, 3],
-  sections: [
-    {
-      title: "Introducción a React",
-      description: "Esta sección introduce los fundamentos de React.",
-      courseId: 2,
-      coverImage: "https://example.com/cover2.jpg",
-      moduleType: "Introductorio",
-      contents: [
-        {
-          title: "¿Qué es React?",
-          text: "Video explicativo",
-          duration: 20,
-          position: 1,
-          sectionId: 2,
-        },
-        {
-          title: "Prueba de conocimientos básicos",
-          text: "Este cuestionario evalúa tus conocimientos básicos sobre HTML y CSS.",
-          quiz: [
-            {
-              question: "¿Qué significa HTML?",
-              answers: [
-                {
-                  answer: "Hyperlinks and Text Markup Language",
-                  isCorrect: false,
-                },
-                { answer: "Home Tool Markup Language", isCorrect: false },
-                { answer: "Hyper Text Markup Language", isCorrect: true },
-                { answer: "Hyper Text Machine Language", isCorrect: false },
-              ],
-            },
-            {
-              question:
-                "¿Cuál es la propiedad de CSS para cambiar el color del texto?",
-              answers: [
-                { answer: "text-color", isCorrect: false },
-                { answer: "font-color", isCorrect: false },
-                { answer: "color", isCorrect: true },
-                { answer: "background-color", isCorrect: false },
-              ],
-            },
-          ],
-          duration: 10,
-          position: 2,
-          sectionId: 2,
-        },
-      ],
-    },
-  ],
-};
-
-const curso3 = {
-  title: "Curso de Python",
-  image:
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png",
-  summary: "Aprende Python desde cero.",
-  about:
-    "Este curso cubre los fundamentos de Python, incluyendo estructuras de datos, funciones y programación orientada a objetos.",
-  careerTypeId: 3,
-  prerequesites: ["Ninguno, este curso es para principiantes."],
-  learningOutcomes: [
-    "Manejo de listas y diccionarios",
-    "Uso de funciones",
-    "Programación orientada a objetos",
-  ],
-  isActive: true,
-  isInDevelopment: false,
-  adminId: 1,
-  categoryIds: [1, 4],
-  sections: [
-    {
-      title: "Introducción a Python",
-      description: "Esta sección introduce los fundamentos de Python.",
-      courseId: 3,
-      coverImage: "https://example.com/cover3.jpg",
-      moduleType: "Intermedio",
-      contents: [
-        {
-          title: "¿Qué es Python?",
-          text: "Video explicativo",
-          duration: 25,
-          position: 1,
-          sectionId: 3,
-        },
-        {
-          title: "Prueba de conocimientos básicos",
-          text: "Este cuestionario evalúa tus conocimientos básicos sobre programación.",
-          quiz: [
-            {
-              question: "¿Qué es una variable?",
-              answers: [
-                { answer: "Un tipo de dato", isCorrect: false },
-                {
-                  answer: "Un contenedor para almacenar datos",
-                  isCorrect: true,
-                },
-                { answer: "Una función", isCorrect: false },
-                { answer: "Un bucle", isCorrect: false },
-              ],
-            },
-            {
-              question: "¿Qué hace la función print() en Python?",
-              answers: [
-                { answer: "Lee datos de entrada", isCorrect: false },
-                { answer: "Imprime datos en la consola", isCorrect: true },
-                { answer: "Crea una lista", isCorrect: false },
-                { answer: "Define una función", isCorrect: false },
-              ],
-            },
-          ],
-          duration: 15,
-          position: 2,
-          sectionId: 3,
-        },
-      ],
-    },
-  ],
-}; */
-
 // Datos de ejemplo para secciones con encabezado
 const seccionesConEncabezado = [
   {
@@ -631,8 +493,10 @@ async function insertData() {
     for (const plan of plansToInsert) {
       await Plan.create(plan);
     }
+
+    // Insertar descuentos y relaciones con planes
     for (const descuento of descuentos) {
-      await Discount.create(descuento);
+      await DiscountEvent.create(descuento);
     }
 
     //Insertar categorias y carreras

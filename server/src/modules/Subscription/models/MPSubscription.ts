@@ -34,28 +34,21 @@ MPSubscription.init(
     },
     payerId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       comment: "ID del pagador",
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: false,
-      comment: "Estado de la suscripción (ej: pending, active)",
+      allowNull: true,
     },
     dateCreated: {
       type: DataTypes.DATE,
-      allowNull: false,
-      comment: "Fecha de creación de la suscripción",
+      allowNull: true,
     },
     nextPaymentDate: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
       comment: "Fecha del próximo pago",
-    },
-    initPoint: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      comment: "Url al checkout de mercado pago",
     },
     data: {
       type: DataTypes.JSONB,
@@ -68,17 +61,20 @@ MPSubscription.init(
     modelName: "MPSubscription",
     tableName: "MPSubscriptions", // Nombre de la tabla en la base de datos
     timestamps: true, // Habilita los timestamps (createdAt, updatedAt)
+    paranoid: true, // Habilita el soft
   }
 );
 
 MPSubscription.belongsTo(Subscription, {
   foreignKey: "subscriptionId",
   as: "subscription",
+  onDelete: "CASCADE",
 });
 
 Subscription.hasOne(MPSubscription, {
   foreignKey: "subscriptionId",
   as: "mpSubscription",
+  onDelete: "CASCADE",
 });
 
 export default MPSubscription;

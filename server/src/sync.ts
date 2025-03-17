@@ -21,7 +21,7 @@ import Section from "./modules/section/Section";
 import Content from "./modules/content/Content";
 
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
-import Discount from "./modules/subscription/models/Discount";
+import DiscountEvent from "./modules/subscription/models/DiscountEvent";
 import Invoice from "./modules/subscription/models/Invoice";
 import Subscription from "./modules/subscription/models/Subscription";
 import MPSubscription from "./modules/subscription/models/MPSubscription";
@@ -69,7 +69,7 @@ async function syncDatabase() {
     // Area de pagos
     await WebhookEvent.sync({ force: true })
     await Plan.sync({ force: true });
-    await Discount.sync({ force: true });
+    await DiscountEvent.sync({ force: true });
     await Subscription.sync({ force: true }); 
     await MPSubscription.sync({ force: true });
     await MPSubPlan.sync({ force: true });

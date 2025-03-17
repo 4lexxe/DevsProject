@@ -1,9 +1,10 @@
 import { Request, Response, RequestHandler } from "express";
-import { validationResult } from "express-validator";
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
 import Subscription from "../models/Subscription";
 import Plan from "../models/Plan";
 import User from "../../user/User";
+import MPSubPlan from "../models/MPSubPlan";
+import MPSubscription from "../models/MPSubscription";
 
 interface SubscriptionData {
   userId: bigint;
@@ -11,7 +12,7 @@ interface SubscriptionData {
   paymentId: string;
   startDate: Date;
   endDate: Date;
-  status: 'active' | 'inactive' | 'cancelled';
+  status: string;
 }
 
 class SubscriptionController {
@@ -22,21 +23,6 @@ class SubscriptionController {
       url: req.protocol + "://" + req.get("host") + req.originalUrl,
       method: req.method,
     };
-  }
-
-  // Función para manejar errores de validación
-  private static handleValidationErrors(req: Request, res: Response): boolean {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({
-        ...this.metadata(req, res),
-        status: "error",
-        message: "Error de validaciones",
-        errors: errors.array(),
-      });
-      return false; // Indica que hay errores
-    }
-    return true; // Indica que no hay errores
   }
 
   // Función para manejar errores internos del servidor
@@ -56,95 +42,68 @@ class SubscriptionController {
   }
 
   /**
-   * Crear una nueva suscripción en la base de datos
-   * @param data Datos de la suscripción a crear
-   * @returns La suscripción creada o null si hubo un error
+   * Updates a subscription by id or planId
+   * @param identifier - Object containing either id or planId
+   * @param data - The subscription data to update
+   * @returns The updated subscription or null if not found
    */
-  static async createSubscription(data: SubscriptionData): Promise<Subscription | null> {
+  static async updateSubscription(
+    identifier: { id?: bigint; planId?: bigint },
+    data: Partial<SubscriptionData>
+  ): Promise<Subscription | null> {
     try {
-      // Validar que exista el plan
-      const plan = await Plan.findByPk(data.planId);
-      if (!plan) {
-        throw new Error(`El plan con ID ${data.planId} no existe`);
-      }
-
-      // Validar que exista el usuario
-      const user = await User.findByPk(data.userId);
-      if (!user) {
-        throw new Error(`El usuario con ID ${data.userId} no existe`);
-      }
-
-      // Crear la suscripción
-      const subscription = await Subscription.create({
-        userId: data.userId,
-        planId: data.planId,
-        paymentId: data.paymentId,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        status: data.status,
-      });
-
-      console.log(`Suscripción creada exitosamente: ID ${subscription.id}`);
-      return subscription;
-    } catch (error) {
-      console.error("Error al crear la suscripción:", error);
-      if (error instanceof Error) {
-        throw new Error(`Error al crear suscripción: ${error.message}`);
-      }
-      throw new Error(`Error desconocido al crear suscripción`);
-    }
-  }
-
-  /**
-   * Actualizar una suscripción existente
-   * @param id ID de la suscripción a actualizar
-   * @param data Datos actualizados
-   * @returns La suscripción actualizada o null si no se encontró
-   */
-  static async updateSubscription(id: bigint, data: Partial<SubscriptionData>): Promise<Subscription | null> {
-    try {
-      // Buscar la suscripción
-      const subscription = await Subscription.findByPk(id);
+      // Find the subscription by id or planId
+      const subscription = await this.findSubscriptionByIdentifier(identifier);
       if (!subscription) {
-        console.error(`No se encontró la suscripción con ID: ${id}`);
         return null;
       }
 
-      // Validar que exista el plan si se está actualizando
-      if (data.planId) {
-        const plan = await Plan.findByPk(data.planId);
-        if (!plan) {
-          throw new Error(`El plan con ID ${data.planId} no existe`);
-        }
-      }
-
-      // Validar que exista el usuario si se está actualizando
-      if (data.userId) {
-        const user = await User.findByPk(data.userId);
-        if (!user) {
-          throw new Error(`El usuario con ID ${data.userId} no existe`);
-        }
-      }
-
-      // Actualizar la suscripción
+      // Update the subscription
       await subscription.update(data);
 
-      console.log(`Suscripción actualizada exitosamente: ID ${id}`);
+      console.log(`Subscription updated successfully: ID ${subscription.id}`);
       return subscription;
     } catch (error) {
-      console.error(`Error al actualizar la suscripción ${id}:`, error);
+      const id = identifier.id || identifier.planId;
+      console.error(`Error updating subscription ${id}:`, error);
       if (error instanceof Error) {
-        throw new Error(`Error al actualizar suscripción: ${error.message}`);
+        throw new Error(`Error updating subscription: ${error.message}`);
       }
-      throw new Error(`Error desconocido al actualizar suscripción`);
+      throw new Error(`Unknown error updating subscription`);
     }
   }
 
   /**
-   * Cancelar una suscripción
-   * @param id ID de la suscripción a cancelar
-   * @returns La suscripción cancelada o null si no se encontró
+   * Helper method to find a subscription by id or planId
    */
+  private static async findSubscriptionByIdentifier(identifier: {
+    id?: bigint;
+    planId?: bigint;
+  }): Promise<Subscription | null> {
+    const { id, planId } = identifier;
+
+    if (!id && !planId) {
+      console.error("No identifier provided to find subscription");
+      return null;
+    }
+
+    let subscription: Subscription | null = null;
+
+    if (id) {
+      subscription = await Subscription.findByPk(id);
+      if (!subscription) {
+        console.error(`Subscription with ID: ${id} not found`);
+      }
+    } else if (planId) {
+      subscription = await Subscription.findOne({ where: { planId } });
+      if (!subscription) {
+        console.error(`Subscription with planId: ${planId} not found`);
+      }
+    }
+
+    return subscription;
+  }
+
   static async cancelSubscription(id: number): Promise<Subscription | null> {
     try {
       const subscription = await Subscription.findByPk(id);
@@ -153,8 +112,8 @@ class SubscriptionController {
         return null;
       }
 
-      await subscription.update({ status: 'cancelled' });
-      
+      await subscription.update({ status: "cancelled" });
+
       console.log(`Suscripción cancelada exitosamente: ID ${id}`);
       return subscription;
     } catch (error) {
@@ -166,108 +125,35 @@ class SubscriptionController {
     }
   }
 
-  // Obtener todas las suscripciones
-  static getAll: RequestHandler = async (req, res) => {
-    try {
-      const {
-        userId,
-        planId,
-        status,
-        startDateFrom,
-        startDateTo,
-        endDateFrom,
-        endDateTo,
-        page = 1,
-        limit = 10,
-        sortBy = "startDate",
-        sortOrder = "DESC",
-      } = req.query;
+  static getData: RequestHandler = async (req, res) => {
+    const userId = (req.session as any).passport?.user?.id;
 
-      // Preparar las opciones de consulta
-      const queryOptions: any = {
-        include: [
-          { model: Plan },
-          { model: User },
-        ],
-        order: [[sortBy as string, sortOrder as string]],
-        limit: Number(limit),
-        offset: (Number(page) - 1) * Number(limit),
-      };
-
-      // Construir filtros
-      const whereClause: any = {};
-
-      if (userId) {
-        whereClause.userId = userId;
-      }
-
-      if (planId) {
-        whereClause.planId = planId;
-      }
-
-      if (status) {
-        whereClause.status = status;
-      }
-
-      // Filtro por fecha de inicio
-      if (startDateFrom || startDateTo) {
-        whereClause.startDate = {};
-        if (startDateFrom) {
-          whereClause.startDate[Op.gte] = new Date(startDateFrom as string);
-        }
-        if (startDateTo) {
-          whereClause.startDate[Op.lte] = new Date(startDateTo as string);
-        }
-      }
-
-      // Filtro por fecha de fin
-      if (endDateFrom || endDateTo) {
-        whereClause.endDate = {};
-        if (endDateFrom) {
-          whereClause.endDate[Op.gte] = new Date(endDateFrom as string);
-        }
-        if (endDateTo) {
-          whereClause.endDate[Op.lte] = new Date(endDateTo as string);
-        }
-      }
-
-      // Si hay filtros, agregarlos a la consulta
-      if (Object.keys(whereClause).length > 0) {
-        queryOptions.where = whereClause;
-      }
-
-      // Ejecutar la consulta
-      const { count, rows } = await Subscription.findAndCountAll(queryOptions);
-
-      // Calcular información de paginación
-      const totalPages = Math.ceil(count / Number(limit));
-
-      res.status(200).json({
-        status: "success",
-        message: "Suscripciones obtenidas exitosamente",
-        data: rows,
-        pagination: {
-          total: count,
-          page: Number(page),
-          limit: Number(limit),
-          totalPages,
-          hasNext: Number(page) < totalPages,
-          hasPrev: Number(page) > 1,
-        },
+    if(!userId) {
+      res.status(401).json({
+        status: "error",
+        message: "Usuario no autenticado",
         metadata: this.metadata(req, res),
       });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al obtener las suscripciones");
     }
-  };
 
-  // Obtener una suscripción por ID
-  static getById: RequestHandler = async (req, res) => {
     try {
-      const subscription = await Subscription.findByPk(req.params.id, {
+      const subscription = await Subscription.findOne({
+        where: {
+          userId: userId,
+        },
+        order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan },
-          { model: User },
+          { model: Plan, as: "plan", attributes: ["name"] },
+          { model: User, as: "user", attributes: ["name", "email"] },
+          { 
+            model: MPSubscription, 
+            as: "mpSubscription", 
+            attributes: [
+              "nextPaymentDate",
+              [literal("data->'auto_recurring'->>'transaction_amount'"), "transactionAmount"]
+              
+            ] 
+          }
         ],
       });
 
@@ -287,43 +173,36 @@ class SubscriptionController {
         metadata: this.metadata(req, res),
       });
     } catch (error) {
-      this.handleServerError(res, req, error, "Error al obtener la suscripción");
+      this.handleServerError(
+        res,
+        req,
+        error,
+        "Error al obtener la suscripción"
+      );
     }
-  };
+  }
 
-  // Obtener suscripciones por ID de usuario
-  static getByUserId: RequestHandler = async (req, res) => {
+
+  // Obtener una suscripción por ID
+  static getById: RequestHandler = async (req, res) => {
     try {
-      const { page = 1, limit = 10 } = req.query;
-      const userId = req.params.userId;
-
-      const { count, rows } = await Subscription.findAndCountAll({
-        where: {
-          userId: userId,
-        },
-        include: [
-          { model: Plan },
-        ],
-        limit: Number(limit),
-        offset: (Number(page) - 1) * Number(limit),
-        order: [["startDate", "DESC"]],
+      const subscription = await Subscription.findByPk(req.params.id, {
+        include: [{ model: Plan, as:"plan" }, { model:MPSubscription, as:"mpSubscription" }],
       });
 
-      // Calcular información de paginación
-      const totalPages = Math.ceil(count / Number(limit));
+      if (!subscription) {
+        res.status(404).json({
+          status: "error",
+          message: "Suscripción no encontrada",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
 
       res.status(200).json({
         status: "success",
-        message: "Suscripciones del usuario obtenidas exitosamente",
-        data: rows,
-        pagination: {
-          total: count,
-          page: Number(page),
-          limit: Number(limit),
-          totalPages,
-          hasNext: Number(page) < totalPages,
-          hasPrev: Number(page) > 1,
-        },
+        message: "Suscripción obtenida exitosamente",
+        data: subscription,
         metadata: this.metadata(req, res),
       });
     } catch (error) {
@@ -331,83 +210,99 @@ class SubscriptionController {
         res,
         req,
         error,
-        "Error al obtener las suscripciones del usuario"
+        "Error al obtener la suscripción"
       );
     }
   };
 
   // Crear una suscripción (endpoint HTTP)
-  /* static create: RequestHandler = async (req, res) => {
-    if (!this.handleValidationErrors(req, res)) return;
-
+  static create: RequestHandler = async (req, res) => {
     try {
-      const subscription = await this.createSubscription(req.body);
+      // Check if user session exists
+
+      const userId = (req.session as any).passport?.user?.id;
+      
+      if (!userId) {
+        console.error("No user session found.");
+        res.status(401).json({
+          status: "error",
+          message: "Usuario no autenticado",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      // Validar que exista el plan
+      const plan = await Plan.findByPk(req.body.planId, {
+        include: [{ model: MPSubPlan, as: "mpSubPlan" }],
+      });
+      if (!plan) {
+        throw new Error(`El plan con ID ${req.body.planId} no existe`);
+      }
+
+      // Validar que el usuario no tenga una suscripcion al plan
+      const existingSubscription = await Subscription.findOne({
+        where: {
+          userId: BigInt(userId),
+          planId: BigInt(req.body.planId),
+        },
+      });
+
+      let subscription;
+      if (existingSubscription) {
+        switch (existingSubscription.status) {
+          case "authorized":
+             res.status(400).json({
+              status: "error",
+              message: "Ya tienes una suscripcion activa a este plan",
+              metadata: this.metadata(req, res),
+            });
+            return;
+          case "cancelled":
+            await existingSubscription.destroy();
+            subscription = await Subscription.create({
+              userId: BigInt(userId),
+              planId: BigInt(req.body.planId),
+              status: "pending",
+            });
+            break;
+          case "pending":
+          case "paused":
+            subscription = existingSubscription;
+            break;
+          default:
+            res.status(400).json({
+              status: "error",
+              message: "Estado de suscripción no válido",
+              metadata: this.metadata(req, res),
+            });
+            return;
+        }
+      } else {
+        subscription = await Subscription.create({
+          userId: BigInt(userId),
+          planId: BigInt(req.body.planId),
+          status: "pending",
+        });
+      }
 
       res.status(201).json({
         status: "success",
         message: "Suscripción creada exitosamente",
-        data: subscription,
+        data: { initPoint: plan.mpSubPlan?.initPoint || "" },
         metadata: this.metadata(req, res),
       });
     } catch (error) {
-      this.handleServerError(res, req, error, "Error al crear la suscripción");
+      console.error("Error al crear la suscripción:", error);
+      if (error instanceof Error) {
+        this.handleServerError(res, req, error, `Error al crear suscripción: ${error.message}`);
+      } else {
+        this.handleServerError(res, req, error, `Error desconocido al crear suscripción`);
+      }
     }
   };
 
-  // Actualizar una suscripción (endpoint HTTP)
-  static update: RequestHandler = async (req, res) => {
-    if (!this.handleValidationErrors(req, res)) return;
-
-    try {
-      const subscription = await this.updateSubscription(
-        parseInt(req.params.id),
-        req.body
-      );
-
-      if (!subscription) {
-        res.status(404).json({
-          status: "error",
-          message: "Suscripción no encontrada",
-          metadata: this.metadata(req, res),
-        });
-        return;
-      }
-
-      res.status(200).json({
-        status: "success",
-        message: "Suscripción actualizada exitosamente",
-        data: subscription,
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al actualizar la suscripción");
-    }
-  };
-
-  // Cancelar una suscripción (endpoint HTTP)
-  static cancel: RequestHandler = async (req, res) => {
-    try {
-      const subscription = await this.cancelSubscription(parseInt(req.params.id));
-
-      if (!subscription) {
-        res.status(404).json({
-          status: "error",
-          message: "Suscripción no encontrada",
-          metadata: this.metadata(req, res),
-        });
-        return;
-      }
-
-      res.status(200).json({
-        status: "success",
-        message: "Suscripción cancelada exitosamente",
-        data: subscription,
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al cancelar la suscripción");
-    }
-  }; */
+ 
 }
 
 export default SubscriptionController;

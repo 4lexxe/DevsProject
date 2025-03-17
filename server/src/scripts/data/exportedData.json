@@ -1,0 +1,289 @@
+{
+  "mpSubPlans": [
+    {
+      "id": "2c9380849564460a01958de0f25614a5",
+      "planId": "1",
+      "reason": "Este plan se guarda En mercado pago con estado anatlitico",
+      "status": "active",
+      "initPoint": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849564460a01958de0f25614a5",
+      "autoRecurring": {
+        "frequency": 1,
+        "currency_id": "ARS",
+        "repetitions": 1,
+        "frequency_type": "days",
+        "transaction_amount": 50
+      },
+      "data": {
+        "id": "2c9380849564460a01958de0f25614a5",
+        "reason": "Este plan se guarda En mercado pago con estado anatlitico",
+        "status": "active",
+        "back_url": "https://jjg61vx9-5173.brs.devtunnels.ms/",
+        "init_point": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849564460a01958de0f25614a5",
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Sat, 15 Mar 2025 16:38:10 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json"
+            ],
+            "x-request-id": [
+              "11a74c1f-5c86-4dbd-9a7f-4bc842242736"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "collector_id": 1018964232,
+        "date_created": "2025-03-13T01:01:24.438-04:00",
+        "last_modified": "2025-03-15T12:38:10.939-04:00",
+        "application_id": 513071619587474,
+        "auto_recurring": {
+          "frequency": 1,
+          "currency_id": "ARS",
+          "repetitions": 1,
+          "frequency_type": "days",
+          "transaction_amount": 100
+        },
+        "payment_methods_allowed": {
+          "payment_types": [
+            {
+              "id": "debit_card"
+            },
+            {
+              "id": "prepaid_card"
+            },
+            {
+              "id": "account_money"
+            }
+          ]
+        }
+      },
+      "createdAt": "2025-03-13T05:01:25.566Z",
+      "updatedAt": "2025-03-15T16:38:12.194Z"
+    },
+    {
+      "id": "2c9380849559fa3601955d183e7b0147",
+      "planId": "2",
+      "reason": "Plan Estándar",
+      "status": "active",
+      "initPoint": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849559fa3601955d183e7b0147",
+      "autoRecurring": {
+        "frequency": 7,
+        "currency_id": "ARS",
+        "frequency_type": "days",
+        "transaction_amount": 100
+      },
+      "data": {
+        "id": "2c9380849559fa3601955d183e7b0147",
+        "reason": "Plan Estándar",
+        "status": "active",
+        "back_url": "https://jjg61vx9-5173.brs.devtunnels.ms/",
+        "init_point": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849559fa3601955d183e7b0147",
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Sat, 15 Mar 2025 16:39:45 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json"
+            ],
+            "x-request-id": [
+              "07b2d521-24b0-45f5-a80f-71bc4bc626b1"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "collector_id": 1018964232,
+        "date_created": "2025-03-03T13:40:24.828-04:00",
+        "last_modified": "2025-03-15T12:39:45.401-04:00",
+        "application_id": 3909856389923111,
+        "auto_recurring": {
+          "frequency": 1,
+          "currency_id": "ARS",
+          "repetitions": 1,
+          "frequency_type": "months",
+          "transaction_amount": 10000
+        },
+        "external_reference": "",
+        "payment_methods_allowed": {
+          "payment_types": [
+            {
+              "id": "debit_card"
+            },
+            {
+              "id": "prepaid_card"
+            },
+            {
+              "id": "account_money"
+            }
+          ]
+        }
+      },
+      "createdAt": "2025-03-15T04:20:52.208Z",
+      "updatedAt": "2025-03-15T16:39:46.647Z"
+    },
+    {
+      "id": "2c9380849563a16501959aaef99619b5",
+      "planId": "3",
+      "reason": "Plan Premium",
+      "status": "active",
+      "initPoint": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849563a16501959aaef99619b5",
+      "autoRecurring": {
+        "frequency": 1,
+        "currency_id": "ARS",
+        "repetitions": 3,
+        "frequency_type": "months",
+        "transaction_amount": 8000
+      },
+      "data": {
+        "id": "2c9380849563a16501959aaef99619b5",
+        "reason": "Plan Premium",
+        "status": "active",
+        "back_url": "https://jjg61vx9-5173.brs.devtunnels.ms/",
+        "init_point": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_plan_id=2c9380849563a16501959aaef99619b5",
+        "api_response": {
+          "status": 201,
+          "headers": {
+            "date": [
+              "Sat, 15 Mar 2025 16:41:53 GMT"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json"
+            ],
+            "x-request-id": [
+              "17d8dbc6-eb43-4f44-94f0-08f3f40c1005"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "collector_id": 1018964232,
+        "date_created": "2025-03-15T12:41:53.302-04:00",
+        "last_modified": "2025-03-15T12:41:53.302-04:00",
+        "application_id": 513071619587474,
+        "auto_recurring": {
+          "frequency": 1,
+          "currency_id": "ARS",
+          "repetitions": 3,
+          "frequency_type": "months",
+          "transaction_amount": 8000
+        },
+        "payment_methods_allowed": {
+          "payment_types": [
+            {
+              "id": "debit_card"
+            },
+            {
+              "id": "prepaid_card"
+            },
+            {
+              "id": "account_money"
+            }
+          ]
+        }
+      },
+      "createdAt": "2025-03-15T16:41:54.547Z",
+      "updatedAt": "2025-03-15T16:41:54.547Z"
+    }
+  ]
+}
