@@ -36,6 +36,7 @@ import NotFound from "./shared/components/NotFound";
 //Importación de las rutas del foro
 import EditorPost from "./forum/components/EditorPost";
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

@@ -10,10 +10,13 @@ const router = Router();
 // Rutas públicas
 router.get('/posts', ForumPostController.getPosts);
 router.get('/posts/popular', ForumPostController.getPopularPosts);
-router.get('/posts/:id', ForumPostController.getPostDetail);
 
 // Ruta para filtros avanzados
 router.get('/posts/filter', ForumPostController.getFilteredPosts);
+
+// Ruta para detalles de un post - formato normal y formato SEO-friendly
+//router.get('/posts/:id', ForumPostController.getPostDetail);
+router.get('/posts/:id/:slug?', ForumPostController.getPostDetail); // Nueva ruta SEO-friendly
 
 // Ruta para crear post - ahora acepta un parámetro type en la query para preseleccionar el tipo de contenido
 router.post('/posts',

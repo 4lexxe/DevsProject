@@ -15,6 +15,8 @@ import ForumReactionReply from './ForumReactionReply';
 import ForumVoteReply, { VoteType as ReplyVoteType } from './ForumVoteReply';
 import User from "../../user/User";
 import { initForumRelations } from './initRelations';
+import PostFlair from './PostFlair';
+import UserFlair from './UserFlair';
 
 // Crear un objeto con todos los modelos
 const models = {
@@ -28,6 +30,8 @@ const models = {
   ForumReactionReply,
   ForumVoteReply,
   User,
+  PostFlair,
+  UserFlair,
 };
 
 
@@ -52,6 +56,8 @@ export {
   ReplyVoteType,
   predefinedFlairs,
   predefinedCategories,
+  PostFlair,
+  UserFlair,
 };
 
 /**

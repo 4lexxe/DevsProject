@@ -4,15 +4,17 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ForumPostService, { ContentType, ForumPost } from '../services/forumPost.service';
 import ForumCategoryService from '../services/forumCategory.service';
+import ForumFlairService, { ForumFlair, FlairType } from '../services/forumFlair.service'; // Adjust the import path as necessary
 // Importar validaciones desde el archivo separado
 import { postSchema, FormValues, ErrorRecord } from '../validators/postValidators';
 // Importar el componente personalizado MDXEditor
-import MDXEditorComponent from './MDXeditor';
+import MDXEditorComponent from './MDXeditor'; 
 // Importar iconos de Heroicons
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { GrSend } from "react-icons/gr";
 import { BsExclamationCircle } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
+import FlairTag from './FlairTag';
 
 interface Category {
   id: number;
@@ -36,6 +38,9 @@ const EditorPost: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+
+  // Estado para los flairs disponibles
+  const [flairs, setFlairs] = useState<ForumFlair[]>([]);
   
   // Estado para la vista previa
   const [linkPreview, setLinkPreview] = useState<string>('');
@@ -50,6 +55,7 @@ const EditorPost: React.FC = () => {
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors, isSubmitting }
   } = useForm<FormValues>({
     resolver: zodResolver(postSchema),
@@ -60,6 +66,7 @@ const EditorPost: React.FC = () => {
       categoryId: categories.length > 0 ? categories[0].id : 0,
       isNSFW: false,
       isSpoiler: false,
+      flairId: undefined,       
       contentType: contentType as ContentType,
       ...(contentType === ContentType.LINK ? { linkUrl: '' } : {}),
       ...(contentType === ContentType.IMAGE ? { imageUrl: '' } : {})
@@ -119,7 +126,22 @@ const EditorPost: React.FC = () => {
     
     loadCategories();
   }, [setValue]);
-  
+
+  // Cargar flairs al montar el componente
+  useEffect(() => {
+    const loadFlairs = async () => {
+      try {
+        const flairsData = await ForumFlairService.getFlairsByType(FlairType.POST);
+        setFlairs(flairsData);
+      } catch (error) {
+        console.error('Error al cargar flairs:', error);
+        setGeneralError('No se pudieron cargar los flairs. Por favor, inténtalo más tarde.');
+      }
+    };
+    
+    loadFlairs();
+  },[]);
+
   // Filtrar categorías cuando cambia el término de búsqueda
   useEffect(() => {
     if (searchTerm) {
@@ -197,6 +219,9 @@ const EditorPost: React.FC = () => {
       }
       
       const newPost = await ForumPostService.createPost(postData, data.contentType);
+      if (data.flairId) {
+        await ForumFlairService.assignFlairToPost(newPost.id, data.flairId);
+      }
       navigate(`/forum/posts/${newPost.id}`);
     } catch (err) {
       console.error('Error al crear la publicación:', err);
@@ -448,30 +473,17 @@ const EditorPost: React.FC = () => {
             </p>
           )}
         </div>
-  
         <div className="space-y-3">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="nsfw"
-              {...register('isNSFW')}
-              className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-            />
-            <label htmlFor="nsfw" className="ml-3 text-sm text-gray-700">
-              NSFW (Contenido sensible)
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="spoiler"
-              {...register('isSpoiler')}
-              className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-            />
-            <label htmlFor="spoiler" className="ml-3 text-sm text-gray-700">
-              Contiene spoilers
-            </label>
-          </div>
+        <FlairTag
+  selectedFlairId={watch('flairId')}
+  onFlairSelect={(flairId) => setValue('flairId', flairId ?? undefined)}
+  isNSFW={watch('isNSFW')}
+  onNSFWChange={(value) => setValue('isNSFW', value)}
+  isSpoiler={watch('isSpoiler')}
+  onSpoilerChange={(value) => setValue('isSpoiler', value)}
+  flairs={flairs}
+/>
+
         </div>
   
         <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">

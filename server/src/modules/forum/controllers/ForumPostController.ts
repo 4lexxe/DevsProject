@@ -25,7 +25,7 @@ export class ForumPostController {
               return;
             }
 
-            const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType: bodyContentType, linkUrl } = req.body;
+            const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType: bodyContentType } = req.body;
             const userId = (req.user as User)?.id;
             
             // Verificar si hay un parámetro 'type' en la query (estilo Reddit)
@@ -51,20 +51,10 @@ export class ForumPostController {
                 contentType = ContentType.TEXT;
             }
 
-            // Validar que el linkUrl esté presente para posts de tipo LINK
-            if (contentType === ContentType.LINK && !linkUrl) {
-                res.status(400).json({ 
-                    success: false, 
-                    message: 'URL is required for LINK type posts' 
-                });
-                return;
-            }
-
             const post = await ForumPost.create({
                 title,
                 content,
                 contentType,
-                linkUrl: contentType === ContentType.LINK ? linkUrl : null,
                 categoryId,
                 authorId: userId,
                 status: PostStatus.PUBLISHED,
@@ -143,7 +133,7 @@ export class ForumPostController {
      */
     static async getPostDetail(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const { id, slug } = req.params;
             const post = await ForumPost.findByPk(id, {
                 include: [
                     { model: User, as: 'author', attributes: ['id', 'username', 'avatar'] },
@@ -163,6 +153,12 @@ export class ForumPostController {
             if (!post) {
                 res.status(404).json({ success: false, message: 'Post not found' });
                 return;
+            }
+
+            // Verificar si la URL utiliza el slug correcto (para SEO)
+            if (req.params.slug !== post.slug) {
+                // Redirigir a la URL correcta con código 301 (redirección permanente)
+                return res.redirect(301, post.getUrl());
             }
 
             await post.increment('viewCount');
@@ -293,7 +289,7 @@ static async updatePost(req: Request, res: Response): Promise<void> {
         }
 
         const { id } = req.params;
-        const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType, linkUrl, isPinned, isLocked, isAnnouncement } = req.body;
+        const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType, isPinned, isLocked, isAnnouncement } = req.body;
         const userId = (req.user as User)?.id;
 
         const post = await ForumPost.findByPk(id);
@@ -317,15 +313,6 @@ static async updatePost(req: Request, res: Response): Promise<void> {
             return;
         }
 
-        // Validar que el linkUrl esté presente para posts de tipo LINK
-        if (contentType === ContentType.LINK && !linkUrl) {
-            res.status(400).json({ 
-                success: false, 
-                message: 'URL is required for LINK type posts' 
-            });
-            return;
-        }
-
         // Actualizar solo los campos proporcionados
         await post.update({
           title,
@@ -335,7 +322,6 @@ static async updatePost(req: Request, res: Response): Promise<void> {
           isSpoiler,
           coverImage,
           contentType: contentType || post.contentType,
-          linkUrl: contentType === ContentType.LINK ? linkUrl : null,
           isLocked,
           isPinned,
           isAnnouncement,

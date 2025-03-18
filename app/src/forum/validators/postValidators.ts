@@ -3,6 +3,7 @@ import { ContentType } from '../services/forumPost.service';
 
 // Esquema base para todos los posts
 export const basePostSchema = z.object({
+  flairId: z.number().optional(),
   title: z.string().min(3, { message: 'El título debe tener al menos 3 caracteres' }).max(100, { message: 'El título debe tener máximo 100 caracteres' }),
   content: z.string().min(10, { message: 'El contenido debe tener al menos 10 caracteres' }),
   categoryId: z.number({ required_error: 'La categoría es obligatoria' }),

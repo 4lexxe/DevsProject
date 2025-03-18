@@ -12,6 +12,10 @@ router.post('/flairs', authMiddleware, ForumFlairController.createFlair);
 router.put('/flairs/:id', authMiddleware, ForumFlairController.updateFlair);
 router.delete('/flairs/:id', authMiddleware, ForumFlairController.deleteFlair);
 
+// Nuevas rutas para obtener usuarios/posts por flair
+router.get('/flairs/:flairId/users', ForumFlairController.getUsersByFlair);
+router.get('/flairs/:flairId/posts', ForumFlairController.getPostsByFlair);
+
 // Rutas de flairs para usuarios
 router.get('/users/:userId/flairs', ForumFlairController.getUserFlairs);
 router.post(

@@ -20,7 +20,7 @@ interface ForumPostAttributes {
   title: string;
   content: string; // Movido desde ForumPost
   contentType: ContentType; // Tipo de contenido: texto, imagen o enlace
-  slug: string; // URL para posts de tipo LINK
+  slug?: string; // URL para posts de tipo LINK
   categoryId: number;
   authorId: number;
   status: PostStatus; // Movido desde ForumPost
@@ -60,7 +60,7 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes>
   // Atributos del Post (integrados)
   public content!: string;
   public contentType!: ContentType;
-  public slug!: string;
+  public slug?: string;
   public status!: PostStatus;
   public isNSFW!: boolean;
   public isSpoiler!: boolean;
@@ -73,6 +73,11 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes>
   // Timestamps
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // Generar una URL amigable
+  public getUrl(): string {
+    return `/posts/${this.id}/${this.slug}`;
+  }
 }
 
 ForumPost.init(
@@ -191,13 +196,15 @@ ForumPost.init(
     hooks: {
       beforeValidate: (post: ForumPost) => {
         // Generar el slug a partir del título
-        post.slug = slugify(post.title, {
+        let slug = slugify(post.title, {
+          replacement: '-',  // replace spaces with replacement character, defaults to `-`
           lower: true,      // convertir a minúsculas
           strict: true,     // eliminar caracteres especiales
           trim: true,       // eliminar espacios al inicio y final
           locale: 'es',     // para manejar caracteres españoles
-          limit: 100        // limitar longitud
         });
+        // Limitar la longitud después
+        post.slug = slug.substring(0, 100);
       },
       afterCreate: async (post: ForumPost) => {
         // Lógica para notificaciones o actualizaciones adicionales

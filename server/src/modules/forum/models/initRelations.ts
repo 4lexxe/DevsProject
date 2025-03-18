@@ -11,6 +11,8 @@ export function initForumRelations(models: any): void {
         ForumReactionPost,
         ForumReactionReply,
         ForumFlair,
+        PostFlair,
+        UserFlair,
     } = models;
 
     // 1. Relaciones de Categorías
@@ -117,9 +119,9 @@ export function initForumRelations(models: any): void {
     });
 
     // 7. Relaciones de Flairs (Etiquetas)
-    // Posts
+    // Posts - Utilizando modelo PostFlair explícitamente
     ForumPost.belongsToMany(ForumFlair, {
-        through: "PostFlairs",
+        through: PostFlair,
         foreignKey: "postId",
         otherKey: "flairId",
         as: "flairs",
@@ -127,29 +129,31 @@ export function initForumRelations(models: any): void {
     });
 
     ForumFlair.belongsToMany(ForumPost, {
-        through: "PostFlairs",
+        through: PostFlair,
         foreignKey: "flairId",
         otherKey: "postId",
         as: "posts",
         onDelete: "CASCADE"
     });
 
-    // Replies
-    ForumReply.belongsToMany(ForumFlair, {
-        through: "ReplyFlairs",
-        foreignKey: "replyId",
-        otherKey: "flairId",
-        as: "flairs",
-        onDelete: "CASCADE"
+    // Relaciones directas para PostFlair
+    PostFlair.belongsTo(ForumPost, {
+        foreignKey: "postId",
+        as: "post"
     });
 
-    ForumFlair.belongsToMany(ForumReply, {
-        through: "ReplyFlairs",
+    PostFlair.belongsTo(ForumFlair, {
         foreignKey: "flairId",
-        otherKey: "replyId",
-        as: "replies",
-        onDelete: "CASCADE"
+        as: "flair"
     });
+
+    PostFlair.belongsTo(User, {
+        foreignKey: "assignedBy",
+        as: "assigner"
+    });
+
+    // No mantenemos relaciones para ReplyFlairs ya que no existe ese modelo actualmente
+    // Si se necesita en el futuro, se debe crear un modelo específico ReplyFlair
 
     // Creador de Flairs
     ForumFlair.belongsTo(User, {
@@ -162,19 +166,30 @@ export function initForumRelations(models: any): void {
         as: "createdFlairs"
     });
 
-    // 8. Relaciones Usuario-Flairs (Asignación)
+    // 8. Relaciones Usuario-Flairs (Asignación) - Utilizando modelo UserFlair explícitamente
     User.belongsToMany(ForumFlair, {
-        through: "UserFlairs",
+        through: UserFlair,
         foreignKey: "userId",
         otherKey: "flairId",
         as: "assignedFlairs"
     });
 
     ForumFlair.belongsToMany(User, {
-        through: "UserFlairs",
+        through: UserFlair,
         foreignKey: "flairId",
         otherKey: "userId",
         as: "assignedUsers"
+    });
+
+    // Relaciones directas para UserFlair
+    UserFlair.belongsTo(User, {
+        foreignKey: "userId",
+        as: "user"
+    });
+
+    UserFlair.belongsTo(ForumFlair, {
+        foreignKey: "flairId",
+        as: "flair"
     });
 
     console.log("✅ Relaciones actualizadas correctamente");

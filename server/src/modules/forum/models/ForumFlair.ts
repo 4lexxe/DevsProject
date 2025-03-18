@@ -3,17 +3,21 @@ import sequelize from "../../../infrastructure/database/db";
 import User from "../../user/User";
 import ForumPost from "./ForumPost";
 import ForumReply from "./ForumReply";
+import PostFlair from "./PostFlair";
+import UserFlair from "./UserFlair";
 
 /**
  * @enum {string} FlairType
  * @description Tipos de distintivos disponibles
  * @property {string} ROLE_BASED - Distintivo asignado automáticamente basado en el rol del usuario
  * @property {string} ACHIEVEMENT - Distintivo otorgado por logros específicos
+ * @property {string} POST - Distintivo específico para posts
  * @property {string} CUSTOM - Distintivo personalizado que puede ser asignado manualmente
  */
 export enum FlairType {
   ROLE_BASED = 'role_based',
   ACHIEVEMENT = 'achievement',
+  POST = 'post',
   CUSTOM = 'custom'
 }
 
@@ -58,35 +62,68 @@ class ForumFlair extends Model<ForumFlairAttributes, ForumFlairCreationAttribute
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  // Métodos adicionales para gestionar flairs
-  public async assignToUser(userId: number): Promise<void> {
+  // Métodos para gestionar la asignación de flairs a usuarios
+  public async assignToUser(userId: number, assignedBy?: number): Promise<UserFlair> {
     const transaction = await sequelize.transaction();
-    const UserFlair = sequelize.models.UserFlair;
     try {
-    await UserFlair.create({ userId, flairId: this.id }, { transaction });
-    await transaction.commit();
-    } catch (error) {
-    await transaction.rollback();
-    throw error;
-    }
-  }
-
-  public async removeFromUser(userId: number): Promise<void> {
-    const transaction = await sequelize.transaction(); // Iniciar transacción
-    const UserFlair = sequelize.models.UserFlair;
-  
-    try {
-      await UserFlair.destroy({
+      // Verificar si ya existe la asignación
+      const existingAssignment = await UserFlair.findOne({
         where: {
           userId,
           flairId: this.id
-        },
-        transaction // Pasar transacción a la operación
+        }
       });
-  
-      await transaction.commit(); // Confirmar cambios
+
+      // Si ya existe y está inactivo, lo reactivamos
+      if (existingAssignment) {
+        if (!existingAssignment.isActive) {
+          existingAssignment.isActive = true;
+          await existingAssignment.save({ transaction });
+        }
+        await transaction.commit();
+        return existingAssignment;
+      }
+
+      // Si no existe, creamos uno nuevo
+      const userFlair = await UserFlair.create({ 
+        userId, 
+        flairId: this.id,
+        isActive: true
+      }, { transaction });
+      
+      await transaction.commit();
+      return userFlair;
     } catch (error) {
-      await transaction.rollback(); // Revertir en caso de error
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  public async removeFromUser(userId: number): Promise<boolean> {
+    const transaction = await sequelize.transaction();
+  
+    try {
+      // Buscar la asignación existente
+      const existingAssignment = await UserFlair.findOne({
+        where: {
+          userId,
+          flairId: this.id
+        }
+      });
+
+      // Si no existe, no hay nada que desactivar
+      if (!existingAssignment) {
+        await transaction.commit();
+        return false;
+      }
+
+      // Marcar como inactivo en lugar de eliminar
+      existingAssignment.isActive = false;
+      await existingAssignment.save({ transaction });
+      await transaction.commit();
+      return true;
+    } catch (error) {
+      await transaction.rollback();
       if (error instanceof Error) {
         throw new Error(`Error removing flair from user: ${error.message}`);
       } else {
@@ -95,43 +132,99 @@ class ForumFlair extends Model<ForumFlairAttributes, ForumFlairCreationAttribute
     }
   }
 
-  // Agregar estos métodos a la clase ForumFlair
-public async assignToPost(postId: number): Promise<void> {
-  const transaction = await sequelize.transaction();
-  const PostFlair = sequelize.models.PostFlairs;
-  try {
-    await PostFlair.create({ 
-      postId, 
-      flairId: this.id 
-    }, { transaction });
-    await transaction.commit();
-  } catch (error) {
-    await transaction.rollback();
-    throw error;
-  }
-}
+  // Métodos para gestionar la asignación de flairs a posts
+  public async assignToPost(postId: number, assignedBy?: number): Promise<PostFlair> {
+    const transaction = await sequelize.transaction();
+    try {
+      // Verificar si ya existe la asignación
+      const existingAssignment = await PostFlair.findOne({
+        where: {
+          postId,
+          flairId: this.id
+        }
+      });
 
-public async removeFromPost(postId: number): Promise<void> {
-  const transaction = await sequelize.transaction();
-  const PostFlair = sequelize.models.PostFlairs;
-  try {
-    await PostFlair.destroy({
-      where: {
-        postId,
-        flairId: this.id
-      },
-      transaction
-    });
-    await transaction.commit();
-  } catch (error) {
-    await transaction.rollback();
-    if (error instanceof Error) {
-      throw new Error(`Error removing flair from post: ${error.message}`);
-    } else {
-      throw new Error('Error removing flair from post');
+      // Si ya existe y está inactivo, lo reactivamos
+      if (existingAssignment) {
+        if (!existingAssignment.isActive) {
+          existingAssignment.isActive = true;
+          await existingAssignment.save({ transaction });
+        }
+        await transaction.commit();
+        return existingAssignment;
+      }
+
+      // Si no existe, creamos uno nuevo
+      const postFlair = await PostFlair.create({ 
+        postId, 
+        flairId: this.id,
+        assignedBy,
+        isActive: true
+      }, { transaction });
+      
+      await transaction.commit();
+      return postFlair;
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
     }
   }
-}
+
+  public async removeFromPost(postId: number): Promise<boolean> {
+    const transaction = await sequelize.transaction();
+    try {
+      // Buscar la asignación existente
+      const existingAssignment = await PostFlair.findOne({
+        where: {
+          postId,
+          flairId: this.id
+        }
+      });
+
+      // Si no existe, no hay nada que desactivar
+      if (!existingAssignment) {
+        await transaction.commit();
+        return false;
+      }
+
+      // Marcar como inactivo en lugar de eliminar
+      existingAssignment.isActive = false;
+      await existingAssignment.save({ transaction });
+      await transaction.commit();
+      return true;
+    } catch (error) {
+      await transaction.rollback();
+      if (error instanceof Error) {
+        throw new Error(`Error removing flair from post: ${error.message}`);
+      } else {
+        throw new Error('Error removing flair from post');
+      }
+    }
+  }
+
+  // Método estático para obtener flairs asignados a un post específico
+  public static async getFlairsForPost(postId: number): Promise<ForumFlair[]> {
+    return await ForumFlair.findAll({
+      include: [{
+        model: PostFlair,
+        as: 'postFlairs',
+        where: { postId, isActive: true },
+        attributes: []
+      }]
+    });
+  }
+
+  // Método estático para obtener flairs asignados a un usuario específico
+  public static async getFlairsForUser(userId: number): Promise<ForumFlair[]> {
+    return await ForumFlair.findAll({
+      include: [{
+        model: UserFlair,
+        as: 'userFlairs',
+        where: { userId, isActive: true },
+        attributes: []
+      }]
+    });
+  }
 }
 
 ForumFlair.init(
@@ -198,7 +291,6 @@ ForumFlair.init(
     comment: "Almacena los distintivos que pueden ser asignados a usuarios en el foro"
   }
 );
-
 
 // Hooks
 ForumFlair.addHook('afterCreate', async (flair: ForumFlair) => {
@@ -279,23 +371,110 @@ export const predefinedFlairs = [
     isActive: true
   },
   {
-    name: "Desarrollador Frontend",
+    name: "Frontend",
     description: "Especialista en desarrollo frontend",
     icon: "💻",
-    type: FlairType.CUSTOM,
+    type: FlairType.POST,
     color: "#5AC8FA",
     isActive: true
   },
   {
-    name: "Desarrollador Backend",
+    name: "Backend",
     description: "Especialista en desarrollo backend",
     icon: "🖥️",
-    type: FlairType.CUSTOM,
+    type: FlairType.POST,
     color: "#4CD964",
+    isActive: true
+  },
+  {
+    name: "DevOps",
+    description: "Especialista en automatización e infraestructura",
+    icon: "🔧",
+    type: FlairType.POST,
+    color: "#F39C12",
+    isActive: true
+  },
+  {
+    name: "Fullstack",
+    description: "Desarrollador con experiencia en frontend y backend",
+    icon: "🗂️",
+    type: FlairType.POST,
+    color: "#34495E",
+    isActive: true
+  },
+  {
+    name: "UI/UX",
+    description: "Diseñador enfocado en experiencia de usuario e interfaces",
+    icon: "🎨",
+    type: FlairType.POST,
+    color: "#E74C3C",
+    isActive: true
+  },
+  {
+    name: "Machine Learning",
+    description: "Especialista en modelos predictivos e inteligencia artificial",
+    icon: "🤖",
+    type: FlairType.POST,
+    color: "#8E44AD",
+    isActive: true
+  },
+  {
+    name: "Data Science",
+    description: "Análisis de datos y modelos estadísticos",
+    icon: "📊",
+    type: FlairType.POST,
+    color: "#3498DB",
+    isActive: true
+  },
+  {
+    name: "Cybersecurity",
+    description: "Experto en seguridad informática y ciberseguridad",
+    icon: "🔒",
+    type: FlairType.POST,
+    color: "#2C3E50",
+    isActive: true
+  },
+  {
+    name: "Blockchain",
+    description: "Desarrollador o entusiasta de tecnología blockchain",
+    icon: "⛓️",
+    type: FlairType.POST,
+    color: "#2980B9",
+    isActive: true
+  },
+  {
+    name: "Gamedev",
+    description: "Desarrollador de videojuegos",
+    icon: "🎮",
+    type: FlairType.POST,
+    color: "#E67E22",
+    isActive: true
+  },
+  {
+    name: "Open Source",
+    description: "Colaborador activo en proyectos de código abierto",
+    icon: "🌐",
+    type: FlairType.POST,
+    color: "#1ABC9C",
+    isActive: true
+  },
+  {
+    name: "Cloud",
+    description: "Especialista en infraestructura en la nube",
+    icon: "☁️",
+    type: FlairType.POST,
+    color: "#00ADEF",
+    isActive: true
+  },
+  {
+    name: "SQL",
+    description: "Experto en bases de datos relacionales y SQL",
+    icon: "🗃️",
+    type: FlairType.POST,
+    color: "#009688",
     isActive: true
   }
 ];
 
-
 // Exportación
-export default ForumFlair; 
+export default ForumFlair;
