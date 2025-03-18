@@ -22,7 +22,7 @@ import Content from './modules/content/Content';
 
 /* Modelos relacionados con el foro */
 
-import {ForumCategory, ForumPost, ForumReply, ForumVotePost, ForumVoteReply, ForumFlair, Report, ForumReactionPost, ForumReactionReply, predefinedFlairs, predefinedCategories} from './modules/forum/models/index';
+import {ForumCategory, ForumPost, ForumReply, ForumVotePost, ForumVoteReply, ForumFlair, Report, ForumReactionPost, ForumReactionReply, predefinedFlairs, predefinedCategories, PostFlair, UserFlair} from './modules/forum/models/index';
 
 // sync.ts
 async function syncDatabase() {
@@ -67,6 +67,8 @@ async function syncDatabase() {
     await ForumVotePost.sync({ force: true });
     await ForumVoteReply.sync({ force: true });
     await ForumFlair.sync({ force: true });
+    await PostFlair.sync({ force: true });
+    await UserFlair.sync({ force: true });
     await Report.sync({ force: true });
     await ForumReactionPost.sync({ force: true });
     await ForumReactionReply.sync({ force: true });

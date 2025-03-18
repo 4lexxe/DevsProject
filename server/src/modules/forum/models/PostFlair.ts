@@ -192,54 +192,47 @@ class PostFlair extends Model<PostFlairAttributes, PostFlairCreationAttributes> 
   }
 }
 
+// Inicializar el modelo
 PostFlair.init(
   {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
-      comment: "Identificador único de la asignación post-flair"
     },
     postId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "ForumPosts",
-        key: "id"
-      },
-      onDelete: "CASCADE",
-      comment: "ID del post al que se asigna el distintivo"
+        model: 'ForumPosts',
+        key: 'id'
+      }
     },
     flairId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "ForumFlairs",
-        key: "id"
-      },
-      onDelete: "CASCADE",
-      comment: "ID del distintivo asignado al post"
+        model: 'ForumFlairs',
+        key: 'id'
+      }
     },
     assignedAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: DataTypes.NOW,
-      comment: "Fecha y hora de asignación del distintivo"
+      defaultValue: DataTypes.NOW
     },
     assignedBy: {
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "Users",
-        key: "id"
-      },
-      comment: "ID del usuario que asignó el distintivo (null si fue automático)"
+        model: 'Users',
+        key: 'id'
+      }
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true,
-      comment: "Indica si la asignación está activa"
+      defaultValue: true
     }
   },
   {
