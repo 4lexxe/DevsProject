@@ -304,6 +304,7 @@ class SubscriptionController {
         });
         return;
       }
+      
 
       // Validar que exista el plan
       const plan = await Plan.findByPk(req.body.planId, {
@@ -320,6 +321,23 @@ class SubscriptionController {
           planId: BigInt(req.body.planId),
         },
       });
+
+      // Nueva validación para verificar que el usuario no tenga una suscripción con estado "authorized"
+      const authorizedSubscription = await Subscription.findOne({
+        where: {
+          userId: BigInt(userId),
+          status: "authorized",
+        },
+      });
+
+      if (authorizedSubscription) {
+        res.status(400).json({
+          status: "error",
+          message: "Ya tienes una suscripción activa",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
 
       let subscription;
       if (existingSubscription) {
