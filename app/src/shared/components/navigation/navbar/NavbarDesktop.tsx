@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, User, Settings, LogIn, UserPlus } from 'lucide-react';
+import { LogOut, User, Settings, LogIn, UserPlus, Subscript, CreditCard } from 'lucide-react'; // Added CreditCard icon
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../auth/contexts/AuthContext';
 import NavLink from '../navbar/NavLink';
@@ -40,7 +40,7 @@ export default function DesktopNavbar() {
 
   return (
     <nav className="bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 shadow-lg sticky top-0 left-0 w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="sm:mx-2 lg:mx-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -66,6 +66,7 @@ export default function DesktopNavbar() {
           {/* Navigation links */}
           <div className="flex items-center space-x-6">
             <NavLink href="/cursos">Cursos</NavLink>
+            <NavLink href="/plans">Planes</NavLink>
             <NavLink href="/ruta-aprendizaje">Ruta de Aprendizaje</NavLink>
             <NavLink href="/recursos">Recursos</NavLink>
           </div>
@@ -121,6 +122,7 @@ function UserMenu({
         <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white">
           <div className="py-1">
             <MenuLink href="/profile" icon={User}>Perfil</MenuLink>
+            <MenuLink href="/subscription" icon={CreditCard}>Mi Suscripción</MenuLink> {/* Updated icon */}
             <MenuLink href="/settings" icon={Settings}>Configuración</MenuLink>
             <button
               onClick={handleLogout}

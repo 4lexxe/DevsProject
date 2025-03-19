@@ -35,7 +35,7 @@ export default function CoursesPage({ activeByCategory = false }) {
     } else {
       fetchCourses();
     }
-  }, []);
+  }, [activeByCategory ]);
 
   return (
     <div className="min-h-screen bg-gray-50">

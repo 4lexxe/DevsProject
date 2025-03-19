@@ -33,6 +33,8 @@ import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
+import { PlansPage, SuccessPage, MySuscription } from "./subscription/index";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -66,6 +68,9 @@ function App() {
               <Route path='/course/:courseId/section/content/:contentId' element={<ContentPage />} />
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
+              <Route path="/plans" element={<PlansPage />} />
+              <Route path="/subscription/success" element={<SuccessPage />} />
+              <Route path="/subscription" element={<MySuscription />} />
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>

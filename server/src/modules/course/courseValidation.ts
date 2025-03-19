@@ -2,19 +2,19 @@ import { body } from "express-validator";
 
 export const validateCourse = [
   body("title")
-    .notEmpty().withMessage("El título es obligatorio.")
+    .notEmpty().withMessage("El título es obligatorio.").bail()
     .isLength({ min: 5, max: 255 }).withMessage("El título debe tener entre 5 y 255 caracteres."),
 
   body("image")
-    .isURL().withMessage("La imagen debe ser una URL válida.")
+    .isURL().withMessage("La imagen debe ser una URL válida.").bail()
     .isLength({ max: 255 }).withMessage("La URL de la imagen no puede superar los 500 caracteres."),
 
   body("summary")
-    .notEmpty().withMessage("El resumen es obligatorio.")
+    .notEmpty().withMessage("El resumen es obligatorio.").bail()
     .isLength({ min: 10, max: 1000 }).withMessage("El resumen debe tener entre 10 y 1000 caracteres."),
 
   body("about")
-    .notEmpty().withMessage("El campo 'about' es obligatorio.")
+    .notEmpty().withMessage("El campo 'about' es obligatorio.").bail()
     .isLength({ min: 20, max: 5000 }).withMessage("El campo 'about' debe tener entre 20 y 5000 caracteres."),
 
   body("careerTypeId")
@@ -22,7 +22,7 @@ export const validateCourse = [
     .isInt().withMessage("careerTypeId debe ser un número."),
 
   body("learningOutcomes")
-    .isArray({ min: 1 }).withMessage("Debe haber al menos un resultado de aprendizaje.")
+    .isArray({ min: 1 }).withMessage("Debe haber al menos un resultado de aprendizaje.").bail()
     .custom((value) => {
       if (!value.every((outcome: string) => typeof outcome === "string" && outcome.length <= 255)) {
         throw new Error("Cada resultado de aprendizaje debe ser una cadena con máximo 255 caracteres.");
@@ -32,7 +32,7 @@ export const validateCourse = [
 
   body("prerequisites")
     .optional()
-    .isArray().withMessage("Los prerequisitos deben ser un array.")
+    .isArray().withMessage("Los prerequisitos deben ser un array.").bail()
     .custom((value) => {
       if (!value.every((prerequisite: string) => typeof prerequisite === "string" && prerequisite.length <= 255)) {
         throw new Error("Cada prerequisito debe ser una cadena con máximo 255 caracteres.");
@@ -57,7 +57,7 @@ export const validateCourse = [
     .isInt().withMessage("adminId debe ser un número."),
 
   body("categoryIds")
-    .isArray({ min: 1 }).withMessage("Debe haber al menos una categoría.")
+    .isArray({ min: 1 }).withMessage("Debe haber al menos una categoría.").bail()
     .custom((value) => {
       if (!value.every(Number.isInteger)) {
         throw new Error("Todos los categoryId deben ser números.");
