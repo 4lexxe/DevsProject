@@ -42,10 +42,10 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas para las subscripciones
-import mercadopagoRoutes from './modules/subscription/routes/mercadopagoRoutes'
-import discountEventRoutes from './modules/subscription/routes/discountRoutes'
-import planRoutes from './modules/subscription/routes/planRoutes'
-import subscriptionRoutes from './modules/subscription/routes/subscriptionRoutes'
+import mercadopagoRoutes from './modules/Subscription2/routes/mercadopagoRoutes'
+import discountEventRoutes from './modules/Subscription2/routes/discountRoutes'
+import planRoutes from './modules/Subscription2/routes/planRoutes'
+import subscriptionRoutes from './modules/Subscription2/routes/subscriptionRoutes'
 
 // ==================================================
 // Importaciones de utilidades y configuraciones

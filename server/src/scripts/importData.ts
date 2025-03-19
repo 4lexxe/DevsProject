@@ -3,11 +3,11 @@
 import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
-import MPSubPlan from '../modules/subscription/models/MPSubPlan';
-import Payment from '../modules/subscription/models/Payment';
-import Invoice from '../modules/subscription/models/Invoice';
-import Subscription from '../modules/subscription/models/Subscription';
-import MPSubscription from '../modules/subscription/models/MPSubscription';
+import MPSubPlan from '../modules/Subscription2/models/MPSubPlan';
+import Payment from '../modules/Subscription2/models/Payment';
+import Invoice from '../modules/Subscription2/models/Invoice';
+import Subscription from '../modules/Subscription2/models/Subscription';
+import MPSubscription from '../modules/Subscription2/models/MPSubscription';
 
 async function importData() {
   try {
