@@ -1,6 +1,6 @@
 import React from 'react';
 import SubscriptionCard from './SubscriptionPlanCard';
-import { Plan } from '../interfaces/Plan';
+import { Plan } from '../../interfaces/plan';
 
 interface SubscriptionPlansProps {
   plans: Plan[];
