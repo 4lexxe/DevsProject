@@ -121,12 +121,12 @@ class PaymentController {
     try {
       const payment = await Payment.create({
         id: paymentData.id,
+        mpSubscriptionId: paymentData.metadata.preapproval_id,
         dateApproved: paymentData.date_approved,
         status: paymentData.status,
         transactionAmount: paymentData.transaction_amount,
         paymentMethodId: paymentData.payment_method_id,
         paymentTypeId: paymentData.payment_type_id,
-        preApprovalId: paymentData.metadata.preapproval_id,
         data: paymentData,
       });
 

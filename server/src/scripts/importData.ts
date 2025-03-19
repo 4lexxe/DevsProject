@@ -4,6 +4,10 @@ import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
 import MPSubPlan from '../modules/subscription/models/MPSubPlan';
+import Payment from '../modules/subscription/models/Payment';
+import Invoice from '../modules/subscription/models/Invoice';
+import Subscription from '../modules/subscription/models/Subscription';
+import MPSubscription from '../modules/subscription/models/MPSubscription';
 
 async function importData() {
   try {
@@ -13,17 +17,34 @@ async function importData() {
 
     // Leer el archivo de datos
     const filePath = path.join(__dirname, 'data/exportedDataTest.json');
-    /* const filePath = path.join(__dirname, 'data/exportedDataTest.json'); */
-
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const data = JSON.parse(fileContent);
 
     // Insertar los datos en la base de datos
     await sequelize.transaction(async (transaction) => {
-      
       // Insertar MPSubPlans
       if (data.mpSubPlans && data.mpSubPlans.length > 0) {
         await MPSubPlan.bulkCreate(data.mpSubPlans, { transaction });
+      }
+      
+      // Insertar Subscriptions
+      if (data.subscriptions && data.subscriptions.length > 0) {
+        await Subscription.bulkCreate(data.subscriptions, { transaction });
+      }
+
+      // Insertar MPSubscriptions
+      if (data.mpSubscriptions && data.mpSubscriptions.length > 0) {
+        await MPSubscription.bulkCreate(data.mpSubscriptions, { transaction });
+      }
+
+      // Insertar Payments
+      if (data.payments && data.payments.length > 0) {
+        await Payment.bulkCreate(data.payments, { transaction });
+      }
+
+      // Insertar Invoices
+      if (data.invoices && data.invoices.length > 0) {
+        await Invoice.bulkCreate(data.invoices, { transaction });
       }
     });
 

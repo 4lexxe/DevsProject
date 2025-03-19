@@ -145,8 +145,8 @@ class MPSubscriptionController {
 
   // Método para actualizar una suscripción en la base de datos
   static async updateSubscriptionInDB(
-    subscriptionData: any,
-    subscriptionId: string
+    subscriptionId: string,
+    subscriptionData: any
   ) {
     try {
       // Buscar la suscripción existente

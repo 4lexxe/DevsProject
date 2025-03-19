@@ -1,9 +1,10 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import Subscription from "./Subscription"; // Asegúrate de importar el modelo Subscription
+import MPSubscription from "./MPSubscription";
 
 class Payment extends Model {
   public id!: string;  
+  public mpSubscriptionId!: string; // ID de la suscripción a la que pertenece el pago
   public dateApproved!: Date; // Fecha de aprobación del pago
   public status!: string; // Estado del pago (ej: "approved")
   public transactionAmount!: number; // Monto total de la transacción
@@ -20,6 +21,10 @@ Payment.init(
       allowNull: false,
       primaryKey: true,
       comment: "ID del pago en MercadoPago",
+    },
+    mpSubscriptionId:{
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     dateApproved: {
       type: DataTypes.DATE,
@@ -46,11 +51,6 @@ Payment.init(
       allowNull: false,
       comment: "Tipo de pago (por ejemplo, credit_card)",
     },
-    preApprovalId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      comment: "ID de la pre-aprobación",
-    },
     data: {
       type: DataTypes.JSONB,
       allowNull: false,
@@ -63,11 +63,21 @@ Payment.init(
     timestamps: true, // Agrega createdAt y updatedAt automáticamente
     paranoid: true,
     comment: "Tabla para almacenar los pagos realizados",
+    hooks: {
+      afterSync: async () => {
+        try {
+          await sequelize.query('ALTER TABLE "Payments" DROP CONSTRAINT IF EXISTS "Payments_mpSubscriptionId_fkey";');
+          console.log('Constraint dropped successfully');
+        } catch (error) {
+          console.error('Error dropping constraint:', error);
+        }
+      }
+    }
   }
 );
 
-// Relación: Payment pertenece a una Subscription
-Payment.belongsTo(Subscription, { foreignKey: "subscriptionId" });
-Subscription.hasMany(Payment, { foreignKey: "subscriptionId" });
-
 export default Payment;
+
+// Relación: Payment pertenece a una Subscription
+Payment.belongsTo(MPSubscription, { foreignKey: "mpSubscriptionId", as: "mpSubscription" });
+MPSubscription.hasMany(Payment, { foreignKey: "mpSubscriptionId", as: "payments" });

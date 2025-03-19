@@ -2,6 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import Plan from "./Plan";
 import User from "../../user/User";
+import Payment from "./Payment";
 
 class Subscription extends Model {
   public id!: bigint;
@@ -11,6 +12,8 @@ class Subscription extends Model {
   public startDate?: Date;
   public endDate?: Date;
   public status!: "paused" | "authorized" | "cancelled" | "pending";
+
+  public mpSubscription: any;
 }
 
 Subscription.init(
@@ -26,23 +29,21 @@ Subscription.init(
       allowNull: false,
       references: { model: "Plans", key: "id" },
     },
-    paymentId: { type: DataTypes.STRING, allowNull: true },
     startDate: { type: DataTypes.DATE, allowNull: true },
     endDate: { type: DataTypes.DATE, allowNull: true },
     status: {
       type: DataTypes.ENUM("authorized", "paused", "cancelled", "pending"),
       allowNull: false,
     },
-    
   },
-  { sequelize, tableName: "Subscriptions", timestamps: true, paranoid: true } 
+  { sequelize, tableName: "Subscriptions", timestamps: true, paranoid: true }
 );
 
 // Relaciones
-Subscription.belongsTo(User, { foreignKey: "userId", as: "user"});
-User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions"});
+Subscription.belongsTo(User, { foreignKey: "userId", as: "user" });
+User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
 
-Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan"});
-Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions"});
+Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan" });
+Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
 
 export default Subscription;

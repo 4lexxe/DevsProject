@@ -68,7 +68,6 @@ MPSubscription.init(
 MPSubscription.belongsTo(Subscription, {
   foreignKey: "subscriptionId",
   as: "subscription",
-  onDelete: "CASCADE",
 });
 
 Subscription.hasOne(MPSubscription, {

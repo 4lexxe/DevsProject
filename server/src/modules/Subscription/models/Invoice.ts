@@ -46,7 +46,7 @@ Invoice.init(
   }
 );
 
-Invoice.belongsTo(Payment, { foreignKey: "paymentId" });
-Payment.hasOne(Invoice, { foreignKey: "paymentId" });
+Invoice.belongsTo(Payment, { foreignKey: "paymentId", as: "payment" });
+Payment.hasOne(Invoice, { foreignKey: "paymentId", as: "invoice" });
 
 export default Invoice;

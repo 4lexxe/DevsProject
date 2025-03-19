@@ -151,15 +151,15 @@ class MercadoPagoController {
           }
         }
 
+        const paymentp = await PaymentModel.findOne({
+          where: { mpSubscriptionId: subscriptionData.id },
+        });
+
         if (!planId) {
           throw new Error(
             "No se pudo determinar el plan asociado a la suscripción"
           );
         }
-
-        const paymentp = await PaymentModel.findOne({
-          where: { preApprovalId: subscriptionData.id },
-        });
 
         // Calcular fechas de inicio y fin
         const startDate = new Date();
@@ -179,11 +179,11 @@ class MercadoPagoController {
         const subscription = await SubscriptionController.updateSubscription(
           {planId: planId},
           {
-          paymentId: paymentp?.id,
           planId,
           startDate,
           endDate,
-          status: subscriptionData.status === "authorized" ? "authorized": "pending",
+          paymentId: paymentp?.id,
+          status: subscriptionData.status,
         });
 
         if (subscription) {
@@ -210,13 +210,13 @@ class MercadoPagoController {
       try {
         const mpSubscription =
           await MPSubscriptionController.updateSubscriptionInDB(
-            subscriptionData,
-            eventId
+            eventId,
+            subscriptionData
           );
 
         if (mpSubscription?.subscriptionId) {
           const paymentp = await PaymentModel.findOne({
-            where: { preApprovalId: subscriptionData.id },
+            where: { mpSubscriptionId: subscriptionData.id },
           });
 
           // Obtener la suscripción actual
