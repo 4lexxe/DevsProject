@@ -36,7 +36,7 @@ export default function SubscriptionPage() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center align-middle">Cargando...</div>;
   }
 
   if (!user) {
