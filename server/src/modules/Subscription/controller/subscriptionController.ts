@@ -155,7 +155,7 @@ class SubscriptionController {
         },
         order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan, as: "plan", attributes: ["name"] },
+          { model: Plan, as: "plan", attributes: ["name",] },
           { model: User, as: "user", attributes: ["name", "email"] },
           {
             model: MPSubscription,
@@ -217,7 +217,7 @@ class SubscriptionController {
         },
         order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan, as: "plan", attributes:["name", "description", "totalPrice", "duration", "features", "accessLevel", "installments", "installmentPrice"] },
+          { model: Plan, as: "plan", attributes:["name", "description", "totalPrice", "duration", "durationType", "features", "accessLevel", "installments", "installmentPrice"] },
           {
             model: MPSubscription,
             as: "mpSubscription",

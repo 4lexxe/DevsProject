@@ -1,5 +1,6 @@
 import type { Subscription } from "@/subscription/interfaces/subscription"
 import { formatCurrency, formatDate } from "@/subscription/utils/formatDate"
+import mercadopago from "@/shared/assets/imgs/mercadopago.png"
 
 interface NextPaymentProps {
   subscription: Subscription
@@ -41,8 +42,9 @@ export default function NextPayment({ subscription }: NextPaymentProps) {
         </div>
         <div className="mt-6 pt-4 border-t border-[#eff6ff]">
           <div className="flex items-center">
-            <img src="/placeholder.svg?height=24&width=120" alt="Mercado Pago" className="h-6" />
+            <img src={mercadopago} alt="Mercado Pago" className="w-40" />
             <p className="ml-2 text-sm text-gray-500">Procesado por Mercado Pago</p>
+
           </div>
         </div>
       </div>

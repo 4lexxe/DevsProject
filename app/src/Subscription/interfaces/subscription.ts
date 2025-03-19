@@ -17,6 +17,7 @@ export interface Plan {
   description: string
   totalPrice: string
   duration: number
+  durationType: string
   features: string[]
   accessLevel: string
   installments: number

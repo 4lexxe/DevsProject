@@ -31,7 +31,7 @@ export default function PlanDetails({ plan }: PlanDetailsProps) {
           <div>
             <p className="text-sm text-gray-500">Duración</p>
             <p className="text-lg font-medium text-[#0c154c]">
-              {plan.duration} {plan.duration === 1 ? "mes" : "meses"}
+              {plan.duration} {plan.durationType}
             </p>
           </div>
         </div>
