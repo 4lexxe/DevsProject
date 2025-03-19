@@ -1,5 +1,3 @@
-import "@/shared/assets/styles/main.css"
-
 const LoadingSpinner = () => {
   return (
     <div className="flex flex-col justify-center items-center h-screen bg-gray-100">

@@ -9,6 +9,7 @@ import {
   Map,
   LogIn,
   UserPlus,
+  CreditCard,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../../auth/contexts/AuthContext";
@@ -47,6 +48,7 @@ export default function BottomNavbar() {
   const dropdownItems = [
     { icon: Settings, label: "Ajustes", path: "/ajustes" },
     { icon: MessageCircle, label: "Foro", path: "/foro" },
+    { icon: CreditCard, label: "Plans", path: "/plans" },
     { icon: Map, label: "Ruta de Aprendizaje", path: "/ruta-aprendizaje" },
   ];
 

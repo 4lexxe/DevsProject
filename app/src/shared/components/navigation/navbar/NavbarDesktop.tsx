@@ -40,7 +40,7 @@ export default function DesktopNavbar() {
 
   return (
     <nav className="bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 shadow-lg sticky top-0 left-0 w-full z-50">
-      <div className="sm:mx-2 lg:mx-16 px-4 sm:px-6 lg:px-8">
+      <div className="lg:mx-16 mx-2 ">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -158,11 +158,11 @@ function MenuLink({ href, icon: Icon, children }: MenuLinkProps) {
 
 function AuthButtons() {
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex items-center lg:space-x-4 ml-4">
       <AuthButton 
         variant="secondary" 
         href="/login"
-        className="flex items-center space-x-2 px-6 py-2.5 rounded-lg hover:bg-blue-100"
+        className="flex items-center   py-2.5 rounded-lg hover:bg-blue-100 md:hidden lg:block"
       >
         <LogIn className="h-5 w-5" />
         <span>Iniciar Sesión</span>
@@ -170,7 +170,7 @@ function AuthButtons() {
       <AuthButton 
         variant="primary" 
         href="/register"
-        className="flex items-center space-x-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
+        className="flex items-center space-x-2 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
       >
         <UserPlus className="h-5 w-5" />
         <span>Registrarse</span>

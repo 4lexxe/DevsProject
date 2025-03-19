@@ -44,7 +44,7 @@ async function exportData() {
     };
 
     // Definir la ruta del archivo de salida
-    const outputPath = path.join(__dirname, 'data/exportedData.json');
+    const outputPath = path.join(__dirname, 'data/exportedDataTest.json');
 
     // Escribir los datos en el archivo
     fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));

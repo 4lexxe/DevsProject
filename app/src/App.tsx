@@ -7,14 +7,11 @@ import { AuthProvider } from "./auth/contexts/AuthContext";
 import { ReactFlowProvider } from "reactflow";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Importación de todos los estilos
-import "@/shared/assets/styles/main.css";
-import '@xyflow/react/dist/style.css';
-import "@/shared/assets/styles/roadmap.css";
-
 // Importación de los componentes
 import DefaultLayout from "./shared/layouts/defaultLayout";
 import Home from "./home/home";
+
+import "@/shared/assets/styles/main.css";
 
 import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage }from '@/course/index';
 

@@ -22,7 +22,7 @@ export default function AuthButton({
   icon,
   className = "",
 }: AuthButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center space-x-2 font-medium transition-all duration-200 rounded-lg focus:outline-none";
+  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-lg focus:outline-none";
 
   const variantStyles = {
     primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg px-5 py-2.5",

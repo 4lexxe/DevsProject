@@ -1,47 +1,52 @@
-  @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+/* Importar fuentes de Google de manera asíncrona */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
 
-  .grain-overlay::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.10;
-    mix-blend-mode: multiply;
-    pointer-events: none;
-  }
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .hero-section {
-    animation: fadeInUp 1s ease-in-out;
-  }
-  
-  .grain-overlay {
-    animation: grainEffect 1s ease-in-out;
-  }
-  
-  @keyframes grainEffect {
-    0% {
-      opacity: 0.3;
-    }
-    100% {
-      opacity: 0.5;
-    }
-  }
+/* Overlay de grano */
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.10;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
 
-  /* Estructura de carga */
+/* Animaciones */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.grain-overlay {
+  animation: grainEffect 1s ease-in-out;
+}
+
+@keyframes grainEffect {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* Estructura de carga */
 .loading-text {
   @apply text-white text-xl font-medium;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -83,9 +88,7 @@
 }
 
 .responsive-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @apply inline-flex items-center justify-center;
 }
 
 @media (max-width: 768px) {

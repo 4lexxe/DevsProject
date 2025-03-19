@@ -10,6 +10,19 @@ export default defineConfig({
   },
   plugins: [react()],
 
+  // Configuracion para produccion
+  build: {
+    outDir: 'dist',
+    sourcemap: false, // Deshabilita los sourcemaps para producción
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
+
   /* Configuracion de alias */
   resolve: { 
     alias: {
