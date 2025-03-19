@@ -21,15 +21,15 @@ import Section from "./modules/section/Section";
 import Content from "./modules/content/Content";
 
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
-import DiscountEvent from "./modules/Subscription2/models/DiscountEvent";
-import Invoice from "./modules/Subscription2/models/Invoice";
-import Subscription from "./modules/Subscription2/models/Subscription";
-import MPSubscription from "./modules/Subscription2/models/MPSubscription";
-import MPSubPlan from "./modules/Subscription2/models/MPSubPlan";
-import Payment from "./modules/Subscription2/models/Payment";
-import Plan from "./modules/Subscription2/models/Plan";
-import Refund from "./modules/Subscription2/models/Refund";
-import WebhookEvent from "./modules/Subscription2/models/WebhookEvent";
+import DiscountEvent from "./modules/subscription/models/DiscountEvent";
+import Invoice from "./modules/subscription/models/Invoice";
+import Subscription from "./modules/subscription/models/Subscription";
+import MPSubscription from "./modules/subscription/models/MPSubscription";
+import MPSubPlan from "./modules/subscription/models/MPSubPlan";
+import Payment from "./modules/subscription/models/Payment";
+import Plan from "./modules/subscription/models/Plan";
+import Refund from "./modules/subscription/models/Refund";
+import WebhookEvent from "./modules/subscription/models/WebhookEvent";
 
 // sync.ts
 async function syncDatabase() {

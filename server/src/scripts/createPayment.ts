@@ -1,4 +1,4 @@
-import Payment from "../modules/Subscription2/models/Payment";
+import Payment from "../modules/subscription/models/Payment";
 
 const createPayment = async () => {
   try {

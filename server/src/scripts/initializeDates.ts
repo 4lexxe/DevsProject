@@ -8,8 +8,8 @@ import Section from "../modules/section/Section";
 import Content from "../modules/content/Content";
 import HeaderSection from "../modules/headerSection/HeaderSection";
 
-import Plan from "../modules/Subscription2/models/Plan";
-import DiscountEvent from "../modules/Subscription2/models/DiscountEvent";
+import Plan from "../modules/subscription/models/Plan";
+import DiscountEvent from "../modules/subscription/models/DiscountEvent";
 
 
 // Carga las variables de entorno del archivo .env
