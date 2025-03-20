@@ -1,20 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import ForumPostService, { ContentType, ForumPost } from '../services/forumPost.service';
 import ForumCategoryService from '../services/forumCategory.service';
-import ForumFlairService, { ForumFlair, FlairType } from '../services/forumFlair.service'; // Adjust the import path as necessary
-// Importar validaciones desde el archivo separado
-import { postSchema, FormValues, ErrorRecord } from '../validators/postValidators';
-// Importar el componente personalizado MDXEditor
+import ForumFlairService, { ForumFlair, FlairType } from '../services/forumFlair.service'; 
+import { postSchema } from '../validators/postValidators';
 import MDXEditorComponent from './MDXeditor'; 
-// Importar iconos de Heroicons
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import { GrSend } from "react-icons/gr";
 import { BsExclamationCircle } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
 import FlairTag from './FlairTag';
+import InputFile from './InputFile';
 
 interface Category {
   id: number;
@@ -23,70 +21,171 @@ interface Category {
   icon?: string;
 }
 
+interface FormData {
+  title: string;
+  content: string;
+  categoryId: number;
+  flairId?: number;
+  isNSFW: boolean;
+  isSpoiler: boolean;
+  linkUrl?: string;
+  imageUrl?: string;
+  contentType: ContentType;
+}
+
+interface PostData extends Partial<ForumPost> {
+  flairId?: number;
+}
+
+const useContentTypeFromUrl = (): [ContentType, (type: ContentType) => void] => {
+  const navigate = useNavigate();
+  
+  const parseContentType = (typeStr: string): ContentType => {
+    const normalized = typeStr.toUpperCase();
+    if (normalized === 'TEXT') return ContentType.TEXT;
+    if (normalized === 'LINK') return ContentType.LINK;
+    if (normalized === 'IMAGE') return ContentType.IMAGE;
+    return ContentType.TEXT; 
+  };
+  
+  const queryType = new URLSearchParams(window.location.search).get('type') || 'text';
+  const [type, setTypeState] = useState<ContentType>(parseContentType(queryType));
+  
+  const setType = useCallback((newType: ContentType) => {
+    console.log('Changing content type to:', newType);
+    setTypeState(newType);
+    navigate(`/forum/submit?type=${newType.toLowerCase()}`, { replace: true });
+  }, [navigate]);
+  
+  return [type, setType];
+};
+
 const EditorPost: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const queryType = new URLSearchParams(location.search).get('type') || 'TEXT';
   
-  // Estado para el tipo de contenido seleccionado
-  const [contentType, setContentType] = useState<ContentType>(
-    (queryType as ContentType) || ContentType.TEXT
-  );
+  const [contentType, setContentType] = useContentTypeFromUrl();
   
-  // Estado para las categorías disponibles
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-
-  // Estado para los flairs disponibles
+  
   const [flairs, setFlairs] = useState<ForumFlair[]>([]);
   
-  // Estado para la vista previa
-  const [linkPreview, setLinkPreview] = useState<string>('');
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [linkPreview, setLinkPreview] = useState<string | null>(null);
   
-  // Estado general para errores no relacionados con campos
-  const [generalError, setGeneralError] = useState<string | null>(null);
+  const [generalError, setGeneralError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [allImageUrls, setAllImageUrls] = useState<string[]>([]);
+  const [editorKey, setEditorKey] = useState(0);
   
-  // Configurar react-hook-form con el esquema de Zod
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    control,
-    formState: { errors, isSubmitting }
-  } = useForm<FormValues>({
+    formState: { errors },
+    trigger
+  } = useForm<FormData>({
     resolver: zodResolver(postSchema),
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       title: '',
-      content: '# Título de tu publicación\n\nEscribe tu contenido aquí...',
-      categoryId: categories.length > 0 ? categories[0].id : 0,
+      content: '',
+      categoryId: 0,
       isNSFW: false,
       isSpoiler: false,
       flairId: undefined,       
-      contentType: contentType as ContentType,
+      contentType,
       ...(contentType === ContentType.LINK ? { linkUrl: '' } : {}),
       ...(contentType === ContentType.IMAGE ? { imageUrl: '' } : {})
     }
   });
   
-  // Convertir errors a un tipo más específico para acceder a campos dinámicos
-  const formErrors = errors as ErrorRecord;
+  // Usar un tipo específico para los errores del formulario en lugar de any
+  const formErrors = errors as Record<string, { message: string }>;
   
-  // Observar valores del formulario para las vistas previas
   const watchContent = watch('content');
   const watchLinkUrl = contentType === ContentType.LINK ? watch('linkUrl') : '';
-  const watchImageUrl = contentType === ContentType.IMAGE ? watch('imageUrl') : '';
   const watchCategoryId = watch('categoryId');
   
-  // Efecto para actualizar las vistas previas
+  // Inicialización del componente
+  useEffect(() => {
+    // 1. Cargar categorías
+    const loadCategories = async () => {
+      try {
+        const categoriesResponse = await ForumCategoryService.getAllCategories();
+        setCategories(categoriesResponse);
+      } catch (error) {
+        console.error('Error al cargar categorías:', error);
+      }
+    };
+    
+    // 2. Cargar flairs
+    const loadFlairs = async () => {
+      try {
+        const flairsResponse = await ForumFlairService.getFlairsByType(FlairType.POST);
+        setFlairs(flairsResponse);
+      } catch (error) {
+        console.error('Error al cargar flairs:', error);
+      }
+    };
+    
+    // 3. Inicializar el array de imágenes si hay una imagen inicial
+    const currentImageUrl = watch('imageUrl');
+    if (currentImageUrl && currentImageUrl.length > 0) {
+      setAllImageUrls([currentImageUrl]);
+    }
+    
+    // Ejecutar todo al montar el componente
+    loadCategories();
+    loadFlairs();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Dependencias vacías = solo al montar
+  
+  // Filtrado de categorías usando useMemo en lugar de useEffect + estado
+  const filteredCategories = useMemo(() => {
+    if (!searchTerm) return categories;
+    
+    return categories.filter(category => 
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [searchTerm, categories]);
+  
+  // Efectos cuando cambia el tipo de contenido
+  useEffect(() => {
+    // 1. Incrementar la clave del editor para reiniciarlo
+    if (contentType === ContentType.TEXT) {
+      setEditorKey(prev => prev + 1);
+    }
+    
+    // 2. Establecer contenido predeterminado si está vacío
+    const defaultContent = contentType === ContentType.LINK
+      ? '# Descripción del enlace\n\nExplica por qué este enlace es interesante...'
+      : '# Título de tu publicación\n\nEscribe tu contenido aquí...';
+    
+    const currentContent = watch('content');
+    if (!currentContent) {
+      setValue('content', defaultContent);
+    }
+    
+    // 3. Limpiar campos no relacionados con el tipo actual
+    if (contentType !== ContentType.LINK) {
+      setValue('linkUrl', '');
+      setLinkPreview('');
+    }
+    
+    if (contentType !== ContentType.IMAGE) {
+      setValue('imageUrl', '');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentType]); // Solo dependencia del tipo de contenido
+  
+  // Vista previa de enlaces
   useEffect(() => {
     if (contentType === ContentType.LINK && watchLinkUrl) {
       try {
-        // Validar si es una URL válida antes de mostrar la vista previa
         new URL(watchLinkUrl);
         setLinkPreview(watchLinkUrl);
       } catch {
@@ -95,130 +194,53 @@ const EditorPost: React.FC = () => {
     } else {
       setLinkPreview('');
     }
-    
-    if (contentType === ContentType.IMAGE && watchImageUrl) {
-      try {
-        new URL(watchImageUrl);
-        setImagePreview(watchImageUrl);
-      } catch {
-        setImagePreview('');
-      }
-    } else {
-      setImagePreview('');
-    }
-  }, [watchLinkUrl, watchImageUrl, contentType]);
+  }, [watchLinkUrl, contentType]);
   
-  // Cargar categorías al montar el componente
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const categoriesData = await ForumCategoryService.getAllCategories();
-        setCategories(categoriesData);
-        setFilteredCategories(categoriesData);
-        if (categoriesData.length > 0) {
-          setValue('categoryId', categoriesData[0].id);
-        }
-      } catch (error) {
-        console.error('Error al cargar categorías:', error);
-        setGeneralError('No se pudieron cargar las categorías. Por favor, inténtalo más tarde.');
-      }
-    };
-    
-    loadCategories();
-  }, [setValue]);
-
-  // Cargar flairs al montar el componente
-  useEffect(() => {
-    const loadFlairs = async () => {
-      try {
-        const flairsData = await ForumFlairService.getFlairsByType(FlairType.POST);
-        setFlairs(flairsData);
-      } catch (error) {
-        console.error('Error al cargar flairs:', error);
-        setGeneralError('No se pudieron cargar los flairs. Por favor, inténtalo más tarde.');
-      }
-    };
-    
-    loadFlairs();
-  },[]);
-
-  // Filtrar categorías cuando cambia el término de búsqueda
-  useEffect(() => {
-    if (searchTerm) {
-      const filtered = categories.filter(category => 
-        category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (category.description && category.description.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-      setFilteredCategories(filtered);
-    } else {
-      setFilteredCategories(categories);
-    }
-  }, [searchTerm, categories]);
-  
-  // Actualizar el tipo de contenido cuando cambia en la URL
-  useEffect(() => {
-    const newType = (new URLSearchParams(location.search).get('type') as ContentType) || ContentType.TEXT;
-    setContentType(newType);
-    
-    // Resetear el formulario con valores predeterminados para el nuevo tipo
-    const defaultContent = newType === ContentType.LINK
-      ? '# Descripción del enlace\n\nExplica por qué este enlace es interesante...'
-      : '# Título de tu publicación\n\nEscribe tu contenido aquí...';
-    
-    // Actualizar campos del formulario
-    setValue('contentType', newType);
-    setValue('content', defaultContent);
-    
-    if (newType === ContentType.LINK) {
-      setValue('linkUrl', '');
-    }
-    
-    if (newType === ContentType.IMAGE) {
-      setValue('imageUrl', '');
-    }
-    
-    // Limpiar vistas previas
-    setLinkPreview('');
-    setImagePreview('');
-  }, [location.search, setValue]);
-  
-  // Cambiar el tipo de contenido y actualizar la URL
   const handleContentTypeChange = (type: ContentType) => {
     setContentType(type);
-    navigate(`/forum/submit?type=${type}`);
   };
   
-  // Seleccionar una categoría de la lista desplegable
   const handleCategorySelect = (category: Category) => {
     setValue('categoryId', category.id);
     setSearchTerm(category.name);
     setShowCategoryDropdown(false);
   };
   
-  // Manejar el envío del formulario
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit = async (data: FormData) => {
+    console.log('Datos del formulario:', data);
+    console.log('allImageUrls:', allImageUrls);
+    
+    setIsSubmitting(true);
+    setGeneralError('');
+    
+    const postData: Partial<ForumPost> & { flairId?: number } = {
+      title: data.title,
+      content: data.content,
+      categoryId: Number(data.categoryId),
+      flairId: data.flairId,
+      isNSFW: data.isNSFW,
+      isSpoiler: data.isSpoiler,
+      contentType
+    };
+    
+    if (contentType === ContentType.LINK && data.linkUrl) {
+      (postData as PostData & { linkUrl: string }).linkUrl = data.linkUrl;
+    }
+    
+    if (contentType === ContentType.IMAGE) {
+      if (!data.imageUrl && allImageUrls.length === 0) {
+        setGeneralError('Por favor, sube o ingresa la URL de una imagen');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      (postData as PostData & { imageUrl: string[] }).imageUrl = allImageUrls.length > 0 
+        ? allImageUrls 
+        : (data.imageUrl ? [data.imageUrl] : []);
+    }
+    
     try {
-      setGeneralError(null);
-      
-      const postData: Partial<ForumPost> = {
-        title: data.title,
-        content: data.content,
-        categoryId: data.categoryId,
-        isNSFW: data.isNSFW,
-        isSpoiler: data.isSpoiler,
-        contentType: data.contentType
-      };
-      
-      if (data.contentType === ContentType.LINK && 'linkUrl' in data) {
-        postData.linkUrl = data.linkUrl;
-      }
-      
-      if (data.contentType === ContentType.IMAGE && 'imageUrl' in data) {
-        // Incorporar la imagen en el contenido markdown
-        postData.content = `![${data.title}](${data.imageUrl})\n\n${data.content}`;
-      }
-      
-      const newPost = await ForumPostService.createPost(postData, data.contentType);
+      const newPost = await ForumPostService.createPost(postData);
       if (data.flairId) {
         await ForumFlairService.assignFlairToPost(newPost.id, data.flairId);
       }
@@ -226,13 +248,13 @@ const EditorPost: React.FC = () => {
     } catch (err) {
       console.error('Error al crear la publicación:', err);
       setGeneralError(err instanceof Error ? err.message : 'Ocurrió un error al crear la publicación');
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
-  // Referencia al contenedor del dropdown
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Efecto para manejar clics fuera del dropdown y cerrarlo
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -240,16 +262,26 @@ const EditorPost: React.FC = () => {
       }
     };
 
-    // Agregar el event listener cuando el dropdown esté visible
     if (showCategoryDropdown) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
-    // Cleanup: remover el event listener cuando el componente se desmonta o el dropdown se cierra
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showCategoryDropdown]);
+
+  const handleImageChange = (fileUrl: string | null) => {
+    setValue('imageUrl', fileUrl || '');
+    trigger('imageUrl');
+    
+    if (fileUrl === null) {
+      setAllImageUrls([]);
+    } 
+    else if (fileUrl && !allImageUrls.includes(fileUrl)) {
+      setAllImageUrls(prev => [...prev, fileUrl]);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto pt-8 px-4 sm:px-6 lg:px-8">
@@ -257,11 +289,11 @@ const EditorPost: React.FC = () => {
   
       {generalError && (
         <div className="p-4 mb-6 rounded-lg bg-red-50 border border-red-200">
-          <p className="text-red-700 flex items-center">
-            <BsExclamationCircle className="w-5 h-5 mr-2" />
-            {generalError}
-          </p>
-        </div>
+        <p className="text-red-700 flex items-center">
+          <BsExclamationCircle className="w-5 h-5 mr-2" />
+          {generalError}
+        </p>
+      </div>
       )}
   
       <div className="flex mb-6 border-b border-gray-200 space-x-2">
@@ -305,7 +337,6 @@ const EditorPost: React.FC = () => {
           )}
         </div>
 
-        {/* Buscador de categorías */}
         <div className="relative" ref={dropdownRef}>
           <label htmlFor="categorySearch" className="block text-sm font-medium text-gray-700 mb-2">
             Selecciona una categoría
@@ -369,7 +400,6 @@ const EditorPost: React.FC = () => {
             </div>
           )}
           
-          {/* Campo oculto para mantener el ID de la categoría seleccionada */}
           <input type="hidden" {...register('categoryId', { valueAsNumber: true })} />
           
           {formErrors.categoryId && (
@@ -379,7 +409,7 @@ const EditorPost: React.FC = () => {
             </p>
           )}
         </div>
-  
+
         {contentType === ContentType.LINK && (
           <div>
             <label htmlFor="linkUrl" className="block text-sm font-medium text-gray-700 mb-2">
@@ -425,54 +455,45 @@ const EditorPost: React.FC = () => {
             )}
           </div>
         )}
-  
+
         {contentType === ContentType.IMAGE && (
           <div>
             <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-2">
-              URL de la imagen
+              Imagen
             </label>
-            <input
-              type="url"
-              id="imageUrl"
-              {...register('imageUrl')}
-              className={`w-full px-4 py-2.5 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                ${formErrors.imageUrl ? 'border-red-300 text-red-900 placeholder-red-300' : 'border-gray-300'}`}
-              placeholder="https://ejemplo.com/imagen.jpg"
+            <InputFile
+              value={watch('imageUrl') || null}
+              onChange={handleImageChange}
+              error={formErrors.imageUrl?.message}
+              disabled={isSubmitting}
+              allImages={allImageUrls} 
             />
-            {formErrors.imageUrl && (
+          </div>
+        )}
+
+        {contentType === ContentType.TEXT && (
+          <div>
+            <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+              Contenido detallado
+            </label>
+            <div className={`rounded-lg overflow-hidden border ${formErrors.content ? 'border-red-300' : 'border-gray-300'}`}>
+              <MDXEditorComponent
+                key={editorKey} 
+                initialContent={watchContent || '# Título de tu publicación\n\nEscribe tu contenido aquí...'}
+                onChange={(value) => setValue('content', value)}
+                minHeight="300px"
+                maxHeight="60vh"
+                className="rounded-lg"
+              />
+            </div>
+            {formErrors.content && (
               <p className="mt-2 text-sm text-red-600 flex items-center">
                 <BsExclamationCircle className="w-4 h-4 mr-1" />
-                {formErrors.imageUrl.message}
+                {formErrors.content.message}
               </p>
-            )}
-            {imagePreview && (
-              <div className="mt-2 p-3 border border-gray-200 rounded bg-gray-50">
-                <img src={imagePreview} alt="Vista previa" className="max-h-64 max-w-full mx-auto" />
-              </div>
             )}
           </div>
         )}
-  
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-            Contenido detallado
-          </label>
-          <div className={`rounded-lg overflow-hidden border ${formErrors.content ? 'border-red-300' : 'border-gray-300'}`}>
-            <MDXEditorComponent
-              initialContent={watchContent}
-              onChange={(value) => setValue('content', value)}
-              minHeight="300px"
-              maxHeight="60vh"
-              className="rounded-lg"
-            />
-          </div>
-          {formErrors.content && (
-            <p className="mt-2 text-sm text-red-600 flex items-center">
-              <BsExclamationCircle className="w-4 h-4 mr-1" />
-              {formErrors.content.message}
-            </p>
-          )}
-        </div>
         <div className="space-y-3">
         <FlairTag
   selectedFlairId={watch('flairId')}

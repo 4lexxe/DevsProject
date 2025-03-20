@@ -74,9 +74,9 @@ async function syncDatabase() {
     await ForumReactionReply.sync({ force: true });
     
     // Poblar datos DESPUÉS de crear todas las tablas
-     await seedInitialData(); 
-     await initializeForumFlairs();
-     await initializeForumCategories();
+    await seedInitialData(); 
+    await initializeForumFlairs();
+    await initializeForumCategories();
     console.log('¡Sincronización exitosa!');
   } catch (error) {
     console.error('Error:', error);

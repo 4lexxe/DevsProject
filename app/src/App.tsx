@@ -35,6 +35,7 @@ import NotFound from "./shared/components/NotFound";
 
 //Importación de las rutas del foro
 import EditorPost from "./forum/components/EditorPost";
+import LeftPanel from "./forum/components/LeftPanel";
 
 
 const queryClient = new QueryClient({
@@ -72,7 +73,8 @@ function App() {
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
 
               {/* Rutas del foro */}
-              <Route path="/forum" element={<EditorPost />} />
+              <Route path="/forum" element={<LeftPanel />} />
+              <Route path="/forum/submit" element={<EditorPost />} />
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>

@@ -25,20 +25,35 @@ export class ForumPostController {
               return;
             }
 
-            const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType: bodyContentType } = req.body;
+            const { 
+                title, 
+                content, 
+                categoryId, 
+                isNSFW, 
+                isSpoiler, 
+                imageUrl, 
+                contentType: requestContentType,
+                linkUrl, // Para posts de tipo LINK
+            } = req.body;
+            
             const userId = (req.user as User)?.id;
             
-            // Verificar si hay un parámetro 'type' en la query (estilo Reddit)
-            const queryType = req.query.type as string;
-            let contentType = bodyContentType;
+            // Determinar el tipo de contenido basado en el valor proporcionado o inferirlo
+            let contentType = requestContentType;
             
-            // Si hay un tipo en la query, usar ese (tiene prioridad)
-            if (queryType && Object.values(ContentType).includes(queryType as ContentType)) {
-                contentType = queryType as ContentType;
+            // Si no se proporcionó tipo, inferir basado en los datos proporcionados
+            if (!contentType) {
+                if (linkUrl) {
+                    contentType = ContentType.LINK;
+                } else if (imageUrl || (content && content.includes('![') && content.includes('](') && content.includes(')'))) {
+                    contentType = ContentType.IMAGE;
+                } else {
+                    contentType = ContentType.TEXT; // Valor por defecto
+                }
             }
 
             // Validar el tipo de contenido
-            if (contentType && !Object.values(ContentType).includes(contentType)) {
+            if (!Object.values(ContentType).includes(contentType)) {
                 res.status(400).json({ 
                     success: false, 
                     message: 'Invalid content type. Must be one of: TEXT, IMAGE, LINK' 
@@ -51,7 +66,8 @@ export class ForumPostController {
                 contentType = ContentType.TEXT;
             }
 
-            const post = await ForumPost.create({
+            // Crear el post
+            const postData: any = {
                 title,
                 content,
                 contentType,
@@ -60,10 +76,33 @@ export class ForumPostController {
                 status: PostStatus.PUBLISHED,
                 isNSFW: isNSFW || false,
                 isSpoiler: isSpoiler || false,
-                coverImage: coverImage || null,
                 viewCount: 0,
                 replyCount: 0
-            }, { transaction });
+            };
+            
+            // Manejar imageUrl según el tipo de contenido
+            if (contentType === ContentType.IMAGE) {
+                // Si viene una URL directa (string), la convertimos en array
+                if (typeof imageUrl === 'string' && imageUrl) {
+                    postData.imageUrl = [imageUrl];
+                } 
+                // Si ya viene como array, lo usamos como está (hasta 8 imágenes)
+                else if (Array.isArray(imageUrl)) {
+                    postData.imageUrl = imageUrl.slice(0, 8);
+                }
+                // Si no hay imágenes, usamos array vacío
+                else {
+                    postData.imageUrl = [];
+                }
+            }
+            
+            // Manejar linkUrl para posts de tipo LINK
+            if (contentType === ContentType.LINK && linkUrl) {
+                postData.linkUrl = linkUrl;
+                // No sobrescribir el slug, dejemos que el hook beforeValidate lo genere correctamente
+            }
+            
+            const post = await ForumPost.create(postData, { transaction });
 
             await transaction.commit();
             res.status(201).json({ success: true, data: post });
@@ -289,21 +328,21 @@ static async updatePost(req: Request, res: Response): Promise<void> {
         }
 
         const { id } = req.params;
-        const { title, content, categoryId, isNSFW, isSpoiler, coverImage, contentType, isPinned, isLocked, isAnnouncement } = req.body;
+        const { title, content, categoryId, isNSFW, isSpoiler, imageUrl, contentType, isPinned, isLocked, isAnnouncement, linkUrl } = req.body;
         const userId = (req.user as User)?.id;
-
+        
         const post = await ForumPost.findByPk(id);
         if (!post) {
             res.status(404).json({ success: false, message: 'Post not found' });
             return;
         }
-
+        
       // Verificar que el usuario sea el autor del post
         if (post.authorId !== userId) {
             res.status(403).json({ success: false, message: 'Not authorized to update this post' });
             return;
         }
-
+        
         // Validar el tipo de contenido si se está actualizando
         if (contentType && !Object.values(ContentType).includes(contentType)) {
             res.status(400).json({ 
@@ -315,19 +354,20 @@ static async updatePost(req: Request, res: Response): Promise<void> {
 
         // Actualizar solo los campos proporcionados
         await post.update({
-          title,
-          content,
-          categoryId,
-          isNSFW,
-          isSpoiler,
-          coverImage,
-          contentType: contentType || post.contentType,
-          isLocked,
-          isPinned,
-          isAnnouncement,
-          updatedAt: new Date()
+            title,
+            content,
+            categoryId,
+            isNSFW,
+            isSpoiler,
+            imageUrl: Array.isArray(imageUrl) ? imageUrl.slice(0, 8) : imageUrl ? [imageUrl] : undefined,
+            contentType: contentType || post.contentType,
+            isLocked,
+            isPinned,
+            isAnnouncement,
+            linkUrl,
+            updatedAt: new Date()
         }, { transaction });
-
+        
         await transaction.commit();
         res.status(200).json({ success: true, data: post });
     } catch (error) {

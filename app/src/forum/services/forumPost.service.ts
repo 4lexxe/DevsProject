@@ -22,6 +22,7 @@ export interface ForumPost {
   content: string;
   contentType: ContentType; // Tipo de contenido: texto, imagen o enlace
   linkUrl?: string; // URL para posts de tipo LINK
+  imageUrl?: string[]; // Array de URLs de imágenes (máximo 8)
   categoryId: number;
   authorId: number;
   status: PostStatus;
@@ -179,16 +180,24 @@ const ForumPostService = {
   },
 
   // Crear una nueva publicación con soporte para diferentes tipos de contenido
-  async createPost(postData: Partial<ForumPost>, contentType?: ContentType): Promise<ForumPost> {
+  async createPost(postData: Partial<ForumPost>): Promise<ForumPost> {
     try {
-      // Asegurarse de que el contentType del postData tenga prioridad sobre el parámetro contentType
-      if (!postData.contentType && contentType) {
-        postData.contentType = contentType;
+      if (!postData.contentType) {
+        throw new Error('Se requiere especificar el tipo de contenido');
       }
       
       // Validar datos según el tipo de contenido
       if (postData.contentType === ContentType.LINK && !postData.linkUrl) {
         throw new Error('Se requiere una URL para publicaciones de tipo enlace');
+      }
+      
+      if (postData.contentType === ContentType.IMAGE) {
+        // Solo verificamos que haya una imagen en el array imageUrl
+        const hasImageUrl = Array.isArray(postData.imageUrl) && postData.imageUrl.length > 0;
+        
+        if (!hasImageUrl) {
+          throw new Error('Se requiere incluir al menos una imagen para publicaciones tipo imagen');
+        }
       }
       
       // Usar siempre la ruta base para posts
@@ -198,7 +207,9 @@ const ForumPostService = {
       return response.data.data;
     } catch (error) {
       console.error('Error al crear la publicación:', error);
-      throw new Error('Error al crear la publicación.');
+      throw error instanceof Error 
+        ? error 
+        : new Error('Error al crear la publicación.');
     }
   },
 

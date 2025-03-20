@@ -26,7 +26,8 @@ interface ForumPostAttributes {
   status: PostStatus; // Movido desde ForumPost
   isNSFW: boolean; // Movido desde ForumPost
   isSpoiler: boolean; // Movido desde ForumPost
-  coverImage?: string; // Movido desde ForumPost
+  linkUrl?: string; // Movido desde ForumPost
+  imageUrl?: string[]; // Array de URLs de imágenes (máximo 8)
   isPinned?: boolean;
   isLocked?: boolean;
   isAnnouncement?: boolean;
@@ -61,10 +62,11 @@ class ForumPost extends Model<ForumPostAttributes, ForumPostCreationAttributes>
   public content!: string;
   public contentType!: ContentType;
   public slug?: string;
+  public linkUrl?: string;
   public status!: PostStatus;
   public isNSFW!: boolean;
   public isSpoiler!: boolean;
-  public coverImage?: string;
+  public imageUrl?: string[];
   public replyCount!: number;
   public voteScore!: number;
   public upvoteCount!: number;
@@ -119,6 +121,10 @@ ForumPost.init(
         key: "id",
       },
     },
+    linkUrl: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM(...Object.values(PostStatus)),
       defaultValue: PostStatus.DRAFT,
@@ -131,9 +137,16 @@ ForumPost.init(
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
-    coverImage: {
-      type: DataTypes.STRING,
+    imageUrl: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
       allowNull: true,
+      validate: {
+        maxLength(value: string[]) {
+          if (value && value.length > 8) {
+            throw new Error('El número máximo de imágenes permitidas es 8');
+          }
+        }
+      }
     },
     isPinned: {
       type: DataTypes.BOOLEAN,
@@ -191,20 +204,21 @@ ForumPost.init(
   // Índices compuestos para casos de uso comunes
   { fields: ["categoryId", "lastActivityAt"] },
   { fields: ["isNSFW", "isSpoiler"] },
-  { fields: ["isPinned", "isAnnouncement"] }
+  { fields: ["isPinned", "isAnnouncement"] },
+  { fields: ["linkUrl"] }
     ],
     hooks: {
       beforeValidate: (post: ForumPost) => {
-        // Generar el slug a partir del título
-        let slug = slugify(post.title, {
-          replacement: '-',  // replace spaces with replacement character, defaults to `-`
-          lower: true,      // convertir a minúsculas
-          strict: true,     // eliminar caracteres especiales
-          trim: true,       // eliminar espacios al inicio y final
-          locale: 'es',     // para manejar caracteres españoles
-        });
-        // Limitar la longitud después
-        post.slug = slug.substring(0, 100);
+          // Generar el slug a partir del título
+          let slug = slugify(post.title, {
+            replacement: '-',  // replace spaces with replacement character, defaults to `-`
+            lower: true,      // convertir a minúsculas
+            strict: true,     // eliminar caracteres especiales
+            trim: true,       // eliminar espacios al inicio y final
+            locale: 'es',     // para manejar caracteres españoles
+          });
+          // Limitar la longitud después
+          post.slug = slug.substring(0, 100);
       },
       afterCreate: async (post: ForumPost) => {
         // Lógica para notificaciones o actualizaciones adicionales

@@ -42,7 +42,7 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas de Foro
-import forumCategoryRoutes from './modules/forum/routes/forumcategory.routes';
+import forumCategoryRoutes from './modules/forum/routes/forumCategory.routes';
 import forumPostRoutes from './modules/forum/routes/forumpost.routes';
 import forumReplyRoutes from './modules/forum/routes/forumreply.routes';
 import forumReactionPostRoutes from './modules/forum/routes/forumreactionpost.routes';
@@ -51,8 +51,7 @@ import forumVotePostRoutes from './modules/forum/routes/forumvotepost.routes';
 import forumVoteReplyRoutes from './modules/forum/routes/forumvotereply.routes';
 import forumFlairRoutes from './modules/forum/routes/forumflairs.routes';
 import forumReportRoutes from './modules/forum/routes/report.routes';
-
-
+import forumUploadRoutes from './modules/forum/routes/upload.routes';
 
 // ==================================================
 // Importaciones de utilidades y configuraciones
@@ -279,6 +278,7 @@ app.use('/api/forum', forumVotePostRoutes);
 app.use('/api/forum', forumVoteReplyRoutes);
 app.use('/api/forum', forumFlairRoutes);
 app.use('/api/forum', forumReportRoutes);
+app.use('/api/forum/upload', forumUploadRoutes);
 
 // Endpoint de estado del sistema
 app.get('/api/status', (req: Request, res) => {
