@@ -9,6 +9,14 @@ interface NextPaymentProps {
 export default function NextPayment({ subscription }: NextPaymentProps) {
   const { mpSubscription, plan } = subscription
 
+  // Verificar si hay un descuento activo
+  const hasActiveDiscount = plan.discountEvent?.isActive
+
+  // Calcular el precio con descuento si hay un descuento activo
+  const amountToPay = hasActiveDiscount
+    ? Number(plan.totalPrice) - (Number(plan.totalPrice) * plan.discountEvent!.value) / 100
+    : Number(plan.totalPrice)
+
   return (
     <div className="bg-white rounded-lg border border-[#eff6ff] shadow-sm">
       <div className="p-6 border-b border-[#eff6ff]">
@@ -38,13 +46,25 @@ export default function NextPayment({ subscription }: NextPaymentProps) {
         </div>
         <div className="mt-4">
           <p className="text-sm text-gray-500">Monto a debitar</p>
-          <p className="text-xl font-bold text-[#0c154c]">{formatCurrency(plan.totalPrice)}</p>
+          {hasActiveDiscount ? (
+            <div className="flex items-center gap-2">
+              <p className="text-xl font-bold text-[#0c154c]">{formatCurrency(amountToPay)}</p>
+              <span className="text-sm line-through text-gray-500">{formatCurrency(plan.totalPrice)}</span>
+              <span className="bg-[#42d7c7] text-[#0c154c] text-xs font-medium px-2 py-1 rounded-full">
+                {plan.discountEvent!.value}% OFF
+              </span>
+            </div>
+          ) : (
+            <p className="text-xl font-bold text-[#0c154c]">{formatCurrency(plan.totalPrice)}</p>
+          )}
+          {hasActiveDiscount && plan.discountEvent?.description && (
+            <p className="text-sm text-[#1d4ed8] mt-1">{plan.discountEvent.description}</p>
+          )}
         </div>
         <div className="mt-6 pt-4 border-t border-[#eff6ff]">
           <div className="flex items-center">
-            <img src={mercadopago} alt="Mercado Pago" className="w-40" />
+            <img src="/placeholder.svg?height=24&width=120" alt="Mercado Pago" className="h-6" />
             <p className="ml-2 text-sm text-gray-500">Procesado por Mercado Pago</p>
-
           </div>
         </div>
       </div>

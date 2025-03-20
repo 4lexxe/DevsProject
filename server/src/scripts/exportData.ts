@@ -3,11 +3,15 @@
 import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
+import User from '../modules/user/User';
 import MPSubPlan from '../modules/subscription/models/MPSubPlan';
 import Payment from '../modules/subscription/models/Payment';
 import Invoice from '../modules/subscription/models/Invoice';
 import Subscription from '../modules/subscription/models/Subscription';
 import MPSubscription from '../modules/subscription/models/MPSubscription';
+import Plan from '../modules/subscription/models/Plan';
+import DiscountEvent from '../modules/subscription/models/DiscountEvent';
+import { Op } from 'sequelize';
 
 async function exportData() {
   try {
@@ -16,19 +20,39 @@ async function exportData() {
     console.log('Conexión a la base de datos establecida correctamente.');
 
     // Consultar datos de la base de datos
+    const users = await User.findAll({
+      where: {
+        id: {
+          [Op.ne]: 1
+        }
+      }
+    });
+    const plans = await Plan.findAll();
+    const discounts = await DiscountEvent.findAll();
     const mpSubPlans = await MPSubPlan.findAll();
-    const subscriptions = await Subscription.findAll();
+    const subscriptions = await Subscription.findAll({ paranoid: true});
     const mpSubscriptions = await MPSubscription.findAll();
     const payments = await Payment.findAll();
     const invoices = await Invoice.findAll();
 
     // Crear un objeto con los datos
     const data = {
-      mpSubPlans: mpSubPlans.map(mpSubPlan => {
-        const subData = mpSubPlan.toJSON();
-        delete subData.id;
-        return subData;
+      users: users.map(user => {
+        const userData = user.toJSON();
+        delete userData.id;
+        return userData;
       }),
+      plans: plans.map(plan => {
+        const planData = plan.toJSON();
+        delete planData.id;
+        return planData;
+      }),
+      discountEvents: discounts.map(discount => {
+        const discountData = discount.toJSON();
+        delete discountData.id;
+        return discountData;
+      }),
+      mpSubPlans: mpSubPlans.map(mpSubPlan => mpSubPlan.toJSON()),
       subscriptions: subscriptions.map(subscription => {
         const subData = subscription.toJSON();
         delete subData.id;

@@ -10,6 +10,7 @@ import Payment from "../models/Payment";
 import { PreApproval } from "mercadopago";
 import MPSubscriptionController from "./mpSubscriptionController";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
+import DiscountEvent from "../models/DiscountEvent";
 
 interface SubscriptionData {
   userId: bigint;
@@ -217,7 +218,11 @@ class SubscriptionController {
         },
         order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan, as: "plan", attributes:["name", "description", "totalPrice", "duration", "durationType", "features", "accessLevel", "installments", "installmentPrice"] },
+          { model: Plan, 
+            as: "plan", 
+            attributes:["name", "description", "totalPrice", "duration", "durationType", "features", "accessLevel", "installments", "installmentPrice"],
+            include: [{ model: DiscountEvent, as: "discountEvent" }]
+          },
           {
             model: MPSubscription,
             as: "mpSubscription",

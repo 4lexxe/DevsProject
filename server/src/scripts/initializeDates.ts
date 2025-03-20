@@ -16,7 +16,7 @@ import DiscountEvent from "../modules/subscription/models/DiscountEvent";
 dotenv.config();
 
 /// Datos para los planes de membresía
-const plansToInsert = [
+/* const plansToInsert = [
   {
     name: "Plan Básico",
     description: "Plan ideal para usuarios que recién comienzan",
@@ -83,10 +83,10 @@ const plansToInsert = [
     installments: 1,
     saveInMp: false,
   },
-];
+]; */
 
 // Datos para los descuentos de los planes
-const descuentos = [
+/* const descuentos = [
   {
     description: "Descuento especial por pascuas",
     value: 70,
@@ -96,7 +96,7 @@ const descuentos = [
     event: "Pascuas 2025", 
     planId: 3, 
   },
-];
+]; */
 
 //Datos de ejemplo para las categorias
 const categorias = [
@@ -488,16 +488,6 @@ async function insertData() {
     // Sincronizar los modelos con la base de datos
     await sequelize.sync();
     console.log("Modelos sincronizados con la base de datos.");
-
-    //Datos para los planes de membresia
-    for (const plan of plansToInsert) {
-      await Plan.create(plan);
-    }
-
-    // Insertar descuentos y relaciones con planes
-    for (const descuento of descuentos) {
-      await DiscountEvent.create(descuento);
-    }
 
     //Insertar categorias y carreras
     for (const categoria of categorias) {

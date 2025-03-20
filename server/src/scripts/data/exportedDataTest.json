@@ -1,6 +1,132 @@
 {
+  "users": [
+    {
+      "name": "asdfa",
+      "email": "mame@gmail.com",
+      "password": "$2b$10$SEXxGmlE9rUAqLosbzRPneGboeYuQ2XT.ys6xEIV.GbS9lDxhsZKW",
+      "phone": null,
+      "roleId": 1,
+      "authProvider": "local",
+      "authProviderId": null,
+      "username": "asdfa",
+      "avatar": null,
+      "displayName": null,
+      "providerMetadata": null,
+      "registrationIp": "127.0.0.1",
+      "registrationGeo": null,
+      "lastLoginIp": "127.0.0.1",
+      "lastLoginGeo": null,
+      "suspiciousActivities": [],
+      "isActiveSession": true,
+      "lastActiveAt": "2025-03-20T15:34:21.385Z",
+      "createdAt": "2025-03-20T14:47:36.352Z",
+      "updatedAt": "2025-03-20T15:34:21.385Z"
+    }
+  ],
+  "plans": [
+    {
+      "name": "Plan Básico",
+      "description": "Plan ideal para usuarios que recién comienzan",
+      "totalPrice": "100.00",
+      "duration": 1,
+      "durationType": "días",
+      "features": [
+        "Acceso básico",
+        "Soporte Básico",
+        "Actualizaciones mensuales"
+      ],
+      "accessLevel": "Básico",
+      "installments": 1,
+      "installmentPrice": "100.00",
+      "isActive": true,
+      "position": 1,
+      "saveInMp": true,
+      "createdAt": "2025-03-20T14:46:50.940Z",
+      "updatedAt": "2025-03-20T14:46:50.940Z",
+      "deletedAt": null
+    },
+    {
+      "name": "Plan Estándar",
+      "description": "Plan para usuarios que necesitan más funcionalidades",
+      "totalPrice": "150.00",
+      "duration": 1,
+      "durationType": "días",
+      "features": [
+        "Acceso completo",
+        "Soporte Estándar",
+        "Actualizaciones semanales"
+      ],
+      "accessLevel": "Estándar",
+      "installments": 1,
+      "installmentPrice": "150.00",
+      "isActive": true,
+      "position": 2,
+      "saveInMp": true,
+      "createdAt": "2025-03-20T14:46:50.953Z",
+      "updatedAt": "2025-03-20T14:46:50.953Z",
+      "deletedAt": null
+    },
+    {
+      "name": "Plan Premium",
+      "description": "Plan para usuarios avanzados que requieren soporte prioritario",
+      "totalPrice": "240.00",
+      "duration": 3,
+      "durationType": "días",
+      "features": [
+        "Acceso completo",
+        "Soporte Premium",
+        "Actualizaciones diarias",
+        "Acceso anticipado a nuevas funciones"
+      ],
+      "accessLevel": "Premium",
+      "installments": 3,
+      "installmentPrice": "80.00",
+      "isActive": true,
+      "position": 3,
+      "saveInMp": true,
+      "createdAt": "2025-03-20T14:46:50.956Z",
+      "updatedAt": "2025-03-20T14:46:50.956Z",
+      "deletedAt": null
+    },
+    {
+      "name": "Este plan se guarda En mercado pago con estado analitico",
+      "description": "Plan para usuarios que necesitan más funcionalidades",
+      "totalPrice": "10000.00",
+      "duration": 1,
+      "durationType": "días",
+      "features": [
+        "Acceso completo",
+        "Soporte Estándar",
+        "Actualizaciones semanales"
+      ],
+      "accessLevel": "Estándar",
+      "installments": 1,
+      "installmentPrice": "10000.00",
+      "isActive": false,
+      "position": null,
+      "saveInMp": false,
+      "createdAt": "2025-03-20T14:46:50.959Z",
+      "updatedAt": "2025-03-20T14:46:50.959Z",
+      "deletedAt": null
+    }
+  ],
+  "discountEvents": [
+    {
+      "description": "Descuento especial por pascuas",
+      "value": 50,
+      "startDate": "2025-03-01T00:00:00.000Z",
+      "endDate": "2025-04-30T00:00:00.000Z",
+      "isActive": true,
+      "planId": "3",
+      "event": "Pascuas 2025",
+      "createdAt": "2025-03-20T14:46:50.961Z",
+      "updatedAt": "2025-03-20T15:02:10.537Z",
+      "deletedAt": null
+    }
+  ],
   "mpSubPlans": [
     {
+      "id": "2c9380849564460a01959c4e556119c2",
       "planId": "1",
       "reason": "Plan Básico",
       "status": "active",
@@ -100,6 +226,7 @@
       "updatedAt": "2025-03-17T21:22:39.372Z"
     },
     {
+      "id": "2c9380849564460a01959c4fba2519c3",
       "planId": "2",
       "reason": "Plan Estándar",
       "status": "active",
@@ -199,6 +326,7 @@
       "updatedAt": "2025-03-17T21:23:05.343Z"
     },
     {
+      "id": "2c9380849563a16501959c5083df1a49",
       "planId": "3",
       "reason": "Plan Premium",
       "status": "active",
@@ -208,7 +336,7 @@
         "currency_id": "ARS",
         "repetitions": 3,
         "frequency_type": "days",
-        "transaction_amount": 24
+        "transaction_amount": 40
       },
       "data": {
         "id": "2c9380849563a16501959c5083df1a49",
@@ -220,7 +348,7 @@
           "status": 200,
           "headers": {
             "date": [
-              "Mon, 17 Mar 2025 21:23:06 GMT"
+              "Thu, 20 Mar 2025 15:02:09 GMT"
             ],
             "vary": [
               "Accept-Encoding"
@@ -232,7 +360,7 @@
               "application/json"
             ],
             "x-request-id": [
-              "bee62528-16cd-4823-99e3-a4c7eb6e2cd6"
+              "24b58bee-220f-490a-b5d2-c2aea4e61bb6"
             ],
             "content-encoding": [
               "gzip"
@@ -268,14 +396,14 @@
         },
         "collector_id": 2290216045,
         "date_created": "2025-03-15T20:17:57.215-04:00",
-        "last_modified": "2025-03-17T17:23:06.878-04:00",
+        "last_modified": "2025-03-20T09:24:01.547-04:00",
         "application_id": 4832380742964303,
         "auto_recurring": {
           "frequency": 1,
           "currency_id": "ARS",
           "repetitions": 3,
           "frequency_type": "days",
-          "transaction_amount": 80
+          "transaction_amount": 40
         },
         "payment_methods_allowed": {
           "payment_types": [
@@ -295,7 +423,7 @@
         }
       },
       "createdAt": "2025-03-16T00:17:58.130Z",
-      "updatedAt": "2025-03-17T21:23:08.130Z"
+      "updatedAt": "2025-03-20T15:02:11.224Z"
     }
   ],
   "subscriptions": [
@@ -307,6 +435,16 @@
       "status": "authorized",
       "createdAt": "2025-03-19T01:03:48.851Z",
       "updatedAt": "2025-03-19T01:04:01.223Z",
+      "deletedAt": null
+    },
+    {
+      "userId": "2",
+      "planId": "3",
+      "startDate": "2025-03-20T15:03:06.386Z",
+      "endDate": "2025-03-23T15:03:06.386Z",
+      "status": "authorized",
+      "createdAt": "2025-03-20T15:01:42.169Z",
+      "updatedAt": "2025-03-20T15:03:10.844Z",
       "deletedAt": null
     }
   ],
@@ -413,36 +551,35 @@
       "deletedAt": null
     },
     {
-      "id": "1db3a5820a1f45c8b16be112db960e9f",
+      "id": "adc32a51a2ab436da9d6c01e01624038",
       "subscriptionId": "2",
-      "payerId": "2104500152",
-      "status": "authorized",
-      "dateCreated": "2025-03-19T01:03:59.001Z",
-      "nextPaymentDate": "2025-03-20T01:03:58.000Z",
+      "payerId": "2102017233",
+      "status": "cancelled",
+      "dateCreated": "2025-03-20T14:48:51.665Z",
+      "nextPaymentDate": "2025-03-21T14:48:51.000Z",
       "data": {
-        "id": "1db3a5820a1f45c8b16be112db960e9f",
+        "id": "adc32a51a2ab436da9d6c01e01624038",
         "owner": null,
-        "reason": "Plan Básico",
-        "status": "authorized",
+        "reason": "Plan Premium",
+        "status": "cancelled",
         "back_url": "https://jjg61vx9-5173.brs.devtunnels.ms/subscription/success",
-        "payer_id": 2104500152,
-        "init_point": "https://www.mercadopago.com.ar/subscriptions/checkout?preapproval_id=1db3a5820a1f45c8b16be112db960e9f",
+        "payer_id": 2102017233,
         "summarized": {
-          "quotas": 1,
-          "semaphore": null,
-          "charged_amount": null,
-          "charged_quantity": null,
-          "last_charged_date": null,
-          "last_charged_amount": null,
-          "pending_charge_amount": 100,
-          "pending_charge_quantity": 1
+          "quotas": 3,
+          "semaphore": "green",
+          "charged_amount": 40,
+          "charged_quantity": 1,
+          "last_charged_date": "2025-03-20T10:50:26.560-04:00",
+          "last_charged_amount": 40,
+          "pending_charge_amount": 80,
+          "pending_charge_quantity": 2
         },
         "payer_email": "",
         "api_response": {
           "status": 200,
           "headers": {
             "date": [
-              "Wed, 19 Mar 2025 01:04:00 GMT"
+              "Thu, 20 Mar 2025 15:01:21 GMT"
             ],
             "vary": [
               "Accept-Encoding"
@@ -454,7 +591,7 @@
               "application/json"
             ],
             "x-request-id": [
-              "cf862a97-c041-4458-95d7-47540dc7bcee"
+              "19122c25-ce8d-40b2-b857-50bcb74c98fd"
             ],
             "content-encoding": [
               "gzip"
@@ -489,29 +626,29 @@
           }
         },
         "collector_id": 2290216045,
-        "date_created": "2025-03-18T21:03:59.001-04:00",
-        "last_modified": "2025-03-18T21:03:59.006-04:00",
+        "date_created": "2025-03-20T10:48:51.665-04:00",
+        "last_modified": "2025-03-20T11:01:19.970-04:00",
         "application_id": 4832380742964303,
         "auto_recurring": {
-          "end_date": "2025-03-19T21:03:59.001-04:00",
+          "end_date": "2025-03-23T10:48:51.666-04:00",
           "frequency": 1,
           "free_trial": null,
-          "start_date": "2025-03-18T21:03:59.001-04:00",
+          "start_date": "2025-03-20T10:48:51.666-04:00",
           "currency_id": "ARS",
           "frequency_type": "days",
           "has_billing_day": false,
-          "transaction_amount": 100,
+          "transaction_amount": 40,
           "billing_day_proportional": false
         },
-        "subscription_id": "1db3a5820a1f45c8b16be112db960e9f",
-        "next_payment_date": "2025-03-19T21:03:58.000-04:00",
+        "subscription_id": "adc32a51a2ab436da9d6c01e01624038",
+        "next_payment_date": "2025-03-21T10:48:51.000-04:00",
         "payment_method_id": "account_money",
-        "preapproval_plan_id": "2c9380849564460a01959c4e556119c2",
+        "preapproval_plan_id": "2c9380849563a16501959c5083df1a49",
         "first_invoice_offset": null,
         "payment_method_id_secondary": null
       },
-      "createdAt": "2025-03-19T01:04:01.225Z",
-      "updatedAt": "2025-03-19T01:04:01.225Z",
+      "createdAt": "2025-03-20T14:48:55.329Z",
+      "updatedAt": "2025-03-20T15:01:23.215Z",
       "deletedAt": null
     }
   ],
@@ -993,6 +1130,484 @@
       "createdAt": "2025-03-19T01:04:00.914Z",
       "updatedAt": "2025-03-19T01:04:00.914Z",
       "deletedAt": null
+    },
+    {
+      "id": "105793569942",
+      "mpSubscriptionId": "adc32a51a2ab436da9d6c01e01624038",
+      "dateApproved": "2025-03-20T14:48:51.000Z",
+      "status": "approved",
+      "transactionAmount": "40.00",
+      "paymentMethodId": "account_money",
+      "paymentTypeId": "account_money",
+      "data": {
+        "id": 105793569942,
+        "card": {},
+        "tags": null,
+        "order": {},
+        "payer": {
+          "id": "2102017233",
+          "type": null,
+          "email": "test_user_437832978@testuser.com",
+          "phone": {
+            "number": null,
+            "area_code": null,
+            "extension": null
+          },
+          "last_name": null,
+          "first_name": null,
+          "entity_type": null,
+          "operator_id": null,
+          "identification": {
+            "type": "DNI",
+            "number": "1111111"
+          }
+        },
+        "pos_id": null,
+        "status": "approved",
+        "refunds": [],
+        "brand_id": null,
+        "captured": true,
+        "metadata": {
+          "preapproval_id": "adc32a51a2ab436da9d6c01e01624038"
+        },
+        "store_id": null,
+        "issuer_id": "2005",
+        "live_mode": true,
+        "sponsor_id": null,
+        "binary_mode": false,
+        "currency_id": "ARS",
+        "description": "Plan Premium",
+        "fee_details": [
+          {
+            "type": "mercadopago_fee",
+            "amount": 0.72,
+            "fee_payer": "collector"
+          }
+        ],
+        "platform_id": null,
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Thu, 20 Mar 2025 14:48:53 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding, Accept,Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json;charset=UTF-8"
+            ],
+            "x-request-id": [
+              "80eb5dc1-1849-4d73-bb0d-f641462d5613"
+            ],
+            "cache-control": [
+              "max-age=0"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "collector_id": 2290216045,
+        "date_created": "2025-03-20T10:48:51.000-04:00",
+        "installments": 1,
+        "release_info": null,
+        "taxes_amount": 0,
+        "accounts_info": null,
+        "build_version": "3.97.0-rc-1",
+        "coupon_amount": 0,
+        "date_approved": "2025-03-20T10:48:51.000-04:00",
+        "integrator_id": null,
+        "status_detail": "accredited",
+        "corporation_id": null,
+        "operation_type": "regular_payment",
+        "payment_method": {
+          "id": "account_money",
+          "type": "account_money",
+          "issuer_id": "2005"
+        },
+        "additional_info": {
+          "items": [
+            {
+              "title": "Plan Premium",
+              "quantity": "1",
+              "unit_price": "40"
+            }
+          ],
+          "ip_address": "181.111.85.190",
+          "tracking_id": "platform:v1-blacklabel,so:ALL,type:N/A,security:none"
+        },
+        "charges_details": [
+          {
+            "id": "105793569942-001",
+            "name": "mercadopago_fee",
+            "type": "fee",
+            "amounts": {
+              "original": 0.72,
+              "refunded": 0
+            },
+            "accounts": {
+              "to": "mp",
+              "from": "collector"
+            },
+            "metadata": {
+              "source": "rule-engine"
+            },
+            "client_id": 0,
+            "reserve_id": null,
+            "date_created": "2025-03-20T10:48:51.000-04:00",
+            "last_updated": "2025-03-20T10:48:51.000-04:00",
+            "refund_charges": []
+          }
+        ],
+        "financing_group": null,
+        "merchant_number": null,
+        "payment_type_id": "account_money",
+        "processing_mode": "aggregator",
+        "shipping_amount": 0,
+        "counter_currency": null,
+        "deduction_schema": null,
+        "notification_url": null,
+        "date_last_updated": "2025-03-20T10:48:51.000-04:00",
+        "marketplace_owner": null,
+        "payment_method_id": "account_money",
+        "authorization_code": null,
+        "date_of_expiration": null,
+        "external_reference": null,
+        "money_release_date": "2025-04-24T10:48:51.000-04:00",
+        "transaction_amount": 40,
+        "merchant_account_id": null,
+        "transaction_details": {
+          "overpaid_amount": 0,
+          "total_paid_amount": 40,
+          "acquirer_reference": null,
+          "installment_amount": 0,
+          "net_received_amount": 39.28,
+          "external_resource_url": null,
+          "financial_institution": null,
+          "payable_deferral_period": null,
+          "payment_method_reference_id": null
+        },
+        "money_release_schema": null,
+        "money_release_status": "pending",
+        "point_of_interaction": {
+          "type": "SUBSCRIPTIONS",
+          "location": {
+            "source": "payer",
+            "state_id": "NN"
+          },
+          "business_info": {
+            "unit": "online_payments",
+            "branch": "Merchant Services",
+            "sub_unit": "recurring"
+          },
+          "application_data": {
+            "name": "recurring",
+            "version": "3.48.0-rc-1"
+          },
+          "transaction_data": {
+            "plan_id": "f08f43b85d714a6e961e52c248b22fcc",
+            "processor": null,
+            "invoice_id": "7a5d578353734a1283afd4c4cad4405a",
+            "billing_date": "2025-03-20",
+            "user_present": null,
+            "first_time_use": true,
+            "invoice_period": {
+              "type": "daily",
+              "period": 1
+            },
+            "subscription_id": "adc32a51a2ab436da9d6c01e01624038",
+            "payment_reference": null,
+            "subscription_sequence": {
+              "total": 3,
+              "number": 1
+            }
+          }
+        },
+        "statement_descriptor": null,
+        "call_for_authorize_id": null,
+        "charges_execution_info": {
+          "internal_execution": {
+            "date": "2025-03-20T10:48:51.353-04:00",
+            "execution_id": "01JPT0EJAN31ZR10EWH0BAFV1D"
+          }
+        },
+        "acquirer_reconciliation": [],
+        "differential_pricing_id": null,
+        "transaction_amount_refunded": 0
+      },
+      "createdAt": "2025-03-20T14:48:54.957Z",
+      "updatedAt": "2025-03-20T14:48:54.957Z",
+      "deletedAt": null
+    },
+    {
+      "id": "105378105215",
+      "mpSubscriptionId": "d078d0c81088471d8ea41e388f9ce834",
+      "dateApproved": "2025-03-20T15:03:05.000Z",
+      "status": "approved",
+      "transactionAmount": "40.00",
+      "paymentMethodId": "account_money",
+      "paymentTypeId": "account_money",
+      "data": {
+        "id": 105378105215,
+        "card": {},
+        "tags": null,
+        "order": {},
+        "payer": {
+          "id": "2102017233",
+          "type": null,
+          "email": "test_user_437832978@testuser.com",
+          "phone": {
+            "number": null,
+            "area_code": null,
+            "extension": null
+          },
+          "last_name": null,
+          "first_name": null,
+          "entity_type": null,
+          "operator_id": null,
+          "identification": {
+            "type": "DNI",
+            "number": "1111111"
+          }
+        },
+        "pos_id": null,
+        "status": "approved",
+        "refunds": [],
+        "brand_id": null,
+        "captured": true,
+        "metadata": {
+          "preapproval_id": "d078d0c81088471d8ea41e388f9ce834"
+        },
+        "store_id": null,
+        "issuer_id": "2005",
+        "live_mode": true,
+        "sponsor_id": null,
+        "binary_mode": false,
+        "currency_id": "ARS",
+        "description": "Plan Premium",
+        "fee_details": [
+          {
+            "type": "mercadopago_fee",
+            "amount": 0.72,
+            "fee_payer": "collector"
+          }
+        ],
+        "platform_id": null,
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Thu, 20 Mar 2025 15:03:07 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding, Accept,Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json;charset=UTF-8"
+            ],
+            "x-request-id": [
+              "d927f2d1-c7db-4e1d-855e-a1cbc275e7c7"
+            ],
+            "cache-control": [
+              "max-age=0"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "collector_id": 2290216045,
+        "date_created": "2025-03-20T11:03:05.000-04:00",
+        "installments": 1,
+        "release_info": null,
+        "taxes_amount": 0,
+        "accounts_info": null,
+        "build_version": "3.97.0-rc-1",
+        "coupon_amount": 0,
+        "date_approved": "2025-03-20T11:03:05.000-04:00",
+        "integrator_id": null,
+        "status_detail": "accredited",
+        "corporation_id": null,
+        "operation_type": "regular_payment",
+        "payment_method": {
+          "id": "account_money",
+          "type": "account_money",
+          "issuer_id": "2005"
+        },
+        "additional_info": {
+          "items": [
+            {
+              "title": "Plan Premium",
+              "quantity": "1",
+              "unit_price": "40"
+            }
+          ],
+          "ip_address": "181.111.85.190",
+          "tracking_id": "platform:v1-blacklabel,so:ALL,type:N/A,security:none"
+        },
+        "charges_details": [
+          {
+            "id": "105378105215-001",
+            "name": "mercadopago_fee",
+            "type": "fee",
+            "amounts": {
+              "original": 0.72,
+              "refunded": 0
+            },
+            "accounts": {
+              "to": "mp",
+              "from": "collector"
+            },
+            "metadata": {
+              "source": "rule-engine"
+            },
+            "client_id": 0,
+            "reserve_id": null,
+            "date_created": "2025-03-20T11:03:05.000-04:00",
+            "last_updated": "2025-03-20T11:03:05.000-04:00",
+            "refund_charges": []
+          }
+        ],
+        "financing_group": null,
+        "merchant_number": null,
+        "payment_type_id": "account_money",
+        "processing_mode": "aggregator",
+        "shipping_amount": 0,
+        "counter_currency": null,
+        "deduction_schema": null,
+        "notification_url": null,
+        "date_last_updated": "2025-03-20T11:03:05.000-04:00",
+        "marketplace_owner": null,
+        "payment_method_id": "account_money",
+        "authorization_code": null,
+        "date_of_expiration": null,
+        "external_reference": null,
+        "money_release_date": "2025-04-24T11:03:05.000-04:00",
+        "transaction_amount": 40,
+        "merchant_account_id": null,
+        "transaction_details": {
+          "overpaid_amount": 0,
+          "total_paid_amount": 40,
+          "acquirer_reference": null,
+          "installment_amount": 0,
+          "net_received_amount": 39.28,
+          "external_resource_url": null,
+          "financial_institution": null,
+          "payable_deferral_period": null,
+          "payment_method_reference_id": null
+        },
+        "money_release_schema": null,
+        "money_release_status": "pending",
+        "point_of_interaction": {
+          "type": "SUBSCRIPTIONS",
+          "location": {
+            "source": "payer",
+            "state_id": "NN"
+          },
+          "business_info": {
+            "unit": "online_payments",
+            "branch": "Merchant Services",
+            "sub_unit": "recurring"
+          },
+          "application_data": {
+            "name": "recurring",
+            "version": "3.48.0-rc-1"
+          },
+          "transaction_data": {
+            "plan_id": "f08f43b85d714a6e961e52c248b22fcc",
+            "processor": null,
+            "invoice_id": "a01fd1dec9584165af41d578b7c10008",
+            "billing_date": "2025-03-20",
+            "user_present": null,
+            "first_time_use": true,
+            "invoice_period": {
+              "type": "daily",
+              "period": 1
+            },
+            "subscription_id": "d078d0c81088471d8ea41e388f9ce834",
+            "payment_reference": null,
+            "subscription_sequence": {
+              "total": 3,
+              "number": 1
+            }
+          }
+        },
+        "statement_descriptor": null,
+        "call_for_authorize_id": null,
+        "charges_execution_info": {
+          "internal_execution": {
+            "date": "2025-03-20T11:03:05.549-04:00",
+            "execution_id": "01JPT18MGMY205XCFAB5Z59X68"
+          }
+        },
+        "acquirer_reconciliation": [],
+        "differential_pricing_id": null,
+        "transaction_amount_refunded": 0
+      },
+      "createdAt": "2025-03-20T15:03:09.219Z",
+      "updatedAt": "2025-03-20T15:03:09.219Z",
+      "deletedAt": null
     }
   ],
   "invoices": [
@@ -1149,6 +1764,160 @@
       "dueDate": "2025-04-18T01:05:33.235Z",
       "createdAt": "2025-03-19T01:05:33.235Z",
       "updatedAt": "2025-03-19T01:05:33.235Z"
+    },
+    {
+      "paymentId": "105793569942",
+      "data": {
+        "id": 7017072026,
+        "type": "recurring",
+        "reason": "Plan Premium",
+        "status": "processed",
+        "payment": {
+          "id": 105793569942,
+          "status": "approved",
+          "status_detail": "accredited"
+        },
+        "debit_date": "2025-03-20T10:48:51.000-04:00",
+        "currency_id": "ARS",
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Thu, 20 Mar 2025 14:50:28 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json"
+            ],
+            "x-request-id": [
+              "09de5c45-9cfb-4594-8088-a5959909bdfb"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "date_created": "2025-03-20T10:50:26.560-04:00",
+        "last_modified": "2025-03-20T10:50:26.560-04:00",
+        "retry_attempt": 1,
+        "preapproval_id": "adc32a51a2ab436da9d6c01e01624038",
+        "next_retry_date": "2025-03-21T10:48:51.000-04:00",
+        "payment_method_id": "account_money",
+        "transaction_amount": 40
+      },
+      "issueDate": "2025-03-20T14:50:26.560Z",
+      "dueDate": "2025-04-19T14:50:30.190Z",
+      "createdAt": "2025-03-20T14:50:30.191Z",
+      "updatedAt": "2025-03-20T14:50:30.191Z"
+    },
+    {
+      "paymentId": "105378105215",
+      "data": {
+        "id": 7017072301,
+        "type": "recurring",
+        "reason": "Plan Premium",
+        "status": "processed",
+        "payment": {
+          "id": 105378105215,
+          "status": "approved",
+          "status_detail": "accredited"
+        },
+        "debit_date": "2025-03-20T11:03:05.000-04:00",
+        "currency_id": "ARS",
+        "api_response": {
+          "status": 200,
+          "headers": {
+            "date": [
+              "Thu, 20 Mar 2025 15:04:41 GMT"
+            ],
+            "vary": [
+              "Accept-Encoding"
+            ],
+            "connection": [
+              "keep-alive"
+            ],
+            "content-type": [
+              "application/json"
+            ],
+            "x-request-id": [
+              "e770a26f-2d43-4400-ab27-71cc78ca98d2"
+            ],
+            "content-encoding": [
+              "gzip"
+            ],
+            "x-xss-protection": [
+              "1; mode=block"
+            ],
+            "transfer-encoding": [
+              "chunked"
+            ],
+            "timing-allow-origin": [
+              "*"
+            ],
+            "access-control-max-age": [
+              "86400"
+            ],
+            "x-content-type-options": [
+              "nosniff"
+            ],
+            "strict-transport-security": [
+              "max-age=16070400; includeSubDomains; preload"
+            ],
+            "access-control-allow-origin": [
+              "*"
+            ],
+            "access-control-allow-headers": [
+              "Content-Type"
+            ],
+            "access-control-allow-methods": [
+              "PUT, GET, POST, DELETE, OPTIONS"
+            ]
+          }
+        },
+        "date_created": "2025-03-20T11:04:39.088-04:00",
+        "last_modified": "2025-03-20T11:04:39.088-04:00",
+        "retry_attempt": 1,
+        "preapproval_id": "d078d0c81088471d8ea41e388f9ce834",
+        "next_retry_date": "2025-03-21T11:03:05.000-04:00",
+        "payment_method_id": "account_money",
+        "transaction_amount": 40
+      },
+      "issueDate": "2025-03-20T15:04:39.088Z",
+      "dueDate": "2025-04-19T15:04:43.265Z",
+      "createdAt": "2025-03-20T15:04:43.265Z",
+      "updatedAt": "2025-03-20T15:04:43.265Z"
     }
   ]
 }

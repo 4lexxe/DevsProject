@@ -183,7 +183,7 @@ class MercadoPagoController {
           startDate,
           endDate,
           paymentId: paymentp?.id,
-          status: subscriptionData.status,
+          status: (subscriptionData.status === "authorized") ? "authorized" : (subscriptionData.status === "cancelled") ? "cancelled" : (subscriptionData.status === "paused") ? "paused" : "pending",  
         });
 
         if (subscription) {
@@ -227,7 +227,7 @@ class MercadoPagoController {
             {id: mpSubscription.subscriptionId},
             {
               paymentId: currentSubscription?.paymentId ? currentSubscription.paymentId : paymentp?.id,
-              status: subscriptionData.status,
+              status: (subscriptionData.status === "authorized") ? "authorized" : (subscriptionData.status === "cancelled") ? "cancelled" : (subscriptionData.status === "paused") ? "paused" : "pending",  
             }
           );
           console.log(

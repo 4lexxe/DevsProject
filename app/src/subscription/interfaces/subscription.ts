@@ -22,6 +22,7 @@ export interface Plan {
   accessLevel: string
   installments: number
   installmentPrice: string
+  discountEvent?: DiscountEvent
 }
 
 export interface Subscription {
@@ -47,3 +48,13 @@ export interface Invoice {
   transaction_amount: string
 }
 
+
+export interface DiscountEvent {
+  description?: string;
+  value: number;
+  startDate: Date;
+  endDate: Date;
+  isActive: boolean;
+  planId: number;
+  event: string;
+}

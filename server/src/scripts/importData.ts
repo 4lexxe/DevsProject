@@ -3,6 +3,9 @@
 import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
+import User from '../modules/user/User';
+import Plan from '../modules/subscription/models/Plan';
+import DiscountEvent from '../modules/subscription/models/DiscountEvent';
 import MPSubPlan from '../modules/subscription/models/MPSubPlan';
 import Payment from '../modules/subscription/models/Payment';
 import Invoice from '../modules/subscription/models/Invoice';
@@ -22,6 +25,20 @@ async function importData() {
 
     // Insertar los datos en la base de datos
     await sequelize.transaction(async (transaction) => {
+      // Insertar los usuarios
+      if(data.users && data.users.length > 0) {
+        await User.bulkCreate(data.users, { transaction })
+      };
+      // Insertar los planes
+      if(data.plans && data.plans.length > 0) {
+        await Plan.bulkCreate(data.plans, { transaction });
+      }
+
+      // Insertar los eventos de descuento
+      if (data.discountEvents && data.discountEvents.length > 0) {
+        await DiscountEvent.bulkCreate(data.discountEvents, { transaction });
+      }
+
       // Insertar MPSubPlans
       if (data.mpSubPlans && data.mpSubPlans.length > 0) {
         await MPSubPlan.bulkCreate(data.mpSubPlans, { transaction });
