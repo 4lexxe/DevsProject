@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { UserService } from '@/profile/services/user.service';
 import { RoleService, Role as RoleType } from '@/profile/services/role.service';
-import { User, RoleCreateRequest, RoleUpdateRequest } from '../types/permission.types';
+import { User, RoleCreateRequest, RoleUpdateRequest, RoleModel } from '../types/permission.types';
 import { SYSTEM_ROLES } from '../constants/roles.constants';
 import toast from 'react-hot-toast';
 
@@ -11,13 +11,23 @@ interface UserUpdateData {
   isActiveSession?: boolean;
 }
 
+// Función auxiliar para convertir Role en RoleModel
+const convertRoleToRoleModel = (role: RoleType): RoleModel => {
+  return {
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    permissions: role.Permissions || []
+  };
+};
+
 export const usePermissionsPage = () => {
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [selectedUsername, setSelectedUsername] = useState<string>('');
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const [roleModalOpen, setRoleModalOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<RoleType | null>(null);
+  const [editingRole, setEditingRole] = useState<RoleModel | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -166,7 +176,7 @@ export const usePermissionsPage = () => {
 
   // Manejador para editar un rol
   const handleEditRole = (role: RoleType) => {
-    setEditingRole(role);
+    setEditingRole(convertRoleToRoleModel(role));
     setRoleModalOpen(true);
   };
 

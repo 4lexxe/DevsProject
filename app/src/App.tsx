@@ -15,8 +15,10 @@ import "@/shared/assets/styles/roadmap.css";
 // Importación de los componentes
 import DefaultLayout from "./shared/layouts/defaultLayout";
 import Home from "./home/home";
+import DashboardLayout from "./dashboard/layouts/DashboardLayout";
+import { renderDashboardRoutes } from "./dashboard/routes/dashboard.routes";
 
-import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage }from '@/course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage } from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./auth/auth";
 import AboutUs from "./shared/components/navigation/AboutUs";
@@ -25,15 +27,13 @@ import LearnRoute from './learnroute/pages/LearnRoute';
 import ResourcePage from './recourse/pages/resources/resourcePages';
 import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
 import ResourceDetailsPage from './recourse/pages/resourceDetails/ResourceDetailsPage';
-import ProtectedRoute from './auth/contexts/ProtectedRoute'; // Importa el componente de protección
+import ProtectedRoute from './auth/contexts/ProtectedRoute';
 import ProtectedRouteAdmin from './auth/contexts/ProtectRouteAdmin';
 
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
-import DashboardPage from "./dashboard/pages/DashboardPage";
-import PermissionsPage from "./dashboard/pages/permissions/PermissionsPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,7 +43,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
 
 function App() {
   return (
@@ -78,13 +77,13 @@ function App() {
               <Route path="/resources/:id" element={<ResourceDetailsPage />} />
               <Route path="/roadmaps/:id" element={<Roadmap />} />
 
-              {/* Rutas de Dashboard sin protección */}
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/dashboard/permissions" element={<PermissionsPage />} />
+              {/* Rutas del Dashboard */}
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                {renderDashboardRoutes()}
+              </Route>
 
               <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
                 <Route path="/editor-roadmap" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
-                {/* Las rutas del dashboard se movieron fuera */}
               </Route>
 
               <Route path="/editor-roadmap/:id" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { UserPlus } from 'lucide-react';
 import { usePermissionsPage } from '@/dashboard/pages/permissions/hooks/usePermissions';
 import UserListSection from '@/dashboard/pages/permissions/components/UserListSection';
 import RoleListSection from '@/dashboard/pages/permissions/components/RolesListSection';
@@ -45,6 +46,10 @@ const PermissionsPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Permisos de Usuario</h1>
           <p className="text-gray-500">Administra roles y permisos de usuarios</p>
         </div>
+        <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm transform hover:translate-y-[-2px] hover:shadow-md">
+          <UserPlus className="h-4 w-4 mr-2" />
+          Añadir Usuario
+        </button>
       </div>
       
       {/* User List Section */}
@@ -84,10 +89,7 @@ const PermissionsPage: React.FC = () => {
       <RoleModal
         isOpen={roleModalOpen}
         onClose={() => setRoleModalOpen(false)}
-        role={editingRole && {
-          ...editingRole,
-          permissions: editingRole.Permissions || []
-        }}
+        role={editingRole}
         onSave={handleSaveRole}
         isLoading={false}
       />
