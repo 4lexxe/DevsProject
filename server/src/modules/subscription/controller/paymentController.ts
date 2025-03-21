@@ -5,8 +5,6 @@ import Subscription from "../models/Subscription"; // Importa el modelo Subscrip
 import { PaymentResponse } from "mercadopago/dist/clients/payment/commonTypes";
 
 class PaymentController {
-  // URL base de la API externa
-  private static EXTERNAL_API_URL = "https://api.mercadopago.com/payments";
 
   // Función para generar metadata
   static metadata(req: Request, res: Response) {
@@ -32,16 +30,6 @@ class PaymentController {
       error: error.message,
       fullError: error,
     });
-  }
-
-  // Método para obtener datos del pago desde la API externa
-  private static async fetchPaymentData(paymentId: string) {
-    try {
-      const response = await axios.get(`${this.EXTERNAL_API_URL}/${paymentId}`);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(`Error al obtener datos del pago: ${error.message}`);
-    }
   }
 
   // Métodos existentes (getAll, getById, getByPaymentId)

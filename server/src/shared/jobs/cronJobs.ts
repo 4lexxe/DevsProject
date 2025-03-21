@@ -3,8 +3,12 @@ import { Op } from "sequelize";
 import DiscountEvent from "../../modules/subscription/models/DiscountEvent";
 import MPSubPlan from "../../modules/subscription/models/MPSubPlan";
 import Plan from "../../modules/subscription/models/Plan";
+import Subscription from "../../modules/subscription/models/Subscription";
 import { PreApprovalPlan } from "mercadopago";
+import { PreApproval } from "mercadopago";
 import { MpConfig } from "../../infrastructure/config/mercadopagoConfig";
+import { retryWithExponentialBackoff } from "../utils/retryService";
+import MPSubscription from "../../modules/subscription/models/MPSubscription";
 
 const preApprovalPlan = new PreApprovalPlan(MpConfig);
 
@@ -15,7 +19,7 @@ const updateExpiredDiscounts = async () => {
       where: {
         isActive: true,
         endDate: {
-          [Op.lt]: now,
+          [Op.lte]: now,
         },
       },
     });
@@ -42,25 +46,22 @@ const updateExpiredDiscounts = async () => {
         continue;
       }
 
-      const mpPlanResponse = await preApprovalPlan.update({
-        id: plan.mpSubPlan.id,
-        updatePreApprovalPlanRequest: {
-          auto_recurring: {
-            transaction_amount: plan.installmentPrice,
+      const mpPlanResponse = await retryWithExponentialBackoff(() =>
+        preApprovalPlan.update({
+          id: plan.mpSubPlan!.id,
+          updatePreApprovalPlanRequest: {
+            auto_recurring: {
+              transaction_amount: plan.installmentPrice,
+            },
           },
-        },
-      });
+        })
+      );
 
       await plan.mpSubPlan.update({
         reason: mpPlanResponse.reason,
         status: mpPlanResponse.status,
-        dateCreated: mpPlanResponse.date_created,
-        lastModified: mpPlanResponse.last_modified,
         initPoint: mpPlanResponse.init_point,
-        frequency: mpPlanResponse.auto_recurring?.frequency,
-        frequencyType: mpPlanResponse.auto_recurring?.frequency_type,
-        repetitions: mpPlanResponse.auto_recurring?.repetitions,
-        transactionAmount: mpPlanResponse.auto_recurring?.transaction_amount,
+        autoRecurring: mpPlanResponse.auto_recurring,
         data: mpPlanResponse,
       });
     }
@@ -72,5 +73,41 @@ const updateExpiredDiscounts = async () => {
   }
 };
 
+const updateExpiredSubscriptions = async () => {
+  try {
+    const now = new Date();
+    const expiredSubscriptions = await Subscription.findAll({
+      where: {
+        status: "authorized",
+        endDate: {
+          [Op.lte]: now,
+        },
+      },
+      include: [{ model: MPSubscription, as: "mpSubscription" }],
+    });
+
+    for (const subscription of expiredSubscriptions) {
+
+      const preApproval = new PreApproval(MpConfig);
+      await retryWithExponentialBackoff(() =>
+        preApproval.update({
+          id: subscription.mpSubscription.id,
+          body: {
+            status: "cancelled",
+          },
+        })
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Error al cancelar suscripciones expiradas:",
+      error
+    );
+  }
+};
+
 // Configurar el cron job para que se ejecute cada día a medianoche
-cron.schedule("0 0 * * *", updateExpiredDiscounts);
+cron.schedule("0 0 * * *", () => {
+  updateExpiredDiscounts();
+  updateExpiredSubscriptions();
+});

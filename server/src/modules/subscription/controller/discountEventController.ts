@@ -4,6 +4,7 @@ import DiscountEvent from "../models/DiscountEvent"; // Importa el modelo Discou
 import PlanController from "./planController";
 import Plan from "../models/Plan";
 import MPSubPlan from "../models/MPSubPlan";
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
 class DiscountEventController {
   // Función para generar metadata
@@ -82,9 +83,8 @@ class DiscountEventController {
       };
 
       // Actualizar el plan en MercadoPago usando el método existente
-      const mpPlanResponse = await PlanController.updateMercadoPagoPlan(
-        updatedPlanData,
-        plan.mpSubPlan.id
+      const mpPlanResponse = await retryWithExponentialBackoff(() =>
+        PlanController.updateMercadoPagoPlan(updatedPlanData, plan.mpSubPlan!.id)
       );
 
       // También actualizar el modelo MPSubPlan con la nueva información

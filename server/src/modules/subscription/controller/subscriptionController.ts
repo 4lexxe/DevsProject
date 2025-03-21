@@ -11,6 +11,7 @@ import { PreApproval } from "mercadopago";
 import MPSubscriptionController from "./mpSubscriptionController";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
 import DiscountEvent from "../models/DiscountEvent";
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
 interface SubscriptionData {
   userId: bigint;
@@ -122,10 +123,12 @@ class SubscriptionController {
       }
 
       const preApproval = new PreApproval(MpConfig);
-      await preApproval.update({
-        id: subscription.mpSubscription.id,
-        body: { status: "cancelled" },
-      });
+      await retryWithExponentialBackoff(() =>
+        preApproval.update({
+          id: subscription.mpSubscription.id,
+          body: { status: "cancelled" },
+        })
+      );
 
       console.log(`Suscripción cancelada exitosamente: ID ${id}`);
       return subscription;

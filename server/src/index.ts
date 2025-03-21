@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import geoip from 'geoip-lite';
 import { Server, Socket } from 'socket.io';
 import { Request } from 'express';
+import './shared/jobs/cronJobs'; // Importa el archivo cronJobs.ts para que se ejecute
 
 // ==================================================
 // Importaciones de rutas
