@@ -152,14 +152,14 @@ static async createInvoiceInDB(invoiceData: any) {
     const user = (req.session as any).user;
 
     try {
-      /* if(!user){
+      if(!user){
         res.status(401).json({
           status: 'error',
           message: 'Usuario no autenticado',
           metadata: this.metadata(req, res),
         });
         return;
-      } */
+      }
       
       const invoiceId = req.params.id;
       const invoice = await Invoice.findByPk(invoiceId, {

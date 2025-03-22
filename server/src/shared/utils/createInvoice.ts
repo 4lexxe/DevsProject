@@ -55,12 +55,8 @@ export async function createInvoicePDF(
     .fontSize(10)
     .text("Nombre del Cliente:", 50, 210)
     .text(user?.name, 150, 210)
-    .text("Dirección:", 50, 225)
-    .text(user?.address, 150, 225)
-    .text("Ciudad y Código Postal:", 50, 240)
-    .text(user?.city + ", " + user?.postalCode, 150, 240)
     .text("País:", 50, 255)
-    .text(user?.country, 150, 255)
+    .text("Argentina", 150, 255)
     .moveDown();
 
   // Detalles del pago
