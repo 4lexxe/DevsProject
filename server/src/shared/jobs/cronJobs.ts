@@ -107,7 +107,7 @@ const updateExpiredSubscriptions = async () => {
 };
 
 // Configurar el cron job para que se ejecute cada día a medianoche
-cron.schedule("0 0 * * *", () => {
+cron.schedule("2 22 * * *", () => {
   updateExpiredDiscounts();
   updateExpiredSubscriptions();
 });
