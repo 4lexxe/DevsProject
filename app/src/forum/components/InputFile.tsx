@@ -7,7 +7,7 @@ import api from '@/api/axios';
 
 interface InputFileProps {
   value: string | null; // URL de la imagen seleccionada (si existe)
-  onChange: (fileUrl: string | null) => void; // Callback para pasar la URL o limpiarla
+  onChange: (fileUrl: string | null, allUrls?: string[]) => void; // Callback para pasar la URL o limpiarla
   error?: string; // Mensaje de error (opcional)
   disabled?: boolean; // Deshabilitar el campo (opcional)
   allImages?: string[]; // Array con todas las imágenes (opcional)
@@ -92,8 +92,8 @@ const InputFile: React.FC<InputFileProps> = ({
           // Actualizar el índice para mostrar la nueva imagen
           setCurrentImageIndex(newUrls.length - 1);
           
-          // Notificar al componente padre con la URL recibida
-          onChange(response.data.url);
+          // Notificar al componente padre con la URL recibida y todas las URLs
+          onChange(response.data.url, newUrls);
           
           toast.success('Imagen subida correctamente');
         } else {
@@ -143,16 +143,14 @@ const InputFile: React.FC<InputFileProps> = ({
       setCurrentImageIndex(newUrls.length - 1);
     } else if (newUrls.length === 0) {
       setCurrentImageIndex(0);
-      // Notificar al componente padre que no hay imágenes
-      onChange(null);
+      // Notificar al componente padre que no hay imágenes Y pasar array vacío
+      onChange(null, []);
       toast.success('Imagen eliminada');
       return;
     }
     
-    // Si eliminamos la primera imagen, notificar al padre con la nueva primera imagen
-    if (currentImageIndex === 0 && newUrls.length > 0) {
-      onChange(newUrls[0]);
-    }
+    // Siempre notificar al padre con el array completo de imágenes restantes
+    onChange(newUrls[currentImageIndex < newUrls.length ? currentImageIndex : 0], newUrls);
     
     toast.success('Imagen eliminada');
   };
@@ -197,8 +195,8 @@ const InputFile: React.FC<InputFileProps> = ({
       // Actualizar el índice para mostrar la nueva imagen
       setCurrentImageIndex(newUrls.length - 1);
       
-      // Notificar al componente padre con la URL recibida
-      onChange(urlInput);
+      // Notificar al componente padre con la URL recibida y todas las URLs
+      onChange(urlInput, newUrls);
       
       // Limpiar el input de URL
       setUrlInput('');
@@ -420,7 +418,7 @@ const InputFile: React.FC<InputFileProps> = ({
                   />
                   <button
                     type="button"
-                    className="px-3 py-1.5 bg-blue-600 text-white rounded flex items-center gap-1 text-sm hover:bg-blue-700 transition-colors"
+                    className="px-6 py-1.5 bg-blue-600 text-white rounded flex items-center gap-1 text-sm hover:bg-blue-700 transition-colors"
                     disabled={disabled}
                   >
                     <Plus className="w-3.5 h-3.5" />

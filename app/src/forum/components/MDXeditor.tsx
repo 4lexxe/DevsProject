@@ -21,10 +21,13 @@ import {
   diffSourcePlugin,
   DiffSourceToggleWrapper,
   linkDialogPlugin,
-  CreateLink
+  CreateLink,
+  InsertImage
 
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
+import { toast } from 'react-hot-toast'
+import api from '@/api/axios'
 import {materialLight} from '@uiw/codemirror-theme-material';
 
 interface MDXEditorProps {
@@ -37,6 +40,7 @@ interface MDXEditorProps {
   maxHeight?: string;
 }
 
+
 const MDXEditorComponent: React.FC<MDXEditorProps> = ({
   initialContent = '# Título\n\nComienza a escribir aquí...',
   onChange,
@@ -46,6 +50,49 @@ const MDXEditorComponent: React.FC<MDXEditorProps> = ({
   minHeight,
   maxHeight,
 }) => {
+
+  // Create the custom image upload handler using your API
+  const imageUploadHandler = async (file: File) => {
+    try {
+      // Size validation (same as in your InputFile component)
+      const MAX_FILE_SIZE = 10 * 1024 * 1024
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error('El archivo es demasiado grande. El límite es de 10MB.')
+        return null
+      }
+      
+      // Type validation
+      if (!file.type.startsWith('image/')) {
+        toast.error('Solo se permiten imágenes.')
+        return null
+      }
+      
+      // Create FormData and append file
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      // Upload using your API
+      const response = await api.post('/forum/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      
+      // Return the URL from the response
+      if (response.data?.url) {
+        toast.success('Imagen subida correctamente')
+        return response.data.url
+      } else {
+        throw new Error('URL no recibida del servidor')
+      }
+    } catch (error) {
+      console.error('Error al subir archivo:', error)
+      toast.error('Error al subir el archivo. Por favor, intenta nuevamente.')
+      return null
+    } 
+  }
+
+  
   return (
     <div 
       className={`mdx-editor-wrapper ${className}`}
@@ -74,7 +121,11 @@ const MDXEditorComponent: React.FC<MDXEditorProps> = ({
           thematicBreakPlugin(),
           markdownShortcutPlugin(),
           frontmatterPlugin(),
-          imagePlugin(),
+          imagePlugin({
+            imageUploadHandler: imageUploadHandler,
+            // You can include autocompleteSuggestions or leave them out if not needed
+            imageAutocompleteSuggestions: [] 
+          }),
           linkPlugin(),
           tablePlugin(),
           linkDialogPlugin(),
@@ -90,8 +141,9 @@ const MDXEditorComponent: React.FC<MDXEditorProps> = ({
                   <UndoRedo />
                   <BlockTypeSelect />
                   <BoldItalicUnderlineToggles />
+                  <InsertImage/>
                   <CodeToggle />
-                  <ListsToggle />
+                  <ListsToggle options={['bullet', 'number']}/>
                   <InsertCodeBlock />
                   <CreateLink />
 
@@ -149,7 +201,7 @@ const globalStyles = `
   .mdxeditor-toolbar {
     background-color: #ffffff;
     border-bottom: 1px solid #f3f4f6;
-    padding: 8px 12px;
+    padding: 8px 6px;
     gap: 4px;
     border-radius: 8px 8px 0 0;
   }

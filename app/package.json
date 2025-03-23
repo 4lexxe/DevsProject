@@ -71,6 +71,7 @@
     "swiper": "^11.2.4",
     "tailwind-merge": "^3.0.1",
     "tailwind-variants": "^0.3.1",
+    "timeago-react": "^3.0.7",
     "zod": "^3.24.1"
   },
   "devDependencies": {

@@ -209,15 +209,13 @@ class ForumFlairService {
    * @param {boolean} onlyActive - Si solo se deben obtener los flairs activos
    * @returns {Promise<PostFlair[]>} Lista de flairs asignados al post
    */
-  async getPostFlairs(postId: number, onlyActive: boolean = true): Promise<PostFlair[]> {
+  async getPostFlairs(postId: number): Promise<PostFlair[]> {
     try {
-      const response = await api.get(`forum/posts/${postId}/flairs`, {
-        params: { onlyActive }
-      });
+      const response = await api.get(`/forum/posts/${postId}/flairs`);
       return response.data.data;
     } catch (error) {
-      console.error('Error al obtener etiquetas del post', error);
-      throw new Error('Error al obtener etiquetas del post');
+      console.error("Error:", error);
+      throw new Error("No se pudieron obtener los flairs");
     }
   }
 
@@ -393,4 +391,4 @@ class ForumFlairService {
   }
 }
 
-export default new ForumFlairService();
+export default new ForumFlairService;

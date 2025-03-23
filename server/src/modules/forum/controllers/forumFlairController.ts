@@ -516,37 +516,22 @@ static async removeFlairFromPost(req: Request, res: Response): Promise<void> {
 static async getPostFlairs(req: Request, res: Response): Promise<void> {
   try {
     const { postId } = req.params;
-    const onlyActive = req.query.onlyActive === 'true' || req.query.onlyActive === undefined;
     
-    // Usar el nuevo método para obtener los flairs del post
-    const postFlairs = await PostFlair.getPostFlairs(parseInt(postId), { onlyActive });
-    
-    if (!postFlairs || postFlairs.length === 0) {
-      res.status(200).json({ success: true, data: [] });
-      return;
-    }
-    
+    // Debug: Verificar que el postId sea numérico
+    console.log("postId recibido:", postId); 
+
+    const postFlairs = await PostFlair.findAll({
+      where: { postId: Number(postId) }, // Conversión explícita
+      include: [{ model: ForumFlair, as: 'flair' }] // Incluir relación
+    });
+
     res.status(200).json({ 
       success: true, 
-      data: postFlairs.map(pf => ({
-        id: pf.id,
-        flairId: pf.flairId,
-        postId: pf.postId,
-        isActive: pf.isActive,
-        assignedAt: pf.assignedAt,
-        assignedBy: pf.assignedBy,
-        createdAt: pf.createdAt,
-        updatedAt: pf.updatedAt,
-        flair: pf.get('flair')
-      }))
+      data: postFlairs 
     });
   } catch (error) {
-    console.error('Error al obtener las etiquetas del post:', error);
-    res.status(500).json({ 
-      success: false, 
-      message: 'Error al obtener las etiquetas del post',
-      error: error instanceof Error ? error.message : String(error)
-    });
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Error interno' });
   }
 }
 

@@ -195,10 +195,10 @@ export class ForumPostController {
             }
 
             // Verificar si la URL utiliza el slug correcto (para SEO)
-            if (req.params.slug !== post.slug) {
+            /*if (req.params.slug !== post.slug) {
                 // Redirigir a la URL correcta con código 301 (redirección permanente)
                 return res.redirect(301, post.getUrl());
-            }
+            }*/
 
             await post.increment('viewCount');
             res.status(200).json({ success: true, data: post });

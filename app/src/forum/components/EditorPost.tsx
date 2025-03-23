@@ -271,11 +271,15 @@ const EditorPost: React.FC = () => {
     };
   }, [showCategoryDropdown]);
 
-  const handleImageChange = (fileUrl: string | null) => {
+  const handleImageChange = (fileUrl: string | null, allUrls?: string[]) => {
     setValue('imageUrl', fileUrl || '');
     trigger('imageUrl');
     
-    if (fileUrl === null) {
+    // Update the full array of images if provided
+    if (allUrls) {
+      setAllImageUrls(allUrls);
+    }
+    else if (fileUrl === null) {
       setAllImageUrls([]);
     } 
     else if (fileUrl && !allImageUrls.includes(fileUrl)) {

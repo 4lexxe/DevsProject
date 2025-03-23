@@ -270,13 +270,13 @@ app.use('/api', roadMapRoutes);
 
 // Rutas de Foro
 app.use('/api/forum', forumCategoryRoutes);
+app.use('/api/forum', forumFlairRoutes);
 app.use('/api/forum', forumPostRoutes);
 app.use('/api/forum', forumReplyRoutes);
 app.use('/api/forum', forumReactionPostRoutes);
 app.use('/api/forum', forumReactionReplyRoutes);
 app.use('/api/forum', forumVotePostRoutes);
 app.use('/api/forum', forumVoteReplyRoutes);
-app.use('/api/forum', forumFlairRoutes);
 app.use('/api/forum', forumReportRoutes);
 app.use('/api/forum/upload', forumUploadRoutes);
 
