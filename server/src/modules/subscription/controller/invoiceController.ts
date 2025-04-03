@@ -2,7 +2,11 @@ import { Request, Response, RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import { Op } from "sequelize";
 import Invoice from "../models/Invoice";
+import User from "../../user/User";
 import Subscription from "../models/Subscription";
+import PDFDocument from 'pdfkit';
+import axios from "axios";
+import { createInvoicePDF } from "../../../shared/utils/createInvoice";
 
 class InvoiceController {
   // Función para generar metadata
@@ -44,178 +48,6 @@ class InvoiceController {
       error: error.message,
     });
   }
-
-  // Obtener todas las facturas con filtros opcionales
-  static getAll: RequestHandler = async (req, res) => {
-    try {
-      const {
-        subscriptionId,
-        startDate,
-        endDate,
-        dueStartDate,
-        dueEndDate,
-        page = 1,
-        limit = 10,
-        sortBy = "issueDate",
-        sortOrder = "DESC",
-      } = req.query;
-
-      // Preparar las opciones de consulta
-      const queryOptions: any = {
-        include: [
-          {
-            model: Subscription,
-            as: "Subscription",
-          },
-        ],
-        order: [[sortBy as string, sortOrder as string]],
-        limit: Number(limit),
-        offset: (Number(page) - 1) * Number(limit),
-      };
-
-      // Construir filtros
-      const whereClause: any = {};
-
-      if (subscriptionId) {
-        whereClause.SubscriptionId = subscriptionId;
-      }
-
-      // Filtro por fecha de emisión
-      if (startDate || endDate) {
-        whereClause.issueDate = {};
-        if (startDate) {
-          whereClause.issueDate[Op.gte] = new Date(startDate as string);
-        }
-        if (endDate) {
-          whereClause.issueDate[Op.lte] = new Date(endDate as string);
-        }
-      }
-
-      // Filtro por fecha de vencimiento
-      if (dueStartDate || dueEndDate) {
-        whereClause.dueDate = {};
-        if (dueStartDate) {
-          whereClause.dueDate[Op.gte] = new Date(dueStartDate as string);
-        }
-        if (dueEndDate) {
-          whereClause.dueDate[Op.lte] = new Date(dueEndDate as string);
-        }
-      }
-
-      // Si hay filtros, agregarlos a la consulta
-      if (Object.keys(whereClause).length > 0) {
-        queryOptions.where = whereClause;
-      }
-
-      // Ejecutar la consulta
-      const { count, rows } = await Invoice.findAndCountAll(queryOptions);
-
-      // Calcular información de paginación
-      const totalPages = Math.ceil(count / Number(limit));
-
-      // Enviar respuesta exitosa
-      res.status(200).json({
-        status: "success",
-        message: "Facturas obtenidas exitosamente",
-        data: rows,
-        pagination: {
-          total: count,
-          page: Number(page),
-          limit: Number(limit),
-          totalPages,
-          hasNext: Number(page) < totalPages,
-          hasPrev: Number(page) > 1,
-        },
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al obtener las facturas");
-    }
-  };
-
-  // Obtener una factura por ID
-  static getById: RequestHandler = async (req, res) => {
-    try {
-      const invoice = await Invoice.findByPk(req.params.id, {
-        include: [
-          {
-            model: Subscription,
-            as: "Subscription",
-          },
-        ],
-      });
-
-      if (!invoice) {
-        res.status(404).json({
-          status: "error",
-          message: "Factura no encontrada",
-          metadata: this.metadata(req, res),
-        });
-        return;
-      }
-
-      res.status(200).json({
-        status: "success",
-        message: "Factura obtenida exitosamente",
-        data: invoice,
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(res, req, error, "Error al obtener la factura");
-    }
-  };
-
-  // Obtener facturas por ID de suscripción
-  static getBySubscriptionId: RequestHandler = async (req, res) => {
-    try {
-      const { page = 1, limit = 10 } = req.query;
-      const subscriptionId = req.params.subscriptionId;
-
-      const { count, rows } = await Invoice.findAndCountAll({
-        where: {
-          SubscriptionId: subscriptionId,
-        },
-        limit: Number(limit),
-        offset: (Number(page) - 1) * Number(limit),
-        order: [["issueDate", "DESC"]],
-      });
-
-      // Calcular información de paginación
-      const totalPages = Math.ceil(count / Number(limit));
-
-      res.status(200).json({
-        status: "success",
-        message: "Facturas obtenidas exitosamente",
-        data: rows,
-        pagination: {
-          total: count,
-          page: Number(page),
-          limit: Number(limit),
-          totalPages,
-          hasNext: Number(page) < totalPages,
-          hasPrev: Number(page) > 1,
-        },
-        metadata: this.metadata(req, res),
-      });
-    } catch (error) {
-      this.handleServerError(
-        res,
-        req,
-        error,
-        "Error al obtener las facturas por suscripción"
-      );
-    }
-  };
-
-
-
-
-
-
-
-
-
-
 
   /**
  * Crea una factura en la base de datos
@@ -313,6 +145,65 @@ static async createInvoiceInDB(invoiceData: any) {
       } else {
         throw new Error(`Error al actualizar factura: ${String(error)}`);
       }
+    }
+  }
+
+
+  static downloadInvoicePDF: RequestHandler = async (req, res) => {
+    const userId = (req.session as any).passport.user.id;
+
+    try {
+      if (!userId) {
+        res.status(401).json({
+          status: 'error',
+          message: 'Usuario no autenticado',
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      const user = await User.findByPk(userId, {
+        raw: true
+      });
+
+      if (!user) {
+        res.status(404).json({
+          status: 'error',
+          message: 'Usuario no encontrado',
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      const paymentId = req.params.id;
+      const invoice = await Invoice.findOne({
+        where: {
+          paymentId: paymentId
+        },
+        raw: true
+      });
+
+      if (!invoice) {
+        res.status(404).json({
+          status: 'error',
+          message: 'Factura no encontrada',
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      console.log("DATOS DE LA FACTURA:::", invoice)
+      console.log("DATOS DEL USUSARIO:::", user);
+      
+      
+
+      const pdfData = await createInvoicePDF(user, invoice);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=factura_${paymentId}.pdf`);
+      res.send(pdfData); // Enviar el PDF como respuesta
+    } catch (error) {
+      this.handleServerError(res, req, error, 'Error al generar el PDF de la factura');
     }
   }
 }

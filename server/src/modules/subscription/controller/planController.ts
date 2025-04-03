@@ -9,6 +9,7 @@ import Plan from "../models/Plan"; // Importa el modelo Plan
 import MPSubPlan from "../models/MPSubPlan"; // Importa el modelo MPSubPlan
 import DiscountEvent from "../models/DiscountEvent";
 import { PreApprovalPlan } from "mercadopago";
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
 class PlanController {
   private static preApprovalPlan = new PreApprovalPlan(MpConfig);
@@ -98,28 +99,30 @@ class PlanController {
 
   // Función para actualizar un plan en Mercado Pago
   static async updateMercadoPagoPlan(planData: any, mpPlanId: string) {
-    const response = await this.preApprovalPlan.update({
-      id: mpPlanId,
-      updatePreApprovalPlanRequest: {
-        reason: planData.name,
-        auto_recurring: {
-          frequency: planData.duration / planData.installments,
-          frequency_type: planData.durationType === "días" ? "days" : "months",
-          transaction_amount: planData.installmentPrice,
-          repetitions: planData.installments,
-          currency_id: "ARS",
+    const response = await retryWithExponentialBackoff(() =>
+      this.preApprovalPlan.update({
+        id: mpPlanId,
+        updatePreApprovalPlanRequest: {
+          reason: planData.name,
+          auto_recurring: {
+            frequency: planData.duration / planData.installments,
+            frequency_type: planData.durationType === "días" ? "days" : "months",
+            transaction_amount: planData.installmentPrice,
+            repetitions: planData.installments,
+            currency_id: "ARS",
+          },
+          payment_methods_allowed: {
+            payment_types: [
+              { id: "debit_card" },
+              { id: "prepaid_card" },
+              { id: "account_money" },
+              { id: "credit_card" },
+            ],
+          },
+          back_url: MP_BACK_URL,
         },
-        payment_methods_allowed: {
-          payment_types: [
-            { id: "debit_card" },
-            { id: "prepaid_card" },
-            { id: "account_money" },
-            { id: "credit_card" },
-          ],
-        },
-        back_url: MP_BACK_URL,
-      },
-    });
+      })
+    );
     
     return response;
   }

@@ -42,3 +42,16 @@ export const cancelSubscription = async (id : string) => {
     throw error;
   }
 };
+
+export const downloadInvoice = async (id : string) => {
+  try {
+    const response = await api.get(`/invoices/${id}/download`, {
+      responseType: "arraybuffer", // Cambiado para manejar binarios
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error al descargar la factura:", error.response?.data || error.message || error);
+    throw error;
+  }
+};
+

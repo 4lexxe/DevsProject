@@ -11,6 +11,7 @@ import rateLimit from 'express-rate-limit';
 import geoip from 'geoip-lite';
 import { Server, Socket } from 'socket.io';
 import { Request } from 'express';
+import './shared/jobs/cronJobs'; // Importa el archivo cronJobs.ts para que se ejecute
 
 // ==================================================
 // Importaciones de rutas
@@ -31,6 +32,7 @@ import categoryRoutes from './modules/category/CategoryRoutes';
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
+import invoiceRoutes from './modules/subscription/routes/invoiceRoutes';
 
 // Rutas de Recursos
 import recourseRoutes from './modules/resource/routes/resource.routes';
@@ -212,7 +214,8 @@ app.use((req, res, next) => {
 // 7. Sistema de enrutamiento
 // ==================================================
 
-// Rutas para las membresias
+// Rutas para las suscripciones
+app.use('/api', invoiceRoutes);
 app.use('/api', mercadopagoRoutes);
 app.use('/api', discountEventRoutes);
 app.use('/api', planRoutes);

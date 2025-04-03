@@ -53,7 +53,7 @@ async function exportData() {
         return discountData;
       }),
       mpSubPlans: mpSubPlans.map(mpSubPlan => mpSubPlan.toJSON()),
-      subscriptions: subscriptions.map(subscription => {
+      /* subscriptions: subscriptions.map(subscription => {
         const subData = subscription.toJSON();
         delete subData.id;
         return subData;
@@ -64,7 +64,7 @@ async function exportData() {
         const invoiceData = invoice.toJSON();
         delete invoiceData.id;
         return invoiceData;
-      }),
+      }), */
     };
 
     // Definir la ruta del archivo de salida

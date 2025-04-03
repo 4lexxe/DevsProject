@@ -13,10 +13,13 @@ import MPSubscriptionController from "./mpSubscriptionController";
 import InvoiceController from "./invoiceController";
 import SubscriptionController from "./subscriptionController";
 
+import {retryWithExponentialBackoff} from "../../../shared/utils/retryService";
+
+
 class MercadoPagoController {
   // Instancias de las clases de MercadoPago
   private static preApproval = new PreApproval(MpConfig);
-  private static preApprovalPlan = new PreApprovalPlan(MpConfig);
+  /* private static preApprovalPlan = new PreApprovalPlan(MpConfig); */
   private static payment = new Payment(MpConfig);
   private static invoice = new Invoice(MpConfig);
 
@@ -134,7 +137,7 @@ class MercadoPagoController {
     }
 
     if (action === "created") {
-      const subscriptionData = await this.preApproval.get({ id: eventId });
+      const subscriptionData = await retryWithExponentialBackoff(() => this.preApproval.get({ id: eventId }));
       console.log("Datos de suscripción obtenidos:", subscriptionData?.id);
 
       // También crear una suscripción en nuestro sistema
@@ -203,7 +206,7 @@ class MercadoPagoController {
         // No lanzamos el error para que no interrumpa el flujo principal
       }
     } else if (action === "updated") {
-      const subscriptionData = await this.preApproval.get({ id: eventId });
+      const subscriptionData = await retryWithExponentialBackoff(() => this.preApproval.get({ id: eventId }));
       console.log("Datos de suscripción actualizados:", subscriptionData?.id);
 
       // También actualizar en nuestro sistema
@@ -256,13 +259,13 @@ class MercadoPagoController {
     }
 
     if (action === "payment.created") {
-      const paymentData = await this.payment.get({ id: eventId });
+      const paymentData = await retryWithExponentialBackoff(() => this.payment.get({ id: eventId }));
 
       console.log("Datos de pago obtenidos:", paymentData?.id);
 
       await PaymentController.createPaymentInDB(paymentData);
     } else if (action === "payment.updated") {
-      const paymentData = await this.payment.get({ id: eventId });
+      const paymentData = await retryWithExponentialBackoff(() => this.payment.get({ id: eventId }));
       console.log("Datos de pago actualizados:", paymentData?.id);
       await PaymentController.updatePaymentInDB(paymentData, eventId);
     } else {
@@ -285,7 +288,7 @@ class MercadoPagoController {
     }
 
     if (action === "created" || action === "updated") {
-      const invoiceData = await this.invoice.get({ id: eventId });
+      const invoiceData = await retryWithExponentialBackoff(() => this.invoice.get({ id: eventId }));
       console.log("Datos de factura obtenidos:", invoiceData?.id);
 
       if (action === "created") {
