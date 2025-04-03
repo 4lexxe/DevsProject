@@ -16,10 +16,7 @@ export async function createInvoicePDF(
 
   let buffers: Buffer[] = [];
   doc.on("data", buffers.push.bind(buffers));
-  doc.on("end", () => {
-    let pdfData = Buffer.concat(buffers);
-    return pdfData;
-  });
+  doc.on("end", () => {});
 
   // Agregar contenido al PDF
   // Encabezado

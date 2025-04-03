@@ -2,6 +2,7 @@ import { Request, Response, RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import { Op } from "sequelize";
 import Invoice from "../models/Invoice";
+import User from "../../user/User";
 import Subscription from "../models/Subscription";
 import PDFDocument from 'pdfkit';
 import axios from "axios";
@@ -148,11 +149,11 @@ static async createInvoiceInDB(invoiceData: any) {
   }
 
 
-  static downloadInvoicePDF: RequestHandler = async(req, res) => {
-    const user = (req.session as any).user;
+  static downloadInvoicePDF: RequestHandler = async (req, res) => {
+    const userId = (req.session as any).passport.user.id;
 
     try {
-      if(!user){
+      if (!userId) {
         res.status(401).json({
           status: 'error',
           message: 'Usuario no autenticado',
@@ -160,10 +161,26 @@ static async createInvoiceInDB(invoiceData: any) {
         });
         return;
       }
-      
-      const invoiceId = req.params.id;
-      const invoice = await Invoice.findByPk(invoiceId, {
-        
+
+      const user = await User.findByPk(userId, {
+        raw: true
+      });
+
+      if (!user) {
+        res.status(404).json({
+          status: 'error',
+          message: 'Usuario no encontrado',
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      const paymentId = req.params.id;
+      const invoice = await Invoice.findOne({
+        where: {
+          paymentId: paymentId
+        },
+        raw: true
       });
 
       if (!invoice) {
@@ -175,15 +192,16 @@ static async createInvoiceInDB(invoiceData: any) {
         return;
       }
 
+      console.log("DATOS DE LA FACTURA:::", invoice)
+      console.log("DATOS DEL USUSARIO:::", user);
+      
+      
+
       const pdfData = await createInvoicePDF(user, invoice);
 
-      res
-        .writeHead(200, {
-          'Content-Length': Buffer.byteLength(pdfData),
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment;filename=factura_${invoiceId}.pdf`,
-        })
-        .end(pdfData);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=factura_${paymentId}.pdf`);
+      res.send(pdfData); // Enviar el PDF como respuesta
     } catch (error) {
       this.handleServerError(res, req, error, 'Error al generar el PDF de la factura');
     }

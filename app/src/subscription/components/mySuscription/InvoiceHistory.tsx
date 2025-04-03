@@ -1,5 +1,6 @@
 import type { Payment } from "@/subscription/interfaces/subscription"
 import { formatCurrency, formatDate, getPaymentMethodText, getStatusText } from "@/subscription/utils/formatDate"
+import { downloadInvoice } from "@/subscription/services/subscriptionService"
 
 interface PaymentHistoryProps {
   payments: Payment[]
@@ -7,6 +8,22 @@ interface PaymentHistoryProps {
 }
 
 export default function InvoiceHistory({ payments, planName }: PaymentHistoryProps) {
+
+  const handleDownloadInvoice = async (paymentId: string) => {
+    try {
+      const invoiceData = await downloadInvoice(paymentId);
+      const blob = new Blob([invoiceData], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoice_${paymentId}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+    }
+  };
+
   const getPaymentMethodIcon = (method: string): JSX.Element => {
     switch (method) {
       case "credit_card":
@@ -184,7 +201,10 @@ export default function InvoiceHistory({ payments, planName }: PaymentHistoryPro
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(payment.status)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-[#1d4ed8] hover:text-[#0c154c] inline-flex items-center">
+                    <button
+                      className="text-[#1d4ed8] hover:text-[#0c154c] inline-flex items-center"
+                      onClick={() => handleDownloadInvoice(payment.id)}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4 mr-1"

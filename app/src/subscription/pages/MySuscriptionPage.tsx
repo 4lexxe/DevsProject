@@ -27,7 +27,6 @@ export default function SubscriptionPage() {
       try {
         const response = await getSubscriptionData();
         setSubscription(response.data);
-        console.log("Subscription data:", response.data);
       } catch (error) {
         console.error("Error fetching subscription data:", error);
       }
