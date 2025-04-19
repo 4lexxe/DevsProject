@@ -1,23 +1,51 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
+import { Howl } from "howler";
+import { useAuth } from "../auth/contexts/AuthContext";
 
-interface NotificationBubbleProps {
-  showWelcomeMessage: boolean;
-  setShowWelcomeMessage: (show: boolean) => void;
-  user: { name: string };
-}
+const notificationSoundPath = "/notification.wav";
 
-const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }: NotificationBubbleProps) => {
+let notificationSound: Howl | null = null;
+
+const NotificationBubble = () => {
+  const { showWelcomeMessage, setShowWelcomeMessage, user } = useAuth();
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   const name = user?.name || "Usuario";
   const welcomeText = `¡Bienvenido ${name}!`;
 
   useEffect(() => {
+    const enableAudioContext = () => {
+      setUserInteracted(true);
+      if (!notificationSound) {
+        notificationSound = new Howl({
+          src: [notificationSoundPath],
+          volume: 0.5,
+          html5: true,
+        });
+      }
+      window.removeEventListener("click", enableAudioContext);
+      window.removeEventListener("keydown", enableAudioContext);
+    };
+
+    window.addEventListener("click", enableAudioContext);
+    window.addEventListener("keydown", enableAudioContext);
+
+    return () => {
+      window.removeEventListener("click", enableAudioContext);
+      window.removeEventListener("keydown", enableAudioContext);
+    };
+  }, []);
+
+  useEffect(() => {
     if (showWelcomeMessage && user) {
       setIsVisible(true);
+      if (userInteracted && notificationSound) {
+        notificationSound.play();
+      }
 
       const expandTimer = setTimeout(() => {
         setIsExpanded(true);
@@ -36,7 +64,7 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
         clearTimeout(closeTimer);
       };
     }
-  }, [showWelcomeMessage, setShowWelcomeMessage, user]);
+  }, [showWelcomeMessage, setShowWelcomeMessage, user, userInteracted]);
 
   return (
     <AnimatePresence>
@@ -47,7 +75,7 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
           animate="animate"
           exit="exit"
         >
-          {/* Outer glow effect */}
+          {/* Círculo de pulso exterior */}
           <motion.div
             variants={{
               initial: {
@@ -57,10 +85,10 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
               },
               animate: {
                 scale: [1, 1.2, 1],
-                opacity: [0, 0.15, 0],
+                opacity: [0, 0.2, 0],
                 x: "-50%",
                 transition: {
-                  duration: 1.5,
+                  duration: 1,
                   times: [0, 0.5, 1],
                   repeat: isExpanded ? 0 : Infinity,
                   repeatType: "reverse",
@@ -75,41 +103,10 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
                 },
               },
             }}
-            className="absolute left-1/2 -translate-x-1/2 bg-blue-500/30 rounded-full w-12 h-12 blur-xl"
+            className="absolute left-1/2 -translate-x-1/2 bg-gray-200/40 rounded-full w-10 h-10"
           />
 
-          {/* Inner glow effect */}
-          <motion.div
-            variants={{
-              initial: {
-                scale: 0.9,
-                opacity: 0,
-                x: "-50%",
-              },
-              animate: {
-                scale: [1, 1.1, 1],
-                opacity: [0, 0.3, 0],
-                x: "-50%",
-                transition: {
-                  duration: 1,
-                  times: [0, 0.5, 1],
-                  repeat: isExpanded ? 0 : Infinity,
-                  repeatType: "reverse",
-                },
-              },
-              exit: {
-                scale: 0.9,
-                opacity: 0,
-                x: "-50%",
-                transition: {
-                  duration: 0.2,
-                },
-              },
-            }}
-            className="absolute left-1/2 -translate-x-1/2 bg-blue-400/40 rounded-full w-10 h-10 blur-md"
-          />
-
-          {/* Main container */}
+          {/* Contenedor principal */}
           <motion.div
             className="relative flex items-center justify-center"
             initial={{ scale: 0 }}
@@ -121,7 +118,7 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
             }}
           >
             <motion.div
-              className="flex items-center bg-white/90 backdrop-blur-md border border-blue-100 rounded-full shadow-lg shadow-blue-500/20 dark:bg-slate-800/90 dark:border-blue-900/50 overflow-hidden"
+              className="flex items-center bg-white backdrop-blur-md border border-gray-300 rounded-full shadow-sm overflow-hidden"
               initial={{
                 width: "40px",
                 height: "40px",
@@ -143,9 +140,9 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
                 },
               }}
             >
-              {/* Notification icon with glow */}
+              {/* Ícono de notificación */}
               <motion.div
-                className="relative flex-shrink-0 p-2 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-800/20"
+                className="flex-shrink-0 p-2 bg-white"
                 initial={{ scale: 0.5, rotate: -180 }}
                 animate={{
                   scale: 1,
@@ -165,13 +162,12 @@ const NotificationBubble = ({ showWelcomeMessage, setShowWelcomeMessage, user }:
                   },
                 }}
               >
-                <div className="absolute inset-0 bg-blue-400/10 blur" />
-                <Bell className="relative w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <Bell className="w-5 h-5 text-gray-700" />
               </motion.div>
 
-              {/* Welcome message */}
+              {/* Mensaje de bienvenida */}
               <motion.p
-                className="px-4 text-sm font-medium bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent dark:from-blue-400 dark:to-blue-300 whitespace-nowrap"
+                className="px-4 text-sm font-medium text-gray-800 whitespace-nowrap"
                 initial={{ opacity: 0 }}
                 animate={{
                   opacity: isExpanded ? 1 : 0,

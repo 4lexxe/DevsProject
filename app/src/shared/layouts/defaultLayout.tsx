@@ -4,14 +4,21 @@ import Footer from '../components/navigation/Footer';
 import NotificationBubble from '../../notification/NotificationBubble';
 import useSocket from '../../hooks/useSocket';
 import Sidebar from '@/dashboard/components/Sidebar';
+import { useState } from 'react';
 
 export default function DefaultLayout() {
   const { backendOnline } = useSocket();
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(true);
+  const user = { name: 'Admin' };
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* Notificaciones */}
-      <NotificationBubble />
+      <NotificationBubble 
+        showWelcomeMessage={showWelcomeMessage}
+        setShowWelcomeMessage={setShowWelcomeMessage}
+        user={user}
+      />
 
       {/* Contenido principal */}
       <main className="flex-grow flex relative">
