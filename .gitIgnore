@@ -15,6 +15,7 @@
 # Ignorar configuraciones del IDE
 /.idea/
 /.vscode/
+/.history/
 
 # Archivos de logs
 *.log
@@ -30,6 +31,5 @@ Thumbs.db    # Windows
 /package-lock.json
 /app/package-lock.json
 /server/package-lock.json
-
 # Ignorar los errores de instalación de npm
 npm-debug.log

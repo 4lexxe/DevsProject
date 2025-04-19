@@ -1,35 +1,24 @@
-import sequelize from "./infrastructure/database/db";
+import sequelize from './infrastructure/database/db';
 
-import Role from "./modules/role/Role";
-import { rolesIniciales } from "./modules/role/Role";
-import Permission from "./modules/role/Permission";
-import RolePermission from "./modules/role/RolePermission";
-import User from "./modules/user/User";
-import Admin from "./modules/admin/Admin";
-import SectionHeader from "./modules/headerSection/HeaderSection";
-import Recourse from "./modules/resource/Resource";
-import Rating from "./modules/resource/rating/Rating";
-import Comment from "./modules/resource/comment/Comment";
-import RoadMap from "./modules/roadmap/RoadMap";
+import Role from './modules/role/Role';
+import { rolesIniciales } from './modules/role/Role';
+import Permission from './modules/role/Permission';
+import RolePermission from './modules/role/RolePermission';
+import User from './modules/user/User';
+import Admin from './modules/admin/Admin';
+import SectionHeader from './modules/headerSection/HeaderSection';
+import Recourse from './modules/resource/Resource';
+import Rating from './modules/resource/rating/Rating';
+import Comment from './modules/resource/comment/Comment';
+import RoadMap from './modules/roadmap/RoadMap';
 
 /* Modelos relacionados con el area de cursos */
-import Category from "./modules/category/Category";
-import CareerType from "./modules/careerType/CareerType";
-import Course from "./modules/course/Course";
-import { CourseCategory } from "./modules/course/Course";
-import Section from "./modules/section/Section";
-import Content from "./modules/content/Content";
-
-/* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
-import DiscountEvent from "./modules/subscription/models/DiscountEvent";
-import Invoice from "./modules/subscription/models/Invoice";
-import Subscription from "./modules/subscription/models/Subscription";
-import MPSubscription from "./modules/subscription/models/MPSubscription";
-import MPSubPlan from "./modules/subscription/models/MPSubPlan";
-import Payment from "./modules/subscription/models/Payment";
-import Plan from "./modules/subscription/models/Plan";
-import Refund from "./modules/subscription/models/Refund";
-import WebhookEvent from "./modules/subscription/models/WebhookEvent";
+import Category from './modules/category/Category';
+import CareerType from './modules/careerType/CareerType';
+import Course from './modules/course/Course';
+import { CourseCategory } from './modules/course/Course';
+import Section from './modules/section/Section';
+import Content from './modules/content/Content';
 
 // sync.ts
 async function syncDatabase() {
@@ -52,32 +41,23 @@ async function syncDatabase() {
 
     await Recourse.sync({ force: true });
 
+    await Category.sync({ force: true });
+    await CareerType.sync({ force: true })
+    await Course.sync({ force: true });
+    await CourseCategory.sync({ force: true });
+    await Section.sync({ force: true });
+
+    await Content.sync({ force: true });
+
+
     await Rating.sync({ force: true });
 
     await Comment.sync({ force: true });
     await Recourse.sync({ force: true });
 
     await RoadMap.sync({ force: true });
-    /* Area de cursos */
-    await Category.sync({ force: true });
-    await CareerType.sync({ force: true });
-    await Course.sync({ force: true });
-    await CourseCategory.sync({ force: true });
-    await Section.sync({ force: true });
-    await Content.sync({ force: true });
-
-    // Area de pagos
-    await WebhookEvent.sync({ force: true })
-    await Plan.sync({ force: true });
-    await DiscountEvent.sync({ force: true });
-    await Subscription.sync({ force: true }); 
-    await MPSubscription.sync({ force: true });
-    await MPSubPlan.sync({ force: true });
-    await Payment.sync({ force: true });
-    await Invoice.sync({ force: true });
-    await Refund.sync({ force: true });
-
-    console.log("¡Sincronización exitosa!");
+    
+    console.log('¡Sincronización exitosa!');
   } catch (error) {
     console.error("Error:", error);
   } finally {

@@ -15,7 +15,7 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST, // Host
   port: Number(process.env.DB_PORT), // Puerto
   dialect: process.env.DB_DIALECT as 'postgres', // Dialecto (aquí lo obtienes desde el archivo .env)
-  logging: false, // para habilitar logs para consultas poner console.log
+  logging: console.log//false, // para habilitar logs para consultas poner console.log
 });
 
 sequelize

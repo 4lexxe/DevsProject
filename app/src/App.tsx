@@ -10,10 +10,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // Importación de los componentes
 import DefaultLayout from "./shared/layouts/defaultLayout";
 import Home from "./home/home";
+import DashboardLayout from "./dashboard/layouts/DashboardLayout";
+import { renderDashboardRoutes } from "./dashboard/routes/dashboard.routes";
 
-import "@/shared/assets/styles/main.css";
-
-import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage }from '@/course/index';
+import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage } from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./auth/auth";
 import AboutUs from "./shared/components/navigation/AboutUs";
@@ -22,7 +22,7 @@ import LearnRoute from './learnroute/pages/LearnRoute';
 import ResourcePage from './recourse/pages/resources/resourcePages';
 import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
 import ResourceDetailsPage from './recourse/pages/resourceDetails/ResourceDetailsPage';
-import ProtectedRoute from './auth/contexts/ProtectedRoute'; // Importa el componente de protección
+import ProtectedRoute from './auth/contexts/ProtectedRoute';
 import ProtectedRouteAdmin from './auth/contexts/ProtectRouteAdmin';
 
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
@@ -40,7 +40,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
 
 function App() {
   return (
@@ -77,6 +76,11 @@ function App() {
               <Route path="/resources/:id/edit" element={<CreateResourceForm />} />
               <Route path="/resources/:id" element={<ResourceDetailsPage />} />
               <Route path="/roadmaps/:id" element={<Roadmap />} />
+
+              {/* Rutas del Dashboard */}
+              <Route path="/dashboard" element={<DashboardLayout />}>
+                {renderDashboardRoutes()}
+              </Route>
 
               <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
                 <Route path="/editor-roadmap" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />

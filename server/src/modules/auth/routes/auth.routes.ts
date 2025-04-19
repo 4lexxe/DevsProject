@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { VerifyController, AuthRequest } from '../controllers/verify.controller';  // Importamos el controlador de verificación y AuthRequest
+import PermissionsLogController from '../controllers/permissions-log.controller';
 import { Request, Response } from 'express';
 
 const router = Router();
@@ -19,6 +20,16 @@ router.post('/login',
   AuthController.loginValidations,
   (req: Request, res: Response) => AuthController.login(req, res)
 );
+
+// Ruta para registrar logs de permisos (no requiere autenticación)
+router.post('/permissions-log', async (req: Request, res: Response) => {
+  try {
+    await PermissionsLogController.logPermissionCheck(req, res);
+  } catch (error) {
+    console.error('Error al procesar log de permisos:', error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
 
 // Rutas existentes de Discord
 router.get('/discord/login', AuthController.discordAuth);
