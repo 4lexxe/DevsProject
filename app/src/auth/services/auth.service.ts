@@ -20,6 +20,20 @@ export interface RegisterData {
   username: string;
 }
 
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  username: string;
+  roleId: number;
+  avatar?: string;
+  role?: {
+    id: number;
+    name: string;
+    description: string;
+  } | null;
+}
+
 export interface AuthResponse {
   user: User;
   token: string;
@@ -43,27 +57,6 @@ export interface ProviderMetadata {
   };
 }
 
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: string;
-  username: string;
-  displayName?: string;
-  roleId: number;
-  role?: {
-    id: number;
-    name: string;
-    description: string;
-    permissions?: string[]; // Agregar la propiedad permissions
-  };
-  isActiveSession: boolean;
-  lastActiveAt: string;
-  authProvider: string;
-  authProviderId?: string;
-  providerMetadata?: ProviderMetadata;
-}
-
 // Clase AuthService para manejar la autenticación
 class AuthService {
   private static instance: AuthService;
@@ -77,8 +70,8 @@ class AuthService {
     }
   }
 
-  // Método estático para obtener la instancia única de AuthService
-  static getInstance(): AuthService {
+  // Obtener la instancia única de AuthService
+  public static getInstance(): AuthService {
     if (!AuthService.instance) {
       AuthService.instance = new AuthService();
     }
@@ -89,8 +82,10 @@ class AuthService {
   private setAuthHeader(token: string | null) {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      localStorage.setItem('token', token);
     } else {
       delete axios.defaults.headers.common['Authorization'];
+      localStorage.removeItem('token');
     }
   }
 
@@ -147,14 +142,12 @@ class AuthService {
   // Guardar el token en localStorage y configurar el encabezado de autorización
   public setToken(token: string): void {
     this.token = token;
-    localStorage.setItem('token', token);
     this.setAuthHeader(token);
   }
 
   // Limpiar el token de localStorage y eliminar el encabezado de autorización
   private clearToken(): void {
     this.token = null;
-    localStorage.removeItem('token');
     this.setAuthHeader(null);
   }
 
@@ -169,5 +162,4 @@ class AuthService {
   }
 }
 
-// Exportar la instancia única de AuthService
 export default AuthService.getInstance();

@@ -1,6 +1,8 @@
 import express from 'express';
 import { ResourceController } from '../controllers/resource.controller';
 import { body } from 'express-validator';
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = express.Router();
 
@@ -16,6 +18,8 @@ const validateResource = [
 // Crear un nuevo recurso (POST /resources)
 router.post(
   '/',
+  authMiddleware,
+  permissionsMiddleware(['create:resources']),
   validateResource,
   ResourceController.createResource
 );
@@ -30,10 +34,15 @@ router.get('/:id', ResourceController.getResourceById);
 router.put(
   '/:id',
   validateResource,
+  authMiddleware,
+  permissionsMiddleware(['edit:resources']),
   ResourceController.updateResource
 );
 
 // Eliminar un recurso (DELETE /resources/:id)
-router.delete('/:id', ResourceController.deleteResource);
+router.delete('/:id', 
+  authMiddleware, 
+  permissionsMiddleware(['delete:resources']), 
+  ResourceController.deleteResource);
 
 export default router;

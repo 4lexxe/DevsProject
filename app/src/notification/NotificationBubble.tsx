@@ -85,7 +85,7 @@ const NotificationBubble = () => {
               },
               animate: {
                 scale: [1, 1.2, 1],
-                opacity: [0, 0.5, 0],
+                opacity: [0, 0.2, 0],
                 x: "-50%",
                 transition: {
                   duration: 1,
@@ -103,7 +103,7 @@ const NotificationBubble = () => {
                 },
               },
             }}
-            className="absolute left-1/2 -translate-x-1/2 bg-blue-500 rounded-full w-10 h-10"
+            className="absolute left-1/2 -translate-x-1/2 bg-gray-200/40 rounded-full w-10 h-10"
           />
 
           {/* Contenedor principal */}
@@ -118,7 +118,7 @@ const NotificationBubble = () => {
             }}
           >
             <motion.div
-              className="flex items-center bg-white/90 backdrop-blur-md border border-gray-200 rounded-full shadow-lg dark:bg-slate-700 dark:border-gray-800 overflow-hidden"
+              className="flex items-center bg-white backdrop-blur-md border border-gray-300 rounded-full shadow-sm overflow-hidden"
               initial={{
                 width: "40px",
                 height: "40px",
@@ -142,7 +142,7 @@ const NotificationBubble = () => {
             >
               {/* Ícono de notificación */}
               <motion.div
-                className="flex-shrink-0 p-2"
+                className="flex-shrink-0 p-2 bg-white"
                 initial={{ scale: 0.5, rotate: -180 }}
                 animate={{
                   scale: 1,
@@ -162,12 +162,12 @@ const NotificationBubble = () => {
                   },
                 }}
               >
-                <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+                <Bell className="w-5 h-5 text-gray-700" />
               </motion.div>
 
               {/* Mensaje de bienvenida */}
               <motion.p
-                className="px-4 text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-nowrap"
+                className="px-4 text-sm font-medium text-gray-800 whitespace-nowrap"
                 initial={{ opacity: 0 }}
                 animate={{
                   opacity: isExpanded ? 1 : 0,

@@ -5,6 +5,7 @@ import { AuthRequest } from './roadMapController';
 import { RequestHandler } from 'express';
 import User from "../../modules/user/User";
 import Roadmap from "../../modules/roadmap/RoadMap";
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
@@ -55,8 +56,8 @@ const checkPublicRoadmap: RequestHandler = async (req, res, next) => {
 
 // The routes remain the same
 // Rutas públicas
-router.get('/roadmaps', handleRoute(RoadmapController.getAll));
-router.get('/roadmaps/:id', checkPublicRoadmap, handleRoute(RoadmapController.getById));
+router.get('/roadmaps',permissionsMiddleware(['read:courses']),  handleRoute(RoadmapController.getAll));
+router.get('/roadmaps/:id', checkPublicRoadmap, permissionsMiddleware(['read:courses']), handleRoute(RoadmapController.getById));
 
 // Rutas protegidas
 router.use(authMiddleware);
