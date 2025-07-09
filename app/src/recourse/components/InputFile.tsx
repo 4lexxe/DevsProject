@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Upload, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 
 interface InputFileProps {

@@ -1,4 +1,4 @@
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 // Definir interfaces
 interface AdminData {

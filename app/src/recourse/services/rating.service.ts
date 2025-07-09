@@ -1,4 +1,4 @@
-import api from '../../api/axios'; // Importa la instancia de Axios configurada
+import api from '../../shared/api/axios'; // Importa la instancia de Axios configurada
 
 // Interfaz para los datos de una calificación
 interface RatingData {

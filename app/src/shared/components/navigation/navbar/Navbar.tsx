@@ -1,4 +1,4 @@
-import { useMediaQuery } from '../../../../hooks/useMediaQuery';
+import { useMediaQuery } from '../../../hooks/useMediaQuery';
 import DesktopNavbar from './NavbarDesktop';
 import TopNavbar from './TopNavbar';
 import BottomNavbar from './BottomNavbar';

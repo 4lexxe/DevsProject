@@ -1,4 +1,4 @@
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 // Obtiene el contenido por sección
 const CONTENT = "/contents"

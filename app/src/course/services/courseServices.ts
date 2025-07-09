@@ -1,4 +1,4 @@
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 interface Course {
   id: number;

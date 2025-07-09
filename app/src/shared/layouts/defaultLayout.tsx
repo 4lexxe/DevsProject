@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '../components/navigation/navbar/Navbar';
 import Footer from '../components/navigation/Footer';
 import NotificationBubble from '../../notification/NotificationBubble';
-import useSocket from '../../hooks/useSocket';
+import useSocket from '../hooks/useSocket';
 
 export default function DefaultLayout() {
   const { backendOnline } = useSocket();

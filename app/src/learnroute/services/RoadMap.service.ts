@@ -1,5 +1,5 @@
 import { Node, Edge } from '@xyflow/react';
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 import { AxiosResponse } from 'axios';
 
 interface User {

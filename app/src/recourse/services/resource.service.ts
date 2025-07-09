@@ -1,5 +1,5 @@
 // resource.service.ts
-import api from '../../api/axios'; // Importa la instancia de axios configurada
+import api from '../../shared/api/axios'; // Importa la instancia de axios configurada
 
 export const ResourceService = {
   // Crear un nuevo recurso

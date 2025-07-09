@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import authService, { User } from '../services/auth.service';
-import useSocket from '../../hooks/useSocket';
+import useSocket from '../../shared/hooks/useSocket';
 
 export interface AuthContextType {
   user: User | null;

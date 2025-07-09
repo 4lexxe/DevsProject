@@ -1,4 +1,4 @@
-import api from "@/api/axios"; // Importa la instancia de axios
+import api from "@/shared/api/axios"; // Importa la instancia de axios
 
 const CATEGORY_ENDPOINT = "/categories/actives";
 

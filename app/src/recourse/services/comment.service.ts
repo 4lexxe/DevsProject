@@ -1,4 +1,4 @@
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 // Definir la interfaz para un comentario
 export interface Comment {

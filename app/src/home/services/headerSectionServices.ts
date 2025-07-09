@@ -1,4 +1,4 @@
-import api from '../../api/axios';
+import api from '../../shared/api/axios';
 
 const HEADER_SECTION_ENDPOINT = '/header-sections';
 

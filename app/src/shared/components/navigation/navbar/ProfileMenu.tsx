@@ -1,6 +1,6 @@
 import { FC, useRef } from 'react';
 import { User, Settings, LogOut } from 'lucide-react';
-import { useClickOutside } from '../../../../hooks/useClickOutside';
+import { useClickOutside } from '../../../hooks/useClickOutside';
 
 interface ProfileMenuProps {
   user: { name: string; email?: string; avatar?: string };
