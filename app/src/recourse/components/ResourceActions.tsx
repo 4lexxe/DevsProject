@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Share2, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useAuth } from '../../auth/contexts/AuthContext'; // Importa el hook useAuth
+import { useAuth } from '@/user/contexts/AuthContext'; // Importa el hook useAuth
 import { ResourceService } from '../services/resource.service';
 import { createPortal } from 'react-dom';
 

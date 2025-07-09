@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MercadoPago from "@/shared/assets/imgs/mercadopago.png";
-import { useAuth } from "@/auth/contexts/AuthContext";
+import { useAuth } from "@/user/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { postSubscription } from "../../services/subscriptionService";

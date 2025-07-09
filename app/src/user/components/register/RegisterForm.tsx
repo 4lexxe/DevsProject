@@ -11,7 +11,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import AuthService from "../../services/auth.service";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
-import TelInput from "@/auth/components/inputs/TelInput";
+import TelInput from "@/user/components/inputs/TelInput";
 import PasswordInput from "@/shared/components/inputs/PasswordInput";
 import CheckInput from "@/shared/components/inputs/CheckInput";
 

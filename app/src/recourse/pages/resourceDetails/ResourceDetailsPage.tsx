@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ResourceService } from '../../services/resource.service';
-import { UserService } from '../../../profile/services/user.service';
+import { UserService } from '../../../user/components/profile/services/user.service';
 import { toast } from 'react-hot-toast';
 import { Resource, UserInfo } from '../../types/resource';
 import ResourceHeader from '../../navigation/ResourceDetailHeader';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, StarFill } from 'react-bootstrap-icons';
 import { toast } from 'react-hot-toast';
 import RatingService from '../services/rating.service';
-import { useAuth } from '../../auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 
 interface RatingProps {
   resourceId: number;

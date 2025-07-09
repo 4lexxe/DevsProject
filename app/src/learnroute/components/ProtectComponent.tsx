@@ -1,5 +1,5 @@
 
-import { useAuth } from '@/auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 
 import { ReactNode } from 'react';
 

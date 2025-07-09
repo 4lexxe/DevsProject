@@ -11,7 +11,7 @@ import ResourceTypeSelector from '../../components/ResourceTypeSelector';
 import ResourceUrlInput from '../../components/ResourceUrlInput';
 import ResourceVisibilityToggle from '../../components/ResourceVisibilityToggle';
 import InputFile from '../../components/InputFile';
-import { useAuth } from '../../../auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 
 const ResourceForm: React.FC = () => {
   const { user } = useAuth();

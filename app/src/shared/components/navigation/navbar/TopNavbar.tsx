@@ -1,6 +1,6 @@
 import { Search, Bell } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../../../../auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 
 const getPageTitle = (pathname: string) => {
   switch (pathname) {

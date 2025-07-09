@@ -13,7 +13,7 @@ import type { Subscription } from "../interfaces/subscription";
 
 import { getSubscriptionData, cancelSubscription } from "../services/subscriptionService";
 
-import { useAuth } from "@/auth/contexts/AuthContext";
+import { useAuth } from "@/user/contexts/AuthContext";
 import { Navigate, Link } from "react-router-dom";
 
 export default function SubscriptionPage() {

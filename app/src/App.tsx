@@ -3,7 +3,7 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import { AuthProvider } from "./auth/contexts/AuthContext";
+import { AuthProvider } from "./user/contexts/AuthContext";
 import { ReactFlowProvider } from "reactflow";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -15,15 +15,15 @@ import "@/shared/assets/styles/main.css";
 
 import { CoursesPage, CourseFormPage, CourseDetail, QuizPage, Profile, SectionFormPage, ContentPage }from '@/course/index';
 
-import { LoginPage, RegisterPage } from "./auth/auth";
+import { LoginPage, RegisterPage } from "./user/auth";
 import AboutUs from "./shared/components/navigation/AboutUs";
 
 import LearnRoute from './learnroute/pages/LearnRoute';
 import ResourcePage from './recourse/pages/resources/resourcePages';
 import CreateResourceForm from './recourse/pages/form/CreateResourceForm';
 import ResourceDetailsPage from './recourse/pages/resourceDetails/ResourceDetailsPage';
-import ProtectedRoute from './auth/contexts/ProtectedRoute'; // Importa el componente de protección
-import ProtectedRouteAdmin from './auth/contexts/ProtectRouteAdmin';
+import ProtectedRoute from './user/contexts/ProtectedRoute'; // Importa el componente de protección
+import ProtectedRouteAdmin from './user/contexts/ProtectRouteAdmin';
 
 import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";

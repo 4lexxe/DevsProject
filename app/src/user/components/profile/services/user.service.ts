@@ -1,5 +1,5 @@
 // userService.ts
-import api from '../../shared/api/axios'; // Importa la instancia de axios configurada
+import api from '../../../../shared/api/axios'; // Importa la instancia de axios configurada
 
 export const UserService = {
   // Obtener todos los usuarios (público)

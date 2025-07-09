@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell } from "lucide-react";
 import { Howl } from "howler";
-import { useAuth } from "@/auth/contexts/AuthContext";
+import { useAuth } from "@/user/contexts/AuthContext";
 
 const notificationSoundPath = "/notification.wav";
 

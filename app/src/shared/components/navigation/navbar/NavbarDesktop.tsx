@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { LogOut, User, Settings, LogIn, UserPlus, Subscript, CreditCard } from 'lucide-react'; // Added CreditCard icon
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 import NavLink from '../navbar/NavLink';
 import AuthButton from '../../buttons/AuthButton';
 import SearchBar from '../../searchBar/SearchBar';

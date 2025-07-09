@@ -6,8 +6,8 @@ import {
   createComment,
   getCommentsByResource,
 } from "../services/comment.service";
-import { useAuth } from "../../auth/contexts/AuthContext";
-import { UserService } from "../../profile/services/user.service";
+import { useAuth } from "@/user/contexts/AuthContext";
+import { UserService } from "../../user/components/profile/services/user.service";
 
 interface CommentProps {
   resourceId: number;

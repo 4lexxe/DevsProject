@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ResourceService } from "../../services/resource.service";
-import { UserService } from "../../../profile/services/user.service";
+import { UserService } from "../../../user/components/profile/services/user.service";
 import ResourceListHeader from "../../navigation/ResourceListHeader";
 import ResourceCard from "../../components/ResourceCard";
 

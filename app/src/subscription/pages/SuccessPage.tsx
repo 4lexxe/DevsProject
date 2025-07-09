@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import Success from "../components/Success";
 import { getSubscriptionSuccess } from "../services/subscriptionService";
-import { useAuth } from "@/auth/contexts/AuthContext";
+import { useAuth } from "@/user/contexts/AuthContext";
 
 function SuccessPage() {
   const { user, loading } = useAuth();

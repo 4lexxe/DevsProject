@@ -12,7 +12,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../../../auth/contexts/AuthContext";
+import { useAuth } from "@/user/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/auth.service';
 import LoadingSpinner from '../components/loading/LoadingSpinner';
-import { useAuth } from '../../auth/contexts/AuthContext'; // Importa el contexto de autenticación
+import { useAuth } from '../contexts/AuthContext'; // Importa el contexto de autenticación
 
 const withAuthCheck = (WrappedComponent: React.ComponentType) => {
   return function WithAuthCheckWrapper(props: any) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
-import { useAuth } from '../../auth/contexts/AuthContext';
+import { useAuth } from '../../user/contexts/AuthContext';
 
 const AddResourceButton: React.FC = () => {
   const { user } = useAuth(); // Obtiene el estado del usuario desde el contexto
