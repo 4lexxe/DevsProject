@@ -3,6 +3,8 @@ import {Router} from 'express';
 import CourseController from './Controller/courseController';
 import CourseGetController from './Controller/courseGetController';
 import { validateCourse } from './courseValidation';
+import { authMiddleware } from '../../shared/middleware/authMiddleware';
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
@@ -33,13 +35,27 @@ router.get('/courses/:id', CourseGetController.getById);
 // Ruta para obtener un curso por ID y la navegacion entre sus secciones y contenidos de cada una
 router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
 
-// Ruta para crear un curso (solo Admin y SuperAdmin)
-router.post('/courses', validateCourse, CourseController.create);
+// Ruta para crear un curso (requiere autenticación y permisos)
+router.post('/courses', 
+  authMiddleware, 
+  permissionsMiddleware(['manage:courses']), 
+  validateCourse, 
+  CourseController.create
+);
 
-// Ruta para actualizar un curso (solo Admin y SuperAdmin)
-router.put('/courses/:id', validateCourse, CourseController.update);
+// Ruta para actualizar un curso (requiere autenticación y permisos)
+router.put('/courses/:id', 
+  authMiddleware, 
+  permissionsMiddleware(['manage:courses']), 
+  validateCourse, 
+  CourseController.update
+);
 
-// Ruta para eliminar un curso (solo Admin y SuperAdmin)
-router.delete('/courses/:id', CourseController.delete);
+// Ruta para eliminar un curso (requiere autenticación y permisos)
+router.delete('/courses/:id', 
+  authMiddleware, 
+  permissionsMiddleware(['delete:courses']), 
+  CourseController.delete
+);
 
 export default router;

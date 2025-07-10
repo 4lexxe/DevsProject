@@ -56,43 +56,98 @@ export const rolesIniciales = [
     name: 'student', 
     description: 'Estudiante del sistema',
     permissions: [
-      'read:courses', 'enroll:courses',
-      'access:course_content', 'read:own_progress',
+      'read:courses', 'read:course_details', 'enroll:courses',
+      'access:course_content', 'read:own_progress', 'manage:own_profile'
     ]
   },
   { 
     name: 'instructor', 
     description: 'Instructor de cursos',
     permissions: [
-      'manage:courses', 'manage:course_content', 'read:courses',
-      'enroll:courses', 'manage:own_profile',
+      'read:courses', 'read:course_details', 'enroll:courses',
+      'access:course_content', 'read:own_progress', 'manage:own_profile',
+      'manage:courses', 'manage:course_content', 'publish:courses',
+      'read:all_progress', 'manage:enrollments'
     ]
   },
   { 
     name: 'moderator', 
     description: 'Moderador de la comunidad',
     permissions: [
-      'moderate:content', 'read:users', 'read:courses',
-      'manage:categories', 'manage:course_content',
+      'read:courses', 'read:course_details', 'enroll:courses',
+      'access:course_content', 'read:own_progress', 'manage:own_profile',
+      'moderate:content', 'delete:content', 'read:users',
+      'manage:categories', 'manage:course_content', 'manage:groups',
+      'manage:community_posts', 'read:all_progress'
     ]
   },
   { 
     name: 'admin', 
     description: 'Administrador del sistema',
     permissions: [
-      'manage:all_users', 'manage:roles', 'manage:permissions',
-      'manage:courses', 'manage:categories', 'manage:course_content',
-      'view:analytics', 'audit:logs', 'manage:system_settings',
+      // Permisos de usuario básico
+      'read:courses', 'read:course_details', 'enroll:courses',
+      'access:course_content', 'read:own_progress', 'manage:own_profile',
+      
+      // Gestión de usuarios
+      'read:users', 'write:users', 'delete:users', 'manage:all_users',
+      
+      // Gestión de roles y permisos
+      'manage:roles', 'manage:permissions',
+      
+      // Gestión de cursos
+      'manage:courses', 'delete:courses', 'publish:courses', 'archive:courses',
+      'manage:categories', 'manage:course_content', 'manage:enrollments',
+      
+      // Moderación
+      'moderate:content', 'delete:content',
+      
+      // Progreso y análisis
+      'read:all_progress', 'view:analytics',
+      
+      // Ventas
+      'manage:sales', 'view:sales', 'refund:sales',
+      
+      // Comunidad
+      'manage:groups', 'manage:community_posts',
+      
+      // Sistema
+      'manage:system_settings', 'audit:logs'
     ]
   },
   { 
     name: 'superadmin', 
     description: 'Super administrador con acceso completo',
     permissions: [
-      'manage:all_users', 'manage:roles', 'manage:permissions',
-      'manage:courses', 'manage:categories', 'manage:course_content',
-      'view:analytics', 'audit:logs', 'manage:system_settings', 'manage:backups',
-      'impersonate:users', 'manage:system_settings',
+      // Todos los permisos de usuario básico
+      'read:courses', 'read:course_details', 'enroll:courses',
+      'access:course_content', 'read:own_progress', 'manage:own_profile',
+      
+      // Gestión completa de usuarios
+      'read:users', 'write:users', 'delete:users', 'manage:all_users',
+      'impersonate:users',
+      
+      // Gestión completa de roles y permisos
+      'manage:roles', 'manage:permissions', 'delete:roles', 'delete:permissions',
+      
+      // Gestión completa de cursos
+      'manage:courses', 'delete:courses', 'publish:courses', 'archive:courses',
+      'manage:categories', 'manage:course_content', 'manage:enrollments',
+      
+      // Moderación completa
+      'moderate:content', 'delete:content',
+      
+      // Progreso y análisis completo
+      'read:all_progress', 'view:analytics', 'audit:logs',
+      
+      // Ventas completas
+      'manage:sales', 'view:sales', 'refund:sales',
+      
+      // Comunidad completa
+      'manage:groups', 'manage:community_posts',
+      
+      // Sistema completo
+      'manage:system_settings', 'manage:backups'
     ]
   }
 ];

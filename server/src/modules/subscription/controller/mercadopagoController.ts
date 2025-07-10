@@ -144,10 +144,12 @@ class MercadoPagoController {
       try {
         // Buscar el plan asociado con esta suscripción
         let planId;
-        if (subscriptionData?.preapproval_plan_id) {
+        const data = subscriptionData as any;
+        
+        if (data.preApprovalPlanId) {
           // Buscar el plan por el ID del plan de preaprobación
           const mpSubPlan = await MPSubPlan.findOne({
-            where: { id: subscriptionData.preapproval_plan_id },
+            where: { id: data.preApprovalPlanId },
           });
           if (mpSubPlan) {
             planId = mpSubPlan.planId;
@@ -164,18 +166,19 @@ class MercadoPagoController {
           );
         }
 
+        const autoRecurring = subscriptionData.auto_recurring as any;
         // Calcular fechas de inicio y fin
         const startDate = new Date();
-        if (subscriptionData.auto_recurring?.start_date) {
+        if (autoRecurring?.start_date) {
           startDate.setTime(
-            new Date(subscriptionData.auto_recurring.start_date).getTime()
+            new Date(autoRecurring.start_date).getTime()
           );
         }
 
-        const endDate = new Date(); 
-        if (subscriptionData.auto_recurring?.end_date) {
+        const endDate = new Date();
+        if (autoRecurring?.end_date) {
           endDate.setTime(
-            new Date(subscriptionData.auto_recurring.end_date).getTime()
+            new Date(autoRecurring.end_date).getTime()
           );
         }
         // Crear la suscripción en nuestro sistema
