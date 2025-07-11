@@ -1,0 +1,246 @@
+import { Request, Response } from 'express';
+import Resource from '../Resource';
+import User from '../../user/User';
+import { body, validationResult } from 'express-validator';
+
+// Interface para los campos actualizables
+import { ResourceType } from '../Resource';
+
+interface UpdatableResourceFields {
+  title?: string;
+  description?: string;
+  url?: string;
+  type?: ResourceType;
+  isVisible?: boolean;
+  coverImage?: string;
+}
+
+export class ResourceController {
+  // Validaciones para los datos de entrada
+  static resourceValidations = [
+    body('title').notEmpty().withMessage('El título es obligatorio'),
+    body('url').isURL().withMessage('La URL debe ser válida'),
+    body('type').isIn(['video', 'document', 'image', 'link']).withMessage('Tipo de recurso inválido'),
+    body('isVisible').optional().isBoolean().withMessage('isVisible debe ser un valor booleano'),
+    body('coverImage').optional().isURL().withMessage('La URL de la imagen de portada debe ser válida'),
+  ];
+
+  // Crear un nuevo recurso (requiere autenticación)
+  static async createResource(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as User;
+      if (!user) {
+        res.status(401).json({ error: 'Usuario no autenticado' });
+        return;
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
+
+      // Verificar permisos básicos para subir recursos
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('upload:resources') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          error: 'No tienes permisos para subir recursos'
+        });
+        return;
+      }
+
+      const { title, description, url, type, isVisible, coverImage } = req.body;
+      const userId = user.id;
+
+      const resource = await Resource.create({
+        title,
+        description,
+        url,
+        type,
+        userId,
+        isVisible: isVisible ?? true,
+        coverImage,
+      });
+
+      res.status(201).json(resource);
+    } catch (error) {
+      console.error('Error creating resource:', error);
+      res.status(500).json({ error: 'Error al crear el recurso' });
+    }
+  }
+
+  // Obtener todos los recursos visibles (público)
+  static async getResources(_req: Request, res: Response): Promise<void> {
+    try {
+      const resources = await Resource.findAll({
+        where: { isVisible: true },
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'], // Agregamos avatar
+          },
+        ],
+      });
+
+      res.json(resources);
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      res.status(500).json({ error: 'Error al obtener los recursos' });
+    }
+  }
+
+  // Obtener un recurso por ID (público)
+  static async getResourceById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+
+      // Validar que el ID sea un número
+      if (!/^\d+$/.test(id)) {
+        res.status(400).json({ error: 'ID inválido. Debe ser un número.' });
+        return;
+      }
+
+      const resource = await Resource.findByPk(id, {
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'], // Agregamos avatar
+          },
+        ],
+      });
+
+      if (!resource) {
+        res.status(404).json({ error: 'Recurso no encontrado' });
+        return;
+      }
+
+      res.json(resource);
+    } catch (error) {
+      console.error('Error fetching resource by ID:', error);
+      res.status(500).json({ error: 'Error al obtener el recurso' });
+    }
+  }
+
+  // Función helper para verificar permisos de propietario o moderador
+  private static canModifyResource(user: User, resource: any): { canModify: boolean; reason?: string } {
+    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+    const isOwner = resource.userId === user.id;
+    const canModerateAll = userPermissions.includes('moderate:all_resources') || user.Role?.name === 'superadmin';
+    const canManageOwn = userPermissions.includes('manage:own_resources');
+
+    if (canModerateAll) {
+      return { canModify: true };
+    }
+
+    if (isOwner && canManageOwn) {
+      return { canModify: true };
+    }
+
+    if (!isOwner) {
+      return { canModify: false, reason: 'Solo el propietario del recurso puede modificarlo' };
+    }
+
+    return { canModify: false, reason: 'No tienes permisos para gestionar recursos' };
+  }
+
+  // Actualizar un recurso (requiere ser propietario o tener permisos de moderador)
+  static async updateResource(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as User;
+      if (!user) {
+        res.status(401).json({ error: 'Usuario no autenticado' });
+        return;
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
+
+      const { id } = req.params;
+      const { title, description, url, type, isVisible, coverImage } = req.body;
+
+      if (!/^\d+$/.test(id)) {
+        res.status(400).json({ error: 'ID inválido. Debe ser un número.' });
+        return;
+      }
+
+      const resource = await Resource.findByPk(id);
+      if (!resource) {
+        res.status(404).json({ error: 'Recurso no encontrado' });
+        return;
+      }
+
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = this.canModifyResource(user, resource);
+      if (!canModify) {
+        res.status(403).json({ error: reason });
+        return;
+      }
+
+      const updatedFields: UpdatableResourceFields = {
+        title,
+        description,
+        url,
+        type,
+        isVisible,
+        coverImage,
+      };
+
+      await resource.update(updatedFields);
+
+      res.json(await Resource.findByPk(id, {
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
+          },
+        ],
+      }));
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      res.status(500).json({ error: 'Error al actualizar el recurso' });
+    }
+  }
+
+  // Eliminar un recurso (requiere ser propietario o tener permisos de moderador)
+  static async deleteResource(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as User;
+      if (!user) {
+        res.status(401).json({ error: 'Usuario no autenticado' });
+        return;
+      }
+
+      const { id } = req.params;
+
+      if (!/^\d+$/.test(id)) {
+        res.status(400).json({ error: 'ID inválido. Debe ser un número.' });
+        return;
+      }
+
+      const resource = await Resource.findByPk(id);
+      if (!resource) {
+        res.status(404).json({ error: 'Recurso no encontrado' });
+        return;
+      }
+
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = this.canModifyResource(user, resource);
+      if (!canModify) {
+        res.status(403).json({ error: reason });
+        return;
+      }
+
+      await resource.destroy();
+      res.json({ message: 'Recurso eliminado correctamente' });
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      res.status(500).json({ error: 'Error al eliminar el recurso' });
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { Request, Response, RequestHandler } from "express";
 import Course, { CourseCategory } from "../Course";
 import Category from "../../category/Category";
 import { validationResult } from "express-validator";
+import User from "../../user/User";
 
 // Función para generar metadata
 const metadata = (req: Request, res: Response) => {
@@ -176,6 +177,19 @@ export default class CourseController {
   static delete: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
+      const user = req.user as User;
+
+      // Verificar que el usuario tenga permisos para eliminar cursos
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('delete:courses') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para eliminar cursos",
+        });
+        return;
+      }
+
       const course = await Course.findByPk(id);
       if (!course) {
         res.status(404).json({
@@ -185,9 +199,12 @@ export default class CourseController {
         });
         return;
       }
+
       await course.destroy();
+      
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Curso eliminado correctamente",
       });
     } catch (error) {
