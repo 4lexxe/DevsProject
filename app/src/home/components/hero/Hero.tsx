@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Play, Code, GitBranch, Star, Coffee, Zap } from 'lucide-react';
+import { ArrowRight, Play, Code, GitBranch, Star, Zap } from 'lucide-react';
 
 // Interfaces
 interface HeaderSection {
@@ -19,7 +19,6 @@ interface HeaderSection {
 const Hero: React.FC = () => {
   const [headerSection, setHeaderSection] = useState<HeaderSection | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
 
   const animatedTexts = [
@@ -33,7 +32,6 @@ const Hero: React.FC = () => {
     const fetchHeaderSection = async () => {
       try {
         setLoading(true);
-        setError(null);
 
         const response = await fetch(`${import.meta.env.VITE_API_URL}/header-sections`);
         
@@ -48,8 +46,8 @@ const Hero: React.FC = () => {
         } else {
           setHeaderSection(null);
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error desconocido');
+      } catch {
+        // Error en la carga de datos - usar datos por defecto
         setHeaderSection(null);
       } finally {
         setLoading(false);
@@ -88,12 +86,14 @@ const Hero: React.FC = () => {
 
   if (loading) {
     return (
-      <section className="relative min-h-[60vh] bg-white overflow-hidden">
-        <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-12 flex items-center justify-center min-h-[60vh]">
-          <div className="animate-pulse text-center">
-            <div className="h-6 sm:h-8 bg-gray-200 rounded-lg w-48 sm:w-72 mx-auto mb-3"></div>
-            <div className="h-3 sm:h-4 bg-gray-200 rounded w-32 sm:w-48 mx-auto mb-4"></div>
-            <div className="h-2 sm:h-3 bg-gray-200 rounded w-40 sm:w-56 mx-auto"></div>
+      <section className="relative py-20 bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="animate-pulse text-center">
+              <div className="h-8 bg-gray-200 rounded-lg w-72 mx-auto mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-48 mx-auto mb-6"></div>
+              <div className="h-3 bg-gray-200 rounded w-56 mx-auto"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -101,27 +101,27 @@ const Hero: React.FC = () => {
   }
 
   return (
-    <section className="relative min-h-[65vh] bg-white overflow-hidden">
-      {/* Animated Background Pattern - More subtle */}
-      <div className="absolute inset-0 opacity-5 sm:opacity-10">
+    <section className="relative py-20 bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
+      {/* Animated Background Pattern */}
+      <div className="absolute inset-0 opacity-30">
         <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.1'%3E%3Cpath d='M30 30c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm0-20c-11.046 0-20 8.954-20 20s8.954 20 20 20 20-8.954 20-20-8.954-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236366f1' fill-opacity='0.05'%3E%3Cpath d='M40 40c0-11.046 8.954-20 20-20s20 8.954 20 20-8.954 20-20 20-20-8.954-20-20zm0-20c-11.046 0-20 8.954-20 20s8.954 20 20 20 20-8.954 20-20-8.954-20-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
       </div>
 
-      {/* Floating Code Elements - Reduced */}
+      {/* Floating Code Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(3)].map((_, i) => (
+        {[...Array(4)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute text-2xl sm:text-3xl opacity-5 text-indigo-400 font-mono"
+            className="absolute text-3xl opacity-10 text-indigo-500 font-mono"
             animate={{
-              x: [0, 25 + i * 6, 0],
-              y: [0, -25 - i * 4, 0],
+              x: [0, 30 + i * 8, 0],
+              y: [0, -30 - i * 6, 0],
               rotate: [0, 180, 360],
             }}
             transition={{
-              duration: 12 + i * 3,
+              duration: 15 + i * 3,
               repeat: Infinity,
               delay: i * 2,
               ease: "linear"
@@ -131,37 +131,37 @@ const Hero: React.FC = () => {
               top: `${Math.random() * 100}%`
             }}
           >
-            {['</', '{}', '=>'][i]}
+            {['</', '{}', '=>', '()'][i]}
           </motion.div>
         ))}
       </div>
 
-      {/* Main Content - More compact */}
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-8 sm:pb-12">
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center min-h-[55vh]">
+      {/* Main Content Container */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-12 xl:gap-20 items-center min-h-[70vh]">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-4 sm:space-y-6 text-center lg:text-left"
+            className="space-y-8 text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
           >
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center space-x-2 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 text-gray-700 shadow-sm text-xs"
+              className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 text-gray-700 shadow-lg text-sm"
             >
-              <GitBranch className="w-3 h-3" />
-              <span className="font-medium">Developer Path</span>
-              <Star className="w-3 h-3 text-yellow-500 fill-current" />
+              <GitBranch className="w-4 h-4" />
+              <span className="font-semibold">Developer Path</span>
+              <Star className="w-4 h-4 text-yellow-500 fill-current" />
             </motion.div>
 
             {/* Main Title */}
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-6">
               <motion.h1 
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-gray-900 leading-tight"
+                className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-gray-900 leading-tight"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -172,7 +172,7 @@ const Hero: React.FC = () => {
               </motion.h1>
               
               {/* Animated Subtitle */}
-              <div className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 h-8 sm:h-10 flex items-center justify-center lg:justify-start font-bold">
+              <div className="text-xl sm:text-2xl lg:text-3xl text-gray-600 h-12 flex items-center justify-center lg:justify-start font-bold">
                 <motion.span
                   key={currentTextIndex}
                   initial={{ opacity: 0, y: 20, scale: 0.8 }}
@@ -188,7 +188,7 @@ const Hero: React.FC = () => {
 
             {/* Description */}
             <motion.p 
-              className="text-sm sm:text-base lg:text-lg text-gray-600 leading-relaxed max-w-lg mx-auto lg:mx-0 font-medium"
+              className="text-lg lg:text-xl text-gray-600 leading-relaxed font-medium max-w-xl mx-auto lg:mx-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
@@ -198,7 +198,7 @@ const Hero: React.FC = () => {
 
             {/* CTA Buttons */}
             <motion.div 
-              className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
@@ -207,35 +207,35 @@ const Hero: React.FC = () => {
                 href={heroData.buttonLink}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group inline-flex items-center justify-center px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl text-sm"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl text-lg"
               >
                 <span>{heroData.buttonName}</span>
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-3 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.a>
 
               <motion.button
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
-                className="group inline-flex items-center justify-center px-5 sm:px-6 py-2.5 sm:py-3 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 hover:border-indigo-300 transition-all duration-300 shadow-md hover:shadow-lg text-sm"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-white/80 backdrop-blur-sm border-2 border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-white hover:border-indigo-300 transition-all duration-300 shadow-lg hover:shadow-xl text-lg"
               >
-                <Play className="mr-2 w-4 h-4 group-hover:scale-110 transition-transform" />
+                <Play className="mr-3 w-5 h-5 group-hover:scale-110 transition-transform" />
                 <span>Demo</span>
               </motion.button>
             </motion.div>
 
             {/* Tech Stack Icons */}
             <motion.div 
-              className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 pt-4 sm:pt-6 justify-center lg:justify-start"
+              className="flex flex-col sm:flex-row items-center gap-4 pt-8 justify-center lg:justify-start"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              <span className="text-xs font-medium text-gray-500">Tech Stack:</span>
-              <div className="flex gap-2">
+              <span className="text-sm font-semibold text-gray-500">Tech Stack:</span>
+              <div className="flex gap-3">
                 {['React', 'Node', 'TS', 'Next'].map((tech, i) => (
                   <motion.div
                     key={tech}
-                    className="px-2 py-0.5 bg-gray-50 border border-gray-200 rounded text-xs font-mono font-bold text-gray-700"
+                    className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-mono font-bold text-gray-700 shadow-md"
                     whileHover={{ scale: 1.1, y: -2 }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -248,43 +248,43 @@ const Hero: React.FC = () => {
             </motion.div>
           </motion.div>
 
-          {/* Right Content - Compact Code Editor */}
+          {/* Right Content - Code Editor */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative order-first lg:order-last"
+            className="relative order-first lg:order-last max-w-2xl mx-auto lg:mx-0"
           >
-            <div className="relative transform hover:rotate-0 lg:rotate-2 transition-transform duration-500">
+            <div className="relative transform hover:rotate-0 lg:rotate-1 transition-transform duration-500">
               {/* Code Editor Window */}
-              <div className="bg-gray-900 rounded-lg lg:rounded-xl shadow-xl overflow-hidden border border-gray-200 mx-2 sm:mx-4 lg:mx-0">
+              <div className="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 backdrop-blur-sm">
                 {/* Window Header */}
-                <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-gray-800 border-b border-gray-700">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                     </div>
-                    <div className="text-xs text-gray-300 font-mono">portfolio.tsx</div>
+                    <div className="text-sm text-gray-300 font-mono">portfolio.tsx</div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <GitBranch className="w-3 h-3 text-gray-400" />
-                    <span className="text-xs text-gray-400">main</span>
+                  <div className="flex items-center space-x-2">
+                    <GitBranch className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">main</span>
                   </div>
                 </div>
 
                 {/* Line Numbers & Code */}
                 <div className="flex">
-                  <div className="bg-gray-800 px-2 py-3 border-r border-gray-700">
-                    {[1,2,3,4,5,6,7].map(num => (
-                      <div key={num} className="text-gray-500 text-xs font-mono leading-4 text-right">
+                  <div className="bg-gray-800 px-4 py-6 border-r border-gray-700">
+                    {[1,2,3,4,5,6,7,8].map(num => (
+                      <div key={num} className="text-gray-500 text-sm font-mono leading-6 text-right">
                         {num}
                       </div>
                     ))}
                   </div>
                   
-                  <div className="p-3 font-mono text-xs space-y-0.5 flex-1">
+                  <div className="p-6 font-mono text-sm space-y-1 flex-1">
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -305,7 +305,7 @@ const Hero: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1.4 }}
-                      className="text-gray-300 ml-2"
+                      className="text-gray-300 ml-4"
                     >
                       <span className="text-purple-400">return</span> (
                     </motion.div>
@@ -313,23 +313,23 @@ const Hero: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1.6 }}
-                      className="text-pink-400 ml-4"
+                      className="text-pink-400 ml-8"
                     >
-                      &lt;<span className="text-blue-400">div</span> <span className="text-yellow-400">className</span>=<span className="text-green-400">"app"</span>&gt;
+                      &lt;<span className="text-blue-400">div</span> <span className="text-yellow-400">className</span>=<span className="text-green-400">"hero"</span>&gt;
                     </motion.div>
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 1.8 }}
-                      className="text-gray-300 ml-6"
+                      className="text-gray-300 ml-12"
                     >
-                      <span className="text-green-400">"Hello World!"</span>
+                      <span className="text-green-400">"Bienvenido!"</span>
                     </motion.div>
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 2.0 }}
-                      className="text-pink-400 ml-4"
+                      className="text-pink-400 ml-8"
                     >
                       &lt;/<span className="text-blue-400">div</span>&gt;
                     </motion.div>
@@ -337,29 +337,37 @@ const Hero: React.FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 2.2 }}
-                      className="text-gray-300 ml-2"
+                      className="text-gray-300 ml-4"
                     >
                       )
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 2.4 }}
+                      className="text-blue-400"
+                    >
+                      {'}'}
                     </motion.div>
                   </div>
                 </div>
               </div>
 
-              {/* Floating Icons - Minimal */}
+              {/* Floating Icons */}
               <motion.div
-                animate={{ y: [-6, 6, -6], rotate: [0, 5, 0] }}
+                animate={{ y: [-8, 8, -8], rotate: [0, 5, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute -top-2 sm:-top-3 -right-2 sm:-right-3 bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg shadow-lg"
+                className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl shadow-lg"
               >
-                <Code className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <Code className="w-5 h-5 text-white" />
               </motion.div>
 
               <motion.div
-                animate={{ y: [6, -6, 6], rotate: [0, -5, 0] }}
+                animate={{ y: [8, -8, 8], rotate: [0, -5, 0] }}
                 transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                className="absolute -bottom-2 sm:-bottom-3 -left-2 sm:-left-3 bg-gradient-to-r from-pink-500 to-orange-500 p-2 rounded-lg shadow-lg"
+                className="absolute -bottom-4 -left-4 bg-gradient-to-r from-pink-500 to-orange-500 p-3 rounded-xl shadow-lg"
               >
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                <Zap className="w-5 h-5 text-white" />
               </motion.div>
             </div>
           </motion.div>
