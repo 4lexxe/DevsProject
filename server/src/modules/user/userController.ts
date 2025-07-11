@@ -12,6 +12,8 @@ interface UpdatableUserFields {
   roleId?: number;
   username?: string | null;
   displayName?: string | null;
+  identificationNumber?: string | null;
+  identificationType?: string | null;
   password?: string;
   isActiveSession?: boolean; // Nuevo campo para actualizar sesión activa
   lastActiveAt?: Date; // Campo para la última actividad
@@ -36,12 +38,6 @@ declare module 'express' {
 }
 
 export class UserController {
-  static userValidations = [
-    body('email').optional().isEmail().withMessage('Email inválido'),
-    body('roleId').optional().isInt().withMessage('El roleId debe ser un número entero'),
-    body('registrationIp').optional().isIP().withMessage('IP inválida'),
-    body('lastLoginIp').optional().isIP().withMessage('IP inválida')
-  ];
 
   // Obtener todos los usuarios (público)
   static async getUsers(_req: Request, res: Response): Promise<void> {
@@ -198,6 +194,61 @@ export class UserController {
       if (isActiveSession !== undefined) {
         updatableFields.lastActiveAt = new Date();
       }
+      await user.update(updatableFields);
+      const updatedUser = await User.findByPk(id, {
+        attributes: { 
+          exclude: [
+            'password',
+            'registrationIp',
+            'lastLoginIp',
+            'registrationGeo',
+            'lastLoginGeo',
+            'suspiciousActivities'
+          ]
+        },
+        include: [{
+          model: Role,
+          as: 'Role', // Usa el alias definido en la relación
+          attributes: ['id', 'name', 'description']
+        }]
+      });
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ error: 'Error al actualizar usuario' });
+    }
+  }
+
+  static async updateForSubscription(req: Request, res: Response): Promise<void> {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({ errors: errors.array() });
+        return;
+      }
+      const { id } = req.params;
+      const { 
+        name, 
+        username,
+        email, 
+        phone,
+        identificationNumber,
+        identificationType,
+      } = req.body;
+      const user = await User.findByPk(id);
+      if (!user) {
+        res.status(404).json({ error: 'Usuario no encontrado' });
+        return;
+      }
+      const updatableFields: UpdatableUserFields = {
+        email, 
+        name,
+        username,
+        phone,
+        identificationNumber,
+        identificationType,
+      };
+      
       await user.update(updatableFields);
       const updatedUser = await User.findByPk(id, {
         attributes: { 

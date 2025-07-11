@@ -19,8 +19,14 @@ declare module "../role/Role" {
 class User extends Model {
   public id!: number;
   public name!: string;
+  public surname!: string;
   public email!: string | null;
   public password!: string | null;
+  
+  //Estos campos se le pedira cuando se quiera suscribir o hacer algun pago
+  public identificationNumber!: string | null; // Numero de identificación del usuario
+  public identificationType!: string | null;    // Tipo de identificación del usuario (DNI, CUIT, CUIL)
+
   public phone!: string | null;
   public roleId!: number;
   public authProvider!: AuthProvider;
@@ -85,6 +91,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    surname: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     email: {
       type: DataTypes.STRING,
       unique: true,
@@ -94,6 +104,14 @@ User.init(
       },
     },
     password: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    identificationNumber: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    identificationType: {
       type: DataTypes.STRING,
       allowNull: true,
     },
@@ -190,6 +208,8 @@ User.init(
       { fields: ["registrationIp"] },
       { fields: ["lastLoginIp"] },
       { fields: ["suspiciousActivities"] },
+      { fields: ["identificationNumber"] }, 
+      { fields: ["identificationType"] },
     ],
   }
 );
