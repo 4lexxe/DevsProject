@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import Rating from "./Rating";
 import Resource from "../Resource";
 import User from "../../user/User";
+import { AuthRequest } from "../../auth/controllers/verify.controller";
 
 // Definimos una interfaz para los métodos del controlador
 interface IRatingController {
   getRatingsByResource(req: Request, res: Response): Promise<void>;
-  rateResource(req: Request, res: Response): Promise<void>;
-  deleteRating(req: Request, res: Response): Promise<void>;
+  rateResource(req: AuthRequest, res: Response): Promise<void>;
+  deleteRating(req: AuthRequest, res: Response): Promise<void>;
   getStarCount(req: Request, res: Response): Promise<void>;
 }
 
@@ -27,36 +28,34 @@ export const RatingController: IRatingController = {
   },
 
   // Agregar o actualizar la calificación de un usuario a un recurso
-  async rateResource(req: Request, res: Response) {
+  async rateResource(req: AuthRequest, res: Response) {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ error: "No autorizado." });
+      return;
+    }
     try {
-      const user = req.user as User;
-      if (!user) {
-        res.status(401).json({ error: "No autorizado." });
-        return;
-      }
-
-      const userId = user.id;
+      const userId = req.user?.id;
       const { resourceId, star } = req.body;
-
       if (typeof star !== "boolean") {
-        res.status(400).json({ error: "El valor de 'star' debe ser booleano." });
+        res
+          .status(400)
+          .json({ error: "El valor de 'star' debe ser booleano." });
         return;
       }
-
       const existingRating = await Rating.findOne({
         where: { userId, resourceId },
       });
-
       if (existingRating) {
         if (existingRating.star === star) {
-          res.status(200).json({ message: "La calificación ya está registrada." });
+          res
+            .status(200)
+            .json({ message: "La calificación ya está registrada." });
           return;
         }
         await existingRating.update({ star });
         res.json({ message: "Calificación actualizada correctamente." });
         return;
       }
-
       await Rating.create({ userId, resourceId, star });
       res.json({ message: "Calificación agregada correctamente." });
     } catch (error) {
@@ -66,33 +65,19 @@ export const RatingController: IRatingController = {
   },
 
   // Eliminar una calificación
-  async deleteRating(req: Request, res: Response) {
+  async deleteRating(req: AuthRequest, res: Response) {
+    if (!req.isAuthenticated()) {
+      res.status(401).json({ error: "No autorizado." });
+      return;
+    }
     try {
-      const user = req.user as User;
-      if (!user) {
-        res.status(401).json({ error: "No autorizado." });
-        return;
-      }
-
-      const userId = user.id;
+      const userId = req.user?.id;
       const { resourceId } = req.body;
       const rating = await Rating.findOne({ where: { userId, resourceId } });
-
       if (!rating) {
         res.status(404).json({ error: "Calificación no encontrada." });
         return;
       }
-
-      // Verificar permisos: propietario de la calificación o admin con permisos
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      const isOwner = rating.userId === userId;
-      const hasPermissions = userPermissions.includes('delete:content') || user.Role?.name === 'superadmin';
-
-      if (!isOwner && !hasPermissions) {
-        res.status(403).json({ error: "No tienes permiso para eliminar esta calificación." });
-        return;
-      }
-
       await rating.destroy();
       res.json({ message: "Calificación eliminada correctamente." });
     } catch (error) {

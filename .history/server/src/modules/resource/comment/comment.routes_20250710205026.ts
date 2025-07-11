@@ -25,7 +25,7 @@ router.put('/:id',
 
 router.delete('/:id', 
   authMiddleware,
-  permissionsMiddleware(['manage:community_posts']),
+  permissionsMiddleware(['delete:content']),
   CommentController.deleteComment
 );
 

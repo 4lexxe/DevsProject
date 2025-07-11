@@ -1,8 +1,6 @@
 import express from 'express';
 import { ResourceController } from '../controllers/resource.controller';
 import { body } from 'express-validator';
-import { authMiddleware } from '../../../shared/middleware/authMiddleware';
-import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = express.Router();
 
@@ -15,29 +13,27 @@ const validateResource = [
   body('coverImage').optional().isURL().withMessage('La URL de la imagen de portada debe ser válida'),
 ];
 
-// Rutas públicas
-router.get('/', ResourceController.getResources);
-router.get('/:id', ResourceController.getResourceById);
-
-// Rutas protegidas
-router.post('/',
-  authMiddleware,
-  permissionsMiddleware(['upload:resources']),
+// Crear un nuevo recurso (POST /resources)
+router.post(
+  '/',
   validateResource,
   ResourceController.createResource
 );
 
-router.put('/:id',
-  authMiddleware,
-  permissionsMiddleware(['manage:own_resources']),
+// Obtener todos los recursos visibles (GET /resources)
+router.get('/', ResourceController.getResources);
+
+// Obtener un recurso por ID (GET /resources/:id)
+router.get('/:id', ResourceController.getResourceById);
+
+// Actualizar un recurso (PUT /resources/:id)
+router.put(
+  '/:id',
   validateResource,
   ResourceController.updateResource
 );
 
-router.delete('/:id',
-  authMiddleware,
-  permissionsMiddleware(['manage:own_resources']),
-  ResourceController.deleteResource
-);
+// Eliminar un recurso (DELETE /resources/:id)
+router.delete('/:id', ResourceController.deleteResource);
 
 export default router;

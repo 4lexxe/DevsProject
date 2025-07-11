@@ -40,11 +40,11 @@ export class ResourceController {
         return;
       }
 
-      // Verificar permisos básicos para subir recursos
+      // Verificar permisos adicionales
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      if (!userPermissions.includes('upload:resources') && user.Role?.name !== 'superadmin') {
+      if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
         res.status(403).json({
-          error: 'No tienes permisos para subir recursos'
+          error: 'No tienes permisos para crear recursos'
         });
         return;
       }
@@ -154,20 +154,14 @@ export class ResourceController {
       }
 
       const userId = user.id;
+
+      // Verificar permisos: propietario del recurso o superadmin/admin con permisos
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       const isOwner = resource.userId === userId;
+      const hasPermissions = userPermissions.includes('manage:course_content') || user.Role?.name === 'superadmin';
 
-      // Verificar permisos: propietario del recurso o admin/superadmin con permisos superiores
-      const canManageOwnResources = userPermissions.includes('manage:own_resources');
-      const canManageAllContent = userPermissions.includes('manage:course_content') || user.Role?.name === 'superadmin';
-
-      if (!isOwner && !canManageAllContent) {
+      if (!isOwner && !hasPermissions) {
         res.status(403).json({ error: 'No tienes permiso para actualizar este recurso' });
-        return;
-      }
-
-      if (isOwner && !canManageOwnResources && !canManageAllContent) {
-        res.status(403).json({ error: 'No tienes permisos para actualizar recursos' });
         return;
       }
 
@@ -221,20 +215,14 @@ export class ResourceController {
       }
 
       const userId = user.id;
+
+      // Verificar permisos: propietario del recurso o admin/superadmin con permisos
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       const isOwner = resource.userId === userId;
+      const hasPermissions = userPermissions.includes('delete:content') || user.Role?.name === 'superadmin';
 
-      // Verificar permisos: propietario del recurso o admin/superadmin con permisos superiores
-      const canManageOwnResources = userPermissions.includes('manage:own_resources');
-      const canDeleteAllContent = userPermissions.includes('delete:content') || user.Role?.name === 'superadmin';
-
-      if (!isOwner && !canDeleteAllContent) {
+      if (!isOwner && !hasPermissions) {
         res.status(403).json({ error: 'No tienes permiso para eliminar este recurso' });
-        return;
-      }
-
-      if (isOwner && !canManageOwnResources && !canDeleteAllContent) {
-        res.status(403).json({ error: 'No tienes permisos para eliminar recursos' });
         return;
       }
 

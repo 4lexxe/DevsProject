@@ -22,21 +22,21 @@ router.get('/:id', ResourceController.getResourceById);
 // Rutas protegidas
 router.post('/',
   authMiddleware,
-  permissionsMiddleware(['upload:resources']),
+  permissionsMiddleware(['manage:course_content']),
   validateResource,
   ResourceController.createResource
 );
 
 router.put('/:id',
   authMiddleware,
-  permissionsMiddleware(['manage:own_resources']),
+  permissionsMiddleware(['manage:course_content']),
   validateResource,
   ResourceController.updateResource
 );
 
 router.delete('/:id',
   authMiddleware,
-  permissionsMiddleware(['manage:own_resources']),
+  permissionsMiddleware(['delete:content']),
   ResourceController.deleteResource
 );
 

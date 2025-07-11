@@ -11,7 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Endpoint para subir archivos al backend (requiere autenticación)
 router.post('/', 
   authMiddleware,
-  permissionsMiddleware(['upload:resources']),
+  permissionsMiddleware(['manage:course_content']),
   upload.single('file'), 
   async (req, res): Promise<void> => {
     try {

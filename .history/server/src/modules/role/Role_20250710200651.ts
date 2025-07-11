@@ -57,8 +57,7 @@ export const rolesIniciales = [
     description: 'Estudiante del sistema',
     permissions: [
       'read:courses', 'read:course_details', 'enroll:courses',
-      'access:course_content', 'read:own_progress', 'manage:own_profile',
-      'upload:resources', 'manage:own_resources', 'manage:community_posts'
+      'access:course_content', 'read:own_progress', 'manage:own_profile'
     ]
   },
   { 
@@ -68,8 +67,7 @@ export const rolesIniciales = [
       'read:courses', 'read:course_details', 'enroll:courses',
       'access:course_content', 'read:own_progress', 'manage:own_profile',
       'manage:courses', 'manage:course_content', 'publish:courses',
-      'read:all_progress', 'manage:enrollments',
-      'upload:resources', 'manage:own_resources', 'manage:community_posts'
+      'read:all_progress', 'manage:enrollments'
     ]
   },
   { 

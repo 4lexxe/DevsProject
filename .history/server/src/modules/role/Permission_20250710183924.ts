@@ -60,10 +60,6 @@ class Permission extends Model {
     { name: 'manage:sales', description: 'Puede gestionar todas las ventas' },
     { name: 'refund:sales', description: 'Puede emitir reembolsos de ventas' },
     { name: 'view:sales', description: 'Puede ver las ventas realizadas' },
-
-    // Módulo: Recursos de Usuario
-    { name: 'upload:resources', description: 'Puede subir recursos propios' },
-    { name: 'manage:own_resources', description: 'Puede gestionar sus propios recursos' },
   ];
 
   declare id: number;

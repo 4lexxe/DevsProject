@@ -22,7 +22,7 @@ router.post("/rate",
 
 router.delete("/",
   authMiddleware,
-  permissionsMiddleware(['manage:community_posts']),
+  permissionsMiddleware(['delete:content']),
   RatingController.deleteRating as RequestHandler
 );
 
