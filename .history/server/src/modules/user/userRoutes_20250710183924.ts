@@ -10,26 +10,26 @@ const router = Router();
 router.use(geoMiddleware);
 
 // Rutas públicas
-router.get('/users', UserController.getUsers);
-router.get('/users/:id', UserController.getUserById);
+router.get('/users', UserController.getUsers); // Obtener todos los usuarios (público)
+router.get('/users/:id', UserController.getUserById); // Obtener un usuario por ID (público)
 
-// Rutas que requieren autenticación y permisos específicos
+// Rutas que requieren autenticación y permisos
 router.get('/users/:id/security',
-  authMiddleware,
-  permissionsMiddleware(['read:users', 'manage:all_users']),
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['view:security_details']),  // Verificar permisos
   UserController.getUserSecurityDetails
 );
 
 router.put('/users/:id', 
-  authMiddleware,
-  permissionsMiddleware(['write:users', 'manage:all_users']),
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
   ...UserController.userValidations, 
   UserController.updateUser
 );
 
 router.delete('/users/:id', 
-  authMiddleware,
-  permissionsMiddleware(['delete:users']),
+  authMiddleware, // Requiere autenticación
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
   UserController.deleteUser
 );
 

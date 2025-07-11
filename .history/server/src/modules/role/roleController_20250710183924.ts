@@ -1,7 +1,6 @@
 import { Request, Response, RequestHandler } from 'express';
 import Role, { IRoleAttributes, IRoleInstance } from '../role/Role';
 import Permission from '../role/Permission';
-import User from '../user/User';
 
 interface RoleRequestBody {
   name: string;
@@ -29,13 +28,6 @@ const handleError = (res: Response, status: number, message: string, error?: unk
 export const createRole: RequestHandler<unknown, RoleResponse<IRoleAttributes>, RoleRequestBody> = async (req, res) => {
   try {
     const { name, description } = req.body;
-    const user = req.user as User;
-
-    // Verificar permisos adicionales
-    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-    if (!userPermissions.includes('manage:roles') && user.Role?.name !== 'superadmin') {
-      return handleError(res, 403, 'No tienes permisos para crear roles');
-    }
 
     const existingRole = await Role.findOne({ where: { name } });
     if (existingRole) {
@@ -65,16 +57,6 @@ export const createRole: RequestHandler<unknown, RoleResponse<IRoleAttributes>, 
 // OBTENER TODOS LOS ROLES
 export const getRoles: RequestHandler<unknown, RoleResponse<IRoleInstance[]>> = async (req, res) => {
   try {
-    const user = req.user as User;
-
-    // Verificar permisos adicionales
-    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-    const canViewRoles = userPermissions.includes('read:users') || userPermissions.includes('manage:roles') || user.Role?.name === 'superadmin';
-
-    if (!canViewRoles) {
-      return handleError(res, 403, 'No tienes permisos para ver roles');
-    }
-
     const roles = await Role.findAll({
       include: [{
         model: Permission,
@@ -99,16 +81,6 @@ export const getRoles: RequestHandler<unknown, RoleResponse<IRoleInstance[]>> = 
 // OBTENER ROL POR ID
 export const getRoleById: RequestHandler<{ id: string }, RoleResponse<IRoleInstance>> = async (req, res) => {
   try {
-    const user = req.user as User;
-
-    // Verificar permisos adicionales
-    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-    const canViewRoles = userPermissions.includes('read:users') || userPermissions.includes('manage:roles') || user.Role?.name === 'superadmin';
-
-    if (!canViewRoles) {
-      return handleError(res, 403, 'No tienes permisos para ver roles');
-    }
-
     const role = await Role.findByPk(req.params.id, {
       include: [{
         model: Permission,
@@ -139,22 +111,10 @@ export const updateRole: RequestHandler<{ id: string }, RoleResponse<IRoleAttrib
   try {
     const { id } = req.params;
     const { name, description } = req.body;
-    const user = req.user as User;
-
-    // Verificar permisos adicionales
-    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-    if (!userPermissions.includes('manage:roles') && user.Role?.name !== 'superadmin') {
-      return handleError(res, 403, 'No tienes permisos para actualizar roles');
-    }
 
     const role = await Role.findByPk(id);
     if (!role) {
       return handleError(res, 404, 'Rol no encontrado');
-    }
-
-    // Prevenir modificación de roles del sistema por usuarios no superadmin
-    if (user.Role?.name !== 'superadmin' && ['superadmin', 'admin'].includes(role.name)) {
-      return handleError(res, 403, 'No puedes modificar roles del sistema');
     }
 
     if (name) {
@@ -192,28 +152,9 @@ export const updateRole: RequestHandler<{ id: string }, RoleResponse<IRoleAttrib
 // ELIMINAR ROL
 export const deleteRole: RequestHandler<{ id: string }, RoleResponse> = async (req, res) => {
   try {
-    const user = req.user as User;
-
-    // Verificar permisos adicionales
-    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-    if (!userPermissions.includes('delete:roles') && user.Role?.name !== 'superadmin') {
-      return handleError(res, 403, 'No tienes permisos para eliminar roles');
-    }
-
     const role = await Role.findByPk(req.params.id);
     if (!role) {
       return handleError(res, 404, 'Rol no encontrado');
-    }
-
-    // Prevenir eliminación de roles del sistema
-    if (['superadmin', 'admin', 'student', 'instructor', 'moderator'].includes(role.name)) {
-      return handleError(res, 403, 'No se pueden eliminar roles del sistema');
-    }
-
-    // Verificar si hay usuarios usando este rol
-    const usersWithRole = await User.count({ where: { roleId: role.id } });
-    if (usersWithRole > 0) {
-      return handleError(res, 400, `No se puede eliminar el rol. Hay ${usersWithRole} usuario(s) asignado(s) a este rol`);
     }
 
     await role.destroy();
