@@ -15,7 +15,7 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
   return (
     <section className="py-16 px-6">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="rounded-xl shadow-sm overflow-hidden">
           {courses === null || courses === undefined ? (
             <div className="flex flex-col items-center justify-center p-8">
               <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />

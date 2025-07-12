@@ -30,7 +30,7 @@ export default function TopNavbar() {
           <img
             src="https://i.ibb.co/dQ09SsH/logoDev2.png"
             alt="Dev's Project"
-            className="h-16 w-16 object-contain"
+            className="h-12 w-12 object-contain"
           />
           <h1 className="text-xl font-semibold">{pageTitle}</h1>
         </div>

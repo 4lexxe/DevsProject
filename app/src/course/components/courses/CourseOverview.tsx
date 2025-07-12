@@ -24,7 +24,7 @@ const CourseOverview: React.FC<CourseOverviewProps> = ({
   return (
     <section className="bg-white rounded-xl shadow-sm p-6 mb-8">
       <h2 className="text-2xl font-bold mb-4">Descripción del Curso</h2>
-      <p className="text-gray-600 mb-6">{about}</p>
+      <p className="text-gray-600 mb-6 break-words overflow-wrap-anywhere leading-relaxed">{about}</p>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="flex items-center space-x-2">

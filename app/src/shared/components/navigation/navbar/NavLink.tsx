@@ -1,25 +1,27 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface NavLinkProps {
   href: string;
   children: React.ReactNode;
   icon?: React.ReactNode;
   className?: string;
-  onClick?: () => void;
 }
 
 export default function NavLink({ href, children, icon, className = "" }: NavLinkProps) {
+  const location = useLocation();
+  const isActive = location.pathname === href;
+
   return (
     <Link
       to={href}
-      className={`block text-base font-medium text-gray-700 transition-all duration-200 
-        hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-        ${className}`}
+      className={`inline-flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+        isActive 
+          ? 'text-blue-600 bg-blue-50' 
+          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+      } ${className}`}
     >
-      <div className="flex items-center space-x-2">
-        {icon && <span className="flex-shrink-0 text-blue-500">{icon}</span>}
-        <span>{children}</span>
-      </div>
+      {icon && <span className="mr-2 flex-shrink-0">{icon}</span>}
+      <span>{children}</span>
     </Link>
   );
 }
