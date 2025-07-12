@@ -1,5 +1,9 @@
 import { Request, Response, RequestHandler } from "express";
 import MPSubscription from "../models/MPSubscription"; // Asegúrate de importar el modelo MPSubscription
+import Subscription from "../models/Subscription";
+import MPSubPlan from "../models/MPSubPlan"; // Asegúrate de importar el modelo MPSubPlan
+import { stat } from "fs";
+import { start } from "repl";
 
 class MPSubscriptionController {
   // Función para generar metadata
@@ -115,12 +119,11 @@ class MPSubscriptionController {
   // Método para crear una suscripción en la base de datos
   static async createSubscriptionInDB(
     subscriptionData: any,
-    subscriptionId: bigint
   ) {
     try {
-      const subscription = await MPSubscription.create({
+      const mpSubscription = await MPSubscription.create({
         id: subscriptionData.id,
-        subscriptionId: subscriptionId,
+        mpSubPlanId: subscriptionData.preapproval_plan_id,
         payerId: subscriptionData.payer_id,
         status: subscriptionData.status,
         dateCreated: subscriptionData.date_created,
@@ -128,7 +131,26 @@ class MPSubscriptionController {
         data: subscriptionData,
       });
 
-      return subscription;
+      const subscription = await Subscription.findOne({
+        where: { payerId: subscriptionData.payer_id },
+      });
+
+      if (subscription) {
+        
+        const mpSubPlan = await MPSubPlan.findOne({
+          where: { id: mpSubscription.mpSubPlanId },
+          attributes: ["planId"],
+        });
+        subscription?.update({
+          mpSubscriptionId: mpSubscription.id,
+          planId: mpSubPlan?.planId,
+          status: subscriptionData.status,
+          startDate: subscriptionData.auto_recurring?.start_date,
+          endDate: subscriptionData.auto_recurring?.end_date,
+        });
+      }
+
+      return mpSubscription;
     } catch (error: unknown) {
       console.error(
         `Error al crear suscripción ${subscriptionData.id}:`,

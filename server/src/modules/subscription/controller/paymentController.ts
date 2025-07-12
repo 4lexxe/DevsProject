@@ -2,10 +2,13 @@ import { Request, Response, RequestHandler } from "express";
 import axios from "axios"; // Para hacer solicitudes HTTP
 import Payment from "../models/Payment"; // Asegúrate de importar el modelo Payment
 import Subscription from "../models/Subscription"; // Importa el modelo Subscription si es necesario
+import User from "../../user/User"; // Importa el modelo User si es necesario
 import { PaymentResponse } from "mercadopago/dist/clients/payment/commonTypes";
+import MPSubPlan from "../models/MPSubPlan";
+import Plan from "../models/Plan";
+import MPSubscription from "../models/MPSubscription";
 
 class PaymentController {
-
   // Función para generar metadata
   static metadata(req: Request, res: Response) {
     return {
@@ -105,7 +108,7 @@ class PaymentController {
   };
 
   // Método para crear un pago en la base de datos
-  static async createPaymentInDB(paymentData: PaymentResponse) {
+  static async createPaymentInDB(paymentData: any) {
     try {
       const payment = await Payment.create({
         id: paymentData.id,
@@ -118,6 +121,58 @@ class PaymentController {
         data: paymentData,
       });
 
+      const subscription = await Subscription.findOne({
+        where: { paymentId: paymentData.id },
+      });
+
+      if (!subscription) {
+        // Buscar al usuario, mpsubplan y crear la suscripción
+        const user = await User.findOne({
+          where: {
+            email: paymentData.payer?.email,
+            identificationNumber: paymentData.payer?.identification?.number,
+            identificationType: paymentData.payer?.identification?.type,
+          },
+        });
+
+        if (!user) {
+          console.error("Usuario no encontrado para el pago:", user);
+          return null;
+        }
+
+        const mpSubscription = await MPSubscription.findOne({
+          where: { id: paymentData.metadata.preapproval_id },
+          attributes: ["mpSubPlanId"],
+        });
+
+        if (!mpSubscription) {
+          await Subscription.create({
+            userId: user.id,
+            paymentId: paymentData.id,
+            payerId: paymentData.payer.id,
+          });
+          return payment;
+        }
+
+        const mpSubPlan = await MPSubPlan.findOne({
+          where: { id: mpSubscription.mpSubPlanId },
+          attributes: ["planId"],
+        });
+        if (!mpSubPlan) {
+          console.error("MPSubPlan no encontrado para el pago:");
+          return payment;
+        }
+
+        await Subscription.create({
+          userId: user.id,
+          planId: mpSubPlan.planId,
+          paymentId: paymentData.id,
+          mpSubscriptionId: paymentData.metadata.preapproval_id,
+          payerId: paymentData.payer.id,
+        });
+      }
+
+      console.log(`Pago creado en la base de datos con ID: ${payment.id}`);
       return payment;
     } catch (error: unknown) {
       console.error(`Error al crear pago ${paymentData.id}:`, error);

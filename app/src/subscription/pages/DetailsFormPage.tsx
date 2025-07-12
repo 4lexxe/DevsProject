@@ -29,6 +29,9 @@ interface PlanData {
   durationType: string;
   accessLevel: "Básico" | "Estándar" | "Premium";
   discountEvent?: DiscountEvent;
+  mpSubPlan: {
+    initPoint: string; // URL de inicio de la suscripción
+  };
 }
 
 function DetailsFormPage() {
@@ -64,6 +67,7 @@ function DetailsFormPage() {
       <DetailForm
         userData={userD}
         planData={{
+          initPoint: planD.mpSubPlan.initPoint,
           name: planD.name,
           description: planD.description,
           installment: planD.installment,

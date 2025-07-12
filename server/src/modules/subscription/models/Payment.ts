@@ -78,6 +78,3 @@ Payment.init(
 
 export default Payment;
 
-// Relación: Payment pertenece a una Subscription
-Payment.belongsTo(MPSubscription, { foreignKey: "mpSubscriptionId", as: "mpSubscription" });
-MPSubscription.hasMany(Payment, { foreignKey: "mpSubscriptionId", as: "payments" });

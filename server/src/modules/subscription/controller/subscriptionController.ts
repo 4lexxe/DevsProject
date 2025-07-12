@@ -48,19 +48,18 @@ class SubscriptionController {
     });
   }
 
-  /**
-   * Updates a subscription by id or planId
-   * @param identifier - Object containing either id or planId
-   * @param data - The subscription data to update
-   * @returns The updated subscription or null if not found
-   */
   static async updateSubscription(
-    identifier: { id?: bigint; planId?: bigint },
+    mpSubscriptionId: string,
     data: Partial<SubscriptionData>
   ): Promise<Subscription | null> {
     try {
       // Find the subscription by id or planId
-      const subscription = await this.findSubscriptionByIdentifier(identifier);
+      const subscription = await Subscription.findOne({
+        where: {
+          mpSubscriptionId: mpSubscriptionId,
+        }
+      });
+
       if (!subscription) {
         return null;
       }
@@ -71,8 +70,7 @@ class SubscriptionController {
       console.log(`Subscription updated successfully: ID ${subscription.id}`);
       return subscription;
     } catch (error) {
-      const id = identifier.id || identifier.planId;
-      console.error(`Error updating subscription ${id}:`, error);
+      console.error(`Error updating subscription ${mpSubscriptionId}:`, error);
       if (error instanceof Error) {
         throw new Error(`Error updating subscription: ${error.message}`);
       }
@@ -80,36 +78,7 @@ class SubscriptionController {
     }
   }
 
-  /**
-   * Helper method to find a subscription by id or planId
-   */
-  private static async findSubscriptionByIdentifier(identifier: {
-    id?: bigint;
-    planId?: bigint;
-  }): Promise<Subscription | null> {
-    const { id, planId } = identifier;
-
-    if (!id && !planId) {
-      console.error("No identifier provided to find subscription");
-      return null;
-    }
-
-    let subscription: Subscription | null = null;
-
-    if (id) {
-      subscription = await Subscription.findByPk(id);
-      if (!subscription) {
-        console.error(`Subscription with ID: ${id} not found`);
-      }
-    } else if (planId) {
-      subscription = await Subscription.findOne({ where: { planId } });
-      if (!subscription) {
-        console.error(`Subscription with planId: ${planId} not found`);
-      }
-    }
-
-    return subscription;
-  }
+  
 
   static async cancelSubscription(id: number): Promise<Subscription | null> {
     try {
@@ -230,13 +199,11 @@ class SubscriptionController {
             model: MPSubscription,
             as: "mpSubscription",
             attributes: ["nextPaymentDate"],
-            include: [
-              {
-                model: Payment,
-                as: "payments",
-                attributes: ["id", "status", "transactionAmount", "paymentMethodId", "dateApproved", "paymentTypeId"],
-              },
-            ],
+          },
+          {
+            model: Payment,
+            as: "payments",
+            attributes: ["id", "status", "transactionAmount", "paymentMethodId", "dateApproved", "paymentTypeId"],
           },
         ],
       });

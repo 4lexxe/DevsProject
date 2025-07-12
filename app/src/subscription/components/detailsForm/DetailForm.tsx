@@ -28,6 +28,7 @@ interface DetailFormProps {
     duration: number;
     durationType: string;
     accessLevel: "Básico" | "Estándar" | "Premium";
+    initPoint: string; // URL de inicio de la suscripción
   };
 }
 export default function SubscriptionFormPage({ userData, planData }: DetailFormProps){
@@ -72,14 +73,13 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
     try {
       // Editar usuario con los datos del formulario
       const response = await editUser(userData.id, {userId: userData.id, ...data});
-      console.log("Datos del usuario editados:", response)
+      
 
       // Simular llamada a API
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
-      alert("Suscripción procesada exitosamente!")
-      // Opcional: reset del formulario después del éxito
-      // reset()
+      if(response) window.location.href = planData.initPoint;
+      
     } catch (error) {
       console.error("Error al procesar la suscripción:", error)
       alert("Error al procesar la suscripción. Por favor, intenta nuevamente.")

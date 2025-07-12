@@ -3,17 +3,21 @@ import sequelize from "../../../infrastructure/database/db";
 import Plan from "./Plan";
 import User from "../../user/User";
 import Payment from "./Payment";
+import MPSubscription from "./MPSubscription";
 
 class Subscription extends Model {
   public id!: bigint;
   public userId!: bigint;
-  public planId!: bigint;
   public paymentId?: string;
+  public payerId?: bigint; // Aca se guarda el id del pagador
+
+  public planId!: bigint;
+  public mpSubscriptionId?: string; // Aca se guarda el id de la subscripcion en la api de mp
   public startDate?: Date;
   public endDate?: Date;
-  public status!: "paused" | "authorized" | "cancelled" | "pending";
+  public status!: string;
 
-  public mpSubscription: any;
+  public mpSubscription?: any;
 }
 
 Subscription.init(
@@ -26,13 +30,28 @@ Subscription.init(
     },
     planId: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
       references: { model: "Plans", key: "id" },
+    },
+    mpSubscriptionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      references: { model: "MPSubscriptions", key: "id" },
+    },
+    paymentId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      references: { model: "Payments", key: "id" },
+    },
+    payerId: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
     },
     startDate: { type: DataTypes.DATE, allowNull: true },
     endDate: { type: DataTypes.DATE, allowNull: true },
     status: {
-      type: DataTypes.ENUM("authorized", "paused", "cancelled", "pending"),
+      type: DataTypes.STRING,
+      defaultValue: "pending", // Valor por defecto
       allowNull: false,
     },
   },
@@ -45,5 +64,18 @@ User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
 
 Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan" });
 Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
+
+Subscription.belongsTo(Payment, { foreignKey: "paymentId", as: "payments" });
+Payment.hasMany(Subscription, { foreignKey: "paymentId", as: "subscription" });
+
+Subscription.belongsTo(MPSubscription, {
+  foreignKey: "mpSubscriptionId",
+  as: "mpSubscription",
+  onDelete: "CASCADE",
+});
+MPSubscription.hasOne(Subscription, {
+  foreignKey: "mpSubscriptionId",
+  as: "subscription",
+});
 
 export default Subscription;

@@ -241,11 +241,6 @@ class PlanController {
         },
         include: [
           {
-            model: MPSubPlan,
-            as: "mpSubPlan", // Especificar el alias
-            attributes: ["initPoint"],
-          },
-          {
             model: DiscountEvent,
             as: "discountEvent",
             where: {

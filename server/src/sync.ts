@@ -70,10 +70,10 @@ async function syncDatabase() {
     await WebhookEvent.sync({ force: true })
     await Plan.sync({ force: true });
     await DiscountEvent.sync({ force: true });
-    await Subscription.sync({ force: true }); 
     await MPSubscription.sync({ force: true });
     await MPSubPlan.sync({ force: true });
     await Payment.sync({ force: true });
+    await Subscription.sync({ force: true }); 
     await Invoice.sync({ force: true });
     await Refund.sync({ force: true });
 
