@@ -138,18 +138,6 @@ export const authMiddleware = async (
 
     cleanupExpiredTokens(user.id);
 
-    // Verificar permisos de administrador solo si no es una ruta de recursos
-    if (!req.path.startsWith('/resources')) {
-      const isAuthorized = user.Role?.name === 'superadmin' || user.roleId === 2;
-      if (!isAuthorized) {
-        res.status(403).json({ 
-          message: "Acceso denegado",
-          details: "Se requieren privilegios de administrador"
-        });
-        return;
-      }
-    }
-
     req.tokenInfo = {
       token: token || undefined,
       decoded: decodedToken,

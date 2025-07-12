@@ -55,7 +55,7 @@ export interface User {
     id: number;
     name: string;
     description: string;
-    permissions?: string[]; // Agregar la propiedad permissions
+    permissions?: string[]; // Lista de permisos específicos
   };
   isActiveSession: boolean;
   lastActiveAt: string;
@@ -98,8 +98,19 @@ class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
       const response = await axios.post(`${API_URL}/auth/login`, credentials);
-      const { token } = response.data;
+      const { token, user } = response.data;
+
+      // Guardar tanto el token como los datos del usuario
       this.setToken(token);
+      this.setUser(user);
+
+      console.log('🔐 Usuario autenticado:', {
+        id: user.id,
+        name: user.name,
+        role: user.role?.name,
+        permissions: user.role?.permissions
+      });
+
       return response.data;
     } catch (error: unknown) {
       this.clearToken();
@@ -111,8 +122,19 @@ class AuthService {
   async register(data: RegisterData): Promise<AuthResponse> {
     try {
       const response = await axios.post(`${API_URL}/auth/register`, data);
-      const { token } = response.data;
+      const { token, user } = response.data;
+
+      // Guardar tanto el token como los datos del usuario
       this.setToken(token);
+      this.setUser(user);
+
+      console.log('🔐 Usuario registrado:', {
+        id: user.id,
+        name: user.name,
+        role: user.role?.name,
+        permissions: user.role?.permissions
+      });
+
       return response.data;
     } catch (error: unknown) {
       this.clearToken();
@@ -126,6 +148,12 @@ class AuthService {
       const response = await axios.get(`${API_URL}/auth/verify`, {
         withCredentials: true,
       });
+
+      // Si la verificación es exitosa, guardar los datos del usuario
+      if (response.data.authenticated && response.data.user) {
+        this.setUser(response.data.user);
+      }
+
       return response.data;
     } catch (error) {
       this.clearToken();
@@ -155,6 +183,7 @@ class AuthService {
   private clearToken(): void {
     this.token = null;
     localStorage.removeItem('token');
+    localStorage.removeItem('user'); // También limpiar datos del usuario
     this.setAuthHeader(null);
   }
 
@@ -166,6 +195,72 @@ class AuthService {
   // Obtener la URL de autenticación de Discord
   getDiscordAuthUrl(): string {
     return `${API_URL}/auth/discord/login`;
+  }
+
+  // Verificar si el usuario tiene un permiso específico
+  hasPermission(permission: string): boolean {
+    const user = this.getCurrentUser();
+    if (!user || !user.role) {
+      return false;
+    }
+
+    // Superadmin tiene todos los permisos
+    if (user.role.name === 'superadmin') {
+      return true;
+    }
+
+    // Verificar si el usuario tiene el permiso específico
+    return user.role.permissions?.includes(permission) || false;
+  }
+
+  // Verificar si el usuario tiene alguno de los permisos de la lista
+  hasAnyPermission(permissions: string[]): boolean {
+    return permissions.some(permission => this.hasPermission(permission));
+  }
+
+  // Verificar si el usuario puede gestionar sus propios recursos
+  canManageOwnResources(): boolean {
+    return this.hasPermission('manage:own_resources');
+  }
+
+  // Verificar si el usuario puede moderar todos los recursos
+  canModerateAllResources(): boolean {
+    return this.hasPermission('moderate:all_resources');
+  }
+
+  // Verificar si el usuario puede gestionar sus propios comentarios
+  canManageOwnComments(): boolean {
+    return this.hasPermission('manage:own_comments');
+  }
+
+  // Verificar si el usuario puede moderar todos los comentarios
+  canModerateAllComments(): boolean {
+    return this.hasPermission('moderate:all_comments');
+  }
+
+  // Verificar si el usuario puede gestionar sus propias calificaciones
+  canManageOwnRatings(): boolean {
+    return this.hasPermission('manage:own_ratings');
+  }
+
+  // Verificar si el usuario puede moderar todas las calificaciones
+  canModerateAllRatings(): boolean {
+    return this.hasPermission('moderate:all_ratings');
+  }
+
+  // Obtener el usuario actual desde localStorage
+  getCurrentUser(): User | null {
+    try {
+      const userData = localStorage.getItem('user');
+      return userData ? JSON.parse(userData) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Guardar datos del usuario en localStorage
+  setUser(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
   }
 }
 

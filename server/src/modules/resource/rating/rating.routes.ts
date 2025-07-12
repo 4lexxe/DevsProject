@@ -1,36 +1,29 @@
 import { Router, RequestHandler } from "express";
-import RatingController from "./rating.controller"; // Ajusta la ruta según tu estructura
-import { authMiddleware } from "../../../shared/middleware/authMiddleware"; // Middleware de autenticación
-import { geoMiddleware } from "../../../shared/middleware/geo.middleware"; // Middleware de geolocalización (opcional)
+import RatingController from "./rating.controller";
+import { authMiddleware } from "../../../shared/middleware/authMiddleware";
+import { permissionsMiddleware } from "../../../shared/middleware/permissionsMiddleware";
+import { geoMiddleware } from "../../../shared/middleware/geo.middleware";
 
 const router = Router();
 
-// Middleware global de geolocalización (opcional, aplica según necesidad)
+// Middleware global de geolocalización (opcional)
 router.use(geoMiddleware);
 
-// Ruta para obtener todas las calificaciones de un recurso específico
-router.get(
-  "/:resourceId",
-  RatingController.getRatingsByResource
-);
+// Rutas públicas
+router.get("/:resourceId", RatingController.getRatingsByResource);
+router.get("/star-count/:resourceId", RatingController.getStarCount);
 
-// Ruta para agregar o actualizar la calificación de un usuario a un recurso
-router.post(
-  "/rate",
-   // Requiere autenticación
+// Rutas protegidas
+router.post("/rate",
+  authMiddleware,
+  permissionsMiddleware(['rate:resources']),
   RatingController.rateResource as RequestHandler
 );
 
-// Ruta para eliminar una calificación
-router.delete(
-  "/",
+router.delete("/",
+  authMiddleware,
+  permissionsMiddleware(['manage:own_ratings', 'moderate:all_ratings']),
   RatingController.deleteRating as RequestHandler
-);
-
-// Ruta para obtener la cantidad total de estrellas de un recurso
-router.get(
-  "/star-count/:resourceId",
-  RatingController.getStarCount
 );
 
 export default router;

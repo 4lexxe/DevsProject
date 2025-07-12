@@ -1,5 +1,28 @@
 // resource.service.ts
-import api from '../../shared/api/axios'; // Importa la instancia de axios configurada
+import api from '../../shared/api/axios';
+import axios from 'axios';
+
+export interface ResourceUser {
+  id: number;
+  name: string;
+  username?: string;
+  displayName?: string;
+  avatar?: string; // Agregamos avatar
+}
+
+export interface Resource {
+  id: number;
+  title: string;
+  description?: string;
+  url: string;
+  type: 'video' | 'document' | 'image' | 'link';
+  isVisible: boolean;
+  coverImage?: string;
+  userId: number;
+  User: ResourceUser;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export const ResourceService = {
   // Crear un nuevo recurso
@@ -21,10 +44,19 @@ export const ResourceService = {
     }
   },
 
-  // Obtener todos los recursos visibles
+  // Obtener todos los recursos visibles (completamente público)
   async getResources() {
     try {
-      const response = await api.get('/resources');
+      // Usar una instancia de axios sin interceptores para rutas públicas
+      const publicApi = axios.create({
+        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      const response = await publicApi.get('/resources');
       return response.data;
     } catch (error) {
       console.error('Error fetching resources:', error);
@@ -32,18 +64,31 @@ export const ResourceService = {
     }
   },
 
-  // Obtener un recurso por ID
+  // Obtener un recurso por ID (completamente público)
   async getResourceById(id: number) {
     try {
-      const response = await api.get(`/resources/${id}`);
+      console.log('🌐 Obteniendo recurso por ID:', id);
+      
+      // Usar una instancia de axios sin interceptores para rutas públicas
+      const publicApi = axios.create({
+        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      });
+
+      const response = await publicApi.get(`/resources/${id}`);
+      console.log('📡 Respuesta del API:', response.data);
+      
       return response.data;
     } catch (error) {
-      console.error('Error fetching resource by ID:', error);
+      console.error('❌ Error fetching resource by ID:', error);
       throw error;
     }
   },
 
-  // Actualizar un recurso existente
+  // Actualizar un recurso existente (requiere autenticación)
   async updateResource(id: number, data: {
     title?: string;
     description?: string;
@@ -61,7 +106,7 @@ export const ResourceService = {
     }
   },
 
-  // Eliminar un recurso
+  // Eliminar un recurso (requiere autenticación)
   async deleteResource(id: number) {
     try {
       const response = await api.delete(`/resources/${id}`);
@@ -71,4 +116,14 @@ export const ResourceService = {
       throw error;
     }
   },
+
+  // Helper para obtener el nombre de usuario que subió el recurso
+  getResourceAuthor(resource: Resource): string {
+    return resource.User?.displayName || resource.User?.name || resource.User?.username || 'Usuario desconocido';
+  },
+
+  // Helper para verificar si el usuario actual es el propietario del recurso
+  isResourceOwner(resource: Resource, currentUserId: number): boolean {
+    return resource.userId === currentUserId;
+  }
 };

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, Clock, Share2 } from 'lucide-react';
+import { ExternalLink, Clock, Share2, Edit, Trash2 } from 'lucide-react';
 import ResourceTypeIcon from '../types/ResourceTypeIcon';
 import ResourceUserInfo from '../userInfo/ResourceUserInfo';
 import RatingComponent from './Rating';
+import { usePermissions } from '../../shared/hooks/usePermissions';
 
 interface Resource {
   id: number;
@@ -13,12 +14,20 @@ interface Resource {
   url: string;
   coverImage?: string;
   userId: number;
+  User?: {
+    id: number;
+    name: string;
+    username?: string;
+    displayName?: string;
+  };
   createdAt: string;
 }
 
 interface UserInfo {
   id: number;
   name: string;
+  username?: string;
+  displayName?: string;
   avatar?: string;
 }
 
@@ -28,12 +37,16 @@ interface ResourceCardProps {
 }
 
 const ResourceCard: React.FC<ResourceCardProps> = ({ resource, user }) => {
+  const { canModifyResource } = usePermissions();
+
   const truncateText = (text: string, maxLength: number = 55): string => {
     if (text.length > maxLength) {
       return text.slice(0, maxLength) + "...";
     }
     return text;
   };
+
+  const canEdit = canModifyResource(resource.userId);
 
   return (
     <div className="group relative bg-gray-100 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-400 select-none">
@@ -56,6 +69,22 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, user }) => {
             
             {/* Quick Action Icons */}
             <div className="absolute bottom-2 right-2 flex gap-1.5 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 ease-out">
+              {canEdit && (
+                <>
+                  <button 
+                    className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors duration-200 text-blue-600 hover:text-blue-700 shadow-sm"
+                    title="Editar recurso"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+                  <button 
+                    className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors duration-200 text-red-600 hover:text-red-700 shadow-sm"
+                    title="Eliminar recurso"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              )}
               <button className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors duration-200 text-gray-700 hover:text-gray-900 shadow-sm">
                 <Share2 className="w-3.5 h-3.5" />
               </button>

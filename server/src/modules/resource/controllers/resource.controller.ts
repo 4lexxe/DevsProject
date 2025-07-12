@@ -25,11 +25,48 @@ export class ResourceController {
     body('coverImage').optional().isURL().withMessage('La URL de la imagen de portada debe ser válida'),
   ];
 
+  // Función helper para verificar permisos de propietario o moderador
+  private static canModifyResource(user: User, resource: any): { canModify: boolean; reason?: string } {
+    try {
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const isOwner = resource.userId === user.id;
+      const canModerateAll = userPermissions.includes('moderate:all_resources') || user.Role?.name === 'superadmin';
+      const canManageOwn = userPermissions.includes('manage:own_resources');
+
+      console.log('🔐 Verificando permisos para resource:', {
+        resourceId: resource.id,
+        resourceUserId: resource.userId,
+        currentUserId: user.id,
+        isOwner,
+        canModerateAll,
+        canManageOwn,
+        userPermissions
+      });
+
+      if (canModerateAll) {
+        return { canModify: true };
+      }
+
+      if (isOwner && canManageOwn) {
+        return { canModify: true };
+      }
+
+      if (!isOwner) {
+        return { canModify: false, reason: 'Solo el propietario del recurso puede modificarlo' };
+      }
+
+      return { canModify: false, reason: 'No tienes permisos para gestionar recursos' };
+    } catch (error) {
+      console.error('Error verificando permisos:', error);
+      return { canModify: false, reason: 'Error verificando permisos' };
+    }
+  }
+
   // Crear un nuevo recurso (requiere autenticación)
   static async createResource(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      const user = req.user as User;
+      if (!user) {
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
@@ -40,13 +77,17 @@ export class ResourceController {
         return;
       }
 
-      const { title, description, url, type, isVisible, coverImage } = req.body;
-      const userId = (req.user as User)?.id;
-
-      if (!userId) {
-        res.status(401).json({ error: 'Usuario no autenticado' });
+      // Verificar permisos básicos para subir recursos
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('upload:resources') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          error: 'No tienes permisos para subir recursos'
+        });
         return;
       }
+
+      const { title, description, url, type, isVisible, coverImage } = req.body;
+      const userId = user.id;
 
       const resource = await Resource.create({
         title,
@@ -73,8 +114,8 @@ export class ResourceController {
         include: [
           {
             model: User,
-            as: 'User', // Usa el alias definido en la relación
-            attributes: ['id', 'name'], // Incluye solo los campos necesarios del usuario
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
           },
         ],
       });
@@ -101,8 +142,8 @@ export class ResourceController {
         include: [
           {
             model: User,
-            as: 'User', // Usa el alias definido en la relación
-            attributes: ['id', 'name'],
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
           },
         ],
       });
@@ -119,17 +160,27 @@ export class ResourceController {
     }
   }
 
-  // Actualizar un recurso (requiere autenticación y permisos)
+  // Actualizar un recurso (requiere ser propietario o tener permisos de moderador)
   static async updateResource(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      console.log('📝 Iniciando actualización de recurso');
+      
+      const user = req.user as User;
+      if (!user) {
+        console.log('❌ Usuario no autenticado');
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
+      console.log('👤 Usuario autenticado:', {
+        id: user.id,
+        roleId: user.roleId,
+        roleName: user.Role?.name
+      });
+
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
+        console.log('❌ Errores de validación:', errors.array());
         res.status(400).json({ errors: errors.array() });
         return;
       }
@@ -137,65 +188,135 @@ export class ResourceController {
       const { id } = req.params;
       const { title, description, url, type, isVisible, coverImage } = req.body;
 
-      // Validar que el ID sea un número
+      console.log('📊 Datos de actualización:', {
+        resourceId: id,
+        title,
+        description: description?.substring(0, 50) + '...',
+        url,
+        type,
+        isVisible,
+        coverImage: coverImage?.substring(0, 50) + '...'
+      });
+
       if (!/^\d+$/.test(id)) {
         res.status(400).json({ error: 'ID inválido. Debe ser un número.' });
         return;
       }
 
-      const resource = await Resource.findByPk(id);
-      if (!resource) {
-        res.status(404).json({ error: 'Recurso no encontrado' });
-        return;
-      }
-
-      const user = req.user as User;
-      const userId = user.id;
-
-      // Verificar si el usuario es el creador del recurso o es superAdmin
-      if (resource.userId !== userId && user.Role?.name !== 'superAdmin') {
-        res.status(403).json({ error: 'No tienes permiso para actualizar este recurso' });
-        return;
-      }
-
-      const updatedFields: UpdatableResourceFields = {
-        title,
-        description,
-        url,
-        type,
-        isVisible,
-        coverImage,
-      };
-
-      await resource.update(updatedFields);
-
-      res.json(await Resource.findByPk(id, {
+      // Buscar el recurso con información completa del usuario
+      const resource = await Resource.findByPk(id, {
         include: [
           {
             model: User,
             as: 'User',
-            attributes: ['id', 'name'],
+            include: [
+              {
+                association: 'Role',
+                include: ['Permissions']
+              }
+            ]
+          }
+        ]
+      });
+
+      if (!resource) {
+        console.log('❌ Recurso no encontrado:', id);
+        res.status(404).json({ error: 'Recurso no encontrado' });
+        return;
+      }
+
+      console.log('📦 Recurso encontrado:', {
+        id: resource.id,
+        userId: resource.userId,
+        title: resource.title
+      });
+
+      // Asegurar que el usuario tenga información completa del rol
+      const userWithRole = await User.findByPk(user.id, {
+        include: [
+          {
+            association: 'Role',
+            include: ['Permissions']
+          }
+        ]
+      });
+
+      if (!userWithRole) {
+        console.log('❌ Error cargando información del usuario');
+        res.status(401).json({ error: 'Error de autenticación' });
+        return;
+      }
+
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = ResourceController.canModifyResource(userWithRole, resource);
+      if (!canModify) {
+        console.log('❌ Sin permisos:', reason);
+        res.status(403).json({ error: reason });
+        return;
+      }
+
+      console.log('✅ Permisos verificados correctamente');
+
+      // Preparar campos para actualizar (solo los que no son undefined)
+      const updatedFields: UpdatableResourceFields = {};
+      
+      if (title !== undefined) updatedFields.title = title;
+      if (description !== undefined) updatedFields.description = description;
+      if (url !== undefined) updatedFields.url = url;
+      if (type !== undefined) updatedFields.type = type;
+      if (isVisible !== undefined) updatedFields.isVisible = isVisible;
+      if (coverImage !== undefined) updatedFields.coverImage = coverImage;
+
+      console.log('🔄 Campos a actualizar:', updatedFields);
+
+      // Actualizar el recurso
+      await resource.update(updatedFields);
+
+      console.log('✅ Recurso actualizado correctamente');
+
+      // Obtener el recurso actualizado con información del usuario
+      const updatedResource = await Resource.findByPk(id, {
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
           },
         ],
-      }));
+      });
+
+      res.json(updatedResource);
+      
     } catch (error) {
-      console.error('Error updating resource:', error);
-      res.status(500).json({ error: 'Error al actualizar el recurso' });
+      console.error('❌ Error updating resource:', error);
+      
+      // Log detallado del error
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Error al actualizar el recurso',
+        details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : String(error) : undefined
+      });
     }
   }
 
-  // Eliminar un recurso (requiere autenticación y permisos)
+  // Eliminar un recurso (requiere ser propietario o tener permisos de moderador)
   static async deleteResource(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      const user = req.user as User;
+      if (!user) {
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
       const { id } = req.params;
 
-      // Validar que el ID sea un número
       if (!/^\d+$/.test(id)) {
         res.status(400).json({ error: 'ID inválido. Debe ser un número.' });
         return;
@@ -207,12 +328,25 @@ export class ResourceController {
         return;
       }
 
-      const user = req.user as User;
-      const userId = user.id;
+      // Asegurar que el usuario tenga información completa del rol
+      const userWithRole = await User.findByPk(user.id, {
+        include: [
+          {
+            association: 'Role',
+            include: ['Permissions']
+          }
+        ]
+      });
 
-      // Verificar si el usuario es el creador del recurso o es superAdmin
-      if (resource.userId !== userId && user.Role?.name !== 'superAdmin') {
-        res.status(403).json({ error: 'No tienes permiso para eliminar este recurso' });
+      if (!userWithRole) {
+        res.status(401).json({ error: 'Error de autenticación' });
+        return;
+      }
+
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = ResourceController.canModifyResource(userWithRole, resource);
+      if (!canModify) {
+        res.status(403).json({ error: reason });
         return;
       }
 

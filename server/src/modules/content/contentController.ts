@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import Content from "./Content";
 import Section from "../section/Section";
+import User from "../user/User";
 
 const metadata = (req: any, res: any) => {
   return {
@@ -147,7 +148,19 @@ export default class ContentController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
-    
+      const user = req.user as User;
+
+      // Verificar permisos adicionales para crear contenido del curso
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para crear contenido de curso",
+        });
+        return;
+      }
+
       const content = await Content.create({
         title,
         text,
@@ -160,8 +173,10 @@ export default class ContentController {
         position,
         sectionId,
       });
+
       res.status(201).json({
         ...metadata(req, res),
+        status: "success",
         message: "Contenido creado correctamente",
         data: content,
       });
@@ -179,10 +194,23 @@ export default class ContentController {
     try {
       const { id } = req.params;
       const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
+      const user = req.user as User;
+
+      // Verificar permisos adicionales para actualizar contenido del curso
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para actualizar contenido de curso",
+        });
+        return;
+      }
+
       const content = await Content.findByPk(id);
-      
       if (!content) {
         res.status(404).json({
+          ...metadata(req, res),
           status: "error",
           message: "Contenido no encontrado",
         });
@@ -201,8 +229,10 @@ export default class ContentController {
         position,
         sectionId,
       });
+
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Contenido actualizado correctamente",
         data: content,
       });
@@ -219,10 +249,23 @@ export default class ContentController {
   static delete: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
+      const user = req.user as User;
+
+      // Verificar que el usuario tenga permisos para eliminar contenido
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('delete:content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para eliminar contenido",
+        });
+        return;
+      }
+
       const content = await Content.findByPk(id);
-      
       if (!content) {
         res.status(404).json({
+          ...metadata(req, res),
           status: "error",
           message: "Contenido no encontrado",
         });
@@ -230,8 +273,10 @@ export default class ContentController {
       }
       
       await content.destroy();
+
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Contenido eliminado correctamente",
       });
     } catch (error) {

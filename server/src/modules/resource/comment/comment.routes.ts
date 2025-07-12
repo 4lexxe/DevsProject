@@ -1,18 +1,32 @@
 import express from 'express';
 import { CommentController } from './comment.controller';
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = express.Router();
 
-// Crear un nuevo comentario (POST /comments)
-router.post('/', CommentController.commentValidations, CommentController.createComment);
-
-// Obtener todos los comentarios de un recurso (GET /comments/resource/:resourceId)
+// Rutas públicas
 router.get('/resource/:resourceId', CommentController.getCommentsByResource);
 
-// Actualizar un comentario (PUT /comments/:id)
-router.put('/:id', CommentController.commentValidations, CommentController.updateComment);
+// Rutas protegidas
+router.post('/', 
+  authMiddleware,
+  permissionsMiddleware(['comment:resources']),
+  CommentController.commentValidations, 
+  CommentController.createComment
+);
 
-// Eliminar un comentario (DELETE /comments/:id)
-router.delete('/:id', CommentController.deleteComment);
+router.put('/:id', 
+  authMiddleware,
+  permissionsMiddleware(['manage:own_comments', 'moderate:all_comments']),
+  CommentController.commentValidations, 
+  CommentController.updateComment
+);
+
+router.delete('/:id', 
+  authMiddleware,
+  permissionsMiddleware(['manage:own_comments', 'moderate:all_comments']),
+  CommentController.deleteComment
+);
 
 export default router;
