@@ -21,7 +21,7 @@ function MpButton({ plan }: { plan: any }) {
         return;
       }
       // Redirige al usuario al punto de inicio de MercadoPago
-      window.location.href = plan.mpSubPlan.initPoint;
+      navigate(`/subscription/plan/${plan.id}/form/details`, { replace: true });
       // No es necesario setIsProcessing(false) aquí porque la página se redirige
     }, 2000);
   };

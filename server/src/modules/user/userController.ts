@@ -261,11 +261,6 @@ export class UserController {
             'suspiciousActivities'
           ]
         },
-        include: [{
-          model: Role,
-          as: 'Role', // Usa el alias definido en la relación
-          attributes: ['id', 'name', 'description']
-        }]
       });
       res.json(updatedUser);
     } catch (error) {

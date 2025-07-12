@@ -106,7 +106,8 @@ class PlanController {
           reason: planData.name,
           auto_recurring: {
             frequency: planData.duration / planData.installments,
-            frequency_type: planData.durationType === "días" ? "days" : "months",
+            frequency_type:
+              planData.durationType === "días" ? "days" : "months",
             transaction_amount: planData.installmentPrice,
             repetitions: planData.installments,
             currency_id: "ARS",
@@ -123,7 +124,7 @@ class PlanController {
         },
       })
     );
-    
+
     return response;
   }
 
@@ -146,7 +147,12 @@ class PlanController {
   // Obtener todos los planes
   static getAll: RequestHandler = async (req, res) => {
     try {
-      const plans = await Plan.findAll({include: [{model: DiscountEvent, as: 'discountEvent'},{ model: MPSubPlan, as: 'mpSubPlan'}]});
+      const plans = await Plan.findAll({
+        include: [
+          { model: DiscountEvent, as: "discountEvent" },
+          { model: MPSubPlan, as: "mpSubPlan" },
+        ],
+      });
       res.status(200).json({
         status: "success",
         message: "Planes obtenidos exitosamente",
@@ -161,7 +167,50 @@ class PlanController {
   // Obtener un plan por ID
   static getById: RequestHandler = async (req, res) => {
     try {
-      const plan = await Plan.findByPk(req.params.id, {include: [{model: DiscountEvent, as: 'discountEvent'}, {model: MPSubPlan, as: 'mpSubPlan'}]});
+      const plan = await Plan.findByPk(req.params.id, {
+        include: [
+          { model: DiscountEvent, as: "discountEvent" },
+          { model: MPSubPlan, as: "mpSubPlan", attributes: ["initPoint"] },
+        ],
+      });
+      if (!plan) {
+        res.status(404).json({
+          status: "error",
+          message: "Plan no encontrado",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+      res.status(200).json({
+        status: "success",
+        message: "Plan obtenido exitosamente",
+        data: plan,
+        metadata: this.metadata(req, res),
+      });
+    } catch (error) {
+      this.handleServerError(res, req, error, "Error al obtener el plan");
+    }
+  };
+
+  // Obtener un plan por ID
+  static getByIdForSubscription: RequestHandler = async (req, res) => {
+    try {
+      const plan = await Plan.findByPk(req.params.id, {
+        include: [
+          { model: DiscountEvent, as: "discountEvent", attributes: ["value", "event"] },
+          { model: MPSubPlan, as: "mpSubPlan", attributes: ["initPoint"] },
+        ],
+        attributes: [
+          "name",
+          "description",
+          "totalPrice",
+          "installments",
+          "installmentPrice",
+          "duration",
+          "durationType",
+          "accessLevel",
+        ],
+      });
       if (!plan) {
         res.status(404).json({
           status: "error",
@@ -193,17 +242,17 @@ class PlanController {
         include: [
           {
             model: MPSubPlan,
-            as: 'mpSubPlan', // Especificar el alias
-            attributes: ['initPoint'] 
+            as: "mpSubPlan", // Especificar el alias
+            attributes: ["initPoint"],
           },
           {
             model: DiscountEvent,
-            as: 'discountEvent',
+            as: "discountEvent",
             where: {
               isActive: true,
             },
-            required: false // Permitir planes sin eventos de descuento activos
-          }
+            required: false, // Permitir planes sin eventos de descuento activos
+          },
         ],
         order: [["position", "ASC"]],
         limit: 3,

@@ -4,6 +4,7 @@ import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 import validatorUser from './validators/userValidator';
+import subscriptionDataValidator from './validators/subscriptionDataValidator';
 
 
 const router = Router();
@@ -23,7 +24,7 @@ router.get('/users/:id/security',
 );
 
 //Actualizar datos necesarios del usuario para la suscripción
-router.put('/users/:id/subscription', UserController.updateForSubscription);
+router.put('/users/:id/subscription',  subscriptionDataValidator, UserController.updateForSubscription);
 
 router.put('/users/:id', 
   authMiddleware, // Requiere autenticación
