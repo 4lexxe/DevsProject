@@ -57,7 +57,7 @@ class SubscriptionController {
       const subscription = await Subscription.findOne({
         where: {
           mpSubscriptionId: mpSubscriptionId,
-        }
+        },
       });
 
       if (!subscription) {
@@ -78,9 +78,7 @@ class SubscriptionController {
     }
   }
 
-  
-
-  static async cancelSubscription(id: number): Promise<Subscription | null> {
+  static async cancelSubscription(id: bigint): Promise<Subscription | null> {
     try {
       const subscription = await Subscription.findByPk(id, {
         include: [{ model: MPSubscription, as: "mpSubscription" }],
@@ -92,12 +90,24 @@ class SubscriptionController {
       }
 
       const preApproval = new PreApproval(MpConfig);
-      await retryWithExponentialBackoff(() =>
-        preApproval.update({
-          id: subscription.mpSubscription.id,
-          body: { status: "cancelled" },
-        })
-      );
+      await retryWithExponentialBackoff(async () => {
+        try {
+          await preApproval.update({
+            id: subscription.mpSubscription.id,
+            body: { status: "cancelled" },
+          });
+        } catch (error: any) {
+          if (
+            error?.message?.includes(
+              "You can not modify a cancelled preapproval."
+            )
+          ) {
+            console.log("La suscripción ya estaba cancelada.");
+            return; // No lanzar error, termina el proceso
+          }
+          throw error; // Otros errores sí se reintentan
+        }
+      });
 
       console.log(`Suscripción cancelada exitosamente: ID ${id}`);
       return subscription;
@@ -128,7 +138,7 @@ class SubscriptionController {
         },
         order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan, as: "plan", attributes: ["name",] },
+          { model: Plan, as: "plan", attributes: ["name"] },
           { model: User, as: "user", attributes: ["name", "email"] },
           {
             model: MPSubscription,
@@ -173,7 +183,7 @@ class SubscriptionController {
   static getById: RequestHandler = async (req, res) => {
     const userId = (req.session as any).passport?.user?.id;
 
-    if(!userId) {
+    if (!userId) {
       res.status(400).json({
         status: "error",
         message: "Usuario no autenticado",
@@ -190,10 +200,21 @@ class SubscriptionController {
         },
         order: [["startDate", "DESC NULLS LAST"]],
         include: [
-          { model: Plan, 
-            as: "plan", 
-            attributes:["name", "description", "totalPrice", "duration", "durationType", "features", "accessLevel", "installments", "installmentPrice"],
-            include: [{ model: DiscountEvent, as: "discountEvent" }]
+          {
+            model: Plan,
+            as: "plan",
+            attributes: [
+              "name",
+              "description",
+              "totalPrice",
+              "duration",
+              "durationType",
+              "features",
+              "accessLevel",
+              "installments",
+              "installmentPrice",
+            ],
+            include: [{ model: DiscountEvent, as: "discountEvent" }],
           },
           {
             model: MPSubscription,
@@ -203,7 +224,14 @@ class SubscriptionController {
           {
             model: Payment,
             as: "payments",
-            attributes: ["id", "status", "transactionAmount", "paymentMethodId", "dateApproved", "paymentTypeId"],
+            attributes: [
+              "id",
+              "status",
+              "transactionAmount",
+              "paymentMethodId",
+              "dateApproved",
+              "paymentTypeId",
+            ],
           },
         ],
       });
@@ -237,7 +265,9 @@ class SubscriptionController {
     const subscriptionId = req.params.id;
 
     try {
-      const subscription = await this.cancelSubscription(parseInt(subscriptionId));
+      const subscription = await this.cancelSubscription(
+        BigInt(subscriptionId)
+      );
       if (!subscription) {
         res.status(404).json({
           status: "error",

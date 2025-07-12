@@ -4,10 +4,11 @@ import Payment from "./Payment";
 
 class Invoice extends Model {
   public id!: bigint;
-  public paymentId!: string; // ID del pago asociado en nuestra bd
+  public mpSubscriptionId?: string; // ID de la suscripción a la que pertenece la factura
+  public paymentId!: bigint; // ID del pago asociado en nuestra bd
   public data!: any; // Datos de la factura o pago autorizado (MercadoPago)
   public issueDate!: Date; // Fecha de emisión de la factura
-  public dueDate!: Date; // Fecha de vencimiento de la factura
+  public retryAttempts?: number; // Número de intentos de reintento
 }
 
 Invoice.init(
@@ -17,8 +18,12 @@ Invoice.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    paymentId: {
+    mpSubscriptionId: {
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    paymentId: {
+      type: DataTypes.BIGINT,
       allowNull: false,
       references: { model: "Payments", key: "id" }, // Relación con la tabla Subscription
     },
@@ -32,10 +37,11 @@ Invoice.init(
       allowNull: false,
       comment: "Fecha de emisión de la factura",
     },
-    dueDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      comment: "Fecha de vencimiento de la factura",
+    retryAttempts: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0, // Valor por defecto para el número de intentos de reintento
+      comment: "Reintentos",
     },
   },
   {

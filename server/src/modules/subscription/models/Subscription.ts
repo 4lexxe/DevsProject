@@ -8,7 +8,6 @@ import MPSubscription from "./MPSubscription";
 class Subscription extends Model {
   public id!: bigint;
   public userId!: bigint;
-  public paymentId?: string;
   public payerId?: bigint; // Aca se guarda el id del pagador
 
   public planId!: bigint;
@@ -38,11 +37,6 @@ Subscription.init(
       allowNull: true,
       references: { model: "MPSubscriptions", key: "id" },
     },
-    paymentId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      references: { model: "Payments", key: "id" },
-    },
     payerId: {
       type: DataTypes.BIGINT,
       allowNull: true,
@@ -65,8 +59,8 @@ User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
 Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan" });
 Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
 
-Subscription.belongsTo(Payment, { foreignKey: "paymentId", as: "payments" });
-Payment.hasMany(Subscription, { foreignKey: "paymentId", as: "subscription" });
+Subscription.hasMany(Payment, { foreignKey: "subscriptionId", as: "payments" });
+Payment.belongsTo(Subscription, { foreignKey: "subscriptionId", as: "subscription" });
 
 Subscription.belongsTo(MPSubscription, {
   foreignKey: "mpSubscriptionId",

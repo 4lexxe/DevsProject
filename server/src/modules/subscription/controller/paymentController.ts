@@ -39,7 +39,7 @@ class PaymentController {
   static getAll: RequestHandler = async (req, res) => {
     try {
       const payments = await Payment.findAll({
-        include: [{ model: Subscription, as: "Subscription" }], // Incluye la suscripción asociada
+        include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
 
       res.status(200).json({
@@ -57,7 +57,7 @@ class PaymentController {
 
     try {
       const payment = await Payment.findByPk(id, {
-        include: [{ model: Subscription, as: "Subscription" }], // Incluye la suscripción asociada
+        include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
 
       if (!payment) {
@@ -84,8 +84,8 @@ class PaymentController {
 
     try {
       const payment = await Payment.findOne({
-        where: { paymentId },
-        include: [{ model: Subscription, as: "Subscription" }], // Incluye la suscripción asociada
+        where: { id: paymentId },
+        include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
 
       if (!payment) {
@@ -111,7 +111,7 @@ class PaymentController {
   static async createPaymentInDB(paymentData: any) {
     try {
       const payment = await Payment.create({
-        id: paymentData.id,
+        id: BigInt(paymentData.id),
         mpSubscriptionId: paymentData.metadata.preapproval_id,
         dateApproved: paymentData.date_approved,
         status: paymentData.status,
@@ -120,56 +120,20 @@ class PaymentController {
         paymentTypeId: paymentData.payment_type_id,
         data: paymentData,
       });
-
+      
       const subscription = await Subscription.findOne({
-        where: { paymentId: paymentData.id },
+        where: { payerId: BigInt(paymentData.payer.id) },
       });
 
-      if (!subscription) {
-        // Buscar al usuario, mpsubplan y crear la suscripción
-        const user = await User.findOne({
-          where: {
-            email: paymentData.payer?.email,
-            identificationNumber: paymentData.payer?.identification?.number,
-            identificationType: paymentData.payer?.identification?.type,
-          },
-        });
-
-        if (!user) {
-          console.error("Usuario no encontrado para el pago:", user);
-          return null;
+      if (subscription) {
+        payment.subscriptionId = subscription.id;
+        await payment.save();
+      } else {
+        const subscriptiond = await this.createSubscription(paymentData);
+        if (subscriptiond) {
+          payment.subscriptionId = subscriptiond.id;
+          await payment.save();
         }
-
-        const mpSubscription = await MPSubscription.findOne({
-          where: { id: paymentData.metadata.preapproval_id },
-          attributes: ["mpSubPlanId"],
-        });
-
-        if (!mpSubscription) {
-          await Subscription.create({
-            userId: user.id,
-            paymentId: paymentData.id,
-            payerId: paymentData.payer.id,
-          });
-          return payment;
-        }
-
-        const mpSubPlan = await MPSubPlan.findOne({
-          where: { id: mpSubscription.mpSubPlanId },
-          attributes: ["planId"],
-        });
-        if (!mpSubPlan) {
-          console.error("MPSubPlan no encontrado para el pago:");
-          return payment;
-        }
-
-        await Subscription.create({
-          userId: user.id,
-          planId: mpSubPlan.planId,
-          paymentId: paymentData.id,
-          mpSubscriptionId: paymentData.metadata.preapproval_id,
-          payerId: paymentData.payer.id,
-        });
       }
 
       console.log(`Pago creado en la base de datos con ID: ${payment.id}`);
@@ -185,12 +149,71 @@ class PaymentController {
     }
   }
 
+  //Metodo para crear una suscripcion
+  static async createSubscription(paymentData: any) {
+    try {
+      // Buscar al usuario, mpsubplan y crear la suscripción
+      const user = await User.findOne({
+        where: {
+          email: paymentData.payer?.email,
+          identificationNumber: paymentData.payer?.identification?.number,
+          identificationType: paymentData.payer?.identification?.type,
+        },
+      });
+
+      if (!user) {
+        console.error("Usuario no encontrado para el pago:", user);
+        return;
+      }
+
+      const mpSubscription = await MPSubscription.findOne({
+        where: { id: paymentData.metadata.preapproval_id },
+        attributes: ["mpSubPlanId"],
+      });
+
+      if (!mpSubscription) {
+        const subscription = await Subscription.create({
+          userId: user.id,
+          payerId: BigInt(paymentData.payer.id),
+        });
+
+        return subscription;
+      } else {
+        const mpSubPlan = await MPSubPlan.findOne({
+          where: { id: mpSubscription.mpSubPlanId },
+          attributes: ["planId"],
+        });
+        if (!mpSubPlan) {
+          console.error("MPSubPlan no encontrado para el pago:");
+          return;
+        }
+
+        const subscription = await Subscription.create({
+          userId: user.id,
+          planId: mpSubPlan.planId,
+          mpSubscriptionId: paymentData.metadata.preapproval_id,
+          payerId: BigInt(paymentData.payer.id),
+        });
+
+        return subscription;
+      }
+    } catch (error: unknown) {
+      console.error(`Error al crear la suscripción:`, error);
+
+      if (error instanceof Error) {
+        throw new Error(`Error al crear la suscripción: ${error.message}`);
+      } else {
+        throw new Error(`Error al crear la suscripción: ${String(error)}`);
+      }
+    }
+  }
+
   // Método para actualizar un pago en la base de datos
   static async updatePaymentInDB(paymentData: any, paymentId: string) {
     try {
       // Buscar el pago existente
       const payment = await Payment.findOne({
-        where: { paymentId },
+        where: { id: paymentId },
       });
 
       if (!payment) {

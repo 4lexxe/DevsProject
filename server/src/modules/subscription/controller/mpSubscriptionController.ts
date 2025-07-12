@@ -127,7 +127,7 @@ class MPSubscriptionController {
         payerId: subscriptionData.payer_id,
         status: subscriptionData.status,
         dateCreated: subscriptionData.date_created,
-        nextPaymentDate: subscriptionData.next_payment_date,
+        nextPaymentDate: subscriptionData.next_payment_date ? subscriptionData.next_payment_date : null,
         data: subscriptionData,
       });
 
@@ -187,7 +187,7 @@ class MPSubscriptionController {
       // Actualizar los campos
       subscription.status = subscriptionData.status;
       subscription.dateCreated = subscriptionData.date_created;
-      subscription.nextPaymentDate = subscriptionData.next_payment_date || ""; // Sacar esto cuando actualize la base de datos
+      subscription.nextPaymentDate = subscriptionData.next_payment_date ? subscriptionData.next_payment_date : null;
       subscription.data = subscriptionData;
 
       // Guardar los cambios
