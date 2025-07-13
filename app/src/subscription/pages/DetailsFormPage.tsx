@@ -9,7 +9,7 @@ interface UserData {
   id: string;
   name: string;
   surname: string;
-  email: string;
+  mpEmail: string;
   identificationNumber: string;
   identificationType: "CUIT" | "CUIL" | "DNI";
 }

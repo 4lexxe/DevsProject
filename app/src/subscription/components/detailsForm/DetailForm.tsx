@@ -11,7 +11,7 @@ interface DetailFormProps {
     id: string;
     name: string;
     surname: string;
-    email: string;
+    mpEmail: string;
     identificationNumber: string;
     identificationType: "CUIT" | "CUIL" | "DNI";
   };
@@ -45,7 +45,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
     defaultValues: {
       name: userData.name,
       surname: userData.surname,
-      email: userData.email,
+      mpEmail: userData.mpEmail,
       identificationNumber: userData.identificationNumber,
       identificationType: userData.identificationType,
     },
@@ -212,12 +212,12 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
               {/* Email */}
               <div className="md:col-span-2">
                 <CustomInput
-                  name="email"
-                  labelText="Email *"
+                  name="mpEmail"
+                  labelText="Email de Mercado Pago *"
                   type="email"
-                  placeholder="Ingresa tu email"
+                  placeholder="Ingresa un email válido de Mercado Pago"
                   register={register}
-                  error={errors.email?.message}
+                  error={errors.mpEmail?.message}
                   disabled={isSubmitting}
                 />
                 <div className="mt-2 p-3 bg-[#fff3cd] border border-[#ffeaa7] rounded-md">
@@ -239,25 +239,23 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
                     <div className="text-sm text-[#856404]">
                       <p className="font-semibold mb-1">⚠️ Importante para completar tu suscripción</p>
                       <p className="mb-2">
-                        El correo electrónico que ingreses debe coincidir exactamente con el que usás en tu cuenta de
-                        Mercado Pago.
+                        Ingresá el correo electrónico que está vinculado y activo en tu cuenta de Mercado Pago. No es para cambiar tu email personal.
                       </p>
                       <p className="mb-2">
-                        Si los correos no coinciden, la suscripción no podrá acreditarse correctamente y podrías perder
-                        el acceso al plan.
+                        Si el email no es el correcto, la suscripción no podrá acreditarse y podrías perder el acceso al plan.
                       </p>
                       <p className="flex items-center">
-                        📩 ¿No estás seguro cuál es tu correo en Mercado Pago? Ingresá a{" "}
+                        📩 ¿No sabés cuál es tu correo en Mercado Pago? Ingresá a
+                      </p>
                         <a
                           href="https://www.mercadopago.com.ar"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[#1d4ed8] underline mx-1 hover:text-[#0c154c]"
+                          className="text-[#1d4ed8] underline mx-1 hover:text-[#0c154c] "
                         >
                           www.mercadopago.com.ar
-                        </a>{" "}
-                        y verificá tu dirección en la sección "Mi cuenta".
-                      </p>
+                        </a>
+                      <p>y verificá tu dirección en la sección "Mi cuenta".</p>
                     </div>
                   </div>
                 </div>

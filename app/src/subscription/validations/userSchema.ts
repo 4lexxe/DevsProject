@@ -7,7 +7,7 @@ export const userSchema = z.object({
   surname: z.string()
     .min(2, "El apellido debe tener al menos 2 caracteres")
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, "El apellido solo puede contener letras y espacios"),
-  email: z.string()
+  mpEmail: z.string()
     .email("El email no tiene un formato válido"),
   identificationNumber: z.string()
     .min(7, "El número de documento debe tener al menos 7 dígitos")
