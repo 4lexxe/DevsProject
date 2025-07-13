@@ -8,6 +8,7 @@ import bcrypt from 'bcrypt';
 interface UpdatableUserFields {
   name?: string;
   email?: string;
+  mpEmail?: string; // Nuevo campo para email de Mercado Pago
   phone?: string | null;
   roleId?: number;
   username?: string | null;
@@ -165,6 +166,7 @@ export class UserController {
       const { 
         name, 
         email, 
+        mpEmail, // Incluir mpEmail si se proporciona
         phone, 
         roleId, 
         password,
@@ -180,6 +182,7 @@ export class UserController {
       const updatableFields: UpdatableUserFields = {
         name,
         email,
+        mpEmail, // Incluir mpEmail si se proporciona
         phone,
         roleId,
         username,
@@ -230,7 +233,8 @@ export class UserController {
       const { 
         name, 
         username,
-        email, 
+        email,
+        mpEmail, 
         phone,
         identificationNumber,
         identificationType,
@@ -241,7 +245,8 @@ export class UserController {
         return;
       }
       const updatableFields: UpdatableUserFields = {
-        email, 
+        email,
+        mpEmail,
         name,
         username,
         phone,

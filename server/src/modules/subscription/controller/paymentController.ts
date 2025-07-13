@@ -155,7 +155,7 @@ class PaymentController {
       // Buscar al usuario, mpsubplan y crear la suscripción
       const user = await User.findOne({
         where: {
-          email: paymentData.payer?.email,
+          mpEmail: paymentData.payer?.email,
           identificationNumber: paymentData.payer?.identification?.number,
           identificationType: paymentData.payer?.identification?.type,
         },

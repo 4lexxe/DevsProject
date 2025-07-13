@@ -26,6 +26,7 @@ class User extends Model {
   //Estos campos se le pedira cuando se quiera suscribir o hacer algun pago
   public identificationNumber!: string | null; // Numero de identificación del usuario
   public identificationType!: string | null;    // Tipo de identificación del usuario (DNI, CUIT, CUIL)
+  public mpEmail!: string | null; // Email de Mercado Pago, si aplica
 
   public phone!: string | null;
   public roleId!: number;
@@ -93,11 +94,18 @@ User.init(
     },
     surname: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
       unique: true,
+      allowNull: true,
+      validate: {
+        isEmail: true,
+      },
+    },
+    mpEmail: {
+      type: DataTypes.STRING,
       allowNull: true,
       validate: {
         isEmail: true,
