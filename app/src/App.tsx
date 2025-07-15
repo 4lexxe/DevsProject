@@ -32,6 +32,11 @@ import NotFound from "./shared/components/NotFound";
 
 import { PlansPage, SuccessPage, MySuscription } from "./subscription/index";
 
+//DASHBOARD IMPORTS
+import Layout from "./dashboard/layout/Layout";
+import DashboardHome from "./dashboard/pages/DashboardHome";
+import CoursesPageDashboard from "./dashboard/pages/CoursesPage";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -86,6 +91,15 @@ function App() {
               <Route path="/sobre-nosotros" element={<AboutUs />} />
               <Route path="/not-found" element={<NotFound />} />
               <Route path="*" element={<NotFound />} />
+            </Route>
+
+            {/* Rutas del dashboard - SIN DefaultLayout */}
+            <Route path="/dashboard" element={<Layout />}>
+              <Route index element={<DashboardHome />} />
+              <Route path="courses" element={<CoursesPageDashboard />} />
+              <Route path="students" element={<div className="p-6"><h1 className="text-2xl font-bold">Gestión de Estudiantes</h1><p className="text-gray-600">Próximamente...</p></div>} />
+              <Route path="analytics" element={<div className="p-6"><h1 className="text-2xl font-bold">Analíticas</h1><p className="text-gray-600">Próximamente...</p></div>} />
+              <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Configuración</h1><p className="text-gray-600">Próximamente...</p></div>} />
             </Route>
           </Routes>
         </AuthProvider>
