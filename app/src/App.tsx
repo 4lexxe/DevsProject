@@ -36,6 +36,9 @@ import { PlansPage, SuccessPage, MySuscription } from "./subscription/index";
 import Layout from "./dashboard/layout/Layout";
 import DashboardHome from "./dashboard/pages/DashboardHome";
 import CoursesPageDashboard from "./dashboard/pages/CoursesPage";
+import StudentsPage from "./dashboard/pages/StudentsPage";
+import StudentProfilePage from "./dashboard/pages/StudentProfilePage";
+import StudentEditPage from "./dashboard/pages/StudentEditPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -97,7 +100,9 @@ function App() {
             <Route path="/dashboard" element={<Layout />}>
               <Route index element={<DashboardHome />} />
               <Route path="courses" element={<CoursesPageDashboard />} />
-              <Route path="students" element={<div className="p-6"><h1 className="text-2xl font-bold">Gestión de Estudiantes</h1><p className="text-gray-600">Próximamente...</p></div>} />
+              <Route path="students" element={<StudentsPage />} />
+              <Route path="students/:id" element={<StudentProfilePage />} />
+              <Route path="students/:id/edit" element={<StudentEditPage />} />
               <Route path="analytics" element={<div className="p-6"><h1 className="text-2xl font-bold">Analíticas</h1><p className="text-gray-600">Próximamente...</p></div>} />
               <Route path="settings" element={<div className="p-6"><h1 className="text-2xl font-bold">Configuración</h1><p className="text-gray-600">Próximamente...</p></div>} />
             </Route>
