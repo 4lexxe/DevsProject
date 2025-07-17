@@ -20,6 +20,9 @@ router.post('/login',
   (req: Request, res: Response) => AuthController.login(req, res)
 );
 
+// Ruta para verificar si un email existe
+router.post('/check-email', AuthController.checkEmail);
+
 // Rutas existentes de Discord
 router.get('/discord/login', AuthController.discordAuth);
 router.get('/discord/callback', AuthController.discordCallback);
