@@ -7,10 +7,11 @@ import Layout from './dashboard/layout/Layout'
 import DashboardHome from './dashboard/pages/DashboardHome'
 import StudentsPage from './dashboard/pages/StudentsPage'
 import LoginPage from './user/pages/LoginPage'
-import RegisterPage from './user/pages/RegisterPage'
 // import StudentProfilePage from './dashboard/pages/StudentProfilePage'
 // import StudentEditPage from './dashboard/pages/StudentEditPage'
 // import CoursesPage from './dashboard/pages/CoursesPage'
+import "@/shared/styles/main.css"; // Importa tus estilos globales
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,8 +31,7 @@ function App() {
           <Routes>
             {/* Rutas públicas */}
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            
+              
             {/* Rutas protegidas del dashboard */}
             <Route path="/" element={
               <ProtectedRoute requiredRole={['admin', 'superadmin']}>

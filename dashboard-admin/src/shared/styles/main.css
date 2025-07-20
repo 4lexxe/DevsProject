@@ -1,0 +1,17 @@
+/* Importar fuentes de Google de manera asíncrona */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Configuración de Tailwind v4 */
+@theme {
+  --font-family-sans: 'Rubik', sans-serif;
+}
+
+/* Utilidades personalizadas */
+@layer utilities {
+  .resize-none {
+    resize: none;
+  }
+}

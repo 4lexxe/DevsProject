@@ -5,13 +5,13 @@
 import { Request, Response, NextFunction } from "express";
 import { RegisterController } from "./register.controller";
 import { LoginController } from "./login.controller";
+import { RootLoginController } from "./rootLogin.controller";
 import { DiscordController } from "./discord.controller";
 import { GitHubController } from "./github.controller";
 import { VerifyController } from "./verify.controller";
 import { SessionController } from "./session.controller";
 import { LogoutController } from "./logout.controller";
 import { TokenController } from "./token.controller";
-import { CheckEmailController } from "./checkEmail.controller";
 import { registerValidations, loginValidations } from "../validators/auth.validator";
 
 export class AuthController {
@@ -21,8 +21,8 @@ export class AuthController {
   // Auth methods
   static register = RegisterController.handle;
   static login = LoginController.handle;
+  static rootLogin = RootLoginController.handle;
   static verifyAuth = VerifyController.handle;
-  static checkEmail = CheckEmailController.handle;
 
   // OAuth methods
   static discordAuth = (req: Request, res: Response, next: NextFunction) => {

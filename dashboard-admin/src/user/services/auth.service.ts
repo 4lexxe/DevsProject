@@ -62,9 +62,18 @@ export interface User {
   authProvider: string;
   authProviderId?: string;
   providerMetadata?: ProviderMetadata;
+  isSuperAdmin?: boolean; // Para el super admin
+  admin?: {
+    id: number;
+    name: string;
+    isSuperAdmin: boolean;
+    permissions: string[];
+    admin_since: string;
+    admin_notes?: string;
+  };
 }
 
-// Clase AuthService para manejar la autenticación
+// Clase AuthService para manejar la autenticación del super admin
 class AuthService {
   private static instance: AuthService;
   private token: string | null = null;
@@ -94,38 +103,41 @@ class AuthService {
     }
   }
 
-  // Iniciar sesión
+  // Iniciar sesión de super admin
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, credentials);
-      const { token, refreshToken } = response.data;
-
-      this.token = token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
-      this.setAuthHeader(token);
-
+      const response = await axios.post(`${API_URL}/auth/root-login`, credentials);
+      const { token } = response.data;
+      this.setToken(token);
       return response.data;
-    } catch (error) {
-      console.error('Error during login:', error);
+    } catch (error: unknown) {
+      this.clearToken();
       throw error;
     }
   }
 
-  // Registrar usuario
-  async register(userData: RegisterData): Promise<AuthResponse> {
+  // Registrar un nuevo usuario (mantenido por compatibilidad)
+  async register(data: RegisterData): Promise<AuthResponse> {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
-      const { token, refreshToken } = response.data;
+      const response = await axios.post(`${API_URL}/auth/register`, data);
+      const { token } = response.data;
+      this.setToken(token);
+      return response.data;
+    } catch (error: unknown) {
+      this.clearToken();
+      throw error;
+    }
+  }
 
-      this.token = token;
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
-      this.setAuthHeader(token);
-
+  // Verificar la autenticación del usuario
+  async verify(): Promise<{ authenticated: boolean; user?: User; session?: AuthResponse['session'] }> {
+    try {
+      const response = await axios.get(`${API_URL}/auth/verify`, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
-      console.error('Error during registration:', error);
+      this.clearToken();
       throw error;
     }
   }
@@ -133,56 +145,26 @@ class AuthService {
   // Cerrar sesión
   async logout(): Promise<void> {
     try {
-      await axios.post(`${API_URL}/auth/logout`);
-    } catch (error) {
-      console.error('Error during logout:', error);
-    } finally {
-      this.token = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      this.setAuthHeader(null);
-    }
-  }
-
-  // Obtener el usuario actual
-  async getCurrentUser(): Promise<User | null> {
-    try {
-      if (!this.token) {
-        return null;
-      }
-
-      const response = await axios.get(`${API_URL}/auth/me`);
-      return response.data.user;
-    } catch (error) {
-      console.error('Error fetching current user:', error);
-      this.logout(); // Limpiar tokens inválidos
-      return null;
-    }
-  }
-
-  // Refrescar token
-  async refreshToken(): Promise<string | null> {
-    try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) {
-        return null;
-      }
-
-      const response = await axios.post(`${API_URL}/auth/refresh`, {
-        refreshToken
+      await axios.delete(`${API_URL}/auth/logout`, {
+        withCredentials: true,
       });
-
-      const { token: newToken } = response.data;
-      this.token = newToken;
-      localStorage.setItem('token', newToken);
-      this.setAuthHeader(newToken);
-
-      return newToken;
-    } catch (error) {
-      console.error('Error refreshing token:', error);
-      this.logout(); // Limpiar tokens inválidos
-      return null;
+    } finally {
+      this.clearToken();
     }
+  }
+
+  // Guardar el token en localStorage y configurar el encabezado de autorización
+  public setToken(token: string): void {
+    this.token = token;
+    localStorage.setItem('token', token);
+    this.setAuthHeader(token);
+  }
+
+  // Limpiar el token de localStorage y eliminar el encabezado de autorización
+  private clearToken(): void {
+    this.token = null;
+    localStorage.removeItem('token');
+    this.setAuthHeader(null);
   }
 
   // Verificar si el usuario está autenticado
@@ -195,21 +177,28 @@ class AuthService {
     return this.token;
   }
 
-  // Verificar autenticación actual
-  async verify(): Promise<{ authenticated: boolean; user?: User }> {
+  // Métodos adicionales para compatibilidad con el código existente
+  async getCurrentUser(): Promise<User | null> {
     try {
-      if (!this.token) {
-        return { authenticated: false };
-      }
-
-      const user = await this.getCurrentUser();
-      return { authenticated: !!user, user: user || undefined };
+      const verifyResponse = await this.verify();
+      return verifyResponse.user || null;
     } catch (error) {
-      console.error('Error verifying authentication:', error);
-      return { authenticated: false };
+      console.error('Error fetching current user:', error);
+      return null;
+    }
+  }
+
+  // Verificar si es super admin
+  async isSuperAdmin(): Promise<boolean> {
+    try {
+      const user = await this.getCurrentUser();
+      return user?.isSuperAdmin === true || user?.role?.name === 'superadmin';
+    } catch (error) {
+      console.error('Error checking super admin status:', error);
+      return false;
     }
   }
 }
 
-// Exportar la instancia única del servicio de autenticación
+// Exportar la instancia única de AuthService
 export default AuthService.getInstance();

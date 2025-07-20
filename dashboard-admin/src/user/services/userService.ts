@@ -1,4 +1,4 @@
-import api from '@/shared/api/axios'
+import api from '../../shared/api/axios'
 import type { User } from './auth.service'
 
 const USERS_ENDPOINT = '/users'

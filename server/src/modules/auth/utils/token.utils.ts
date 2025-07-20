@@ -6,22 +6,31 @@ import { GeoUtils } from "./geo.utils";
 import { TokenSession } from "../../../shared/types/auth.types";
 
 export class TokenUtils {
-  static generateToken(user: User): string {
+  static generateToken(user: User, isSuperAdmin: boolean = false): string {
+    const payload: any = {
+      id: user.id,
+      email: user.email,
+      roleId: user.roleId,
+      username: user.username,
+      authProvider: user.authProvider,
+    };
+
+    // Agregar información especial para super admin
+    if (isSuperAdmin) {
+      payload.isSuperAdmin = true;
+      payload.superAdminAccess = true;
+      payload.adminLevel = 'root';
+    }
+
     return jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        roleId: user.roleId,
-        username: user.username,
-        authProvider: user.authProvider,
-      },
+      payload,
       process.env.JWT_SECRET!,
       { expiresIn: "24h" }
     );
   }
 
-  static async getAuthResponse(user: User, req: Request) {
-    const token = this.generateToken(user);
+  static async getAuthResponse(user: User, req: Request, isSuperAdmin: boolean = false) {
+    const token = this.generateToken(user, isSuperAdmin);
     const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const geoData = await GeoUtils.getGeoData(ip as string);
 

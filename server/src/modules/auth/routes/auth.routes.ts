@@ -20,8 +20,11 @@ router.post('/login',
   (req: Request, res: Response) => AuthController.login(req, res)
 );
 
-// Ruta para verificar si un email existe
-router.post('/check-email', AuthController.checkEmail);
+// Ruta para login de super administrador (root)
+router.post('/root-login',
+  AuthController.loginValidations, // Usa las mismas validaciones
+  (req: Request, res: Response) => AuthController.rootLogin(req, res)
+);
 
 // Rutas existentes de Discord
 router.get('/discord/login', AuthController.discordAuth);

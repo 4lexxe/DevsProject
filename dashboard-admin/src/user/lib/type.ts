@@ -1,16 +1,8 @@
 import { z } from "zod";
-import { checkIfEmailExists } from "./emailValidation";
 
-/*export type FormInputLogin = {
-    username: string,
-    email: string,
-    phoneNumber: string,
-    password: string,
-    confirmPassword: string,
-    checkbox?: boolean
-}; */ //Es lo mismo que FormInputLoginZod solo que de forma manual digamos 
 
-export const registerSchemaZod = z
+//Si en un futuro se necesita usar Zod para validar el registro de un nuevo admin, se puede descomentar
+/*export const registerSchemaZod = z
   .object({
     username: z
       .string()
@@ -46,18 +38,14 @@ export const registerSchemaZod = z
     path: ["confirmPassword"],
   });
 
-export type FormInputRegisterZod = z.infer<typeof registerSchemaZod>;
+export type FormInputRegisterZod = z.infer<typeof registerSchemaZod>;*/
 
 export const loginSchemaZod = z
   .object({
     email: z
       .string()
       .nonempty({ message: "Email es requerido" })
-      .email({ message: "Email inválido" })
-      .refine(async (email) => {
-        // Verificar si el email existe en la base de datos
-        return await checkIfEmailExists(email);
-      }, "Este email no está registrado en nuestra base de datos"),
+      .email({ message: "Email inválido" }),
     password: z
       .string()
       .nonempty({ message: "Contraseña requerida" })
