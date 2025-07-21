@@ -1,7 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import MPSubscription from "../models/MPSubscription"; // Asegúrate de importar el modelo MPSubscription
 import Subscription from "../models/Subscription";
-import MPSubPlan from "../models/MPSubPlan"; // Asegúrate de importar el modelo MPSubPlan
 import { stat } from "fs";
 import { start } from "repl";
 
@@ -137,7 +136,7 @@ class MPSubscriptionController {
 
       if (subscription) {
         
-        const mpSubPlan = await MPSubPlan.findOne({
+        /* const mpSubPlan = await MPSubPlan.findOne({
           where: { id: mpSubscription.mpSubPlanId },
           attributes: ["planId"],
         });
@@ -147,7 +146,7 @@ class MPSubscriptionController {
           status: subscriptionData.status,
           startDate: subscriptionData.auto_recurring?.start_date,
           endDate: subscriptionData.auto_recurring?.end_date,
-        });
+        }); */
       }
 
       return mpSubscription;

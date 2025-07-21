@@ -3,7 +3,6 @@ import { Op, literal } from "sequelize";
 import Subscription from "../models/Subscription";
 import Plan from "../models/Plan";
 import User from "../../user/User";
-import MPSubPlan from "../models/MPSubPlan";
 import MPSubscription from "../models/MPSubscription";
 import Invoice from "../models/Invoice";
 import Payment from "../models/Payment";

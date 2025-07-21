@@ -50,9 +50,6 @@ export const validatePlan = [
     .optional()
     .isFloat({ min: 0 }).withMessage("El precio de cada cuota debe ser un número decimal mayor o igual a 0"),
   
-  body("saveInMp")
-    .isBoolean().withMessage("El campo saveInMp debe ser un valor booleano"),
-  
   body("isActive")
     .isBoolean().withMessage("El estado activo debe ser un valor booleano")
     .bail()

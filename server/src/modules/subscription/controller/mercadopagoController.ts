@@ -247,6 +247,46 @@ class MercadoPagoController {
       console.log(`Acción de pago autorizado no manejada: ${action}`);
     }
   }
+
+  static handleCheckout: RequestHandler = async (req, res) => {
+
+    console.log("Procesando solicitud de checkout");
+    console.log("Datos recibidos:", req.body);
+    /* try {
+      const { token, paymentMethodId, issuerId, amount, email } = req.body;
+
+      if (!token || !paymentMethodId || !issuerId || !amount || !email) {
+        res.status(400).json({
+          ...this.generateMetadata(req, res),
+          status: "error",
+          message: "Faltan datos necesarios para el checkout",
+        });
+        return;
+      }
+
+      const paymentData = {
+        token,
+        payment_method_id: paymentMethodId,
+        issuer_id: issuerId,
+        transaction_amount: amount,
+        payer: {
+          email,
+        },
+      };
+
+      const paymentResponse = await this.payment.create(paymentData);
+      console.log("Respuesta del pago:", paymentResponse);
+
+      res.status(200).json({
+        ...this.generateMetadata(req, res),
+        status: "success",
+        message: "Pago procesado correctamente",
+        data: paymentResponse,
+      });
+    } catch (error) {
+      this.handleServerError(res, req, error, "Error al procesar el checkout");
+    } */
+  }
 }
 
 export default MercadoPagoController;

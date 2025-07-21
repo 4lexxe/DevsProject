@@ -25,7 +25,6 @@ import DiscountEvent from "./modules/subscription/models/DiscountEvent";
 import Invoice from "./modules/subscription/models/Invoice";
 import Subscription from "./modules/subscription/models/Subscription";
 import MPSubscription from "./modules/subscription/models/MPSubscription";
-import MPSubPlan from "./modules/subscription/models/MPSubPlan";
 import Payment from "./modules/subscription/models/Payment";
 import Plan from "./modules/subscription/models/Plan";
 import Refund from "./modules/subscription/models/Refund";
@@ -71,8 +70,7 @@ async function syncDatabase() {
     await Plan.sync({ force: true });
     await DiscountEvent.sync({ force: true });
     await MPSubscription.sync({ force: true });
-    await MPSubPlan.sync({ force: true });
-    await Subscription.sync({ force: true }); 
+    await Subscription.sync({ force: true });
     await Payment.sync({ force: true });
     await Invoice.sync({ force: true });
     await Refund.sync({ force: true });

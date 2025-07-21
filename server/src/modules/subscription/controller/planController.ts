@@ -6,7 +6,6 @@ import {
 } from "../../../infrastructure/config/mercadopagoConfig";
 import sequelize from "../../../infrastructure/database/db"; // Import sequelize instance
 import Plan from "../models/Plan"; // Importa el modelo Plan
-import MPSubPlan from "../models/MPSubPlan"; // Importa el modelo MPSubPlan
 import DiscountEvent from "../models/DiscountEvent";
 import { PreApprovalPlan } from "mercadopago";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
@@ -78,25 +77,6 @@ class PlanController {
     });
   }
 
-  private static async saveMercadoPagoSubscriptionPlan(
-    mpPlanResponse: any,
-    planId: bigint,
-    transaction: any
-  ) {
-    return await MPSubPlan.create(
-      {
-        id: mpPlanResponse.id,
-        planId: planId,
-        reason: mpPlanResponse.reason,
-        status: mpPlanResponse.status,
-        initPoint: mpPlanResponse.init_point,
-        autoRecurring: mpPlanResponse.auto_recurring,
-        data: mpPlanResponse,
-      },
-      { transaction }
-    );
-  }
-
   // Función para actualizar un plan en Mercado Pago
   static async updateMercadoPagoPlan(planData: any, mpPlanId: string) {
     const response = await retryWithExponentialBackoff(() =>
@@ -150,7 +130,6 @@ class PlanController {
       const plans = await Plan.findAll({
         include: [
           { model: DiscountEvent, as: "discountEvent" },
-          { model: MPSubPlan, as: "mpSubPlan" },
         ],
       });
       res.status(200).json({
@@ -170,7 +149,6 @@ class PlanController {
       const plan = await Plan.findByPk(req.params.id, {
         include: [
           { model: DiscountEvent, as: "discountEvent" },
-          { model: MPSubPlan, as: "mpSubPlan", attributes: ["initPoint"] },
         ],
       });
       if (!plan) {
@@ -198,7 +176,6 @@ class PlanController {
       const plan = await Plan.findByPk(req.params.id, {
         include: [
           { model: DiscountEvent, as: "discountEvent", attributes: ["value", "event"] },
-          { model: MPSubPlan, as: "mpSubPlan", attributes: ["initPoint"] },
         ],
         attributes: [
           "name",
@@ -281,39 +258,6 @@ class PlanController {
       // Crear el plan en la base de datos
       const plan = await Plan.create(req.body, { transaction });
 
-      // Si es un plan de suscripción, crear también en Mercado Pago
-      if (req.body.saveInMp) {
-        try {
-          const mpPlanResponse = await this.createMercadoPagoPlan(plan);
-          const mpSubPlan = await this.saveMercadoPagoSubscriptionPlan(
-            mpPlanResponse,
-            plan.id,
-            transaction
-          );
-
-          // Commit the transaction
-          await transaction.commit();
-          isTransactionFinalized = true; // Marcar la transacción como finalizada
-
-          // Respuesta exitosa
-          this.sendSuccessResponse(
-            res,
-            201,
-            "Plan de suscripción creado exitosamente",
-            { plan, mpSubPlan },
-            req
-          );
-          return;
-        } catch (error) {
-          // Rollback solo si la transacción no ha sido finalizada
-          if (!isTransactionFinalized) {
-            await transaction.rollback();
-            isTransactionFinalized = true; // Marcar la transacción como finalizada
-          }
-          throw error; // Relanzar el error para que sea manejado por el catch externo
-        }
-      }
-
       // Commit the transaction if not a subscription plan
       await transaction.commit();
       isTransactionFinalized = true; // Marcar la transacción como finalizada
@@ -354,58 +298,6 @@ class PlanController {
 
       // Actualizar el plan en la base de datos
       await plan.update(req.body);
-
-      // Si es un plan de suscripción, actualizar también en Mercado Pago
-      if (req.body.saveInMp) {
-        if (!plan.mpSubPlan) {
-          // Si el plan no existe en Mercado Pago, crear uno nuevo
-          const mpPlanResponse = await this.createMercadoPagoPlan(plan);
-          const mpSubPlan = await this.saveMercadoPagoSubscriptionPlan(
-            mpPlanResponse,
-            plan.id,
-            null
-          );
-
-          // Respuesta exitosa
-          this.sendSuccessResponse(
-            res,
-            201,
-            "Plan de suscripción creado exitosamente",
-            { plan, mpSubPlan },
-            req
-          );
-        } else {
-          const mpPlanResponse = await this.updateMercadoPagoPlan(
-            plan,
-            plan.mpSubPlan.id
-          );
-
-          await plan.mpSubPlan.update({
-            reason: mpPlanResponse.reason,
-            status: mpPlanResponse.status,
-            dateCreated: mpPlanResponse.date_created,
-            lastModified: mpPlanResponse.last_modified,
-            initPoint: mpPlanResponse.init_point,
-            frequency: mpPlanResponse.auto_recurring?.frequency,
-            frequencyType: mpPlanResponse.auto_recurring?.frequency_type,
-            repetitions: mpPlanResponse.auto_recurring?.repetitions,
-            transactionAmount:
-              mpPlanResponse.auto_recurring?.transaction_amount,
-            data: mpPlanResponse,
-          });
-
-          // Respuesta exitosa
-          this.sendSuccessResponse(
-            res,
-            200,
-            "Plan de suscripción actualizado exitosamente",
-            { plan },
-            req
-          );
-        }
-
-        return;
-      }
 
       // Respuesta exitosa
       this.sendSuccessResponse(

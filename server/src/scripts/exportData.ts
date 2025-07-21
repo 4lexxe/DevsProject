@@ -4,7 +4,6 @@ import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
 import User from '../modules/user/User';
-import MPSubPlan from '../modules/subscription/models/MPSubPlan';
 import Payment from '../modules/subscription/models/Payment';
 import Invoice from '../modules/subscription/models/Invoice';
 import Subscription from '../modules/subscription/models/Subscription';
@@ -29,7 +28,6 @@ async function exportData() {
     });
     const plans = await Plan.findAll();
     const discounts = await DiscountEvent.findAll();
-    const mpSubPlans = await MPSubPlan.findAll();
     const subscriptions = await Subscription.findAll({ paranoid: true});
     const mpSubscriptions = await MPSubscription.findAll();
     const payments = await Payment.findAll();
@@ -52,7 +50,6 @@ async function exportData() {
         delete discountData.id;
         return discountData;
       }),
-      mpSubPlans: mpSubPlans.map(mpSubPlan => mpSubPlan.toJSON()),
       /* subscriptions: subscriptions.map(subscription => {
         const subData = subscription.toJSON();
         delete subData.id;

@@ -7,49 +7,102 @@ import MPSubscription from "./MPSubscription";
 
 class Subscription extends Model {
   public id!: bigint;
-  public userId!: bigint;
-  public payerId?: bigint; // Aca se guarda el id del pagador
+  public userId!: bigint; // ID del usuario propietario
+  public payerId?: bigint; // ID del pagador en MercadoPago
+  
+  public planId!: bigint; // ID del plan asociado
+  public mpSubscriptionId?: string; // ID de la suscripción en MercadoPago API
+  public startDate?: Date; // Fecha de inicio de la suscripción
+  public endDate?: Date; // Fecha de finalización de la suscripción
+  public status!: "authorized" | "paused" | "cancelled" | "pending"; // Estado de la suscripción
 
-  public planId!: bigint;
-  public mpSubscriptionId?: string; // Aca se guarda el id de la subscripcion en la api de mp
-  public startDate?: Date;
-  public endDate?: Date;
-  public status!: string;
-
+  // Relaciones
   public mpSubscription?: any;
+  
+  // Timestamps automáticos
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+  public readonly deletedAt?: Date;
 }
 
 Subscription.init(
   {
-    id: { type: DataTypes.BIGINT, autoIncrement: true, primaryKey: true },
+    id: { 
+      type: DataTypes.BIGINT, 
+      autoIncrement: true, 
+      primaryKey: true,
+      comment: "ID único de la suscripción",
+    },
     userId: {
       type: DataTypes.BIGINT,
       allowNull: false,
       references: { model: "Users", key: "id" },
+      comment: "ID del usuario propietario de la suscripción",
     },
     planId: {
       type: DataTypes.BIGINT,
       allowNull: true,
       references: { model: "Plans", key: "id" },
+      comment: "ID del plan asociado a la suscripción",
     },
     mpSubscriptionId: {
       type: DataTypes.STRING,
       allowNull: true,
       references: { model: "MPSubscriptions", key: "id" },
+      comment: "ID de la suscripción en MercadoPago",
     },
     payerId: {
       type: DataTypes.BIGINT,
       allowNull: true,
+      comment: "ID del pagador en MercadoPago",
     },
-    startDate: { type: DataTypes.DATE, allowNull: true },
-    endDate: { type: DataTypes.DATE, allowNull: true },
+    startDate: { 
+      type: DataTypes.DATE, 
+      allowNull: true,
+      comment: "Fecha de inicio de la suscripción",
+    },
+    endDate: { 
+      type: DataTypes.DATE, 
+      allowNull: true,
+      comment: "Fecha de finalización de la suscripción",
+    },
     status: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("authorized", "paused", "cancelled", "pending"),
       defaultValue: "pending", // Valor por defecto
       allowNull: false,
+      comment: "Estado de la suscripción",
     },
   },
-  { sequelize, tableName: "Subscriptions", timestamps: true, paranoid: true }
+  { 
+    sequelize, 
+    tableName: "Subscriptions", 
+    timestamps: true, 
+    paranoid: true,
+    comment: "Tabla principal de suscripciones que conecta usuarios con planes y MercadoPago",
+    // Índices importantes para optimizar consultas
+    indexes: [
+      {
+        fields: ["userId", "status"],
+        name: "idx_user_status"
+      },
+      {
+        fields: ["planId"],
+        name: "idx_plan_id"
+      },
+      {
+        fields: ["mpSubscriptionId"],
+        name: "idx_mp_subscription_id"
+      },
+      {
+        unique: true,
+        fields: ["userId"],
+        where: {
+          status: "authorized"
+        },
+        name: "unique_active_subscription_per_user"
+      }
+    ]
+  }
 );
 
 // Relaciones
