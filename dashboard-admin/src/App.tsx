@@ -6,6 +6,11 @@ import ProtectedRoute from './user/contexts/ProtectedRoute'
 import Layout from './dashboard/layout/Layout'
 import DashboardHome from './dashboard/pages/DashboardHome'
 import StudentsPage from './dashboard/pages/StudentsPage'
+import CoursesPage from './dashboard/pages/CoursesPage'
+import CourseDetailPage from './course/pages/courseDetail'
+import CourseFormPage from './course/pages/CourseFormPage'
+import SectionFormPage from './course/pages/SectionFormPage'
+import ContentPage from './course/pages/ContentPage'
 import LoginPage from './user/pages/LoginPage'
 // import StudentProfilePage from './dashboard/pages/StudentProfilePage'
 // import StudentEditPage from './dashboard/pages/StudentEditPage'
@@ -38,11 +43,18 @@ function App() {
                 <Layout />
               </ProtectedRoute>
             }>
+              {/* Aquí dentro ya heredan la protección */}
               <Route index element={<DashboardHome />} />
               <Route path="students" element={<StudentsPage />} />
               {/* <Route path="students/:id" element={<StudentProfilePage />} />
-              <Route path="students/:id/edit" element={<StudentEditPage />} />
-              <Route path="courses" element={<CoursesPage />} /> */}
+              <Route path="students/:id/edit" element={<StudentEditPage />} /> */}
+              <Route path="courses" element={<CoursesPage />} />
+              <Route path="courses/:id" element={<CourseDetailPage />} />
+              <Route path="courses/:id/edit" element={<CourseFormPage />} />
+              <Route path="courses/new" element={<CourseFormPage />} />
+              <Route path="courses/:courseId/section/form" element={<SectionFormPage />} />
+              <Route path="courses/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
+              <Route path="courses/:courseId/section/content/:contentId" element={<ContentPage />} />
               <Route path="analytics" element={
                 <div className="p-6">
                   <h1 className="text-2xl font-bold">Analíticas</h1>

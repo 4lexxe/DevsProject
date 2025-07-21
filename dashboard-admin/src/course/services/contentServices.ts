@@ -1,4 +1,4 @@
-import api from '../../shared/api/axios';
+import { axios as api } from '@/shared/api';
 
 const CONTENT_ENDPOINT = "/contents";
 const SECTIONS_ENDPOINT = "/sections";

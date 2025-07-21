@@ -11,7 +11,7 @@ import {
   Search,
   Filter
 } from 'lucide-react'
-import { getCourses, deleteCourse } from '@/course/services/courseServices'
+import { getCourses, deleteCourse } from '../../course/services/courseServices'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
@@ -112,7 +112,7 @@ const CoursesPage = () => {
           <p className="text-gray-600">Administra todos los cursos de la plataforma</p>
         </div>
         <Link
-          to="/course/form"
+          to="/courses/new"
           className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -277,14 +277,14 @@ const CoursesPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        to={`/course/${course.id}`}
+                        to={`/courses/${course.id}`}
                         className="text-blue-600 hover:text-blue-900 p-1"
                         title="Ver curso"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
                       <Link
-                        to={`/course/${course.id}/form`}
+                        to={`/courses/${course.id}/edit`}
                         className="text-green-600 hover:text-green-900 p-1"
                         title="Editar curso"
                       >
@@ -319,7 +319,7 @@ const CoursesPage = () => {
             {!searchTerm && filterStatus === 'all' && (
               <div className="mt-6">
                 <Link
-                  to="/course/form"
+                  to="/courses/new"
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                 >
                   <Plus className="h-4 w-4 mr-2" />

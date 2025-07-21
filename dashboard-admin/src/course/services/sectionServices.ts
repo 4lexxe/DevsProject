@@ -1,4 +1,4 @@
-import api from '../../shared/api/axios';
+import { axios as api } from '@/shared/api';
 import { type Section, type Content } from './contentServices';
 
 const SECTIONS_ENDPOINT = '/sections';

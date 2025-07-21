@@ -146,7 +146,7 @@ const DashboardHome = () => {
         <h2 className="text-xl font-bold text-gray-900 mb-4">Acciones Rápidas</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
-            to="/course/form"
+            to="/courses/new"
             className="flex items-center p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors"
           >
             <BookOpen className="h-6 w-6 text-primary-600 mr-3" />
@@ -209,13 +209,13 @@ const DashboardHome = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Link
-                    to={`/course/${course.id}`}
+                    to={`/courses/${course.id}`}
                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                   >
                     Ver
                   </Link>
                   <Link
-                    to={`/course/${course.id}/form`}
+                    to={`/courses/${course.id}/edit`}
                     className="text-green-600 hover:text-green-800 text-sm font-medium"
                   >
                     Editar
@@ -231,7 +231,7 @@ const DashboardHome = () => {
             <p className="mt-1 text-sm text-gray-500">Comienza creando tu primer curso</p>
             <div className="mt-6">
               <Link
-                to="/course/form"
+                to="/courses/new"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
               >
                 <BookOpen className="h-4 w-4 mr-2" />

@@ -26,7 +26,12 @@
     /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/shared/*": ["./src/shared/*"],
+      "@/course/*": ["./src/course/*"],
+      "@/dashboard/*": ["./src/dashboard/*"],
+      "@/user/*": ["./src/user/*"],
+      "@/home/*": ["./src/home/*"]
     }
   },
   "include": ["src"]

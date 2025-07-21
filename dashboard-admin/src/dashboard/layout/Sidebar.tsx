@@ -11,11 +11,11 @@ import {
 import { cn } from '../utils/cn'
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: Users, label: 'Estudiantes', path: '/dashboard/students' },
-  { icon: BookOpen, label: 'Cursos', path: '/dashboard/courses' },
-  { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics' },
-  { icon: Settings, label: 'Configuración', path: '/dashboard/settings' },
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+  { icon: Users, label: 'Estudiantes', path: '/students' },
+  { icon: BookOpen, label: 'Cursos', path: '/courses' },
+  { icon: BarChart3, label: 'Analytics', path: '/analytics' },
+  { icon: Settings, label: 'Configuración', path: '/settings' },
 ]
 
 const Sidebar = () => {

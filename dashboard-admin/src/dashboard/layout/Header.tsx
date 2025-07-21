@@ -1,6 +1,19 @@
-import { Bell, Search, User } from 'lucide-react'
+import { Bell, Search, User, LogOut } from 'lucide-react'
+import AuthService from '../../user/services/auth.service'
 
 const Header = () => {
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+      // El logout ya redirige automáticamente, pero por si acaso:
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Forzar redirección incluso si hay error
+      window.location.href = '/';
+    }
+  };
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -19,6 +32,14 @@ const Header = () => {
           <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg">
             <Bell className="h-5 w-5" />
             <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+          </button>
+          
+          <button 
+            onClick={handleLogout}
+            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Cerrar sesión"
+          >
+            <LogOut className="h-5 w-5" />
           </button>
           
           <div className="flex items-center space-x-3">

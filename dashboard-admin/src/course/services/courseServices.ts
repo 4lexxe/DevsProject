@@ -1,4 +1,4 @@
-import api from '../../shared/api/axios';
+import { axios as api } from '@/shared/api';
 
 // Interfaces para cursos en el dashboard admin
 export interface Category {
@@ -252,6 +252,33 @@ export const getCourseStats = async (): Promise<CourseStats> => {
     };
   }
 };
+
+// Obtener navegacion de un curso por su id
+export const getNavegationById = async(id: string) => {
+  if(id){
+    try {
+      const response = await api.get(COURSES_ENDPOINT + `/${id}/navigate`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error al obtener los cursos:', error);
+      throw error;
+    }
+  }
+}
+
+// Obtener curso por id
+export const getById = async(id: string) => {
+  if(id){
+    try {
+      const response = await api.get(COURSES_ENDPOINT + `/${id}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error al obtener los cursos:', error);
+      throw error;
+    }
+  }
+}
+
 
 // Obtener categorías disponibles
 export const getCategories = async (): Promise<Category[]> => {
