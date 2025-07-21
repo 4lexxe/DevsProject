@@ -67,7 +67,6 @@ function DetailsFormPage() {
       <DetailForm
         userData={userD}
         planData={{
-          initPoint: planD.mpSubPlan.initPoint,
           name: planD.name,
           description: planD.description,
           installment: planD.installment,

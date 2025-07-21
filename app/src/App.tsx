@@ -30,7 +30,7 @@ import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
-import { PlansPage, SuccessPage, MySuscription, DetailsFormPage } from "./subscription/index";
+import { PlansPage, SuccessPage, MySuscription, DetailsFormPage, CardFormPage } from "./subscription/index";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +70,9 @@ function App() {
               <Route path="/subscription/success" element={<SuccessPage />} />
               <Route path="/subscription" element={<MySuscription />} />
               <Route path="/subscription/plan/:id/form/details" element={<DetailsFormPage />} />
+              <Route path="/subscription/plan/:id/form/card" element={<CardFormPage />} />
+
+              {/* Rutas públicas */}
 
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>

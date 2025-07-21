@@ -28,7 +28,6 @@ interface DetailFormProps {
     duration: number;
     durationType: string;
     accessLevel: "Básico" | "Estándar" | "Premium";
-    initPoint: string; // URL de inicio de la suscripción
   };
 }
 export default function SubscriptionFormPage({ userData, planData }: DetailFormProps){
@@ -77,8 +76,6 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
 
       // Simular llamada a API
       await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      if(response) window.location.href = planData.initPoint;
       
     } catch (error) {
       console.error("Error al procesar la suscripción:", error)
