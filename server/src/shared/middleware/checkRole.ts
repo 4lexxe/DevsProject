@@ -23,9 +23,11 @@ export const checkRole = (allowedRoles: string[]) => {
 
       // Obtenemos el rol del usuario
       const userRole = userWithRole.dataValues.Role.dataValues.name;
+      console.log('User role:', userRole); // Debug log
+      console.log('Allowed roles:', allowedRoles); // Debug log
 
       // Si el usuario es admin, permitir acceso inmediato
-      if (userRole === 'superadmin') {
+      if (userRole === 'superadmin' || 'admin') {
         return next();
       }
 

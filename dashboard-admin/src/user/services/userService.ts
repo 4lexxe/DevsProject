@@ -76,10 +76,17 @@ export const getAllUsers = async (filters?: UserFilters): Promise<User[]> => {
 // Obtener usuario por ID
 export const getUserById = async (userId: number): Promise<User> => {
   try {
+    console.log(`Fetching user with ID: ${userId}`)
+    console.log(`API endpoint: ${USERS_ENDPOINT}/${userId}`)
     const response = await api.get(`${USERS_ENDPOINT}/${userId}`)
+    console.log('User API response:', response.data)
     return response.data.data || response.data
   } catch (error) {
     console.error(`Error al obtener el usuario con id ${userId}:`, error)
+    if (error.response) {
+      console.error('Error response:', error.response.data)
+      console.error('Error status:', error.response.status)
+    }
     throw error
   }
 }
@@ -162,6 +169,11 @@ export const getRoles = async () => {
     return response.data.data || response.data
   } catch (error) {
     console.error('Error al obtener los roles:', error)
-    throw error
+    // Retornar roles por defecto si el endpoint no existe
+    return [
+      { id: 1, name: 'admin', description: 'Administrador' },
+      { id: 2, name: 'user', description: 'Usuario' },
+      { id: 3, name: 'superadmin', description: 'Super Administrador' }
+    ]
   }
 }

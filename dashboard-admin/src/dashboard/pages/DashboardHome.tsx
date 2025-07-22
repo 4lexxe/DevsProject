@@ -53,6 +53,10 @@ const DashboardHome = () => {
   const { data: userStats } = useQuery({
     queryKey: ['user-stats'],
     queryFn: getUserStats,
+    retry: false,
+    onError: (error) => {
+      console.warn('Error loading user stats:', error);
+    }
   })
 
   const stats = {

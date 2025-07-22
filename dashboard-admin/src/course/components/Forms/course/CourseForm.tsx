@@ -43,11 +43,11 @@ export default function CourseForm({ course }: { course?: ICourse }) {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<"success" | "error" | undefined>(undefined);
   const [message, setMessage] = useState<string>();
-  
+
   // Estado para datos de categorías y tipos de carrera
   const [categories, setCategories] = useState<any[]>([]);
   const [careerTypes, setCareerTypes] = useState<any[]>([]);
-  
+
   // Estado para errores de validación del backend
   const [errors2, setErrors2] = useState<string[]>();
   const navigate = useNavigate();
@@ -91,10 +91,14 @@ export default function CourseForm({ course }: { course?: ICourse }) {
           getCategories(),
           getCareerTypes(),
         ]);
-        setCategories(categoriesData.data);
-        setCareerTypes(careerTypesData.data);
+        // Asegurar que siempre tengamos arrays, incluso si la API falla
+        setCategories(Array.isArray(categoriesData?.data) ? categoriesData.data : Array.isArray(categoriesData) ? categoriesData : []);
+        setCareerTypes(Array.isArray(careerTypesData?.data) ? careerTypesData.data : Array.isArray(careerTypesData) ? careerTypesData : []);
       } catch (err) {
         console.error("Error al cargar datos", err);
+        // En caso de error, mantener arrays vacíos
+        setCategories([]);
+        setCareerTypes([]);
       }
     };
     fetchData();
@@ -174,7 +178,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                 <BookOpen className="w-5 h-5" />
                 <h3 className="text-lg font-semibold">Información Básica</h3>
               </div>
-              
+
               <CustomInput
                 name="title"
                 register={register}
@@ -287,7 +291,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               <GraduationCap className="w-5 h-5" />
               <h3 className="text-lg font-semibold">Estado del Curso</h3>
             </div>
-            
+
             <div className="flex items-center space-x-6">
               <CheckInput
                 name="isActive"

@@ -1,10 +1,10 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Eye, 
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Eye,
   Users,
   Search,
   Filter,
@@ -13,11 +13,11 @@ import {
   Calendar,
   Shield
 } from 'lucide-react'
-import { 
-  getAllUsers, 
-  deleteUser, 
-  deactivateUser, 
-  activateUser, 
+import {
+  getAllUsers,
+  deleteUser,
+  deactivateUser,
+  activateUser,
   getUserStats,
   getRoles
 } from '@/user/services/userService'
@@ -57,12 +57,12 @@ const StudentsPage = () => {
       // Filtro de búsqueda
       if (debouncedSearchTerm) {
         const searchLower = debouncedSearchTerm.toLowerCase()
-        const matchesSearch = 
+        const matchesSearch =
           user.name?.toLowerCase().includes(searchLower) ||
           user.email?.toLowerCase().includes(searchLower) ||
           user.username?.toLowerCase().includes(searchLower) ||
           user.displayName?.toLowerCase().includes(searchLower)
-        
+
         if (!matchesSearch) return false
       }
 
@@ -100,19 +100,21 @@ const StudentsPage = () => {
     queryKey: ['user-stats'],
     queryFn: getUserStats,
     staleTime: 10 * 60 * 1000, // Las estadísticas no cambian tan frecuentemente
+    retry: false
   })
 
   const { data: roles = [] } = useQuery({
     queryKey: ['roles'],
     queryFn: getRoles,
     staleTime: 30 * 60 * 1000, // Los roles casi nunca cambian
+    retry: false
   })
 
   // Mutations optimizadas con callbacks memoizados
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-users'] })
+      queryClient.invalidateQueries({ queryKey: ['all-users'] })
       queryClient.invalidateQueries({ queryKey: ['user-stats'] })
       toast.success('Usuario eliminado exitosamente')
     },
@@ -127,7 +129,7 @@ const StudentsPage = () => {
       return action === 'activate' ? activateUser(userId) : deactivateUser(userId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-users'] })
+      queryClient.invalidateQueries({ queryKey: ['all-users'] })
       queryClient.invalidateQueries({ queryKey: ['user-stats'] })
       toast.success('Estado del usuario actualizado')
     },
@@ -147,7 +149,7 @@ const StudentsPage = () => {
   const handleToggleStatus = useCallback((userId: number, isActive: boolean) => {
     const action = isActive ? 'deactivate' : 'activate'
     const message = isActive ? 'desactivar' : 'activar'
-    
+
     if (window.confirm(`¿Estás seguro de que quieres ${message} este usuario?`)) {
       toggleStatusMutation.mutate({ userId, action })
     }
@@ -189,7 +191,7 @@ const StudentsPage = () => {
           <p className="text-gray-600">Administra todos los usuarios registrados en la plataforma</p>
         </div>
         <Link
-          to="/dashboard/students/create"
+          to="/students/create"
           className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
@@ -208,7 +210,7 @@ const StudentsPage = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center">
             <UserCheck className="h-8 w-8 text-green-600" />
@@ -320,9 +322,9 @@ const StudentsPage = () => {
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10">
                         {user.avatar ? (
-                          <img 
-                            className="h-10 w-10 rounded-full" 
-                            src={user.avatar} 
+                          <img
+                            className="h-10 w-10 rounded-full"
+                            src={user.avatar}
                             alt={user.name}
                           />
                         ) : (
@@ -339,23 +341,21 @@ const StudentsPage = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.role?.name === 'superadmin' 
-                        ? 'bg-red-100 text-red-800'
-                        : user.role?.name === 'admin'
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role?.name === 'superadmin'
+                      ? 'bg-red-100 text-red-800'
+                      : user.role?.name === 'admin'
                         ? 'bg-purple-100 text-purple-800'
                         : 'bg-blue-100 text-blue-800'
-                    }`}>
+                      }`}>
                       {user.role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
                       {user.role?.description || user.role?.name || 'Usuario'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      user.isActiveSession 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.isActiveSession
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                      }`}>
                       {user.isActiveSession ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
@@ -368,14 +368,14 @@ const StudentsPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        to={`/dashboard/students/${user.id}`}
+                        to={`/students/${user.id}`}
                         className="text-blue-600 hover:text-blue-900 p-1"
                         title="Ver perfil"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
                       <Link
-                        to={`/dashboard/students/${user.id}/edit`}
+                        to={`/students/${user.id}/edit`}
                         className="text-green-600 hover:text-green-900 p-1"
                         title="Editar usuario"
                       >
@@ -383,11 +383,10 @@ const StudentsPage = () => {
                       </Link>
                       <button
                         onClick={() => handleToggleStatus(user.id, user.isActiveSession)}
-                        className={`p-1 ${
-                          user.isActiveSession 
-                            ? 'text-orange-600 hover:text-orange-900' 
-                            : 'text-green-600 hover:text-green-900'
-                        }`}
+                        className={`p-1 ${user.isActiveSession
+                          ? 'text-orange-600 hover:text-orange-900'
+                          : 'text-green-600 hover:text-green-900'
+                          }`}
                         title={user.isActiveSession ? 'Desactivar' : 'Activar'}
                         disabled={toggleStatusMutation.isPending}
                       >

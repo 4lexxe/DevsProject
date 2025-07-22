@@ -1,4 +1,4 @@
-import { AcademicCapIcon, UsersIcon, ShoppingCartIcon } from '@heroicons/react/outline';
+import { AcademicCapIcon, UsersIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 const features = [
   {

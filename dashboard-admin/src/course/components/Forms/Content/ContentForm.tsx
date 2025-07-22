@@ -12,6 +12,10 @@ import { Save, X, Plus, Trash2 } from "lucide-react";
 import { useSectionContext, useQuizContext } from "@/course/context";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contentSchema } from "@/course/validations/contentSchema";
+import { z } from "zod";
+
+// 1️⃣ Inferimos el tipo directamente de Zod:
+type ContentFormValues = z.infer<typeof contentSchema>;
 
 export default function ContentForm() {
   const { state: sectionState, saveContent, cancelEdit } = useSectionContext();
@@ -23,7 +27,7 @@ export default function ContentForm() {
     watch,
     control,
     formState: { errors },
-  } = useForm<IContentInput>({
+  } = useForm<ContentFormValues>({
     resolver: zodResolver(contentSchema),
     defaultValues: {
       title: initialData?.title || "",
@@ -48,7 +52,7 @@ export default function ContentForm() {
     name: "resources",
   });
 
-  const onSubmit: SubmitHandler<IContentInput> = async (data) => {
+  const onSubmit: SubmitHandler<ContentFormValues> = async (data) => {
     saveContent(data);
   };
 
@@ -124,11 +128,10 @@ export default function ContentForm() {
                       type="text"
                       placeholder="Resource Title"
                       {...register(`resources.${index}.title` as const)}
-                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${
-                        titleError
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-blue-500"
-                      }`}
+                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${titleError
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
+                        }`}
                     />
                     {titleError && (
                       <p className="mt-1 text-xs text-red-500">
@@ -146,11 +149,10 @@ export default function ContentForm() {
                       type="text"
                       placeholder="Resource URL"
                       {...register(`resources.${index}.url` as const)}
-                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${
-                        urlError
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-blue-500"
-                      }`}
+                      className={`w-full p-2 border rounded-md focus:ring-2 focus:outline-none ${urlError
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-blue-500"
+                        }`}
                     />
                     {urlError && (
                       <p className="mt-1 text-xs text-red-500">

@@ -68,7 +68,7 @@ const StudentProfilePage = () => {
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <p className="text-red-600">Error al cargar el perfil del usuario</p>
         <Link 
-          to="/dashboard/students" 
+          to="/students" 
           className="text-primary-600 hover:text-primary-800 mt-2 inline-block"
         >
           ← Volver a la lista
@@ -82,7 +82,7 @@ const StudentProfilePage = () => {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link
-          to="/dashboard/students"
+          to="/students"
           className="inline-flex items-center text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -115,7 +115,7 @@ const StudentProfilePage = () => {
               </div>
             </div>
             <Link
-              to={`/dashboard/students/${user.id}/edit`}
+              to={`/students/${user.id}/edit`}
               className="bg-white text-primary-600 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors flex items-center gap-2"
             >
               <Edit2 className="h-4 w-4" />
@@ -321,7 +321,7 @@ const StudentProfilePage = () => {
         <h2 className="text-xl font-bold text-gray-900 mb-4">Acciones</h2>
         <div className="flex space-x-4">
           <Link
-            to={`/dashboard/students/${user.id}/edit`}
+            to={`/students/${user.id}/edit`}
             className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           >
             <Edit2 className="h-4 w-4" />

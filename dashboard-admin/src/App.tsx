@@ -12,9 +12,8 @@ import CourseFormPage from './course/pages/CourseFormPage'
 import SectionFormPage from './course/pages/SectionFormPage'
 import ContentPage from './course/pages/ContentPage'
 import LoginPage from './user/pages/LoginPage'
-// import StudentProfilePage from './dashboard/pages/StudentProfilePage'
-// import StudentEditPage from './dashboard/pages/StudentEditPage'
-// import CoursesPage from './dashboard/pages/CoursesPage'
+import StudentProfilePage from './dashboard/pages/StudentProfilePage'
+import StudentEditPage from './dashboard/pages/StudentEditPage'
 import "@/shared/styles/main.css"; // Importa tus estilos globales
 
 
@@ -36,7 +35,7 @@ function App() {
           <Routes>
             {/* Rutas públicas */}
             <Route path="/login" element={<LoginPage />} />
-              
+
             {/* Rutas protegidas del dashboard */}
             <Route path="/" element={
               <ProtectedRoute requiredRole={['admin', 'superadmin']}>
@@ -46,8 +45,8 @@ function App() {
               {/* Aquí dentro ya heredan la protección */}
               <Route index element={<DashboardHome />} />
               <Route path="students" element={<StudentsPage />} />
-              {/* <Route path="students/:id" element={<StudentProfilePage />} />
-              <Route path="students/:id/edit" element={<StudentEditPage />} /> */}
+              <Route path="students/:id" element={<StudentProfilePage />} />
+              <Route path="students/:id/edit" element={<StudentEditPage />} />
               <Route path="courses" element={<CoursesPage />} />
               <Route path="courses/:id" element={<CourseDetailPage />} />
               <Route path="courses/:id/edit" element={<CourseFormPage />} />

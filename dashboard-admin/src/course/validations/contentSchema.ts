@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { linkTypes } from "../interfaces/Content";
 
 // Esquema para una respuesta individual
 const answerSchema = z.object({
@@ -30,9 +31,10 @@ export const contentSchema = z.object({
   title: z.string().min(1, "El título es obligatorio"),
   text: z.string().min(10, "El texto debe tener minimo 10 caracteres"),
   markdown: z.string().optional(),
-  linkType: z.string().optional(),
+  linkType: z.enum(linkTypes).optional(),
   link: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
-
+  quiz: z.array(questionSchema).optional(),
   resources: z.array(resourceSchema).optional(),
   duration: z.number().positive("La duración debe ser mayor a 0").default(1),
+  position: z.number().min(0, "La posición debe ser mayor o igual a 0").default(0),
 });

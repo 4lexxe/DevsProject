@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getById } from "@/course/services";
+import { getById } from "../services/courseServices";
 import {
   HeroCourse,
   CourseOverview,

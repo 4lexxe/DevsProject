@@ -1,20 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import CourseCard from './CourseCard';
-import { getCourses } from '@/course/services/courseServices'; // Asegúrate de que este servicio esté configurado correctamente
-
-interface Course {
-  id: number;
-  title: string;
-  summary: string; 
-  admin: {
-    name: string;
-  };
-  image: string;
-  createdAt: string; // Asegúrate de que la API retorne este campo
-  category: string; // Añadir la categoría
-  careerType: string; // Añadir el tipo de carrera relacionada
-}
+import { getCourses, type Course } from '@/course/services/courseServices';
 
 export default function LatestCourses() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -57,14 +44,14 @@ export default function LatestCourses() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {courses.map((course) => (
             <CourseCard
-            key={course.id}
-            id={course.id}
-            title={course.title}
-            summary={course.summary}
-            courseName={course.category} // Muestra la categoría
-            image={course.image}
-            careerType={course.careerType.name} // Muestra el tipo de carrera relacionada
-          />          
+              key={course.id}
+              id={course.id}
+              title={course.title}
+              summary={course.summary}
+              courseName={course.categories?.[0]?.name || 'Sin categoría'} // Muestra la primera categoría
+              image={course.image}
+              careerType={course.careerType?.name || 'Sin tipo de carrera'} // Muestra el tipo de carrera relacionada
+            />
           ))}
         </div>
       </div>

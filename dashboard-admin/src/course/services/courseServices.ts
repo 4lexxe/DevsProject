@@ -37,6 +37,19 @@ export interface Course {
   status?: 'active' | 'draft' | 'inactive';
 }
 
+export interface CourseFormData {
+  title: string;
+  image: string;
+  summary: string;
+  categoryIds: string[];
+  about: string;
+  careerTypeId?: string;
+  learningOutcomes: string[];
+  prerequisites: string[];
+  isActive: boolean;
+  isInDevelopment: boolean;
+}
+
 export interface CourseInput {
   title: string;
   image: string;
@@ -68,6 +81,8 @@ export interface CourseStats {
 }
 
 const COURSES_ENDPOINT = '/courses';
+
+
 
 // Obtener todos los cursos para el dashboard (incluye activos e inactivos)
 export const getAllCourses = async (filters?: CourseFilters): Promise<Course[]> => {
@@ -299,7 +314,7 @@ export const getCategories = async (): Promise<Category[]> => {
 // Obtener tipos de carrera disponibles
 export const getCareerTypes = async (): Promise<CareerType[]> => {
   try {
-    const response = await api.get('/career-types');
+    const response = await api.get('/careerTypes');
     return response.data.data || response.data;
   } catch (error) {
     console.error('Error al obtener los tipos de carrera:', error);

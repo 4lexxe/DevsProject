@@ -3,6 +3,7 @@ import { UserController } from '../user/userController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
+import { checkRole } from '../../shared/middleware/checkRole';
 
 const router = Router();
 
@@ -22,14 +23,14 @@ router.get('/users/:id/security',
 
 router.put('/users/:id', 
   authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  checkRole(['admin', 'superadmin']),  // Verificar roles (como en adminRoutes.ts)
   ...UserController.userValidations, 
   UserController.updateUser
 );
 
 router.delete('/users/:id', 
   authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  checkRole(['admin', 'superadmin']),  // Verificar roles (como en adminRoutes.ts)
   UserController.deleteUser
 );
 

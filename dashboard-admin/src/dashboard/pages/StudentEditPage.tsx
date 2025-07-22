@@ -60,7 +60,7 @@ const StudentEditPage = () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile', id] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-users'] })
       toast.success('Usuario actualizado exitosamente')
-      navigate(`/dashboard/students/${id}`)
+      navigate(`/students/${id}`)
     },
     onError: (error) => {
       console.error('Error al actualizar:', error)
@@ -118,7 +118,7 @@ const StudentEditPage = () => {
   if (userLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     )
   }
@@ -128,8 +128,8 @@ const StudentEditPage = () => {
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <p className="text-red-600">Usuario no encontrado</p>
         <Link 
-          to="/dashboard/students" 
-          className="text-primary-600 hover:text-primary-800 mt-2 inline-block"
+          to="/students" 
+          className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
         >
           ← Volver a la lista
         </Link>
@@ -143,7 +143,7 @@ const StudentEditPage = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
-            to={`/dashboard/students/${id}`}
+            to={`/students/${id}`}
             className="inline-flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -167,8 +167,8 @@ const StudentEditPage = () => {
                 alt={user.name}
               />
             ) : (
-              <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
-                <User className="h-6 w-6 text-primary-600" />
+              <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <User className="h-6 w-6 text-blue-600" />
               </div>
             )}
             <div className="ml-4">
@@ -193,7 +193,7 @@ const StudentEditPage = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Nombre completo del usuario"
               />
             </div>
@@ -210,7 +210,7 @@ const StudentEditPage = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="correo@ejemplo.com"
               />
             </div>
@@ -227,7 +227,7 @@ const StudentEditPage = () => {
                 value={formData.username}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="nombreusuario"
               />
             </div>
@@ -243,7 +243,7 @@ const StudentEditPage = () => {
                 name="displayName"
                 value={formData.displayName}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Nombre que se mostrará públicamente"
               />
             </div>
@@ -263,7 +263,7 @@ const StudentEditPage = () => {
                   name="roleId"
                   value={formData.roleId}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {roles.map((role: Role) => (
                     <option key={role.id} value={role.id}>
@@ -287,7 +287,7 @@ const StudentEditPage = () => {
                     name="isActiveSession"
                     checked={formData.isActiveSession}
                     onChange={handleInputChange}
-                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <label htmlFor="isActiveSession" className="ml-2 text-sm text-gray-700">
                     Sesión activa
@@ -334,7 +334,7 @@ const StudentEditPage = () => {
           {/* Actions */}
           <div className="border-t pt-6 flex justify-end space-x-4">
             <Link
-              to={`/dashboard/students/${id}`}
+              to={`/students/${id}`}
               className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancelar
@@ -342,7 +342,7 @@ const StudentEditPage = () => {
             <button
               type="submit"
               disabled={updateMutation.isPending}
-              className="bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
             >
               {updateMutation.isPending ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
