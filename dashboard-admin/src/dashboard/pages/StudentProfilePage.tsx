@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { getUserById } from '@/user/services/userService'
 
+
 const StudentProfilePage = () => {
   const { id } = useParams<{ id: string }>()
   
