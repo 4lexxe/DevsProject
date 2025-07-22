@@ -29,6 +29,7 @@ import RoadmapEditor from "./learnroute/components/RoadmapEditor";
 import Roadmap from "./learnroute/pages/RoadMap";
 import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
+import HeaderSectionAdminPage from "./home/pages/admin/HeaderSectionAdminPage";
 
 import { PlansPage, SuccessPage, MySuscription } from "./subscription/index";
 
@@ -80,6 +81,10 @@ function App() {
 
               <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
                 <Route path="/editor-roadmap" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
+              </Route>
+
+              <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
+                <Route path="/formulario-header" element={<HeaderSectionAdminPage />} />
               </Route>
 
               <Route path="/editor-roadmap/:id" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
