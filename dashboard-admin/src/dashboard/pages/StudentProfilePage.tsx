@@ -108,7 +108,7 @@ const StudentProfilePage = () => {
                   </div>
                 )}
               </div>
-              <div className="text-white">
+              <div className="text-gray-900">
                 <h1 className="text-3xl font-bold">{user.name}</h1>
                 <p className="text-primary-100 text-lg">@{user.username}</p>
                 <p className="text-primary-200 mt-1">{user.email}</p>
@@ -144,14 +144,14 @@ const StudentProfilePage = () => {
             </div>
             <div className="flex items-center space-x-4">
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                user.role?.name === 'superadmin' 
+                user.Role?.name === 'superadmin' 
                   ? 'bg-red-100 text-red-800'
-                  : user.role?.name === 'admin'
+                  : user.Role?.name === 'admin'
                   ? 'bg-purple-100 text-purple-800'
                   : 'bg-blue-100 text-blue-800'
               }`}>
-                {user.role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
-                {user.role?.description || user.role?.name || 'Usuario'}
+                {user.Role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
+                {user.Role?.description || user.Role?.name || 'Usuario'}
               </span>
             </div>
           </div>
@@ -228,19 +228,19 @@ const StudentProfilePage = () => {
                 <p className="text-sm font-medium text-gray-500">Nivel de acceso</p>
                 <div className="mt-1">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    user.role?.name === 'superadmin' 
+                    user.Role?.name === 'superadmin' 
                       ? 'bg-red-100 text-red-800'
-                      : user.role?.name === 'admin'
+                      : user.Role?.name === 'admin'
                       ? 'bg-purple-100 text-purple-800'
                       : 'bg-blue-100 text-blue-800'
                   }`}>
-                    {user.role?.description || user.role?.name || 'Usuario'}
+                    {user.Role?.description || user.Role?.name || 'Usuario'}
                   </span>
-                  {user.role?.permissions && user.role.permissions.length > 0 && (
+                  {user.Role?.permissions && user.Role.permissions.length > 0 && (
                     <div className="mt-2">
                       <p className="text-xs text-gray-500 mb-1">Permisos:</p>
                       <div className="flex flex-wrap gap-1">
-                        {user.role.permissions.map((permission: string, index: number) => (
+                        {user.Role.permissions.map((permission: string, index: number) => (
                           <span 
                             key={index}
                             className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"

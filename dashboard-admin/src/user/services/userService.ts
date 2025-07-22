@@ -46,7 +46,7 @@ export const getAllUsers = async (filters?: UserFilters): Promise<User[]> => {
       }
       
       // Filtro por rol
-      if (filters.role && user.role?.name.toLowerCase() !== filters.role.toLowerCase()) {
+      if (filters.role && user.Role?.name.toLowerCase() !== filters.role.toLowerCase()) {
         return false
       }
       
@@ -83,10 +83,6 @@ export const getUserById = async (userId: number): Promise<User> => {
     return response.data.data || response.data
   } catch (error) {
     console.error(`Error al obtener el usuario con id ${userId}:`, error)
-    if (error.response) {
-      console.error('Error response:', error.response.data)
-      console.error('Error status:', error.response.status)
-    }
     throw error
   }
 }
@@ -152,12 +148,18 @@ export const getUserStats = async (): Promise<UserStats> => {
     return response.data.data || response.data
   } catch (error) {
     console.error('Error al obtener las estadísticas de usuarios:', error)
-    // Retornar valores por defecto en caso de error
+    // Si el endpoint no existe, calculamos desde todos los usuarios
+    const users = await getAllUsers()
+    const now = new Date()
+    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    
     return {
-      totalUsers: 0,
-      activeUsers: 0,
-      inactiveUsers: 0,
-      newUsersThisMonth: 0
+      totalUsers: users.length,
+      activeUsers: users.filter(user => user.isActiveSession).length,
+      inactiveUsers: users.filter(user => !user.isActiveSession).length,
+      newUsersThisMonth: users.filter(user => 
+        new Date(user.lastActiveAt) >= thisMonth
+      ).length
     }
   }
 }
@@ -165,7 +167,7 @@ export const getUserStats = async (): Promise<UserStats> => {
 // Obtener roles disponibles
 export const getRoles = async () => {
   try {
-    const response = await api.get('/roles')
+    const response = await api.get('/roles/roles')
     return response.data.data || response.data
   } catch (error) {
     console.error('Error al obtener los roles:', error)

@@ -26,11 +26,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Verificar rol si es requerido
   if (requiredRole.length > 0) {
+    console.log('Usuario completo:', user);
+    console.log('user.role:', user.role);
+    console.log('user.roleId:', user.roleId);
+    
     const userRole = user.role?.name.toLowerCase()
     const hasRequiredRole = requiredRole.some(role => 
       role.toLowerCase() === userRole
     )
-    
+    console.log(hasRequiredRole, userRole, requiredRole)
     if (!hasRequiredRole) {
       return (
         <div className="flex items-center justify-center h-screen">

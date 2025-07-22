@@ -90,7 +90,7 @@ export class RootLoginController {
           ...authResponse,
           user: {
             ...authResponse.user,
-            role: {
+            Role: {
               id: userRole.id,
               name: userRole.name,
               description: userRole.description,
