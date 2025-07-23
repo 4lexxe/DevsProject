@@ -56,8 +56,13 @@ Subscription.init(
       allowNull: true,
       comment: "ID del pagador en MercadoPago",
     },
-    startDate: { 
-      type: DataTypes.DATE, 
+    payerEmail: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Email del pagador en MercadoPago",
+    },
+    startDate: {
+      type: DataTypes.DATE,
       allowNull: true,
       comment: "Fecha de inicio de la suscripción",
     },

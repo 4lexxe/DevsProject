@@ -21,6 +21,7 @@
     "@google-cloud/vision": "^4.3.2",
     "@heroicons/react": "^1.0.6",
     "@hookform/resolvers": "^3.10.0",
+    "@mercadopago/sdk-react": "^1.0.3",
     "@radix-ui/react-accordion": "^1.2.2",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-aspect-ratio": "^1.1.1",

@@ -132,7 +132,8 @@ class MercadoPagoController {
     }
 
     if (action === "created") {
-      const subscriptionData = await retryWithExponentialBackoff(() =>
+      console.log("Suscripcion");
+     /*  const subscriptionData = await retryWithExponentialBackoff(() =>
         this.preApproval.get({ id: eventId })
       );
       console.log("Datos de suscripción obtenidos:", subscriptionData?.id);
@@ -151,7 +152,7 @@ class MercadoPagoController {
       } catch (error) {
         console.error("Error al crear la suscripción en el sistema:", error);
         // No lanzamos el error para que no interrumpa el flujo principal
-      }
+      } */
     } else if (action === "updated") {
       const subscriptionData = await retryWithExponentialBackoff(() =>
         this.preApproval.get({ id: eventId })
@@ -252,6 +253,7 @@ class MercadoPagoController {
 
     console.log("Procesando solicitud de checkout");
     console.log("Datos recibidos:", req.body);
+    console.log(req.body.formData.payer.identification)
     /* try {
       const { token, paymentMethodId, issuerId, amount, email } = req.body;
 

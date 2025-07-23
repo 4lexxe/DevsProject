@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
+import MPSubscription from "./MPSubscription";
 
 class Payment extends Model {
   public id!: bigint;  
@@ -24,13 +25,9 @@ Payment.init(
     },
     subscriptionId: {
       type: DataTypes.BIGINT,
-      allowNull: true,
+      allowNull: false,
       references: { model: "Subscriptions", key: "id" },
       comment: "ID de la suscripción a la que pertenece el pago",
-    },
-    mpSubscriptionId:{
-      type: DataTypes.STRING,
-      allowNull: false,
     },
     dateApproved: {
       type: DataTypes.DATE,
@@ -71,6 +68,18 @@ Payment.init(
     comment: "Tabla para almacenar los pagos realizados",
   }
 );
+
+// Relaciones
+Payment.belongsTo(MPSubscription, {
+  foreignKey: "mpSubscriptionId",
+  as: "mpSubscription",
+  onDelete: "CASCADE",
+});
+
+MPSubscription.hasMany(Payment, {
+  foreignKey: "mpSubscriptionId",
+  as: "payments",
+});
 
 export default Payment;
 

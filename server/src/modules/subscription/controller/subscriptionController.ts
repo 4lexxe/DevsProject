@@ -4,7 +4,6 @@ import Subscription from "../models/Subscription";
 import Plan from "../models/Plan";
 import User from "../../user/User";
 import MPSubscription from "../models/MPSubscription";
-import Invoice from "../models/Invoice";
 import Payment from "../models/Payment";
 import { PreApproval } from "mercadopago";
 import MPSubscriptionController from "./mpSubscriptionController";
@@ -22,6 +21,8 @@ interface SubscriptionData {
 }
 
 class SubscriptionController {
+  static preApproval = new PreApproval(MpConfig);
+
   // Función para generar metadata
   private static metadata(req: Request, res: Response) {
     return {
@@ -88,10 +89,9 @@ class SubscriptionController {
         return null;
       }
 
-      const preApproval = new PreApproval(MpConfig);
       await retryWithExponentialBackoff(async () => {
         try {
-          await preApproval.update({
+          await this.preApproval.update({
             id: subscription.mpSubscription.id,
             body: { status: "cancelled" },
           });
@@ -259,6 +259,131 @@ class SubscriptionController {
       );
     }
   };
+
+  static create: RequestHandler = async(req , res) => {
+    const { formData, planId, userId } = req.body;
+    console.log("Datos recibidos para crear suscripción:", { formData, planId, userId });
+    try {
+      // Obtener información del plan
+      const plan = await Plan.findByPk(planId);
+      if (!plan) {
+        res.status(404).json({
+          status: "error",
+          message: "Plan no encontrado",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      // Verificar si el usuario ya tiene una suscripción activa
+      const existingSubscription = await Subscription.findOne({
+        where: {
+          userId: userId,
+          status: "authorized"
+        }
+      });
+
+      if (existingSubscription) {
+        res.status(400).json({
+          status: "error",
+          message: "El usuario ya tiene una suscripción activa",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      // Crear la preaprobación en MercadoPago
+      const preApprovalResponse = await this.preApproval.create({
+        body: {
+          card_token_id: formData.token,
+          payer_email: formData.payer.email,
+          back_url: process.env.MP_BACK_URL,
+          auto_recurring: {
+            frequency: plan.durationType === "meses" ? 1 : 1, // Frecuencia de pago
+            frequency_type: plan.durationType === "meses" ? "months" : "days",
+            transaction_amount: plan.installmentPrice || plan.totalPrice,
+            currency_id: "ARS", // o USD según tu configuración
+            start_date: new Date().toISOString(),
+          },
+          reason: `Suscripción al plan ${plan.name}`,
+          external_reference: `subscription_${userId}_${planId}_${Date.now()}`,
+          status: "authorized",
+        }
+      });
+
+      console.log(preApprovalResponse);
+
+      if (!preApprovalResponse || !preApprovalResponse.id) {
+        res.status(400).json({
+          status: "error",
+          message: "Error al crear la suscripción en MercadoPago",
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      // Crear registro en la tabla MPSubscription con los datos completos de MP
+      const mpSubscription = await MPSubscription.create({
+        id: preApprovalResponse.id,
+        payerId: preApprovalResponse.payer_id || null,
+        status: preApprovalResponse.status,
+        dateCreated: new Date(preApprovalResponse.date_created || new Date()),
+        nextPaymentDate: preApprovalResponse.next_payment_date ? 
+          new Date(preApprovalResponse.next_payment_date) : null,
+        lastModified: preApprovalResponse.last_modified ? 
+          new Date(preApprovalResponse.last_modified) : null,
+        applicationId: preApprovalResponse.application_id || null,
+        reason: preApprovalResponse.reason || null,
+        data: preApprovalResponse, // Guardar toda la respuesta de MP
+      });
+
+      // Crear registro en la tabla Subscription
+      const subscription = await Subscription.create({
+        userId: userId,
+        planId: planId,
+        mpSubscriptionId: preApprovalResponse.id,
+        payerId: preApprovalResponse.payer_id,
+        payerEmail: formData.payer.email,
+        startDate: (preApprovalResponse as any)?.auto_recurring?.start_date,
+        endDate: (preApprovalResponse as any)?.auto_recurring?.end_date, 
+        status: preApprovalResponse.status || "pending",
+      });
+
+      console.log(`Suscripción creada exitosamente: ID ${subscription.id}, MP ID ${preApprovalResponse.id}`);
+
+      res.status(201).json({
+        status: "success",
+        message: "Suscripción creada exitosamente",
+        data: {
+          subscription: subscription,
+          mpSubscription: mpSubscription,
+          payment_url: preApprovalResponse.init_point, // URL para redirigir al usuario si es necesario
+        },
+        metadata: this.metadata(req, res),
+      });
+
+    } catch (error: any) {
+      console.error("Error al crear la suscripción:", error);
+      
+      // Manejar errores específicos de MercadoPago
+      if (error.cause) {
+        res.status(400).json({
+          status: "error",
+          message: "Error en MercadoPago",
+          details: error.cause,
+          metadata: this.metadata(req, res),
+        });
+        return;
+      }
+
+      this.handleServerError(
+        res,
+        req,
+        error,
+        "Error interno al crear la suscripción"
+      );
+    }
+  }
 
   static cancel: RequestHandler = async (req, res) => {
     const subscriptionId = req.params.id;

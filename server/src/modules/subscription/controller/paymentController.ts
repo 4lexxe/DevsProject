@@ -109,9 +109,17 @@ class PaymentController {
   // Método para crear un pago en la base de datos
   static async createPaymentInDB(paymentData: any) {
     try {
+      const subscription = await Subscription.findOne({
+        where: { payerId: paymentData.payer.id },
+      });
+
+      if(!subscription) {
+        throw new Error("No se encontró la suscripción asociada al pago");
+      }
+
       const payment = await Payment.create({
         id: BigInt(paymentData.id),
-        mpSubscriptionId: paymentData.metadata.preapproval_id,
+        subscriptionId: subscription.id,
         dateApproved: paymentData.date_approved,
         status: paymentData.status,
         transactionAmount: paymentData.transaction_amount,

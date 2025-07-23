@@ -1,8 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import MPSubscription from "../models/MPSubscription"; // Asegúrate de importar el modelo MPSubscription
 import Subscription from "../models/Subscription";
-import { stat } from "fs";
-import { start } from "repl";
 
 class MPSubscriptionController {
   // Función para generar metadata
@@ -122,7 +120,6 @@ class MPSubscriptionController {
     try {
       const mpSubscription = await MPSubscription.create({
         id: subscriptionData.id,
-        mpSubPlanId: subscriptionData.preapproval_plan_id,
         payerId: subscriptionData.payer_id,
         status: subscriptionData.status,
         dateCreated: subscriptionData.date_created,
