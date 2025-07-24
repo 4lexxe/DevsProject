@@ -53,9 +53,7 @@ class DiscountEventController {
   ): Promise<void> {
     try {
       // Obtener el plan asociado al descuento
-      const plan = await Plan.findByPk(discountEvent.planId, {
-        include: ["mpSubPlan"],
-      });
+      const plan = await Plan.findByPk(discountEvent.planId);
 
       if (!plan) {
         throw new Error(

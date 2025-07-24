@@ -9,6 +9,7 @@ class MPSubscription extends Model {
   public status!: string;
   public dateCreated!: Date;
   public nextPaymentDate!: Date;
+  public initPoint!: string; // URL de inicio de pago, opcional
   public data!: any;
 }
 
@@ -34,16 +35,21 @@ MPSubscription.init(
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     dateCreated: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     nextPaymentDate: {
       type: DataTypes.DATE,
       allowNull: true,
       comment: "Fecha del próximo pago",
+    },
+    initPoint: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      comment: "URL de inicio de pago en MercadoPago",
     },
     data: {
       type: DataTypes.JSONB,

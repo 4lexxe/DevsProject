@@ -12,7 +12,7 @@ export const validateDiscount = [
   body('value')
     .notEmpty().withMessage('El valor del descuento es obligatorio')
     
-    .isInt({min: 1, max: 80 }).withMessage('El valor debe ser un entero entre 0 y 100'),
+    .isInt({min: 1, max: 90 }).withMessage('El valor debe ser un entero entre 0 y 100'),
 
   // Validación para el campo 'startDate'
   body('startDate')

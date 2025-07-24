@@ -5,20 +5,22 @@ import CustomInput from "@/shared/components/inputs/CustomInput"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { userSchema } from "@/subscription/validations/userSchema"
 import { editUser } from "@/subscription/services/userService"
+import api from "@/shared/api/axios"
 
 interface DetailFormProps {
   userData: {
     id: string;
     name: string;
     surname: string;
-    mpEmail: string;
+    email: string;
     identificationNumber: string;
     identificationType: "CUIT" | "CUIL" | "DNI";
   };
   planData: {
+    id: number;
     name: string;
     description: string;
-    installment: number;
+    installments: number;
     installmentPrice: string;
     discount?: {
       value: number;
@@ -28,7 +30,6 @@ interface DetailFormProps {
     duration: number;
     durationType: string;
     accessLevel: "Básico" | "Estándar" | "Premium";
-    initPoint: string; // URL de inicio de la suscripción
   };
 }
 export default function SubscriptionFormPage({ userData, planData }: DetailFormProps){
@@ -45,7 +46,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
     defaultValues: {
       name: userData.name,
       surname: userData.surname,
-      mpEmail: userData.mpEmail,
+      email: userData.email,
       identificationNumber: userData.identificationNumber,
       identificationType: userData.identificationType,
     },
@@ -73,16 +74,44 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
     try {
       // Editar usuario con los datos del formulario
       const response = await editUser(userData.id, {userId: userData.id, ...data});
-      
+      console.log("Respuesta de editUser:", response);
 
-      // Simular llamada a API
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      // Verificar si la API devolvió success
+      if (response.status === "success") {
+        try {
+          // Hacer POST a /api/subscription con los datos necesarios usando axios
+          console.log(planData);
+          const subscriptionResponse = await api.post("/subscriptions", {
+            userId: userData.id,
+            planId: planData.id,
+            payerEmail: response.user.email,
+          });
 
-      if(response) window.location.href = planData.initPoint;
+          console.log("Respuesta de suscripción:", subscriptionResponse.data);
+
+          if (subscriptionResponse.data.status === "success") {
+            alert("¡Suscripción creada exitosamente!");
+            // Aquí podrías redirigir a una página de éxito o siguiente paso
+            window.location.href = subscriptionResponse.data.data.initPoint;
+          } else {
+            throw new Error(subscriptionResponse.data.message || "Error al crear la suscripción");
+          }
+
+        } catch (subscriptionError: any) {
+          console.error("Error al crear la suscripción:", subscriptionError);
+          const errorMessage = subscriptionError.response?.data?.message || subscriptionError.message || "Error desconocido";
+          alert(`Usuario actualizado, pero hubo un error al crear la suscripción: ${errorMessage}`);
+        }
+      } else {
+        throw new Error(response.message || "Error al actualizar el usuario");
+      }
+
+      // Simular llamada a API (remover esta línea si no es necesaria)
+      // await new Promise((resolve) => setTimeout(resolve, 2000))
       
     } catch (error) {
-      console.error("Error al procesar la suscripción:", error)
-      alert("Error al procesar la suscripción. Por favor, intenta nuevamente.")
+      console.error("Error al procesar:", error)
+      alert("Error al procesar la solicitud. Por favor, intenta nuevamente.")
     } finally {
       setIsSubmitting(false)
     }
@@ -134,7 +163,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
               <div>
                 <p className="text-sm text-gray-500 mb-1">Cuotas</p>
                 <p className="text-lg font-medium text-[#0c154c]">
-                  {planData.installment} cuota{planData.installment > 1 ? "s" : ""} de{" "}
+                  {planData.installments} cuota{planData.installments > 1 ? "s" : ""} de{" "}
                   {formatCurrency(planData.installmentPrice)}
                 </p>
               </div>
@@ -208,57 +237,17 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
                 </p>
               </div>
 
-
-              {/* Email */}
+               {/* Email */}
               <div className="md:col-span-2">
                 <CustomInput
-                  name="mpEmail"
-                  labelText="Email de Mercado Pago *"
+                  name="email"
+                  labelText="Email *"
                   type="email"
-                  placeholder="Ingresa un email válido de Mercado Pago"
+                  placeholder="Ingresa un email válido"
                   register={register}
-                  error={errors.mpEmail?.message}
+                  error={errors.email?.message}
                   disabled={isSubmitting}
                 />
-                <div className="mt-2 p-3 bg-[#fff3cd] border border-[#ffeaa7] rounded-md">
-                  <div className="flex items-start">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 text-[#856404] mr-2 mt-0.5 flex-shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    <div className="text-sm text-[#856404]">
-                      <p className="font-semibold mb-1">⚠️ Importante para completar tu suscripción</p>
-                      <p className="mb-2">
-                        Ingresá el correo electrónico que está vinculado y activo en tu cuenta de Mercado Pago. No es para cambiar tu email personal.
-                      </p>
-                      <p className="mb-2">
-                        Si el email no es el correcto, la suscripción no podrá acreditarse y podrías perder el acceso al plan.
-                      </p>
-                      <p className="flex items-center">
-                        📩 ¿No sabés cuál es tu correo en Mercado Pago? Ingresá a
-                      </p>
-                        <a
-                          href="https://www.mercadopago.com.ar"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#1d4ed8] underline mx-1 hover:text-[#0c154c] "
-                        >
-                          www.mercadopago.com.ar
-                        </a>
-                      <p>y verificá tu dirección en la sección "Mi cuenta".</p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* type de Documento */}

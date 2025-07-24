@@ -40,6 +40,20 @@ Subscription.init(
     payerId: {
       type: DataTypes.BIGINT,
       allowNull: true,
+<<<<<<< Updated upstream
+=======
+      comment: "ID del pagador en MercadoPago",
+    },
+    startDate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "Fecha de inicio de la suscripción",
+    },
+    endDate: { 
+      type: DataTypes.DATE, 
+      allowNull: true,
+      comment: "Fecha de finalización de la suscripción",
+>>>>>>> Stashed changes
     },
     startDate: { type: DataTypes.DATE, allowNull: true },
     endDate: { type: DataTypes.DATE, allowNull: true },

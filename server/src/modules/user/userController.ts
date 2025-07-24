@@ -4,11 +4,12 @@ import Role from '../role/Role';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
+
 // Interface para los campos actualizables
 interface UpdatableUserFields {
   name?: string;
   email?: string;
-  mpEmail?: string; // Nuevo campo para email de Mercado Pago
+  surname?: string;
   phone?: string | null;
   roleId?: number;
   username?: string | null;
@@ -166,7 +167,6 @@ export class UserController {
       const { 
         name, 
         email, 
-        mpEmail, // Incluir mpEmail si se proporciona
         phone, 
         roleId, 
         password,
@@ -182,7 +182,6 @@ export class UserController {
       const updatableFields: UpdatableUserFields = {
         name,
         email,
-        mpEmail, // Incluir mpEmail si se proporciona
         phone,
         roleId,
         username,
@@ -232,9 +231,8 @@ export class UserController {
       const { id } = req.params;
       const { 
         name, 
-        username,
+        surname,
         email,
-        mpEmail, 
         phone,
         identificationNumber,
         identificationType,
@@ -246,28 +244,25 @@ export class UserController {
       }
       const updatableFields: UpdatableUserFields = {
         email,
-        mpEmail,
         name,
-        username,
+        surname,
         phone,
         identificationNumber,
         identificationType,
       };
       
       await user.update(updatableFields);
-      const updatedUser = await User.findByPk(id, {
-        attributes: { 
-          exclude: [
-            'password',
-            'registrationIp',
-            'lastLoginIp',
-            'registrationGeo',
-            'lastLoginGeo',
-            'suspiciousActivities'
-          ]
-        },
+      
+      res.status(200).json({
+        message: 'Usuario actualizado correctamente',
+        status: 'success',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          surname: user.surname,
+        }
       });
-      res.json(updatedUser);
     } catch (error) {
       console.error('Error updating user:', error);
       res.status(500).json({ error: 'Error al actualizar usuario' });

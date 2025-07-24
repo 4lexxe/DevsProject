@@ -171,8 +171,6 @@ class MercadoPagoController {
           await SubscriptionController.updateSubscription(
               mpSubscription.id,
             {
-              startDate: subscriptionData?.auto_recurring?.start_date,
-              endDate: subscriptionData?.auto_recurring?.end_date,
               status: subscriptionData.status
             }
           );

@@ -14,18 +14,7 @@ const userValidations = [
         .notEmpty().withMessage('El teléfono es obligatorio')
         .isLength({ min: 10, max: 15 }).withMessage('El teléfono debe tener entre 10 y 15 caracteres')
         .matches(/^(\+54\s?)?(\d{10})$/).withMessage('Teléfono argentino inválido'), */
-    body('mpEmail')
-        .notEmpty().withMessage('El email es obligatorio')
-        .isEmail().withMessage('Email inválido')
-        .custom(async (value, { req }) => {
-            if (!value) return true;
-            const user = await User.findOne({ where: { mpEmail: value } });
-            // Permite si no existe o si el id coincide (edición)
-            if (user && user.id !== req.body.userId) {
-                throw new Error('El email ya está registrado por otro usuario');
-            }
-            return true;
-        }),
+    
     body('identificationNumber')
         .notEmpty().withMessage('El número de identificación es obligatorio')
         .isString().withMessage('Número de identificación inválido'),

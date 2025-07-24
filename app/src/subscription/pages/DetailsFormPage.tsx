@@ -9,7 +9,8 @@ interface UserData {
   id: string;
   name: string;
   surname: string;
-  mpEmail: string;
+  email: string;
+  phone: string;
   identificationNumber: string;
   identificationType: "CUIT" | "CUIL" | "DNI";
 }
@@ -20,18 +21,16 @@ interface DiscountEvent {
 }
 
 interface PlanData {
+  id: number;
   name: string;
   description: string;
-  installment: number;
+  installments: number;
   installmentPrice: string;
   totalPrice: string;
   duration: number;
   durationType: string;
   accessLevel: "Básico" | "Estándar" | "Premium";
   discountEvent?: DiscountEvent;
-  mpSubPlan: {
-    initPoint: string; // URL de inicio de la suscripción
-  };
 }
 
 function DetailsFormPage() {
@@ -67,10 +66,10 @@ function DetailsFormPage() {
       <DetailForm
         userData={userD}
         planData={{
-          initPoint: planD.mpSubPlan.initPoint,
+          id: planD.id,
           name: planD.name,
           description: planD.description,
-          installment: planD.installment,
+          installments: planD.installments,
           installmentPrice: planD.installmentPrice,
           totalPrice: planD.totalPrice,
           duration: planD.duration,

@@ -71,6 +71,8 @@ function App() {
               <Route path="/subscription" element={<MySuscription />} />
               <Route path="/subscription/plan/:id/form/details" element={<DetailsFormPage />} />
 
+              {/* Rutas públicas */}
+
               {/* Rutas protegidas */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/resources/create" element={<CreateResourceForm />} />
