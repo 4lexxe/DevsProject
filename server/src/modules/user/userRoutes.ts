@@ -4,7 +4,7 @@ import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 import validatorUser from './validators/userValidator';
-import subscriptionDataValidator from './validators/subscriptionDataValidator';
+import subscriptionDataValidator from './validators/SubscriptionDataValidator';
 
 
 const router = Router();
@@ -12,14 +12,27 @@ const router = Router();
 // Middleware de geolocalización (opcional, aplica según necesidad)
 router.use(geoMiddleware);
 
-// Rutas públicas
-router.get('/users', UserController.getUsers); // Obtener todos los usuarios (público)
-router.get('/users/:id', UserController.getUserById); // Obtener un usuario por ID (público)
+// Rutas públicas (datos básicos únicamente)
+router.get('/users/public', UserController.getPublicUsers);
+router.get('/users/public/:id', UserController.getPublicUserById);
 
-// Rutas que requieren autenticación y permisos
+// Rutas protegidas (requieren permisos administrativos)
+router.get('/users', 
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:all_users']),
+  UserController.getUsers
+);
+
+router.get('/users/:id', 
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:all_users']),
+  UserController.getUserById
+);
+
+// Rutas que requieren autenticación y permisos específicos
 router.get('/users/:id/security',
-  authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['view:security_details']),  // Verificar permisos
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:all_users']),
   UserController.getUserSecurityDetails
 );
 
@@ -30,12 +43,14 @@ router.put('/users/:id',
   authMiddleware, // Requiere autenticación
   permissionsMiddleware(['manage:users']),  // Verificar permisos
   validatorUser,
+  authMiddleware,
+  permissionsMiddleware(['write:users', 'manage:all_users']),
   UserController.updateUser
 );
 
 router.delete('/users/:id', 
-  authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  authMiddleware,
+  permissionsMiddleware(['delete:users']),
   UserController.deleteUser
 );
 

@@ -3,6 +3,7 @@ import sequelize from "../../../infrastructure/database/db";
 import Section from "../Section";
 import Course from "../../course/Course";
 import Content from "../../content/Content";
+import User from "../../user/User";
 import { Sequelize, Op } from "sequelize";
 import { validationResult } from "express-validator";
 
@@ -46,6 +47,9 @@ export default class SectionController {
   static create: RequestHandler = async (req, res) => {
     try {
       const { title, description, courseId, coverImage, moduleType, colorGradient } = req.body;
+      const user = req.user as User;
+
+      // Verificar que el curso existe
       const course = await Course.findByPk(courseId);
       if (!course) {
         res.status(400).json({
@@ -55,6 +59,18 @@ export default class SectionController {
         });
         return;
       }
+
+      // Verificar permisos adicionales para crear contenido del curso
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para crear secciones de curso",
+        });
+        return;
+      }
+
       const newSection = await Section.create({
         title,
         description,
@@ -63,8 +79,10 @@ export default class SectionController {
         moduleType,
         colorGradient,
       });
+
       res.status(201).json({
         ...metadata(req, res),
+        status: "success",
         message: "Sección creada correctamente",
         data: newSection,
       });
@@ -228,8 +246,20 @@ export default class SectionController {
     try {
       const { id } = req.params;
       const { title, description, courseId, coverImage, moduleType, colorGradient } = req.body;
-      const section = await Section.findByPk(id);
+      const user = req.user as User;
 
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para actualizar secciones de curso",
+        });
+        return;
+      }
+
+      const section = await Section.findByPk(id);
       if (!section) {
         res.status(404).json({
           ...metadata(req, res),
@@ -247,8 +277,10 @@ export default class SectionController {
         moduleType,
         colorGradient,
       });
+
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Sección actualizada correctamente",
         data: section,
       });
@@ -261,6 +293,19 @@ export default class SectionController {
   static delete: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
+      const user = req.user as User;
+
+      // Verificar que el usuario tenga permisos para eliminar contenido
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('delete:content') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "No tienes permisos para eliminar secciones",
+        });
+        return;
+      }
+
       const section = await Section.findByPk(id);
       if (!section) {
         res.status(404).json({
@@ -270,9 +315,12 @@ export default class SectionController {
         });
         return;
       }
+
       await section.destroy();
+      
       res.status(200).json({
         ...metadata(req, res),
+        status: "success",
         message: "Sección eliminada correctamente",
       });
     } catch (error) {

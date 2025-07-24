@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { ResourceService } from '../../services/resource.service';
-import { UserService } from '../../../user/components/profile/services/user.service';
 import { toast } from 'react-hot-toast';
 import { Resource, UserInfo } from '../../types/resource';
 import ResourceHeader from '../../navigation/ResourceDetailHeader';
@@ -13,18 +12,23 @@ import Comment from '../../components/Comment';
 const ResourceDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [resource, setResource] = useState<Resource | null>(null);
-  const [resourceUser, setResourceUser] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchResourceAndUser = async () => {
+    const fetchResourceDetails = async () => {
       try {
         setLoading(true);
+        setError(null);
+
+        if (!id) {
+          setError('ID de recurso no válido');
+          return;
+        }
+
         const resourceData = await ResourceService.getResourceById(Number(id));
         setResource(resourceData);
-        const userData = await UserService.getUserById(resourceData.userId);
-        setResourceUser(userData);
+
       } catch (err) {
         console.error('Error fetching resource details:', err);
         setError('Error al cargar el recurso. Por favor, intenta nuevamente.');
@@ -32,8 +36,9 @@ const ResourceDetailsPage: React.FC = () => {
         setLoading(false);
       }
     };
+
     if (id) {
-      fetchResourceAndUser();
+      fetchResourceDetails();
     }
   }, [id]);
 
@@ -67,11 +72,23 @@ const ResourceDetailsPage: React.FC = () => {
     );
   }
 
+  // Crear el objeto resourceUser a partir de la información que ya viene en el recurso
+  const resourceUser: UserInfo | null = resource.User ? {
+    id: resource.User.id,
+    name: resource.User.name,
+    username: resource.User.username,
+    displayName: resource.User.displayName,
+    avatar: resource.User.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      resource.User.displayName || resource.User.name || resource.User.username || `Usuario ${resource.User.id}`
+    )}&background=random`
+  } : null;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Encabezado del recurso */}
         <ResourceHeader resource={resource} />
+        
         {/* Contenido principal del recurso */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <ResourceContent resource={resource} />

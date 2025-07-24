@@ -1,87 +1,103 @@
 import React, { useState, useEffect } from 'react';
-import { Star, StarFill } from 'react-bootstrap-icons';
-import { toast } from 'react-hot-toast';
+import { Star } from 'lucide-react';
 import RatingService from '../services/rating.service';
-import { useAuth } from '@/user/contexts/AuthContext';
+import { usePermissions } from '../../shared/hooks/usePermissions';
 
 interface RatingProps {
   resourceId: number;
-  mode: 'view' | 'interactive';
+  mode?: 'display' | 'interactive';
+  size?: 'sm' | 'md' | 'lg';
 }
 
-const RatingComponent: React.FC<RatingProps> = ({ resourceId, mode }) => {
-  const [totalStars, setTotalStars] = useState<number>(0);
+const RatingComponent: React.FC<RatingProps> = ({ 
+  resourceId, 
+  mode = 'display', 
+  size = 'sm' 
+}) => {
+  const { hasPermission, user } = usePermissions();
+  const [starCount, setStarCount] = useState<number>(0);
   const [userRating, setUserRating] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchRatings = async () => {
+    const fetchStarCount = async () => {
       try {
-        const ratings = await RatingService.getRatingsByResource(resourceId);
-        const stars = ratings.filter((rating: { star: boolean }) => rating.star).length;
-        setTotalStars(stars);
-
-        if (mode === 'interactive' && user) {
-          const userRating = ratings.find(
-            (rating: { userId: number; star: boolean }) => rating.userId === user.id
-          )?.star || null;
-          setUserRating(userRating);
-        }
+        const data = await RatingService.getStarCount(resourceId);
+        setStarCount(data.starCount || 0);
       } catch (error) {
-        console.error('Error fetching ratings:', error);
-        toast.error('Error al cargar las calificaciones');
+        console.error('Error fetching star count:', error);
+        setStarCount(0);
       }
     };
 
-    fetchRatings();
-  }, [resourceId, mode, user]);
+    fetchStarCount();
+  }, [resourceId]);
 
-  const handleStarClick = async () => {
-    if (!user) {
-      toast.error('Debes iniciar sesión para calificar');
+  const handleRate = async (star: boolean) => {
+    if (mode !== 'interactive' || loading) return;
+
+    // Verificar permisos antes de calificar
+    if (!hasPermission('rate:resources')) {
+      console.warn('No tienes permisos para calificar recursos');
+      if (!user) {
+        alert('Debes iniciar sesión para calificar recursos');
+      } else {
+        alert('No tienes permisos para calificar recursos');
+      }
       return;
     }
 
-    setLoading(true);
-
     try {
+      setLoading(true);
+      await RatingService.rateResource({ resourceId, star });
+      
       if (userRating === null) {
-        await RatingService.rateResource({ resourceId, star: true });
-        setTotalStars(prev => prev + 1);
-        setUserRating(true);
-      } else {
-        await RatingService.deleteRating(resourceId);
-        setTotalStars(prev => Math.max(0, prev - 1));
-        setUserRating(null);
+        setStarCount(prev => star ? prev + 1 : prev);
+      } else if (userRating !== star) {
+        setStarCount(prev => star ? prev + 1 : prev - 1);
       }
+      
+      setUserRating(star);
     } catch (error) {
-      console.error('Error handling star click:', error);
-      toast.error('Error al procesar la calificación');
+      console.error('Error rating resource:', error);
+      alert('Error al calificar el recurso');
     } finally {
       setLoading(false);
     }
   };
 
-  if (mode === 'view') {
-    return (
-      <div className="flex items-center gap-2 text-yellow-500">
-        <StarFill className="w-5 h-5" />
-        <span>{totalStars || 0}</span>
-      </div>
-    );
-  }
+  const sizeClasses = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6'
+  };
+
+  const canRate = hasPermission('rate:resources');
 
   return (
-    <div className="flex items-center gap-2 cursor-pointer" onClick={handleStarClick}>
-      {loading ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-500" />
-      ) : userRating ? (
-        <StarFill className="w-5 h-5 text-yellow-500" />
+    <div className="flex items-center gap-1">
+      {mode === 'interactive' && canRate ? (
+        <button
+          onClick={() => handleRate(true)}
+          disabled={loading}
+          className={`${sizeClasses[size]} text-yellow-400 hover:text-yellow-500 transition-colors disabled:opacity-50`}
+          title={user ? "Calificar recurso" : "Inicia sesión para calificar"}
+        >
+          <Star fill="currentColor" />
+        </button>
+      ) : mode === 'interactive' && !canRate ? (
+        <div 
+          className={`${sizeClasses[size]} text-gray-400 cursor-not-allowed`}
+          title={!user ? "Inicia sesión para calificar" : "No tienes permisos para calificar"}
+        >
+          <Star fill="currentColor" />
+        </div>
       ) : (
-        <Star className="w-5 h-5 text-gray-400 hover:text-yellow-500 transition-colors" />
+        <Star className={`${sizeClasses[size]} text-yellow-400`} fill="currentColor" />
       )}
-      <span>{totalStars || 0}</span>
+      <span className="text-sm text-gray-600 font-medium">
+        {starCount}
+      </span>
     </div>
   );
 };

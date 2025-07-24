@@ -2,6 +2,14 @@
 /app/node_modules/
 /server/node_modules/
 
+#
+/app/.history/
+/server/.history/
+/app/history/
+/server/history/
+history/
+.history/
+
 # Ignorar archivos de build de TypeScript en las carpetas app y server
 /app/dist/
 /server/dist/
@@ -15,6 +23,8 @@
 # Ignorar configuraciones del IDE
 /.idea/
 /.vscode/
+
+
 
 # Archivos de logs
 *.log

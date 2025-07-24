@@ -6,24 +6,41 @@ import {
   updateRole,
   deleteRole,
 } from './roleController';
+import { authMiddleware } from '../../shared/middleware/authMiddleware';
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
-// Rutas para manejar las operaciones CRUD de los roles
+// Rutas públicas (solo lectura básica para algunos casos)
+router.get('/roles', 
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:roles']),
+  getRoles
+);
 
-// Crear un nuevo rol
-router.post('/roles', createRole);
+router.get('/roles/:id', 
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:roles']),
+  getRoleById
+);
 
-// Obtener todos los roles
-router.get('/roles', getRoles);
+// Rutas protegidas (requieren permisos administrativos)
+router.post('/roles',
+  authMiddleware,
+  permissionsMiddleware(['manage:roles']),
+  createRole
+);
 
-// Obtener un rol por ID
-router.get('/roles/:id', getRoleById);
+router.put('/roles/:id',
+  authMiddleware,
+  permissionsMiddleware(['manage:roles']),
+  updateRole
+);
 
-// Actualizar un rol por ID
-router.put('/roles/:id', updateRole);
-
-// Eliminar un rol por ID
-router.delete('/roles/:id', deleteRole);
+router.delete('/roles/:id',
+  authMiddleware,
+  permissionsMiddleware(['delete:roles']),
+  deleteRole
+);
 
 export default router;

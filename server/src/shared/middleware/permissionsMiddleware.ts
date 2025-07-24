@@ -3,7 +3,7 @@ import User from "../../modules/user/User";
 
 export const permissionsMiddleware = (requiredPermissions: string[]) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const user = req.user as User; // Aquí estamos diciendo que `user` es de tipo `User`
+    const user = req.user as User;
 
     if (!user) {
       res.status(401).json({ 
@@ -13,17 +13,25 @@ export const permissionsMiddleware = (requiredPermissions: string[]) => {
       return;
     }
 
-    // Verificar si el usuario tiene los permisos necesarios
+    // Los superadmin tienen acceso total
+    if (user.Role?.name === 'superadmin') {
+      next();
+      return;
+    }
+
+    // Verificar si el usuario tiene al menos uno de los permisos necesarios (OR logic)
     const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
 
-    const hasPermissions = requiredPermissions.every(permission => 
+    const hasAnyPermission = requiredPermissions.some(permission => 
       userPermissions.includes(permission)
     );
 
-    if (!hasPermissions) {
+    if (!hasAnyPermission) {
       res.status(403).json({ 
-        message: "Acceso denegado uwu", 
-        details: "No tienes los permisos necesarios para esta acción" 
+        message: "Acceso denegado", 
+        details: `No tienes ninguno de los permisos necesarios para esta acción. Permisos requeridos: ${requiredPermissions.join(' O ')}`,
+        requiredPermissions,
+        userPermissions
       });
       return;
     }

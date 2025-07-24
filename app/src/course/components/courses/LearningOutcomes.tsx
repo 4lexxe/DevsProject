@@ -39,9 +39,9 @@ const LearningOutcomes: React.FC<LearningOutcomesProps> = ({ outcomes }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
         {/* Contenido visible */}
         {visibleOutcomes.map((outcome, index) => (
-          <div key={index} className="flex items-start space-x-3">
+          <div key={index} className="flex items-start space-x-3 min-w-0">
             <CheckCircle2 className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-            <p className="text-[#1a1f36] text-sm">{outcome}</p>
+            <p className="text-[#1a1f36] text-sm word-break break-all leading-relaxed min-w-0 flex-1">{outcome}</p>
           </div>
         ))}
 
@@ -57,9 +57,9 @@ const LearningOutcomes: React.FC<LearningOutcomesProps> = ({ outcomes }) => {
         {/* Contenido oculto (solo visible cuando se hace clic en "Ver más") */}
         {showAll &&
           hiddenOutcomes.map((outcome, index) => (
-            <div key={index + maxVisibleItemsMobile} className="flex items-start space-x-3">
+            <div key={index + maxVisibleItemsMobile} className="flex items-start space-x-3 min-w-0">
               <CheckCircle2 className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
-              <p className="text-[#1a1f36] text-sm">{outcome}</p>
+              <p className="text-[#1a1f36] text-sm word-break break-all leading-relaxed min-w-0 flex-1">{outcome}</p>
             </div>
           ))}
                   {/* Botón "Cerrar" para dispositivos móviles */}
