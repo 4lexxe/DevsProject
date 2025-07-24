@@ -27,11 +27,7 @@ import roleRoutes from './modules/role/roleRoutes';
 
 // Rutas de Contenido
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import careerTypeRoutes from './modules/careerType/CareerTypeRoutes';
-import categoryRoutes from './modules/category/CategoryRoutes';
-import courseRoutes from './modules/course/courseRoutes';
-import sectionRoutes from './modules/section/sectionRoutes';
-import contentRoutes from './modules/content/contentRoutes';
+import courseRoutes from './modules/course/routes';
 
 // Rutas de Recursos
 import recourseRoutes from './modules/resource/routes/resource.routes';
@@ -43,11 +39,11 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas para las subscripciones
-import mercadopagoRoutes from './modules/subscription/routes/mercadopagoRoutes'
-import discountEventRoutes from './modules/subscription/routes/discountRoutes'
-import planRoutes from './modules/subscription/routes/planRoutes'
-import subscriptionRoutes from './modules/subscription/routes/subscriptionRoutes'
-import invoiceRoutes from './modules/subscription/routes/invoiceRoutes';
+import mercadopagoRoutes from './modules/billing/routes/mercadopagoRoutes'
+import discountEventRoutes from './modules/billing/routes/discountRoutes'
+import planRoutes from './modules/billing/routes/planRoutes'
+import subscriptionRoutes from './modules/billing/routes/subscriptionRoutes'
+import invoiceRoutes from './modules/billing/routes/invoiceRoutes';
 
 // ==================================================
 // Importaciones de utilidades y configuraciones
@@ -261,12 +257,8 @@ app.use('/api/comment', commentRoutes);
 // Rutas de Contenido en el hero
 app.use('/api', HeaderSectionRoutes);
 
-// Rutas de Cursos
+// Rutas de Cursos (unificadas)
 app.use('/api', courseRoutes);
-app.use('/api', sectionRoutes);
-app.use('/api', careerTypeRoutes);
-app.use('/api', categoryRoutes);
-app.use('/api', contentRoutes);
 
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);

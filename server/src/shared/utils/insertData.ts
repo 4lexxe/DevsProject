@@ -1,7 +1,7 @@
 import { Transaction } from "sequelize";
-import Course from "../../modules/course/Course";
-import Section from "../../modules/section/Section";
-import Content from "../../modules/content/Content";
+import Course from "../../modules/course/models/Course";
+import Section from "../../modules/course/models/Section";
+import Content from "../../modules/course/models/Content";
 import HeaderSection from "../../modules/headerSection/HeaderSection";
 import { CreationAttributes } from "sequelize";
 

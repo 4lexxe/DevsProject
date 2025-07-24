@@ -4,13 +4,12 @@ import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
 import User from '../modules/user/User';
-import Plan from '../modules/subscription/models/Plan';
-import DiscountEvent from '../modules/subscription/models/DiscountEvent';
-import MPSubPlan from '../modules/subscription/models/MPSubPlan';
-import Payment from '../modules/subscription/models/Payment';
-import Invoice from '../modules/subscription/models/Invoice';
-import Subscription from '../modules/subscription/models/Subscription';
-import MPSubscription from '../modules/subscription/models/MPSubscription';
+import Plan from '../modules/billing/models/Plan';
+import DiscountEvent from '../modules/billing/models/DiscountEvent';
+import Payment from '../modules/billing/models/Payment';
+import Invoice from '../modules/billing/models/Invoice';
+import Subscription from '../modules/billing/models/Subscription';
+import MPSubscription from '../modules/billing/models/MPSubscription';
 
 async function importData() {
   try {
@@ -37,11 +36,6 @@ async function importData() {
       // Insertar los eventos de descuento
       if (data.discountEvents && data.discountEvents.length > 0) {
         await DiscountEvent.bulkCreate(data.discountEvents, { transaction });
-      }
-
-      // Insertar MPSubPlans
-      if (data.mpSubPlans && data.mpSubPlans.length > 0) {
-        await MPSubPlan.bulkCreate(data.mpSubPlans, { transaction });
       }
       
       // Insertar Subscriptions

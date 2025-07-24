@@ -15,21 +15,20 @@ import RoadMap from "./modules/roadmap/RoadMap";
 /* Modelos relacionados con el area de cursos */
 import Category from "./modules/category/Category";
 import CareerType from "./modules/careerType/CareerType";
-import Course from "./modules/course/Course";
-import { CourseCategory } from "./modules/course/Course";
-import Section from "./modules/section/Section";
-import Content from "./modules/content/Content";
+import Course from "./modules/course/models/Course";
+import { CourseCategory } from "./modules/course/models/Course";
+import Section from "./modules/course/models/Section";
+import Content from "./modules/course/models/Content";
 
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
-import DiscountEvent from "./modules/subscription/models/DiscountEvent";
-import Invoice from "./modules/subscription/models/Invoice";
-import Subscription from "./modules/subscription/models/Subscription";
-import MPSubscription from "./modules/subscription/models/MPSubscription";
-import MPSubPlan from "./modules/subscription/models/MPSubPlan";
-import Payment from "./modules/subscription/models/Payment";
-import Plan from "./modules/subscription/models/Plan";
-import Refund from "./modules/subscription/models/Refund";
-import WebhookEvent from "./modules/subscription/models/WebhookEvent";
+import DiscountEvent from "./modules/billing/models/DiscountEvent";
+import Invoice from "./modules/billing/models/Invoice";
+import Subscription from "./modules/billing/models/Subscription";
+import MPSubscription from "./modules/billing/models/MPSubscription";
+import Payment from "./modules/billing/models/Payment";
+import Plan from "./modules/billing/models/Plan";
+import Refund from "./modules/billing/models/Refund";
+import WebhookEvent from "./modules/billing/models/WebhookEvent";
 
 // sync.ts
 async function syncDatabase() {
@@ -71,7 +70,6 @@ async function syncDatabase() {
     await Plan.sync({ force: true });
     await DiscountEvent.sync({ force: true });
     await MPSubscription.sync({ force: true });
-    await MPSubPlan.sync({ force: true });
     await Subscription.sync({ force: true }); 
     await Payment.sync({ force: true });
     await Invoice.sync({ force: true });

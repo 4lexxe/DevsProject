@@ -1,15 +1,12 @@
 import dotenv from "dotenv";
 import sequelize from "../infrastructure/database/db";
-import Category from "../modules/category/Category";
-import CareerType from "../modules/careerType/CareerType";
-import { CourseCategory } from "../modules/course/Course";
-import Course from "../modules/course/Course";
-import Section from "../modules/section/Section";
-import Content from "../modules/content/Content";
+import Category from "../modules/course/models/Category";
+import CareerType from "../modules/course/models/CareerType";
+import { CourseCategory } from "../modules/course/models/Course";
+import Course from "../modules/course/models/Course";
+import Section from "../modules/course/models/Section";
+import Content from "../modules/course/models/Content";
 import HeaderSection from "../modules/headerSection/HeaderSection";
-
-import Plan from "../modules/subscription/models/Plan";
-import DiscountEvent from "../modules/subscription/models/DiscountEvent";
 
 
 // Carga las variables de entorno del archivo .env
@@ -230,6 +227,7 @@ const curso1 = {
   isInDevelopment: false,
   adminId: 1,
   categoryIds: [1, 2],
+  price: 100,
   sections: [
     {
       title: "Introducción al Curso",

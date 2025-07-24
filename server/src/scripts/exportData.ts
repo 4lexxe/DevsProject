@@ -4,13 +4,13 @@ import fs from 'fs';
 import path from 'path';
 import sequelize from '../infrastructure/database/db';
 import User from '../modules/user/User';
-import MPSubPlan from '../modules/subscription/models/MPSubPlan';
-import Payment from '../modules/subscription/models/Payment';
-import Invoice from '../modules/subscription/models/Invoice';
-import Subscription from '../modules/subscription/models/Subscription';
-import MPSubscription from '../modules/subscription/models/MPSubscription';
-import Plan from '../modules/subscription/models/Plan';
-import DiscountEvent from '../modules/subscription/models/DiscountEvent';
+import MPSubPlan from '../modules/billing/models/MPSubPlan';
+import Payment from '../modules/billing/models/Payment';
+import Invoice from '../modules/billing/models/Invoice';
+import Subscription from '../modules/billing/models/Subscription';
+import MPSubscription from '../modules/billing/models/MPSubscription';
+import Plan from '../modules/billing/models/Plan';
+import DiscountEvent from '../modules/billing/models/DiscountEvent';
 import { Op } from 'sequelize';
 
 async function exportData() {

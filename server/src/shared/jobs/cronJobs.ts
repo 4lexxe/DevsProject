@@ -1,13 +1,13 @@
 import cron from "node-cron";
 import { Op } from "sequelize";
-import DiscountEvent from "../../modules/subscription/models/DiscountEvent";
-import Plan from "../../modules/subscription/models/Plan";
-import Subscription from "../../modules/subscription/models/Subscription";
+import DiscountEvent from "../../modules/billing/models/DiscountEvent";
+import Plan from "../../modules/billing/models/Plan";
+import Subscription from "../../modules/billing/models/Subscription";
 import { PreApprovalPlan } from "mercadopago";
 import { PreApproval } from "mercadopago";
 import { MpConfig } from "../../infrastructure/config/mercadopagoConfig";
 import { retryWithExponentialBackoff } from "../utils/retryService";
-import MPSubscription from "../../modules/subscription/models/MPSubscription";
+import MPSubscription from "../../modules/billing/models/MPSubscription";
 
 const preApprovalPlan = new PreApprovalPlan(MpConfig);
 
