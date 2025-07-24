@@ -11,6 +11,7 @@ export async function createSuperUser(
   email: string,
   password: string,
   name: string,
+  surname: string,
   username: string,
   transaction?: Transaction,
 ): Promise<User> {
@@ -50,6 +51,7 @@ export async function createSuperUser(
         email,
         password: hashedPassword,
         name,
+        surname,
         username,
         roleId: superAdminRole.id,
         authProvider: AuthProvider.LOCAL,

@@ -3,7 +3,9 @@ import { UserController } from '../user/userController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
-import { checkRole } from '../../shared/middleware/checkRole';
+import validatorUser from './validators/userValidator';
+import subscriptionDataValidator from './validators/subscriptionDataValidator';
+
 
 const router = Router();
 
@@ -21,10 +23,13 @@ router.get('/users/:id/security',
   UserController.getUserSecurityDetails
 );
 
+//Actualizar datos necesarios del usuario para la suscripción
+router.put('/users/:id/subscription',  subscriptionDataValidator, UserController.updateForSubscription);
+
 router.put('/users/:id', 
   authMiddleware, // Requiere autenticación
-  checkRole(['admin', 'superadmin']),  // Verificar roles (como en adminRoutes.ts)
-  ...UserController.userValidations, 
+  permissionsMiddleware(['manage:users']),  // Verificar permisos
+  validatorUser,
   UserController.updateUser
 );
 

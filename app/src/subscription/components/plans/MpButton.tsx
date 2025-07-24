@@ -1,59 +1,34 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MercadoPago from "@/shared/assets/imgs/mercadopago.png";
 import { useAuth } from "@/user/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { postSubscription } from "../../services/subscriptionService";
-import { div } from "@tensorflow/tfjs";
-import { set } from "react-hook-form";
 
 function MpButton({ plan }: { plan: any }) {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [message, setMessage] = useState("");
 
   const checkout = () => {
-    if (loading || isProcessing) {
-      return;
-    }
+    if (loading || isProcessing) return;
 
     setIsProcessing(true);
 
-    const fetchSubscription = async () => {
-      try {
-        const response = await postSubscription({ planId: plan.id });
-
-        if (!response.data.initPoint) {
-          setIsProcessing(false);
-          return;
-        }
-        window.location.href = response.data.initPoint;
-        return response;
-      } catch (error: any) {
-
-        setMessage(error.response.data.message);
-        console.error("Error al crear la suscripción:", error);
-        setIsProcessing(false);
-      }
-    };
-
     setTimeout(() => {
       if (!user) {
-        navigate("/register", { replace: true });
         setIsProcessing(false);
+        navigate("/register", { replace: true });
         return;
       }
-
-      fetchSubscription();
-
-      setIsProcessing(false);
+      // Redirige al usuario al punto de inicio de MercadoPago
+      navigate(`/subscription/plan/${plan.id}/form/details`, { replace: true });
+      // No es necesario setIsProcessing(false) aquí porque la página se redirige
     }, 2000);
   };
 
   return (
     <div>
-      { message && <div className="text-red-500 text-sm mb-4">{message}</div>}
+      
       <button
         onClick={checkout}
         disabled={loading || isProcessing}
