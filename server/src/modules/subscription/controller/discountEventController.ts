@@ -61,14 +61,6 @@ class DiscountEventController {
         );
       }
 
-      // Verificar si el plan tiene una suscripción en MercadoPago
-      if (!plan.mpSubPlan) {
-        console.log(
-          `El plan ${plan.id} no tiene una suscripción en MercadoPago`
-        );
-        return;
-      }
-
       // Calcular el nuevo precio con descuento
       const originalPrice = plan.installmentPrice ?? 0; // Manejar el caso donde installmentPrice sea undefined
       const discountValue = discountEvent.value; // Porcentaje de descuento
@@ -79,31 +71,6 @@ class DiscountEventController {
         ...plan.toJSON(),
         installmentPrice: newPrice,
       };
-
-      // Actualizar el plan en MercadoPago usando el método existente
-      const mpPlanResponse = await retryWithExponentialBackoff(() =>
-        PlanController.updateMercadoPagoPlan(updatedPlanData, plan.mpSubPlan!.id)
-      );
-
-      // También actualizar el modelo MPSubPlan con la nueva información
-      if (mpPlanResponse) {
-        await MPSubPlan.update(
-          {
-            reason: mpPlanResponse.reason,
-            status: mpPlanResponse.status,
-            initPoint: mpPlanResponse.init_point,
-            autoRecurring: mpPlanResponse.auto_recurring,
-            data: mpPlanResponse, // Actualizar el objeto JSON completo
-          },
-          {
-            where: { id: plan.mpSubPlan.id },
-          }
-        );
-
-        console.log(
-          `MPSubPlan actualizado con ID: ${plan.mpSubPlan.id}, nuevo precio: ${mpPlanResponse.auto_recurring?.transaction_amount}`
-        );
-      }
 
       console.log(
         `Descuento aplicado al plan ${plan.id}, nuevo precio: ${newPrice}`

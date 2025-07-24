@@ -4,7 +4,8 @@ import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 import validatorUser from './validators/userValidator';
-import subscriptionDataValidator from './validators/subscriptionDataValidator';
+import subscriptionDataValidator from './validators/SubscriptionDataValidator';
+import { checkRole } from './../../shared/middleware/checkRole';
 
 
 const router = Router();
