@@ -22,8 +22,6 @@ class Plan extends Model {
 
   public discountEvent?: any; // Evento de descuento asociado al plan, si existe
 
-  public mpSubPlan?: MPSubPlan; // Relacion con el modelo de MPSubPlan
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }

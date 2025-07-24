@@ -204,33 +204,6 @@ class PlanController {
       // Crear el plan en la base de datos
       const plan = await Plan.create(req.body, { transaction });
 
-      // Si es un plan de suscripción, crear también en Mercado Pago
-      if (req.body.saveInMp) {
-        try {
-
-          // Commit the transaction
-          await transaction.commit();
-          isTransactionFinalized = true; // Marcar la transacción como finalizada
-
-          // Respuesta exitosa
-          this.sendSuccessResponse(
-            res,
-            201,
-            "Plan de suscripción creado exitosamente",
-            { plan},
-            req
-          );
-          return;
-        } catch (error) {
-          // Rollback solo si la transacción no ha sido finalizada
-          if (!isTransactionFinalized) {
-            await transaction.rollback();
-            isTransactionFinalized = true; // Marcar la transacción como finalizada
-          }
-          throw error; // Relanzar el error para que sea manejado por el catch externo
-        }
-      }
-
       // Commit the transaction if not a subscription plan
       await transaction.commit();
       isTransactionFinalized = true; // Marcar la transacción como finalizada
