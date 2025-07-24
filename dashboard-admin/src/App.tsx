@@ -37,23 +37,23 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             {/* Rutas protegidas del dashboard */}
-            <Route path="/" element={
+            <Route path="/" /* element={
               <ProtectedRoute requiredRole={['admin', 'superadmin']}>
                 <Layout />
               </ProtectedRoute>
-            }>
+            } */>
               {/* Aquí dentro ya heredan la protección */}
               <Route index element={<DashboardHome />} />
               <Route path="students" element={<StudentsPage />} />
               <Route path="students/:id" element={<StudentProfilePage />} />
               <Route path="students/:id/edit" element={<StudentEditPage />} />
-              <Route path="courses" element={<CoursesPage />} />
-              <Route path="courses/:id" element={<CourseDetailPage />} />
-              <Route path="courses/:id/edit" element={<CourseFormPage />} />
-              <Route path="courses/new" element={<CourseFormPage />} />
-              <Route path="courses/:courseId/section/form" element={<SectionFormPage />} />
-              <Route path="courses/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
-              <Route path="courses/:courseId/section/content/:contentId" element={<ContentPage />} />
+              <Route path="dashboard/courses" element={<CoursesPage />} />
+              <Route path="course/:id" element={<CourseDetailPage />} />
+              <Route path="course/:id/edit" element={<CourseFormPage />} />
+              <Route path="course/new" element={<CourseFormPage />} />
+              <Route path="course/:courseId/section/form" element={<SectionFormPage />} />
+              <Route path="course/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
+              <Route path="course/:courseId/section/content/:contentId" element={<ContentPage />} />
               <Route path="analytics" element={
                 <div className="p-6">
                   <h1 className="text-2xl font-bold">Analíticas</h1>

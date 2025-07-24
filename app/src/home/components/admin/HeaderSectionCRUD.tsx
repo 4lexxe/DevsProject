@@ -9,7 +9,7 @@ import {
 import HeaderSectionForm from './HeaderSectionForm';
 import HeaderSectionList from './HeaderSectionList';
 import HeaderSectionPreview from './HeaderSectionPreview';
-import { useAuth } from '@/auth/contexts/AuthContext';
+import { useAuth } from '@/user/contexts/AuthContext';
 import { Plus, AlertCircle, Loader2 } from 'lucide-react';
 
 const initialFormState: HeaderSection = {
