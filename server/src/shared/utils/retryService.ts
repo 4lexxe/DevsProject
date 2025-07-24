@@ -16,7 +16,7 @@ export async function retryWithExponentialBackoff<T>(
       if (attempt >= maxRetries) {
         throw error;
       }
-      console.log(`Retry attempt ${attempt} failed. Retrying in ${delay}ms...`);
+      console.log(`\nError: ${error} \n Retry attempt ${attempt} failed. Retrying in ${delay}ms...\n`);
       await new Promise(resolve => setTimeout(resolve, delay));
       delay *= 2; // Exponential backoff
     }

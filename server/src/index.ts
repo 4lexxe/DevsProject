@@ -32,7 +32,6 @@ import categoryRoutes from './modules/category/CategoryRoutes';
 import courseRoutes from './modules/course/courseRoutes';
 import sectionRoutes from './modules/section/sectionRoutes';
 import contentRoutes from './modules/content/contentRoutes';
-import invoiceRoutes from './modules/subscription/routes/invoiceRoutes';
 
 // Rutas de Recursos
 import recourseRoutes from './modules/resource/routes/resource.routes';
@@ -48,6 +47,7 @@ import mercadopagoRoutes from './modules/subscription/routes/mercadopagoRoutes'
 import discountEventRoutes from './modules/subscription/routes/discountRoutes'
 import planRoutes from './modules/subscription/routes/planRoutes'
 import subscriptionRoutes from './modules/subscription/routes/subscriptionRoutes'
+import invoiceRoutes from './modules/subscription/routes/invoiceRoutes';
 
 // ==================================================
 // Importaciones de utilidades y configuraciones

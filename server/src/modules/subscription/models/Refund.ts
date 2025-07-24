@@ -4,7 +4,7 @@ import Payment from "./Payment";
 
 class Refund extends Model {
   public id!: bigint;
-  public paymentId!: string;
+  public paymentId!: bigint;
   public refundDate!: Date;
   public amount!: number;
   public reason!: string | null;
@@ -19,7 +19,7 @@ Refund.init(
       primaryKey: true,
     },
     paymentId: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
       references: { model: "Payments", key: "id" },
     },

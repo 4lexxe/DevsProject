@@ -1,28 +1,4 @@
 {
-  "users": [
-    {
-      "name": "asdfa",
-      "email": "mame@gmail.com",
-      "password": "$2b$10$SEXxGmlE9rUAqLosbzRPneGboeYuQ2XT.ys6xEIV.GbS9lDxhsZKW",
-      "phone": null,
-      "roleId": 1,
-      "authProvider": "local",
-      "authProviderId": null,
-      "username": "asdfa",
-      "avatar": null,
-      "displayName": null,
-      "providerMetadata": null,
-      "registrationIp": "127.0.0.1",
-      "registrationGeo": null,
-      "lastLoginIp": "127.0.0.1",
-      "lastLoginGeo": null,
-      "suspiciousActivities": [],
-      "isActiveSession": false,
-      "lastActiveAt": "2025-03-20T15:52:54.638Z",
-      "createdAt": "2025-03-20T14:47:36.352Z",
-      "updatedAt": "2025-03-20T15:52:54.638Z"
-    }
-  ],
   "plans": [
     {
       "name": "Plan Básico",

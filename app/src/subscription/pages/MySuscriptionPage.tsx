@@ -49,7 +49,7 @@ export default function SubscriptionPage() {
     </div>;
   }
 
-  const payments = subscription?.mpSubscription?.payments || [];
+  const payments = subscription?.payments || [];
 
   const handleCancelSubscription = async () => {
     try {

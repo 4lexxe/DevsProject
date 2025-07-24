@@ -2,16 +2,6 @@ import api from "@/shared/api/axios";
 
 const SUBS = "/subscriptions";
 
-export const postSubscription = async (data: any) => {
-  try {
-    const response = await api.post(SUBS, data);
-    return response.data;
-  } catch (error: any) {
-    console.error("Error posting subscription:", error.response?.data || error.message || error);
-    throw error;
-  }
-};
-
 export const getSubscriptionSuccess = async () => {
   try {
     const response = await api.get(`${SUBS}/success`);

@@ -9,7 +9,6 @@ export interface Plan {
   accessLevel: string;
   installments: number;
   installmentPrice: number;
-  initialPoint?: string;
   discountEvent: DiscountEvent;
   mpSubPlan: MPSubPlan;
 }

@@ -4,17 +4,13 @@ import { PreApproval, PreApprovalPlan, Payment, Invoice } from "mercadopago";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
 
 import WebhookEvent from "../models/WebhookEvent";
-import MPSubPlan from "../models/MPSubPlan";
-import PaymentModel from "../models/Payment";
-import Subscription from "../models/Subscription";
 
 import PaymentController from "./paymentController";
 import MPSubscriptionController from "./mpSubscriptionController";
 import InvoiceController from "./invoiceController";
 import SubscriptionController from "./subscriptionController";
 
-import {retryWithExponentialBackoff} from "../../../shared/utils/retryService";
-
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
 class MercadoPagoController {
   // Instancias de las clases de MercadoPago
@@ -51,7 +47,6 @@ class MercadoPagoController {
 
   // Método para manejar webhooks
   static handleWebhook: RequestHandler = async (req, res) => {
-
     try {
       const eventData = req.body; // Obtiene el JSON del cuerpo de la solicitud
       console.log("Webhook recibido:", JSON.stringify(eventData, null, 2));
@@ -126,7 +121,7 @@ class MercadoPagoController {
   // Método para manejar eventos de suscripción
   private static async handleSubscriptionEvent(
     action: string,
-    eventId: string,
+    eventId: string
   ) {
     console.log(
       `Procesando evento de suscripción. Acción: ${action}, ID: ${eventId}`
@@ -137,77 +132,30 @@ class MercadoPagoController {
     }
 
     if (action === "created") {
-      const subscriptionData = await retryWithExponentialBackoff(() => this.preApproval.get({ id: eventId }));
+      const subscriptionData = await retryWithExponentialBackoff(() =>
+        this.preApproval.get({ id: eventId })
+      );
       console.log("Datos de suscripción obtenidos:", subscriptionData?.id);
 
       // También crear una suscripción en nuestro sistema
       try {
-        // Buscar el plan asociado con esta suscripción
-        let planId;
-        if (subscriptionData?.preapproval_plan_id) {
-          // Buscar el plan por el ID del plan de preaprobación
-          const mpSubPlan = await MPSubPlan.findOne({
-            where: { id: subscriptionData.preapproval_plan_id },
-          });
-          if (mpSubPlan) {
-            planId = mpSubPlan.planId;
-          }
-        }
-
-        const paymentp = await PaymentModel.findOne({
-          where: { mpSubscriptionId: subscriptionData.id },
-        });
-
-        if (!planId) {
-          throw new Error(
-            "No se pudo determinar el plan asociado a la suscripción"
+        // Crear la suscripción en MercadoPago DB
+        const mpSubscription =
+          await MPSubscriptionController.createSubscriptionInDB(
+            subscriptionData
           );
-        }
-
-        // Calcular fechas de inicio y fin
-        const startDate = new Date();
-        if (subscriptionData.auto_recurring?.start_date) {
-          startDate.setTime(
-            new Date(subscriptionData.auto_recurring.start_date).getTime()
-          );
-        }
-
-        const endDate = new Date(); 
-        if (subscriptionData.auto_recurring?.end_date) {
-          endDate.setTime(
-            new Date(subscriptionData.auto_recurring.end_date).getTime()
-          );
-        }
-        // Crear la suscripción en nuestro sistema
-        const subscription = await SubscriptionController.updateSubscription(
-          {planId: planId},
-          {
-          planId,
-          startDate,
-          endDate,
-          paymentId: paymentp?.id,
-          status: (subscriptionData.status === "authorized") ? "authorized" : (subscriptionData.status === "cancelled") ? "cancelled" : (subscriptionData.status === "paused") ? "paused" : "pending",  
-        });
-
-        if (subscription) {
-          // Crear la suscripción en MercadoPago DB
-          const mpSubscription =
-            await MPSubscriptionController.createSubscriptionInDB(
-              subscriptionData,
-              subscription?.id
-            );
-        }
 
         console.log(
-          `Suscripción creada en el sistema con ID: ${subscription?.id}`
+          `Suscripción creada en el sistema con ID: ${mpSubscription?.id}`
         );
       } catch (error) {
         console.error("Error al crear la suscripción en el sistema:", error);
         // No lanzamos el error para que no interrumpa el flujo principal
       }
     } else if (action === "updated") {
-      const subscriptionData = await retryWithExponentialBackoff(() => this.preApproval.get({ id: eventId }));
-      console.log("Datos de suscripción actualizados:", subscriptionData?.id);
+      const subscriptionData = await retryWithExponentialBackoff(() =>
+        this.preApproval.get({ id: eventId })
+      ) as any;
 
       // También actualizar en nuestro sistema
       try {
@@ -217,24 +165,17 @@ class MercadoPagoController {
             subscriptionData
           );
 
-        if (mpSubscription?.subscriptionId) {
-          const paymentp = await PaymentModel.findOne({
-            where: { mpSubscriptionId: subscriptionData.id },
-          });
-
-          // Obtener la suscripción actual
-          const currentSubscription = await Subscription.findByPk( mpSubscription.subscriptionId);
+        if (mpSubscription) {
 
           // Actualizar estado de la suscripción en nuestro sistema solo si paymentId es null
           await SubscriptionController.updateSubscription(
-            {id: mpSubscription.subscriptionId},
+              mpSubscription.id,
             {
-              paymentId: currentSubscription?.paymentId ? currentSubscription.paymentId : paymentp?.id,
-              status: (subscriptionData.status === "authorized") ? "authorized" : (subscriptionData.status === "cancelled") ? "cancelled" : (subscriptionData.status === "paused") ? "paused" : "pending",  
+              status: subscriptionData.status
             }
           );
           console.log(
-            `Suscripción actualizada en el sistema con ID: ${mpSubscription.subscriptionId}`
+            `Suscripción actualizada en el sistema con ID: ${mpSubscription?.id}`
           );
         }
       } catch (error) {
@@ -249,7 +190,6 @@ class MercadoPagoController {
     }
   }
 
-
   // Método para manejar eventos de pago
   private static async handlePaymentEvent(action: string, eventId: string) {
     console.log(`Procesando evento de pago. Acción: ${action}, ID: ${eventId}`);
@@ -259,20 +199,23 @@ class MercadoPagoController {
     }
 
     if (action === "payment.created") {
-      const paymentData = await retryWithExponentialBackoff(() => this.payment.get({ id: eventId }));
+      const paymentData = await retryWithExponentialBackoff(() =>
+        this.payment.get({ id: eventId })
+      );
 
       console.log("Datos de pago obtenidos:", paymentData?.id);
 
       await PaymentController.createPaymentInDB(paymentData);
     } else if (action === "payment.updated") {
-      const paymentData = await retryWithExponentialBackoff(() => this.payment.get({ id: eventId }));
+      const paymentData = await retryWithExponentialBackoff(() =>
+        this.payment.get({ id: eventId })
+      );
       console.log("Datos de pago actualizados:", paymentData?.id);
       await PaymentController.updatePaymentInDB(paymentData, eventId);
     } else {
       console.log(`Acción de pago no manejada: ${action}`);
     }
   }
-
 
   // Método para manejar eventos de pago autorizado de suscripción
   private static async handleAuthorizedPaymentEvent(
@@ -288,7 +231,9 @@ class MercadoPagoController {
     }
 
     if (action === "created" || action === "updated") {
-      const invoiceData = await retryWithExponentialBackoff(() => this.invoice.get({ id: eventId }));
+      const invoiceData = await retryWithExponentialBackoff(() =>
+        this.invoice.get({ id: eventId })
+      );
       console.log("Datos de factura obtenidos:", invoiceData?.id);
 
       if (action === "created") {
