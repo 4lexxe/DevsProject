@@ -18,19 +18,14 @@ Invoice.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    mpSubscriptionId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     paymentId: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      references: { model: "Payments", key: "id" }, // Relación con la tabla Subscription
+      references: { model: "Payments", key: "id" },
     },
-    data: {
-      type: DataTypes.JSONB, // Almacena datos JSON (información de MercadoPago)
-      allowNull: false,
-      comment: "Datos de la factura o pago autorizado (MercadoPago)",
+    mpSubscriptionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     issueDate: {
       type: DataTypes.DATE,
@@ -42,6 +37,11 @@ Invoice.init(
       allowNull: true,
       defaultValue: 0, // Valor por defecto para el número de intentos de reintento
       comment: "Reintentos",
+    },
+    data: {
+      type: DataTypes.JSONB, // Almacena datos JSON (información de MercadoPago)
+      allowNull: false,
+      comment: "Datos de la factura o pago autorizado (MercadoPago)",
     },
   },
   {

@@ -1,5 +1,5 @@
 import express from "express";
-import MPSubscriptionController from "../controller/mpSubscriptionController";
+import MPSubscriptionController from "../controller/mpSubscription.controller";
 
 const router = express.Router();
 

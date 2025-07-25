@@ -1,5 +1,5 @@
 import express from 'express';
-import DiscountEventController from '../controller/discountEventController';
+import DiscountEventController from '../controller/discountEvent.controller';
 import { validateDiscount } from '../validators/discountValidate';
 
 const router = express.Router();

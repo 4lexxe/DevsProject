@@ -72,7 +72,7 @@ Course.init(
       allowNull: false,
     },
     price: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2), 
       allowNull: false,
       defaultValue: 10000, // Precio por defecto
     },

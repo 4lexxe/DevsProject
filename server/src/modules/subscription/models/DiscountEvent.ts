@@ -12,7 +12,6 @@ class DiscountEvent extends Model {
   public endDate!: Date;
   public isActive!: boolean;
   public planId!: number;
-  public courseId?: number; // Opcional, si aplica a un curso específico
   public event!: string; // Evento o periodo especial (obligatorio)
 
   // Campos automáticos de Sequelize

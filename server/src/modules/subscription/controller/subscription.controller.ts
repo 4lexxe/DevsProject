@@ -7,7 +7,7 @@ import MPSubscription from "../models/MPSubscription";
 import Invoice from "../models/Invoice";
 import Payment from "../models/Payment";
 import { PreApproval } from "mercadopago";
-import MPSubscriptionController from "./mpSubscriptionController";
+import MPSubscriptionController from "./mpSubscription.controller";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
 import DiscountEvent from "../models/DiscountEvent";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";

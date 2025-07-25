@@ -10,7 +10,6 @@ class Payment extends Model {
   public transactionAmount!: number; // Monto total de la transacción
   public paymentMethodId!: string; // ID del método de pago (ej: "master")
   public paymentTypeId!: string; // Tipo de pago (ej: "credit_card")
-  public preApprovalId!: string; // ID de la pre-aprobación
   public data!: any; // Resto de los datos encapsulados en JSONB
 }
 

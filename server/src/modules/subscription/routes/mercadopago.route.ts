@@ -1,5 +1,5 @@
 import express from 'express';
-import MercadoPagoController from '../controller/mercadopagoController';
+import MercadoPagoController from '../controller/mercadopago.controller';
 
 const router = express.Router();
 

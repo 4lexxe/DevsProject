@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import SubscriptionController from '../controller/subscriptionController';
+import SubscriptionController from '../controller/subscription.controller';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
 
 const router = Router();

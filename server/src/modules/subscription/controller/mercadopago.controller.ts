@@ -5,10 +5,10 @@ import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
 
 import WebhookEvent from "../models/WebhookEvent";
 
-import PaymentController from "./paymentController";
-import MPSubscriptionController from "./mpSubscriptionController";
-import InvoiceController from "./invoiceController";
-import SubscriptionController from "./subscriptionController";
+import PaymentController from "./payment.controller";
+import MPSubscriptionController from "./mpSubscription.controller";
+import InvoiceController from "./invoice.controller";
+import SubscriptionController from "./subscription.controller";
 
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 

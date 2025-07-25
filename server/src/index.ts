@@ -39,11 +39,11 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas para las subscripciones
-import mercadopagoRoutes from './modules/billing/routes/mercadopagoRoutes'
-import discountEventRoutes from './modules/billing/routes/discountRoutes'
-import planRoutes from './modules/billing/routes/planRoutes'
-import subscriptionRoutes from './modules/billing/routes/subscriptionRoutes'
-import invoiceRoutes from './modules/billing/routes/invoiceRoutes';
+import mercadopagoRoutes from './modules/subscription/routes/mercadopago.route'
+import discountEventRoutes from './modules/subscription/routes/discount.route'
+import planRoutes from './modules/subscription/routes/plan.route'
+import subscriptionRoutes from './modules/subscription/routes/subscription.route'
+import invoiceRoutes from './modules/subscription/routes/invoice.route';
 
 // ==================================================
 // Importaciones de utilidades y configuraciones
