@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Upload, X, AlertCircle, Link2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import api from '@/api/axios';
+import api from '@/shared/api/axios';
 
 
 interface InputFileProps {
@@ -237,7 +237,7 @@ const InputFile: React.FC<InputFileProps> = ({
                   handleRemove();
                 }}
               />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
+              <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center">
                 {!disabled && (
                   <button
                     onClick={handleRemove}

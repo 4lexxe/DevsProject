@@ -1,5 +1,5 @@
 import React from 'react';
-import HeaderSectionCRUD from '../../components/admin/HeaderSectionCRUD';
+import HeaderSectionCRUD from '../components/HeaderSectionCRUD';
 import { LayoutGrid, ChevronLeft, Info } from 'lucide-react';
 
 const HeaderSectionAdminPage: React.FC = () => {

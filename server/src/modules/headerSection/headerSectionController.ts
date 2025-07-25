@@ -7,13 +7,14 @@ import { authMiddleware } from '../../shared/middleware/authMiddleware';
 export const createHeaderSection: RequestHandler[] = [
   authMiddleware,
   async (req, res): Promise<void> => {
-    const { image, title, slogan, about, buttonName, buttonLink, adminId } = req.body;
+    const { image, title, slogan, about, buttonName, buttonLink } = req.body;
 
     try {
-      // Verificar que el admin existe
-      const admin = await Admin.findByPk(adminId);
-      if (!admin) {
-        res.status(404).json({ message: 'Admin no encontrado' });
+      // Obtener adminId del usuario autenticado
+      const adminId = (req as any).user?.id;
+      
+      if (!adminId) {
+        res.status(401).json({ message: 'Usuario no autenticado' });
         return;
       }
 
@@ -73,7 +74,7 @@ export const updateHeaderSection: RequestHandler[] = [
   authMiddleware,
   async (req, res): Promise<void> => {
     const { id } = req.params;
-    const { image, title, slogan, about, buttonName, buttonLink, adminId } = req.body;
+    const { image, title, slogan, about, buttonName, buttonLink } = req.body;
 
     try {
       const headerSection = await HeaderSection.findByPk(id);
@@ -82,14 +83,15 @@ export const updateHeaderSection: RequestHandler[] = [
         return;
       }
 
-      // Verificar que el admin existe
-      const admin = await Admin.findByPk(adminId);
-      if (!admin) {
-        res.status(404).json({ message: 'Admin no encontrado' });
+      // Obtener adminId del usuario autenticado
+      const adminId = (req as any).user?.id;
+      
+      if (!adminId) {
+        res.status(401).json({ message: 'Usuario no autenticado' });
         return;
       }
 
-      // Actualizar la sección de encabezado solo si hay cambios
+      // Actualizar la sección de encabezado
       const updatedSection = await headerSection.update({
         image,
         title,

@@ -4,12 +4,12 @@ import {
   createHeaderSection, 
   updateHeaderSection, 
   deleteHeaderSection,
-  HeaderSection
-} from '../../services/headerSectionServices';
+  type HeaderSection
+} from '../services/headerSectionServices';
 import HeaderSectionForm from './HeaderSectionForm';
 import HeaderSectionList from './HeaderSectionList';
 import HeaderSectionPreview from './HeaderSectionPreview';
-import { useAuth } from '@/auth/contexts/AuthContext';
+import { useAuth } from '../../user/contexts';
 import { Plus, AlertCircle, Loader2 } from 'lucide-react';
 
 const initialFormState: HeaderSection = {
@@ -19,7 +19,6 @@ const initialFormState: HeaderSection = {
   about: '',
   buttonName: '',
   buttonLink: '',
-  adminId: 0
 };
 
 const HeaderSectionCRUD: React.FC = () => {
@@ -49,12 +48,6 @@ const HeaderSectionCRUD: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (user && user.id) {
-      initialFormState.adminId = user.id;
-    }
-  }, [user]);
-
-  useEffect(() => {
     fetchHeaderSections();
   }, []);
 
@@ -76,17 +69,19 @@ const HeaderSectionCRUD: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      let nextId = 1;
+      // Verificar que el usuario tenga un ID válido
+      console.log('Usuario:', user);
+      console.log('User ID:', user?.id);
       
-      if (headerSections.length > 0) {
-        nextId = headerSections.length + 2;
+      if (!user?.id) {
+        throw new Error('ID de usuario no disponible');
       }
-      
+
       const sectionWithAdminId = {
         ...headerSection,
-        id: nextId.toString(),
-        adminId: user?.id || 0
       };
+      
+      console.log('Datos que se enviarán:', sectionWithAdminId);
       
       const response = await createHeaderSection(sectionWithAdminId);
       setHeaderSections([...headerSections, response.data]);
@@ -107,9 +102,13 @@ const HeaderSectionCRUD: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
+      // Verificar que el usuario tenga un ID válido
+      if (!user?.id) {
+        throw new Error('ID de usuario no disponible');
+      }
+
       const sectionWithAdminId = {
         ...headerSection,
-        adminId: user?.id || 0
       };
       
       const response = await updateHeaderSection(id, sectionWithAdminId);
@@ -179,21 +178,6 @@ const HeaderSectionCRUD: React.FC = () => {
       resetForm();
     }
   };
-
-  if (!user) {
-    return (
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md shadow-sm">
-          <div className="flex items-center">
-            <AlertCircle className="h-5 w-5 text-yellow-400 mr-3" />
-            <p className="text-yellow-700">
-              Debes iniciar sesión como administrador para gestionar las secciones de encabezado.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">

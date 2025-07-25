@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HeaderSection } from '../../services/headerSectionServices';
+import { type HeaderSection } from '../services/headerSectionServices';
 import { Edit2, Trash2, ChevronDown, ChevronUp, Image as ImageIcon } from 'lucide-react';
 
 interface HeaderSectionListProps {

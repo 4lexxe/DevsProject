@@ -5,7 +5,8 @@ import {
   BookOpen, 
   BarChart3, 
   Settings,
-  GraduationCap
+  GraduationCap,
+  Image
 } from 'lucide-react'
 // Update the import path to the correct relative location
 import { cn } from '../utils/cn'
@@ -14,6 +15,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Users, label: 'Estudiantes', path: '/students' },
   { icon: BookOpen, label: 'Cursos', path: '/courses' },
+  { icon: Image, label: 'Secciones Hero', path: '/header-section' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: Settings, label: 'Configuración', path: '/settings' },
 ]

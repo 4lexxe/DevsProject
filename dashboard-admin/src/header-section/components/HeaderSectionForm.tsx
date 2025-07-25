@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HeaderSection } from '../../services/headerSectionServices';
+import { type HeaderSection } from '../services/headerSectionServices';
 import { AlertCircle, Image, Type, MessageSquare, Link2, Loader2 } from 'lucide-react';
 import InputFile from './InputFile';
 

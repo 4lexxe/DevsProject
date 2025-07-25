@@ -9,7 +9,6 @@ export interface HeaderSection {
   about: string;
   buttonName: string;
   buttonLink: string;
-  adminId: number;
 }
 
 const HEADER_SECTION_ENDPOINT = '/header-sections';
@@ -39,11 +38,17 @@ export const getHeaderSectionById = async (id: string) => {
 // Crear una nueva sección de encabezado
 export const createHeaderSection = async (headerSectionData: HeaderSection) => {
   try {
+    console.log('Datos que se envían al servidor:', headerSectionData);
     // Asegurarse de que se envía el ID si está definido
     const response = await api.post(HEADER_SECTION_ENDPOINT, headerSectionData);
+    console.log('Respuesta del servidor:', response.data);
     return response;
   } catch (error) {
     console.error('Error al crear la sección de encabezado:', error);
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { response?: { data?: unknown } };
+      console.error('Detalles del error del servidor:', axiosError.response?.data);
+    }
     throw error;
   }
 };

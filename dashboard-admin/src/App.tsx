@@ -14,6 +14,7 @@ import ContentPage from './course/pages/ContentPage'
 import LoginPage from './user/pages/LoginPage'
 import StudentProfilePage from './dashboard/pages/StudentProfilePage'
 import StudentEditPage from './dashboard/pages/StudentEditPage'
+import HeaderSectionAdminPage from './header-section/page/HeaderSectionAdminPage'
 import "@/shared/styles/main.css"; // Importa tus estilos globales
 
 
@@ -54,6 +55,7 @@ function App() {
               <Route path="courses/:courseId/section/form" element={<SectionFormPage />} />
               <Route path="courses/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
               <Route path="courses/:courseId/section/content/:contentId" element={<ContentPage />} />
+              <Route path="header-section" element={<HeaderSectionAdminPage />} />
               <Route path="analytics" element={
                 <div className="p-6">
                   <h1 className="text-2xl font-bold">Analíticas</h1>

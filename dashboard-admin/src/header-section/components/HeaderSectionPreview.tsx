@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HeaderSection } from '../../services/headerSectionServices';
+import { type HeaderSection } from '../services/headerSectionServices';
 import { ExternalLink, Maximize2, Minimize2, AlertCircle } from 'lucide-react';
 
 interface HeaderSectionPreviewProps {
