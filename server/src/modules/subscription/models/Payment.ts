@@ -1,9 +1,9 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import MPSubscription from "./MPSubscription";
 
 class Payment extends Model {
-  public id!: string;  
+  public id!: bigint;  
+  public subscriptionId!: bigint; // ID de la suscripción a la que pertenece el pago
   public mpSubscriptionId!: string; // ID de la suscripción a la que pertenece el pago
   public dateApproved!: Date; // Fecha de aprobación del pago
   public status!: string; // Estado del pago (ej: "approved")
@@ -17,10 +17,16 @@ class Payment extends Model {
 Payment.init(
   {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true,
       comment: "ID del pago en MercadoPago",
+    },
+    subscriptionId: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+      references: { model: "Subscriptions", key: "id" },
+      comment: "ID de la suscripción a la que pertenece el pago",
     },
     mpSubscriptionId:{
       type: DataTypes.STRING,
@@ -63,21 +69,8 @@ Payment.init(
     timestamps: true, // Agrega createdAt y updatedAt automáticamente
     paranoid: true,
     comment: "Tabla para almacenar los pagos realizados",
-    hooks: {
-      afterSync: async () => {
-        try {
-          await sequelize.query('ALTER TABLE "Payments" DROP CONSTRAINT IF EXISTS "Payments_mpSubscriptionId_fkey";');
-          console.log('Constraint dropped successfully');
-        } catch (error) {
-          console.error('Error dropping constraint:', error);
-        }
-      }
-    }
   }
 );
 
 export default Payment;
 
-// Relación: Payment pertenece a una Subscription
-Payment.belongsTo(MPSubscription, { foreignKey: "mpSubscriptionId", as: "mpSubscription" });
-MPSubscription.hasMany(Payment, { foreignKey: "mpSubscriptionId", as: "payments" });

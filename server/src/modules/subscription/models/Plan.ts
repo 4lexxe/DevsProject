@@ -19,7 +19,8 @@ class Plan extends Model {
 
   public isActive!: boolean; // Solo podran haber tres planes con este campo en true
   public position!: number; // Indica la posicion en que se mostrara el plan
-  public saveInMp!: boolean; // Indica si se guarda en el plan de subscripcion en la api de mercadopago
+
+  public discountEvent?: any; // Evento de descuento asociado al plan, si existe
 
   public mpSubPlan?: MPSubPlan; // Relacion con el modelo de MPSubPlan
 
@@ -118,11 +119,7 @@ Plan.init(
         msg: "El valor de la posición debe ser único.",
       },
     },
-    saveInMp: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
+
   },
   {
     sequelize,

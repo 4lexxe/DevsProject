@@ -10,3 +10,12 @@ export const getActivePlans = async () => {
   }
 };
 
+export const getPlanById = async (id: string) => {
+  try {
+    const response = await api.get(`/plans/${id}/subscription`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching plan by ID:", error);
+    throw error;
+  }
+};

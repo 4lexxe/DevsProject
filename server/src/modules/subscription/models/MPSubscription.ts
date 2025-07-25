@@ -4,12 +4,12 @@ import Subscription from "./Subscription";
 
 class MPSubscription extends Model {
   public id!: string; // Aca se guarda el id generado en la api de mp
-  public subscriptionId!: bigint; // Aca se guarda el id de la suscripcion en la base de datos
+  public mpSubPlanId?: string; // Aca se guarda el id del plan de la suscripción
   public payerId!: number;
   public status!: string;
   public dateCreated!: Date;
   public nextPaymentDate!: Date;
-  public initPoint!: string;
+  public initPoint!: string; // URL de inicio de pago, opcional
   public data!: any;
 }
 
@@ -23,14 +23,10 @@ MPSubscription.init(
       primaryKey: true,
       comment: "ID único de la suscripción de la api de MP",
     },
-    subscriptionId: {
-      type: DataTypes.BIGINT,
-      allowNull: false,
-      comment: "ID de la suscripción en la base de datos",
-      references: {
-        model: Subscription,
-        key: "id",
-      }
+    mpSubPlanId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "ID del plan de la suscripción en la api de MP",
     },
     payerId: {
       type: DataTypes.BIGINT,
@@ -39,16 +35,21 @@ MPSubscription.init(
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     dateCreated: {
       type: DataTypes.DATE,
-      allowNull: true,
+      allowNull: false,
     },
     nextPaymentDate: {
       type: DataTypes.DATE,
       allowNull: true,
       comment: "Fecha del próximo pago",
+    },
+    initPoint: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      comment: "URL de inicio de pago en MercadoPago",
     },
     data: {
       type: DataTypes.JSONB,
@@ -65,15 +66,5 @@ MPSubscription.init(
   }
 );
 
-MPSubscription.belongsTo(Subscription, {
-  foreignKey: "subscriptionId",
-  as: "subscription",
-});
-
-Subscription.hasOne(MPSubscription, {
-  foreignKey: "subscriptionId",
-  as: "mpSubscription",
-  onDelete: "CASCADE",
-});
 
 export default MPSubscription;

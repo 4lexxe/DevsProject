@@ -53,22 +53,12 @@ class DiscountEventController {
   ): Promise<void> {
     try {
       // Obtener el plan asociado al descuento
-      const plan = await Plan.findByPk(discountEvent.planId, {
-        include: ["mpSubPlan"],
-      });
+      const plan = await Plan.findByPk(discountEvent.planId);
 
       if (!plan) {
         throw new Error(
           `No se encontró el plan asociado con el descuento ID ${discountEvent.id}`
         );
-      }
-
-      // Verificar si el plan tiene una suscripción en MercadoPago
-      if (!plan.mpSubPlan) {
-        console.log(
-          `El plan ${plan.id} no tiene una suscripción en MercadoPago`
-        );
-        return;
       }
 
       // Calcular el nuevo precio con descuento
@@ -81,31 +71,6 @@ class DiscountEventController {
         ...plan.toJSON(),
         installmentPrice: newPrice,
       };
-
-      // Actualizar el plan en MercadoPago usando el método existente
-      const mpPlanResponse = await retryWithExponentialBackoff(() =>
-        PlanController.updateMercadoPagoPlan(updatedPlanData, plan.mpSubPlan!.id)
-      );
-
-      // También actualizar el modelo MPSubPlan con la nueva información
-      if (mpPlanResponse) {
-        await MPSubPlan.update(
-          {
-            reason: mpPlanResponse.reason,
-            status: mpPlanResponse.status,
-            initPoint: mpPlanResponse.init_point,
-            autoRecurring: mpPlanResponse.auto_recurring,
-            data: mpPlanResponse, // Actualizar el objeto JSON completo
-          },
-          {
-            where: { id: plan.mpSubPlan.id },
-          }
-        );
-
-        console.log(
-          `MPSubPlan actualizado con ID: ${plan.mpSubPlan.id}, nuevo precio: ${mpPlanResponse.auto_recurring?.transaction_amount}`
-        );
-      }
 
       console.log(
         `Descuento aplicado al plan ${plan.id}, nuevo precio: ${newPrice}`

@@ -16,10 +16,11 @@ async function initializeSuperUser() {
   const email = process.env.SUPER_USER_EMAIL
   const password = process.env.SUPER_USER_PASSWORD
   const name = process.env.SUPER_USER_NAME
+  const surname = process.env.SUPER_USER_SURNAME  
   const username = process.env.SUPER_USER_USERNAME
 
   // Verifica que todas las variables necesarias estén definidas
-  if (!email || !password || !name || !username) {
+  if (!email || !password || !name || !surname || !username) {
     console.error("Missing required environment variables for super user creation")
     process.exit(1)
   }
@@ -28,7 +29,7 @@ async function initializeSuperUser() {
     // Verifica la conexión a la base de datos
     await sequelize.authenticate()
     // Crea el super usuario con los datos proporcionados
-    const superUser = await createSuperUser(email, password, name, username)
+    const superUser = await createSuperUser(email, password, name,surname, username)
     console.log("Super user created successfully:", superUser.id)
     process.exit(0)
   } catch (error) {

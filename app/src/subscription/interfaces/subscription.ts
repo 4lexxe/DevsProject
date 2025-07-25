@@ -9,7 +9,6 @@ export interface Payment {
 
 export interface MpSubscription {
   nextPaymentDate: string
-  payments: Payment[]
 }
 
 export interface Plan {
@@ -37,6 +36,7 @@ export interface Subscription {
   deletedAt: string | null
   plan: Plan
   mpSubscription: MpSubscription
+  payments: Payment[]
 }
 
 export interface Invoice {
