@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getById } from "../services/courseServices";
-import HeroCourse from "../components/courses/HeroCourse";
-import CourseOverview from "../components/courses/CourseOverview";
-import LearningOutcomes from "../components/courses/LearningOutcomes";
-import Prerequisites from "../components/courses/Prerequisites";
-import SectionList from "../components/courses/SectionList";
-import AddSectionButton from "../components/courses/AddSectionButton";
-import { Course } from "../interfaces/ViewnerCourse";
+
+import { Course } from "@/course/interfaces/ViewnerCourse";
+import HeroCourse from "@/course/components/CourseDetail/HeroCourse";
+import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
+import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
+import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
+import SectionList from "@/course/components/CourseDetail/SectionList";
+import AddSectionButton from "@/course/components/CourseDetail/AddSectionButton";
+
+import { getById } from "@/course/services/courseServices";
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();

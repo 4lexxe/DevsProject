@@ -24,7 +24,7 @@ import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
-import ImagePreview from "@/course/components/forms/previews/ImagePreview";
+import ImagePreview from "@/course/components/CourseForm/ImagePreview";
 
 import { ICourseInput, ICourse } from "@/course/interfaces/CourseForm";
 import { courseSchema } from "@/course/validations/courseSchema";
@@ -180,7 +180,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                 type="text"
                 error={errors["title"]?.message}
                 labelText="Título del Curso"
-                icon={<BookOpen className="w-5 h-5 text-gray-500" />}
               />
 
               <CustomInput
@@ -189,7 +188,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                 type="text"
                 error={errors["image"]?.message}
                 labelText="URL de la imagen"
-                icon={<ImageIcon className="w-5 h-5 text-gray-500" />}
               />
             </div>
 
@@ -216,7 +214,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                   label: category.name,
                 }))}
                 placeholder="Seleccione categorías"
-                icon={<Tags className="w-5 h-5 text-gray-500" />}
               />
 
               <SelectInput
@@ -229,7 +226,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                   value: careerType.id,
                   label: careerType.name,
                 }))}
-                icon={<Briefcase className="w-5 h-5 text-gray-500" />}
               />
             </div>
           </div>
@@ -248,7 +244,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               register={register}
               error={errors["prerequisites"]?.message}
               arrayValue={true}
-              icon={<ListChecks className="w-5 h-5 text-gray-500" />}
             />
 
             <TextAreaInput
@@ -257,7 +252,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               rows={3}
               register={register}
               error={errors["summary"]?.message}
-              icon={<Info className="w-5 h-5 text-gray-500" />}
             />
 
             <TextAreaInput
@@ -266,7 +260,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               register={register}
               error={errors["about"]?.message}
               rows={4}
-              icon={<FileText className="w-5 h-5 text-gray-500" />}
             />
 
             <TextAreaInput
@@ -276,7 +269,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               arrayValue={true}
               error={errors["learningOutcomes"]?.message}
               rows={4}
-              icon={<Target className="w-5 h-5 text-gray-500" />}
             />
           </div>
 
@@ -292,13 +284,11 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                 name="isActive"
                 labelText="Activo"
                 register={register}
-                icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
               />
               <CheckInput
                 name="isInDevelopment"
                 labelText="En desarrollo"
                 register={register}
-                icon={<Target className="w-5 h-5 text-blue-500" />}
               />
             </div>
           </div>

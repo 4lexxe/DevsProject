@@ -16,7 +16,7 @@ import { restrictToParentElement } from "@dnd-kit/modifiers";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import type { IContent } from "@/course/interfaces/Content";
 
-import DraggableItem from "@/course/components/forms/content/DraggableItem";
+import DraggableItem from "@/course/components/SectionForm/DraggableItem";
 import { useSectionContext } from "@/course/context/SectionFormContext";
 import { useState, useEffect } from "react";
 

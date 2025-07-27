@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2, AlertCircle, BookOpen } from "lucide-react";
-import CourseForm from "../components/forms/course/CourseForm";
+import CourseForm from "../components/CourseForm/CourseForm";
 import { getById } from "../services/courseServices";
 
 function CourseFormPage() {

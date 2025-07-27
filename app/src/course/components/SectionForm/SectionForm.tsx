@@ -16,8 +16,8 @@ import {
   Save as SaveIcon,
   Palette,
 } from "lucide-react";
-import { ColorSelector } from "../../colors/ColorSelector";
-import { ColorPicker } from "../../colors/ColorPicker";
+import { ColorSelector } from "./ColorSelector";
+import { ColorPicker } from "./ColorPicker";
 
 export default function SectionForm() {
   const navigate = useNavigate();

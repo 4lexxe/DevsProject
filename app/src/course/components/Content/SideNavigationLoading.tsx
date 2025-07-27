@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import SideNavigation from "../navigation/SideNavigation";
-import { getNavegationById } from "../../../services/courseServices";
+import SideNavigation from "./SideNavigation";
+import { getNavegationById } from "@/course/services/courseServices";
 
 interface Props {
   contentId: string;

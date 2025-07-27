@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getContentBySection } from '../../services/contentServices';
-import ContentViewer from './ContentViewer';
+import ContentViewer from '../CourseDetail/ContentViewer';
 import { Loader2 } from 'lucide-react';
 import { IContentApi } from '@/course/interfaces/Content';
 
@@ -57,7 +57,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
   return (
     <div className="space-y-6">
       {contents.map((content) => (
-        <ContentViewer key={content.id} content={content} />
+        <ContentViewer key={content.id} content={content} courseId={content.courseId} />
       ))}
     </div>
   );

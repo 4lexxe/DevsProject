@@ -1,6 +1,6 @@
 import type { Subscription } from "@/subscription/interfaces/subscription"
 import { formatDate } from "@/subscription/utils/formatDate"
-import StatusBadge from "./StatusBadge"
+import StatusBadge from "../../MySubscription/StatusBadge"
 
 interface SubscriptionInfoProps {
   subscription: Subscription

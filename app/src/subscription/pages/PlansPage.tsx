@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import SubscriptionPlans from '../components/plans/SubscriptionPlans';
+import SubscriptionPlans from '../components/Plans/SubscriptionPlans';
 import { getActivePlans } from '../services/planService';
 
 function PlansPage() {

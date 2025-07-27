@@ -1,7 +1,8 @@
 import React from 'react';
 import { Tag } from 'lucide-react';
 import { Category } from '@/course/interfaces/ViewnerCourse';
-import EditCourseButton from '../../components/courses/EditCourseButton';
+import EditCourseButton from './EditCourseButton';
+import AddToCartButton from './AddToCartButton';
 
 interface HeroCourseProps {
   title: string;
@@ -87,10 +88,21 @@ export default function HeroCourse({
               whitespace-normal 
               break-words 
               max-w-full
+              mb-6
             "
           >
             {description}
           </p>
+
+          {/* Botón agregar al carrito */}
+          {courseId && (
+            <div className="mt-6">
+              <AddToCartButton 
+                courseId={courseId}
+                className="shadow-lg"
+              />
+            </div>
+          )}
         </div>
       </div>
 

@@ -31,6 +31,9 @@ import { Toaster } from 'react-hot-toast';
 import NotFound from "./shared/components/NotFound";
 
 import { PlansPage, SuccessPage, MySuscription, DetailsFormPage } from "./subscription/index";
+import CartPage from "./payment/pages/CartPage";
+import MyPaymentsPage from "./payment/pages/MyPayments";
+import MyCoursesPage from "./payment/pages/MyCourses";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +73,11 @@ function App() {
               <Route path="/subscription/success" element={<SuccessPage />} />
               <Route path="/subscription" element={<MySuscription />} />
               <Route path="/subscription/plan/:id/form/details" element={<DetailsFormPage />} />
+
+              {/* Rutas de pago y carrito */}
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/my-payments" element={<MyPaymentsPage />} />
+              <Route path="/my-courses" element={<MyCoursesPage />} />
 
               {/* Rutas públicas */}
 

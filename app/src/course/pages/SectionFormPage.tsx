@@ -1,12 +1,12 @@
-import SectionList from "../components/forms/section/SectionList";
-import SectionForm from "../components/forms/section/SectionForm";
+import SectionList from "../components/SectionForm/SectionList";
+import SectionForm from "../components/SectionForm/SectionForm";
 
 import {
   SectionProvider,
   useSectionContext,
 } from "../context/SectionFormContext";
 import { QuizProvider, useQuizContext } from "../context/QuizFormContext";
-import QuizForm from "../components/forms/content/QuizForm";
+import QuizForm from "../components/SectionForm/QuizForm";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getSectionById } from "../services/sectionServices";

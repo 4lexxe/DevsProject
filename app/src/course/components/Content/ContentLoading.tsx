@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import TopBar from "../navigation/TopBar";
-import ContentDetail from "../ContentDetail";
-import { getContentById } from "../../../services/contentServices";
+import TopBar from "./TopBar";
+import ContentDetail from "./ContentDetail";
+import { getContentById } from "@/course/services/contentServices";
 
 function ContentLoading({
   contentId,

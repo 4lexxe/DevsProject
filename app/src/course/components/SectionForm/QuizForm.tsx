@@ -6,8 +6,8 @@ import { useSectionContext } from "@/course/context/SectionFormContext";
 import { quizSchema } from "@/course/validations/contentSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import QuizCustomInput from "./inputs/QuizCustomInput";
-import QuizCustomSelect from "./inputs/QuizCustomSelect";
+import QuizCustomInput from "./QuizCustomInput";
+import QuizCustomSelect from "./QuizCustomSelect";
 
 interface FormState {
   quiz: Quiz[];
