@@ -1,4 +1,5 @@
 import axiosInstance from '@/shared/api/axios';
+import { MyCourseDetail } from '@/payment/interfaces/ViewnerCourse';
 
 export interface UserCourse {
   id: number;
@@ -52,7 +53,7 @@ export interface MyCourse {
 }
 
 class CourseService {
-  private baseUrl = '/api/courses';
+  private baseUrl = '/courses';
 
   /**
    * Obtiene los cursos a los que el usuario tiene acceso
@@ -70,9 +71,9 @@ class CourseService {
   /**
    * Obtiene los cursos del usuario con progreso y detalles de acceso
    */
-  async getUserCourses(): Promise<UserCourse[]> {
+  async getUserCourses(userId: string): Promise<UserCourse[]> {
     try {
-      const response = await axiosInstance.get(`${this.baseUrl}/user-courses`);
+      const response = await axiosInstance.get(`/course-access/${userId}/courses`);
       return response.data.data;
     } catch (error) {
       console.error('Error obteniendo cursos del usuario:', error);
@@ -85,7 +86,7 @@ class CourseService {
    */
   async getCourseAccesses(): Promise<CourseAccess[]> {
     try {
-      const response = await axiosInstance.get(`/api/course-access`);
+      const response = await axiosInstance.get(`/course-access`);
       return response.data.data;
     } catch (error) {
       console.error('Error obteniendo accesos a cursos:', error);
@@ -94,14 +95,27 @@ class CourseService {
   }
 
   /**
-   * Obtiene un curso específico
+   * Obtiene un curso específico con detalles completos
    */
-  async getCourseById(courseId: number): Promise<MyCourse> {
+  async getCourseById(courseId: string): Promise<MyCourseDetail> {
     try {
       const response = await axiosInstance.get(`${this.baseUrl}/${courseId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error obteniendo curso:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene las secciones de un curso específico
+   */
+  async getSectionsByCourse(courseId: string): Promise<any> {
+    try {
+      const response = await axiosInstance.get(`/sections/course/${courseId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error('Error al obtener las secciones del curso:', error);
       throw error;
     }
   }

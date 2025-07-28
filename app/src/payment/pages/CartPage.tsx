@@ -1,16 +1,23 @@
 "use client"
 
 import { Link } from "react-router-dom"
-import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag } from "lucide-react"
+import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag, AlertTriangle, X, BookOpen } from "lucide-react"
 import { useEffect, useState } from "react"
 import { cartService } from "../services"
 import type { CartSummary } from "../services/cartService"
+import PendingPaymentModal from "../components/PendingPaymentModal"
 
 export default function CartPage() {
   const [cartData, setCartData] = useState<CartSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [removing, setRemoving] = useState<number | null>(null)
   const [processingPayment, setProcessingPayment] = useState(false)
+  const [showPendingModal, setShowPendingModal] = useState(false)
+  const [cancelingPending, setCancelingPending] = useState(false)
+  const [courseAccessError, setCourseAccessError] = useState<{
+    message: string;
+    coursesWithAccess: Array<{id: number; title: string}>;
+  } | null>(null)
 
   useEffect(() => {
     loadCart()
@@ -53,15 +60,85 @@ export default function CartPage() {
   const proceedToPayment = async () => {
     try {
       setProcessingPayment(true)
+      setCourseAccessError(null) // Limpiar errores previos
       const preference = await cartService.createPaymentPreference()
       // Redirigir a MercadoPago
       window.location.href = preference.initPoint
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating payment preference:', error)
+      
+      // Verificar si es error de carrito pendiente
+      if (error.response?.status === 422) {
+        const errorMessage = error.response?.data?.message;
+        const errorData = error.response?.data?.data;
+        
+        if (errorMessage?.includes('carrito pendiente') || errorMessage?.includes('Ya existe un carrito pendiente')) {
+          setShowPendingModal(true);
+          return;
+        }
+        
+        // Verificar si es error de cursos con acceso previo
+        if (errorMessage?.includes('Ya tienes acceso a los siguientes cursos') && errorData?.coursesWithAccess) {
+          setCourseAccessError({
+            message: errorMessage,
+            coursesWithAccess: errorData.coursesWithAccess
+          });
+          return;
+        }
+      }
     } finally {
       setProcessingPayment(false)
     }
   }
+
+  const handleCancelPendingAndContinue = async () => {
+    try {
+      setCancelingPending(true);
+      
+      // Cancelar el carrito pendiente
+      await cartService.cancelPendingCart();
+      
+      // Cerrar modal
+      setShowPendingModal(false);
+      
+      // Intentar proceder al pago nuevamente
+      await proceedToPayment();
+      
+    } catch (error) {
+      console.error('Error cancelando carrito pendiente:', error);
+      setShowPendingModal(false);
+    } finally {
+      setCancelingPending(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowPendingModal(false);
+  };
+
+  const handleRemoveCoursesWithAccess = async () => {
+    if (!courseAccessError?.coursesWithAccess) return;
+
+    try {
+      // Eliminar cada curso del carrito
+      for (const course of courseAccessError.coursesWithAccess) {
+        await cartService.removeCourseFromCart(course.id);
+      }
+      
+      // Recargar el carrito
+      await loadCart();
+      
+      // Limpiar el error
+      setCourseAccessError(null);
+      
+    } catch (error) {
+      console.error('Error eliminando cursos del carrito:', error);
+    }
+  };
+
+  const handleDismissCourseAccessError = () => {
+    setCourseAccessError(null);
+  };
 
   if (loading) {
     return (
@@ -294,6 +371,68 @@ export default function CartPage() {
             </div>
           </div>
         </div>
+
+        {/* Modal de pago pendiente */}
+        <PendingPaymentModal
+          isOpen={showPendingModal}
+          onClose={handleCloseModal}
+          onContinue={handleCancelPendingAndContinue}
+          loading={cancelingPending}
+        />
+
+        {/* Modal de error de cursos con acceso */}
+        {courseAccessError && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#fef3c7" }}>
+                  <AlertTriangle className="w-6 h-6" style={{ color: "#d97706" }} />
+                </div>
+                <h3 className="text-lg font-semibold" style={{ color: "#0c154c" }}>
+                  Cursos ya adquiridos
+                </h3>
+              </div>
+
+              <p className="text-gray-600 mb-4">
+                Ya tienes acceso a algunos cursos en tu carrito. No puedes comprar cursos que ya posees.
+              </p>
+
+              {/* Lista de cursos con acceso */}
+              <div className="space-y-2 mb-6">
+                {courseAccessError.coursesWithAccess.map((course) => (
+                  <div 
+                    key={course.id}
+                    className="flex items-center gap-3 p-3 rounded-lg border"
+                    style={{ backgroundColor: "#eff6ff", borderColor: "#42d7c7" }}
+                  >
+                    <BookOpen className="w-5 h-5" style={{ color: "#1d4ed8" }} />
+                    <span className="font-medium" style={{ color: "#0c154c" }}>
+                      {course.title}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={handleRemoveCoursesWithAccess}
+                  className="flex-1 inline-flex items-center justify-center rounded-md font-medium transition-colors h-10 px-4 py-2 text-white"
+                  style={{ backgroundColor: "#1d4ed8" }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar del carrito
+                </button>
+                <button
+                  onClick={handleDismissCourseAccessError}
+                  className="inline-flex items-center justify-center rounded-md font-medium transition-colors border border-gray-300 bg-transparent hover:bg-gray-50 h-10 px-4 py-2"
+                  style={{ color: "#6b7280" }}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

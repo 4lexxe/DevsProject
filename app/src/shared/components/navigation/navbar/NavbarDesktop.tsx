@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, User, Settings, LogIn, UserPlus, CreditCard, Search, Bell, BookOpen, Route, FolderOpen } from 'lucide-react';
+import { LogOut, User, Settings, LogIn, UserPlus, CreditCard, Search, Bell, BookOpen, Route, FolderOpen, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/user/contexts/AuthContext';
 import NavLink from '../navbar/NavLink';
@@ -83,6 +83,9 @@ export default function DesktopNavbar() {
             <NavLink href="/recursos" icon={<FolderOpen className="w-4 h-4" />}>
               Recursos
             </NavLink>
+            <NavLink href="/cart" icon={<ShoppingCart className="w-4 h-4" />}>
+              Carrito
+            </NavLink>
           </div>
 
           {/* Right section */}
@@ -152,6 +155,12 @@ function UserMenu({
           </MenuLink>
           <MenuLink href="/subscription" icon={CreditCard}>
             Suscripción
+          </MenuLink>
+          <MenuLink href="/user/orders" icon={ShoppingCart}>
+            Mis ordenes
+          </MenuLink>
+          <MenuLink href="/my-courses" icon={BookOpen}>
+            Mis cursos
           </MenuLink>
           <MenuLink href="/settings" icon={Settings}>
             Configuración

@@ -61,3 +61,41 @@ export interface Section {
   courseId: string;
 }
 
+// Interfaz específica para cursos que el usuario ya posee
+export interface MyCourseDetail {
+  id: number;
+  title: string;
+  image: string;
+  summary: string;
+  categories: Category[];
+  about: string;
+  careerType: CareerType;
+  prerequisites: string[];
+  learningOutcomes: string[];
+  isActive: boolean;
+  isInDevelopment: boolean;
+  adminId: number; 
+  createdAt: string;
+  sections: Section[];
+  // Información específica de acceso del usuario
+  accessGrantedAt?: string;
+  progress?: number;
+  status?: 'active' | 'revoked';
+  // Información de precios (opcional para cursos ya adquiridos)
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    activeDiscount?: {
+      id: number;
+      event: string;
+      description: string;
+      percentage: number;
+      amount: number;
+      startDate: string;
+      endDate: string;
+    };
+    savings: number;
+  };
+}
+

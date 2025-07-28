@@ -22,7 +22,7 @@ export const getCourses = async () => {
 export const getById = async(id: string) => {
   if(id){
     try {
-      const response = await api.get(COURSES_ENDPOINT + `/${id}`);
+      const response = await api.get(COURSES_ENDPOINT + `/${id}/price`);
       return response.data.data;
     } catch (error) {
       console.error('Error al obtener los cursos:', error);

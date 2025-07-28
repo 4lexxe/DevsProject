@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Course } from "@/course/interfaces/ViewnerCourse";
-import HeroCourse from "@/course/components/CourseDetail/HeroCourse";
-import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
-import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
-import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
-import SectionList from "@/course/components/CourseDetail/SectionList";
-import AddSectionButton from "@/course/components/CourseDetail/AddSectionButton";
-import AddToCartButton from '@/course/components/CourseDetail/AddToCartButton';
+import { MyCourseDetail } from "@/payment/interfaces/ViewnerCourse";
+import HeroCourse from "@/payment/components/CourseDetail/HeroCourse";
+import CourseOverview from "@/payment/components/CourseDetail/CourseOverview";
+import LearningOutcomes from "@/payment/components/CourseDetail/LearningOutcomes";
+import Prerequisites from "@/payment/components/CourseDetail/Prerequisites";
+import SectionList from "@/payment/components/CourseDetail/SectionList";
 
-import { getById } from "@/course/services/courseServices";
+import { courseService } from "@/payment/services/courseService";
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [course, setCourse] = useState<Course | null>(null);
+  const [course, setCourse] = useState<MyCourseDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [moduleCount, setModuleCount] = useState<number>(0);
@@ -24,7 +22,7 @@ const CourseDetails: React.FC = () => {
       if (id) {
         try {
           setLoading(true);
-          const course = await getById(id);
+          const course = await courseService.getCourseById(id);
           if (course) {
             setCourse(course);
             const count = course.sections.length;
@@ -65,7 +63,8 @@ const CourseDetails: React.FC = () => {
           image={course.image}
           categories={course.categories}
           courseId={id}
-          pricing={course.pricing}
+          progress={course.progress}
+          status={course.status}
         />
       </div>
 
@@ -82,14 +81,6 @@ const CourseDetails: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
               <LearningOutcomes outcomes={course.learningOutcomes} />
             </div>
-            {id && (
-            <div className="mt-6">
-              <AddToCartButton 
-                courseId={id}
-                className="shadow-lg"
-              />
-            </div>
-          )}
             
           </div>
 
@@ -109,7 +100,6 @@ const CourseDetails: React.FC = () => {
                   Módulos del Curso
                 </h2>
               </div>
-              <AddSectionButton courseId={id || ""} />
             </div>
 
             {/* Sections List */}

@@ -1,7 +1,7 @@
 import React from "react";
 import { IContentApi } from "@/course/interfaces/Content";
 import { Clock, ArrowLeft, BookOpen } from "lucide-react";
-import MarkdownPreview from "./MarkdownPreview";
+import MarkdownPreview from "../SectionForm/MarkdownPreview";
 import { Link } from "react-router-dom";
 
 function ContentDetail({ content, courseId }: { content: IContentApi, courseId: string }) {

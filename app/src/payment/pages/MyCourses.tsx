@@ -1,27 +1,33 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
 import { Play, CheckCircle, Download, Clock, Award, GraduationCap, ArrowLeft } from "lucide-react"
 import { courseService } from "../services"
 import type { UserCourse } from "../services/courseService"
+import { useAuth } from "@/user/contexts/AuthContext";
 
 export default function MyCoursesPage() {
   const [courses, setCourses] = useState<UserCourse[]>([])
-  const [loading, setLoading] = useState(true)
+  const [coursesLoading, setCoursesLoading] = useState(true)
+  const { user, loading: authLoading } = useAuth()
 
   useEffect(() => {
-    loadUserCourses()
-  }, [])
+    if (user) {
+      loadUserCourses()
+    }
+  }, [user])
 
   const loadUserCourses = async () => {
+    if (!user) return
+    
     try {
-      const userCourses = await courseService.getUserCourses()
+      const userCourses = await courseService.getUserCourses(user.id.toString())
       setCourses(userCourses)
     } catch (error) {
       console.error('Error loading user courses:', error)
     } finally {
-      setLoading(false)
+      setCoursesLoading(false)
     }
   }
 
@@ -84,7 +90,23 @@ export default function MyCoursesPage() {
     }
   }
 
-  if (loading) {
+  // Verificaciones condicionales después de todos los hooks
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Verificando autenticación...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (coursesLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -172,9 +194,9 @@ export default function MyCoursesPage() {
                   {/* Header con título y badge */}
                   <div className="mb-4">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-bold text-lg text-gray-900 line-clamp-2">
+                      <Link className="font-bold text-lg text-gray-900 line-clamp-2" to={`/my-course/${course.id}`}>
                         {course.title}
-                      </h3>
+                      </Link>
                       <span 
                         className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ml-2 flex-shrink-0"
                         style={statusBadge.style}
@@ -225,7 +247,7 @@ export default function MyCoursesPage() {
                   {/* Acciones */}
                   <div className="flex gap-2">
                     <Link
-                      to={`/course/${course.id}`}
+                      to={`/my-course/${course.id}`}
                       className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-white font-medium transition-colors"
                       style={{ backgroundColor: "#1d4ed8" }}
                       onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#1e40af"}

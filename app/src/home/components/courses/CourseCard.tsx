@@ -1,6 +1,6 @@
 import type React from "react";
 import { motion } from "framer-motion";
-import { GraduationCap, ArrowRight } from "lucide-react";
+import { GraduationCap, ArrowRight, DollarSign, Percent } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface CourseCardProps {
@@ -10,6 +10,21 @@ interface CourseCardProps {
   courseName: string;
   image: string;
   careerType: string;
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    activeDiscount?: {
+      id: number;
+      event: string;
+      description: string;
+      percentage: number;
+      amount: number;
+      startDate: string;
+      endDate: string;
+    };
+    savings: number;
+  };
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -18,6 +33,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   summary,
   image,
   careerType,
+  pricing,
 }) => {
   const navigate = useNavigate();
 
@@ -45,6 +61,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <GraduationCap className="w-3.5 h-3.5 text-blue-600" />
           {careerType}
         </div>
+
+        {/* Badge de descuento en la esquina superior derecha */}
+        {pricing?.hasDiscount && pricing.activeDiscount && (
+          <div className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-lg">
+            <Percent className="w-3 h-3" />
+            {pricing.activeDiscount.percentage}% OFF
+          </div>
+        )}
       </div>
 
       <div className="p-5 space-y-4">
@@ -55,6 +79,34 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
         {/* Descripción */}
         <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">{summary}</p>
+        
+        {/* Información de precios */}
+        {pricing && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-green-600" />
+              {pricing.hasDiscount ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-green-600">
+                    ${pricing.finalPrice.toFixed(2)}
+                  </span>
+                  <span className="text-sm line-through text-gray-400">
+                    ${pricing.originalPrice.toFixed(2)}
+                  </span>
+                </div>
+              ) : (
+                <span className="text-lg font-bold text-green-600">
+                  ${pricing.finalPrice.toFixed(2)}
+                </span>
+              )}
+            </div>
+            {pricing.hasDiscount && pricing.savings > 0 && (
+              <div className="text-xs text-green-600 font-medium">
+                Ahorras ${pricing.savings.toFixed(2)}
+              </div>
+            )}
+          </div>
+        )}
         
         {/* Botón */}
         <motion.button

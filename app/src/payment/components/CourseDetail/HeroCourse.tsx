@@ -1,7 +1,6 @@
 import React from 'react';
-import { Tag, DollarSign, Percent } from 'lucide-react';
+import { Tag, DollarSign, Percent, CheckCircle, Clock } from 'lucide-react';
 import { Category } from '@/course/interfaces/ViewnerCourse';
-import EditCourseButton from './EditCourseButton';
 
 interface HeroCourseProps {
   title: string;
@@ -24,6 +23,10 @@ interface HeroCourseProps {
     };
     savings: number;
   };
+  // Propiedades específicas para cursos ya adquiridos
+  accessGrantedAt?: string;
+  progress?: number;
+  status?: 'active' | 'revoked';
 }
 
 export default function HeroCourse({
@@ -33,6 +36,9 @@ export default function HeroCourse({
   categories,
   courseId,
   pricing,
+  accessGrantedAt,
+  progress,
+  status,
 }: HeroCourseProps) {
   return (
     <div className="relative min-h-[400px]">
@@ -109,7 +115,50 @@ export default function HeroCourse({
             {description}
           </p>
 
-          {/* Información de precios */}
+          {/* Información del curso adquirido */}
+          {(status || accessGrantedAt || progress !== undefined) && (
+            <div className="mb-6">
+              <div className="flex items-center gap-4 mb-3">
+                {/* Estado del curso */}
+                {status && (
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className={`w-5 h-5 ${status === 'active' ? 'text-green-400' : 'text-red-400'}`} />
+                    <span className={`text-sm font-medium ${status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
+                      {status === 'active' ? 'Acceso Activo' : 'Acceso Revocado'}
+                    </span>
+                  </div>
+                )}
+
+                {/* Fecha de acceso */}
+                {accessGrantedAt && (
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-blue-400" />
+                    <span className="text-sm text-gray-300">
+                      Acceso desde: {new Date(accessGrantedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Progreso del curso */}
+              {progress !== undefined && (
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-300">Progreso del curso</span>
+                    <span className="text-sm text-green-400 font-medium">{progress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div 
+                      className="bg-green-400 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(progress, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Información de precios (si está disponible) */}
           {pricing && (
             <div className="mb-6">
               <div className="flex items-center gap-4 mb-3">
@@ -144,7 +193,7 @@ export default function HeroCourse({
                   </span>
                   {pricing.savings > 0 && (
                     <span className="text-sm text-green-400 font-medium">
-                      Ahorras ${pricing.savings.toFixed(2)}
+                      Ahorrado: ${pricing.savings.toFixed(2)}
                     </span>
                   )}
                 </div>
@@ -154,13 +203,6 @@ export default function HeroCourse({
           
         </div>
       </div>
-
-      {/* Botón "Editar curso" en la esquina superior derecha */}
-      {courseId && (
-        <div className="absolute top-4 right-4">
-          <EditCourseButton courseId={courseId} />
-        </div>
-      )}
     </div>
   );
 }

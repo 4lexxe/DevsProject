@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler, useFieldArray } from "react-hook-form";
 import { type IContentInput, linkTypes } from "@/course/interfaces/Content";
 
-import MarkdownPreview from "../previews/MarkdownPreview";
+import MarkdownPreview from "./MarkdownPreview";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
