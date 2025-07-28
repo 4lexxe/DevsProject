@@ -2,7 +2,7 @@ import React from "react";
 import { CreditCard, Check, AlertCircle, Tag, Sparkles } from "lucide-react";
 import { Plan, DiscountEvent } from "../../interfaces/plan";
 
-import MpButton from "./MpButton";
+
 
 interface SubscriptionCardProps {
   plan: Plan;
@@ -256,7 +256,9 @@ const SubscriptionPlanCard: React.FC<SubscriptionCardProps> = ({ plan }) => {
 
       {/* CTA Button */}
       <div className="px-6 pb-8 mt-auto">
-        <MpButton plan={plan} />
+        <div>
+          Proximamente !!!
+        </div>
         <p
           className={`text-xs mt-2 text-center ${
             plan.accessLevel === "Premium" ? "text-gray-300" : "text-gray-600"
