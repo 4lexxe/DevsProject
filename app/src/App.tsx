@@ -73,6 +73,7 @@ function App() {
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />
               
+              
               <Route path="/plans" element={<PlansPage />} />
               <Route path="/subscription/success" element={<SuccessPage />} />
               <Route path="/subscription" element={<MySuscription />} />
@@ -100,6 +101,7 @@ function App() {
               <Route element={<ProtectedRouteAdmin allowedRoles={['superadmin', 'privileged']} />}>
                 <Route path="/editor-roadmap" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
               </Route>
+
 
               <Route path="/editor-roadmap/:id" element={<ReactFlowProvider><RoadmapEditor /></ReactFlowProvider>} />
               <Route path="/sobre-nosotros" element={<AboutUs />} />

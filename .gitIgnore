@@ -43,3 +43,6 @@ Thumbs.db    # Windows
 
 # Ignorar los errores de instalación de npm
 npm-debug.log
+
+# Ignorar archivos de configuración de Kiro
+/kiro

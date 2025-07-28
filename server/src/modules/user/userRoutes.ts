@@ -5,6 +5,10 @@ import { geoMiddleware } from '../../shared/middleware/geo.middleware';
 import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 import validatorUser from './validators/userValidator';
 import subscriptionDataValidator from './validators/SubscriptionDataValidator';
+<<<<<<< HEAD
+=======
+import { checkRole } from './../../shared/middleware/checkRole';
+>>>>>>> feature/dashboard
 
 
 const router = Router();
@@ -43,14 +47,22 @@ router.put('/users/:id',
   authMiddleware, // Requiere autenticación
   permissionsMiddleware(['manage:users']),  // Verificar permisos
   validatorUser,
+<<<<<<< HEAD
   authMiddleware,
   permissionsMiddleware(['write:users', 'manage:all_users']),
+=======
+>>>>>>> feature/dashboard
   UserController.updateUser
 );
 
 router.delete('/users/:id', 
+<<<<<<< HEAD
   authMiddleware,
   permissionsMiddleware(['delete:users']),
+=======
+  authMiddleware, // Requiere autenticación
+  checkRole(['admin', 'superadmin']),  // Verificar roles (como en adminRoutes.ts)
+>>>>>>> feature/dashboard
   UserController.deleteUser
 );
 

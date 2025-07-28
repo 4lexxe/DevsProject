@@ -86,7 +86,11 @@ const PORT = /* process.env.PORT || */ 3000;
 app.set('trust proxy', true);
 app.use(helmet()); // Seguridad de cabeceras HTTP
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: [
+    process.env.CLIENT_URL || 'http://localhost:5173',           // App principal de usuarios
+    process.env.ADMIN_CLIENT_URL || 'http://localhost:5174',     // App de dashboard admin
+    'http://localhost:3000'  // Para desarrollo local adicional
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For']

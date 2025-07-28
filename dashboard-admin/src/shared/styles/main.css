@@ -1,0 +1,89 @@
+/* Importar fuentes de Google de manera asíncrona */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+
+/* Tailwind CSS v4 */
+@import "tailwindcss";
+
+/* Configuración de Tailwind v4 */
+@theme {
+  --font-family-sans: 'Rubik', sans-serif;
+}
+
+/* Overlay de grano para el Hero */
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.10;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Animaciones para el Hero */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-section {
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.grain-overlay {
+  animation: grainEffect 1s ease-in-out;
+}
+
+@keyframes grainEffect {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+/* Estructura de carga */
+.loading-text {
+  @apply text-white text-xl font-medium;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.loading-dot {
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+    opacity: 0.3;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Utilidades personalizadas */
+@layer utilities {
+  .resize-none {
+    resize: none;
+  }
+}

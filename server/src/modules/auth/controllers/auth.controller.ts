@@ -5,6 +5,7 @@
 import { Request, Response, NextFunction } from "express";
 import { RegisterController } from "./register.controller";
 import { LoginController } from "./login.controller";
+import { RootLoginController } from "./rootLogin.controller";
 import { DiscordController } from "./discord.controller";
 import { GitHubController } from "./github.controller";
 import { VerifyController } from "./verify.controller";
@@ -20,6 +21,7 @@ export class AuthController {
   // Auth methods
   static register = RegisterController.handle;
   static login = LoginController.handle;
+  static rootLogin = RootLoginController.handle;
   static verifyAuth = VerifyController.handle;
 
   // OAuth methods
