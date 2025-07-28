@@ -14,3 +14,4 @@ if (!MP_BACK_URL) {
 export const MpConfig = new MercadoPagoConfig({
   accessToken: MP_ACCESS_TOKEN, // Reemplaza con tu Access Token
 });
+

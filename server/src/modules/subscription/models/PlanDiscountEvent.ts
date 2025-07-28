@@ -87,7 +87,7 @@ DiscountEvent.init(
   },
   {
     sequelize,
-    tableName: 'DiscountEvents',
+    tableName: 'PlanDiscountEvents',
     timestamps: true,
     paranoid: true, // Habilita el borrado lógico (soft delete)
     hooks: {

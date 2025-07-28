@@ -74,7 +74,7 @@ Course.init(
     price: {
       type: DataTypes.DECIMAL(10, 2), 
       allowNull: false,
-      defaultValue: 10000, // Precio por defecto
+      defaultValue: 100, // Precio por defecto
     },
   },
   {

@@ -5,8 +5,8 @@ import path from 'path';
 import sequelize from '../infrastructure/database/db';
 import User from '../modules/user/User';
 import Plan from '../modules/subscription/models/Plan';
-import DiscountEvent from '../modules/subscription/models/DiscountEvent';
-import Payment from '../modules/subscription/models/Payment';
+import DiscountEvent from '../modules/subscription/models/PlanDiscountEvent';
+import Payment from '../modules/subscription/models/SubscriptionPayment';
 import Invoice from '../modules/subscription/models/Invoice';
 import Subscription from '../modules/subscription/models/Subscription';
 import MPSubscription from '../modules/subscription/models/MPSubscription';
@@ -36,26 +36,6 @@ async function importData() {
       // Insertar los eventos de descuento
       if (data.discountEvents && data.discountEvents.length > 0) {
         await DiscountEvent.bulkCreate(data.discountEvents, { transaction });
-      }
-      
-      // Insertar Subscriptions
-      if (data.subscriptions && data.subscriptions.length > 0) {
-        await Subscription.bulkCreate(data.subscriptions, { transaction });
-      }
-
-      // Insertar MPSubscriptions
-      if (data.mpSubscriptions && data.mpSubscriptions.length > 0) {
-        await MPSubscription.bulkCreate(data.mpSubscriptions, { transaction });
-      }
-
-      // Insertar Payments
-      if (data.payments && data.payments.length > 0) {
-        await Payment.bulkCreate(data.payments, { transaction });
-      }
-
-      // Insertar Invoices
-      if (data.invoices && data.invoices.length > 0) {
-        await Invoice.bulkCreate(data.invoices, { transaction });
       }
     });
 

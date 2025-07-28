@@ -5,11 +5,11 @@ import Plan from "../models/Plan";
 import User from "../../user/User";
 import MPSubscription from "../models/MPSubscription";
 import Invoice from "../models/Invoice";
-import Payment from "../models/Payment";
+import SubscriptionPayment from "../models/SubscriptionPayment";
 import { PreApproval } from "mercadopago";
 import MPSubscriptionController from "./mpSubscription.controller";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
-import DiscountEvent from "../models/DiscountEvent";
+import DiscountEvent from "../models/PlanDiscountEvent";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
 interface SubscriptionData {
@@ -244,7 +244,7 @@ class SubscriptionController {
             attributes: ["nextPaymentDate"],
           },
           {
-            model: Payment,
+            model: SubscriptionPayment,
             as: "payments",
             attributes: [
               "id",

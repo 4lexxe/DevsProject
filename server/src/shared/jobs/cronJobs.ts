@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { Op } from "sequelize";
-import DiscountEvent from "../../modules/subscription/models/DiscountEvent";
+import DiscountEvent from "../../modules/subscription/models/PlanDiscountEvent";
 import Plan from "../../modules/subscription/models/Plan";
 import Subscription from "../../modules/subscription/models/Subscription";
 import { PreApprovalPlan } from "mercadopago";

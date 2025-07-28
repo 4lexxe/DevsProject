@@ -6,7 +6,7 @@ import {
 } from "../../../infrastructure/config/mercadopagoConfig";
 import sequelize from "../../../infrastructure/database/db"; // Import sequelize instance
 import Plan from "../models/Plan"; // Importa el modelo Plan
-import DiscountEvent from "../models/DiscountEvent";
+import DiscountEvent from "../models/PlanDiscountEvent";
 import { PreApprovalPlan } from "mercadopago";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 

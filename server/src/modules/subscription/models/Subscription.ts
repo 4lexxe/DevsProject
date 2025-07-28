@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 import Plan from "./Plan";
 import User from "../../user/User";
-import Payment from "./Payment";
+import SubscriptionPayment from "./SubscriptionPayment";
 import MPSubscription from "./MPSubscription";
 
 class Subscription extends Model {
@@ -112,8 +112,8 @@ User.hasMany(Subscription, { foreignKey: "userId", as: "subscriptions" });
 Subscription.belongsTo(Plan, { foreignKey: "planId", as: "plan" });
 Plan.hasMany(Subscription, { foreignKey: "planId", as: "subscriptions" });
 
-Subscription.hasMany(Payment, { foreignKey: "subscriptionId", as: "payments" });
-Payment.belongsTo(Subscription, { foreignKey: "subscriptionId", as: "subscription" });
+Subscription.hasMany(SubscriptionPayment, { foreignKey: "subscriptionId", as: "payments" });
+SubscriptionPayment.belongsTo(Subscription, { foreignKey: "subscriptionId", as: "subscription" });
 
 Subscription.belongsTo(MPSubscription, {
   foreignKey: "mpSubscriptionId",

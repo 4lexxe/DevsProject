@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 
-class Payment extends Model {
+class SubscriptionPayment extends Model {
   public id!: bigint;  
   public subscriptionId!: bigint; // ID de la suscripción a la que pertenece el pago
   public mpSubscriptionId!: string; // ID de la suscripción a la que pertenece el pago
@@ -13,7 +13,7 @@ class Payment extends Model {
   public data!: any; // Resto de los datos encapsulados en JSONB
 }
 
-Payment.init(
+SubscriptionPayment.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -64,12 +64,12 @@ Payment.init(
   },
   {
     sequelize,
-    tableName: "Payments",
+    tableName: "SubscriptionPayments",
     timestamps: true, // Agrega createdAt y updatedAt automáticamente
     paranoid: true,
     comment: "Tabla para almacenar los pagos realizados",
   }
 );
 
-export default Payment;
+export default SubscriptionPayment;
 

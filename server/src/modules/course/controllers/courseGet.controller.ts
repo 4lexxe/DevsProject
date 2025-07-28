@@ -4,6 +4,10 @@ import Category from "../models/Category";
 import CareerType from "../models/CareerType";
 import Section from "../models/Section";
 import Content from "../models/Content";
+import CourseDiscountEvent from "../../purchase/models/CourseDiscountEvent";
+import { Op } from "sequelize";
+// Importar asociaciones para asegurar que están cargadas
+import "../../purchase/models/Associations";
 
 // Función para generar metadata
 const metadata = (req: Request, res: Response) => {
@@ -55,14 +59,61 @@ export default class CourseGetController{
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          {
+            model: CourseDiscountEvent,
+            as: "discountEvents",
+            where: {
+              isActive: true,
+              startDate: { [Op.lte]: new Date() },
+              endDate: { [Op.gte]: new Date() },
+            },
+            required: false, // LEFT JOIN para incluir cursos sin descuentos
+            order: [["value", "DESC"]], // Obtener el mayor descuento
+          },
         ],
         order: [["id", "ASC"]],
       });
+
+      // Procesar precios y descuentos para cada curso
+      const coursesWithPricing = courses.map(course => {
+        const courseData = course.toJSON() as any;
+        const originalPrice = parseFloat(courseData.price.toString());
+        let finalPrice = originalPrice;
+        let activeDiscount = null;
+
+        if (courseData.discountEvents && courseData.discountEvents.length > 0) {
+          // Tomar el primer descuento (el mayor por el ORDER BY)
+          const discount = courseData.discountEvents[0];
+          const discountAmount = (originalPrice * discount.value) / 100;
+          finalPrice = originalPrice - discountAmount;
+          activeDiscount = {
+            id: discount.id,
+            event: discount.event,
+            description: discount.description,
+            percentage: discount.value,
+            amount: discountAmount,
+            startDate: discount.startDate,
+            endDate: discount.endDate,
+          };
+        }
+
+        return {
+          ...courseData,
+          pricing: {
+            originalPrice,
+            finalPrice,
+            hasDiscount: !!activeDiscount,
+            activeDiscount,
+            savings: originalPrice - finalPrice,
+          },
+        };
+      });
+
       res.status(200).json({
         ...metadata(req, res),
         message: "Cursos activos obtenidos correctamente",
-        length: courses.length,
-        data: courses,
+        length: coursesWithPricing.length,
+        data: coursesWithPricing,
       });
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener los cursos activos");
@@ -134,10 +185,86 @@ export default class CourseGetController{
         });
         return;
       }
+
       res.status(200).json({
         ...metadata(req, res),
         message: "Curso obtenido correctamente",
         data: course,
+      });
+    } catch (error) {
+      handleServerError(res, req, error, "Error al obtener el curso");
+    }
+  };
+
+  // Obtener un curso por ID
+  static getByIdWithPrices: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = await Course.findByPk(id, {
+        include: [
+          { model: Category, as: "categories" },
+          { model: CareerType, as: "careerType" },
+          { model: Section, as: "sections" },
+          {
+            model: CourseDiscountEvent,
+            as: "discountEvents",
+            where: {
+              isActive: true,
+              startDate: { [Op.lte]: new Date() },
+              endDate: { [Op.gte]: new Date() },
+            },
+            required: false, // LEFT JOIN para incluir cursos sin descuentos
+            order: [["value", "DESC"]], // Obtener el mayor descuento
+          },
+        ],
+      });
+      if (!course) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "Curso no encontrado",
+        });
+        return;
+      }
+
+      // Calcular precio con descuento si existe
+      const courseData = course.toJSON() as any;
+      const originalPrice = parseFloat(courseData.price.toString());
+      let finalPrice = originalPrice;
+      let activeDiscount = null;
+
+      if (courseData.discountEvents && courseData.discountEvents.length > 0) {
+        // Tomar el primer descuento (el mayor por el ORDER BY)
+        const discount = courseData.discountEvents[0];
+        const discountAmount = (originalPrice * discount.value) / 100;
+        finalPrice = originalPrice - discountAmount;
+        activeDiscount = {
+          id: discount.id,
+          event: discount.event,
+          description: discount.description,
+          percentage: discount.value,
+          amount: discountAmount,
+          startDate: discount.startDate,
+          endDate: discount.endDate,
+        };
+      }
+
+      // Agregar información de precios al objeto de respuesta
+      const responseData = {
+        ...courseData,
+        pricing: {
+          originalPrice,
+          finalPrice,
+          hasDiscount: !!activeDiscount,
+          activeDiscount,
+          savings: originalPrice - finalPrice,
+        },
+      };
+
+      res.status(200).json({
+        ...metadata(req, res),
+        message: "Curso obtenido correctamente",
+        data: responseData,
       });
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener el curso");

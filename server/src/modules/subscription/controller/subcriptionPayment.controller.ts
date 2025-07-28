@@ -1,13 +1,15 @@
 import { Request, Response, RequestHandler } from "express";
 import axios from "axios"; // Para hacer solicitudes HTTP
-import Payment from "../models/Payment"; // Asegúrate de importar el modelo Payment
+import SubscriptionPayment from "../models/SubscriptionPayment"; // Asegúrate de importar el modelo Payment
 import Subscription from "../models/Subscription"; // Importa el modelo Subscription si es necesario
 import User from "../../user/User"; // Importa el modelo User si es necesario
 import { PaymentResponse } from "mercadopago/dist/clients/payment/commonTypes";
 import Plan from "../models/Plan";
 import MPSubscription from "../models/MPSubscription";
+import CourseAccess from "../../purchase/models/CourseAccess";
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 
-class PaymentController {
+class SubscriptionPaymentController {
   // Función para generar metadata
   static metadata(req: Request, res: Response) {
     return {
@@ -37,7 +39,7 @@ class PaymentController {
   // Métodos existentes (getAll, getById, getByPaymentId)
   static getAll: RequestHandler = async (req, res) => {
     try {
-      const payments = await Payment.findAll({
+      const payments = await SubscriptionPayment.findAll({
         include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
 
@@ -55,7 +57,7 @@ class PaymentController {
     const { id } = req.params;
 
     try {
-      const payment = await Payment.findByPk(id, {
+      const payment = await SubscriptionPayment.findByPk(id, {
         include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
 
@@ -82,7 +84,7 @@ class PaymentController {
     const { paymentId } = req.params;
 
     try {
-      const payment = await Payment.findOne({
+      const payment = await SubscriptionPayment.findOne({
         where: { id: paymentId },
         include: [{ model: Subscription, as: "subscription" }], // Incluye la suscripción asociada
       });
@@ -107,8 +109,10 @@ class PaymentController {
   };
 
   // Método para crear un pago en la base de datos
-  static async createPaymentInDB(paymentData: any) {
+  public static async createPaymentInDB(paymentData: any) {
     try {
+
+      // En esta parte puede haber problemas si el usuario tiene varias susbcripciones <-----------------------------------------------------------------------------------------------
       const subscription = await Subscription.findOne({
         where: { payerId: paymentData.payer.id },
       });
@@ -117,7 +121,7 @@ class PaymentController {
         throw new Error("No se encontró la suscripción asociada al pago");
       }
 
-      const payment = await Payment.create({
+      const payment = await SubscriptionPayment.create({
         id: BigInt(paymentData.id),
         subscriptionId: subscription.id,
         dateApproved: paymentData.date_approved,
@@ -145,7 +149,7 @@ class PaymentController {
   static async updatePaymentInDB(paymentData: any, paymentId: string) {
     try {
       // Buscar el pago existente
-      const payment = await Payment.findOne({
+      const payment = await SubscriptionPayment.findOne({
         where: { id: paymentId },
       });
 
@@ -178,4 +182,4 @@ class PaymentController {
   }
 }
 
-export default PaymentController;
+export default SubscriptionPaymentController;

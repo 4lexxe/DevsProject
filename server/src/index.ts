@@ -39,12 +39,15 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas para las subscripciones
-import mercadopagoRoutes from './modules/subscription/routes/mercadopago.route'
 import discountEventRoutes from './modules/subscription/routes/discount.route'
 import planRoutes from './modules/subscription/routes/plan.route'
 import subscriptionRoutes from './modules/subscription/routes/subscription.route'
 import invoiceRoutes from './modules/subscription/routes/invoice.route';
 
+// Rutas para compras
+import purchaseRoutes from './modules/purchase/routes';
+
+import webhookRoute from './modules/webhook/webhook.route';
 // ==================================================
 // Importaciones de utilidades y configuraciones
 // ==================================================
@@ -212,10 +215,13 @@ app.use((req, res, next) => {
 
 // Rutas para las suscripciones
 app.use('/api', invoiceRoutes);
-app.use('/api', mercadopagoRoutes);
+app.use('/api', webhookRoute);
 app.use('/api', discountEventRoutes);
 app.use('/api', planRoutes);
 app.use('/api', subscriptionRoutes);
+
+// Rutas para compras
+app.use('/api', purchaseRoutes);
 
 // --------------------------
 // 7.1 Rutas de Autenticación

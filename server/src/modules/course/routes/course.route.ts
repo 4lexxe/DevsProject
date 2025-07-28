@@ -32,6 +32,9 @@ router.get('/courses/admin/:id', CourseGetController.getByAdminId)
 // Ruta para obtener un curso por ID (público)
 router.get('/courses/:id', CourseGetController.getById);
 
+// Ruta para obtener un curso por ID (público)
+router.get('/courses/:id/price', CourseGetController.getByIdWithPrices);
+
 // Ruta para obtener un curso por ID y la navegacion entre sus secciones y contenidos de cada una
 router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
 

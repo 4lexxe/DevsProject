@@ -1,6 +1,6 @@
 import { Request, Response, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import DiscountEvent from "../models/DiscountEvent"; // Importa el modelo DiscountEvent
+import DiscountEvent from "../models/PlanDiscountEvent"; // Importa el modelo DiscountEvent
 import PlanController from "./plan.controller";
 import Plan from "../models/Plan";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";

@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import Payment from "./Payment";
+import SubscriptionPayment from "./SubscriptionPayment";
 
 class Invoice extends Model {
   public id!: bigint;
@@ -21,7 +21,7 @@ Invoice.init(
     paymentId: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      references: { model: "Payments", key: "id" },
+      references: { model: "SubscriptionPayments", key: "id" },
     },
     mpSubscriptionId: {
       type: DataTypes.STRING,
@@ -52,7 +52,7 @@ Invoice.init(
   }
 );
 
-Invoice.belongsTo(Payment, { foreignKey: "paymentId", as: "payment" });
-Payment.hasOne(Invoice, { foreignKey: "paymentId", as: "invoice" });
+Invoice.belongsTo(SubscriptionPayment, { foreignKey: "paymentId", as: "payment" });
+SubscriptionPayment.hasOne(Invoice, { foreignKey: "paymentId", as: "invoice" });
 
 export default Invoice;

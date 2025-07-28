@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
-import sequelize from "../../../infrastructure/database/db";
+import sequelize from "../../infrastructure/database/db";
 
-class WebhookEvent extends Model {
+class MPWebhookEvent extends Model {
   public id!: number;
   public action!: string | null;
   public type!: string | null;
@@ -9,7 +9,7 @@ class WebhookEvent extends Model {
   public payload!: object; // Campo JSONB para guardar todo el payload
 }
 
-WebhookEvent.init(
+MPWebhookEvent.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -40,7 +40,7 @@ WebhookEvent.init(
   },
   {
     sequelize,
-    tableName: "WebhookEvents",
+    tableName: "MPWebhookEvents",
     timestamps: true,
     paranoid: true, // Habilita el borrado lógico (soft delete)
     comment:
@@ -48,4 +48,4 @@ WebhookEvent.init(
   }
 );
 
-export default WebhookEvent;
+export default MPWebhookEvent;
