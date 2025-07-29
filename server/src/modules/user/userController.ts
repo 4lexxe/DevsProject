@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../user/User';
 import Role from '../role/Role';
+import Permission from '../role/Permission';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
@@ -58,11 +59,26 @@ export class UserController {
         include: [{
           model: Role,
           as: 'Role', // Usa el alias definido en la relación
-          attributes: ['id', 'name', 'description']
+          attributes: ['id', 'name', 'description'],
+          include: [{
+            model: Permission,
+            through: { attributes: [] }, // Excluir datos de la tabla intermedia
+            attributes: ['id', 'name', 'description']
+          }]
         }] 
       });
       
-      res.json(users);
+      // Transformar los datos para incluir permisos en el formato esperado
+      const usersData = users.map(user => {
+        const userData = user.toJSON();
+        if (userData.Role && userData.Role.Permissions) {
+          userData.Role.permissions = userData.Role.Permissions.map((permission: any) => permission.name);
+          delete userData.Role.Permissions; // Eliminar la propiedad original
+        }
+        return userData;
+      });
+      
+      res.json(usersData);
     } catch (error) {
       console.error('Error fetching users:', error);
       res.status(500).json({ error: 'Error al obtener usuarios' });
@@ -87,14 +103,27 @@ export class UserController {
         include: [{
           model: Role,
           as: 'Role', // Usa el alias definido en la relación
-          attributes: ['id', 'name', 'description']
+          attributes: ['id', 'name', 'description'],
+          include: [{
+            model: Permission,
+            through: { attributes: [] }, // Excluir datos de la tabla intermedia
+            attributes: ['id', 'name', 'description']
+          }]
         }]
       });
       if (!user) {
         res.status(404).json({ error: 'Usuario no encontrado' });
         return;
       }
-      res.json(user);
+
+      // Transformar los datos para incluir permisos en el formato esperado
+      const userData = user.toJSON();
+      if (userData.Role && userData.Role.Permissions) {
+        userData.Role.permissions = userData.Role.Permissions.map((permission: any) => permission.name);
+        delete userData.Role.Permissions; // Eliminar la propiedad original
+      }
+
+      res.json(userData);
     } catch (error) {
       console.error('Error fetching user by ID:', error);
       res.status(500).json({ error: 'Error al obtener usuario' });

@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   ArrowLeft,
   Save,
   User,
   Mail,
-  Shield
+  Shield,
+  X,
+  Plus
 } from 'lucide-react'
 import { getUserById, updateUser, getRoles } from '@/user/services/userService'
+import { RoleService, type Permission, type Role as RoleType } from '@/user/services/role.service'
 import type { User as UserType } from '@/user/services/auth.service'
 import toast from 'react-hot-toast'
 
@@ -19,12 +23,14 @@ interface UserFormData {
   displayName: string
   roleId: number
   isActiveSession: boolean
+  customPermissions?: number[] // Permisos personalizados del usuario
 }
 
 interface Role {
   id: number
   name: string
   description: string
+  Permissions?: Permission[]
 }
 
 const StudentEditPage = () => {
@@ -38,8 +44,13 @@ const StudentEditPage = () => {
     username: '',
     displayName: '',
     roleId: 1,
-    isActiveSession: false
+    isActiveSession: false,
+    customPermissions: []
   })
+
+  const [rolePermissions, setRolePermissions] = useState<Permission[]>([])
+  const [hoveredPermission, setHoveredPermission] = useState<number | null>(null)
+  const [showAddDropdown, setShowAddDropdown] = useState(false)
 
   // Queries
   const { data: user, isLoading: userLoading } = useQuery({
@@ -52,6 +63,24 @@ const StudentEditPage = () => {
     queryKey: ['roles'],
     queryFn: getRoles
   })
+
+  const { data: rolesWithPermissions = [] } = useQuery({
+    queryKey: ['roles-with-permissions'],
+    queryFn: RoleService.getRolesWithPermissions
+  })
+
+  // Obtener todos los permisos únicos disponibles en el sistema
+  const allAvailablePermissions = useMemo(() => {
+    const permissionsMap = new Map<number, Permission>()
+    rolesWithPermissions.forEach((role: RoleType) => {
+      if (role.Permissions) {
+        role.Permissions.forEach(permission => {
+          permissionsMap.set(permission.id, permission)
+        })
+      }
+    })
+    return Array.from(permissionsMap.values())
+  }, [rolesWithPermissions])
 
   // Update mutation
   const updateMutation = useMutation({
@@ -77,17 +106,73 @@ const StudentEditPage = () => {
         username: user.username || '',
         displayName: user.displayName || '',
         roleId: user.roleId || 1,
-        isActiveSession: user.isActiveSession || false
+        isActiveSession: user.isActiveSession || false,
+        customPermissions: [] // Por ahora vacío hasta implementar permisos
       })
     }
   }, [user])
 
+  // Memoize the current role to prevent infinite loops
+  const currentRole = useMemo(() => {
+    if (formData.roleId && rolesWithPermissions.length > 0) {
+      return rolesWithPermissions.find((r: RoleType) => r.id === formData.roleId) || null
+    }
+    return null
+  }, [formData.roleId, rolesWithPermissions])
+
+  // Effect to update role permissions when role changes
+  useEffect(() => {
+    if (currentRole) {
+      setRolePermissions(currentRole.Permissions || [])
+      // Ya no necesitamos setAvailablePermissions porque usaremos solo los permisos del rol
+    }
+  }, [currentRole])
+
+  // Funciones para manejar permisos
+  const toggleCustomPermission = (permissionId: number) => {
+    setFormData(prev => {
+      const currentCustom = prev.customPermissions || []
+      if (currentCustom.includes(permissionId)) {
+        // Remover permiso personalizado
+        return {
+          ...prev,
+          customPermissions: currentCustom.filter(id => id !== permissionId)
+        }
+      } else {
+        // Agregar permiso personalizado
+        return {
+          ...prev,
+          customPermissions: [...currentCustom, permissionId]
+        }
+      }
+    })
+  }
+
+  // Permisos disponibles para agregar (que no están en el rol actual)
+  const availableToAdd = useMemo(() => {
+    return allAvailablePermissions.filter(permission => 
+      !rolePermissions.some(p => p.id === permission.id) && 
+      !(formData.customPermissions || []).includes(permission.id)
+    )
+  }, [allAvailablePermissions, rolePermissions, formData.customPermissions])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
-    }))
+    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        [name]: newValue
+      }
+      
+      // Si cambia el rol, resetear permisos personalizados
+      if (name === 'roleId') {
+        updated.customPermissions = []
+      }
+      
+      return updated
+    })
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -267,7 +352,7 @@ const StudentEditPage = () => {
                 >
                   {roles.map((role: Role) => (
                     <option key={role.id} value={role.id}>
-                      {role.description || role.name}
+                      {role.name}
                     </option>
                   ))}
                 </select>
@@ -328,6 +413,162 @@ const StudentEditPage = () => {
                   />
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Gestión de Permisos */}
+          <div className="border-t pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Gestión de Permisos</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Los permisos del rol se aplican automáticamente. Puedes agregar permisos adicionales específicos para este usuario.
+            </p>
+
+            <div>
+              <h4 className="text-md font-medium text-gray-700 mb-2">
+                Permisos del usuario:
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {/* Permisos del rol */}
+                {rolePermissions.map((permission) => (
+                  <span
+                    key={`role-${permission.id}`}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200"
+                  >
+                    <Shield className="h-3 w-3 mr-1" />
+                    {permission.name}
+                  </span>
+                ))}
+                
+                {/* Permisos personalizados */}
+                <AnimatePresence>
+                  {(formData.customPermissions || []).map((permissionId) => {
+                    const permission = allAvailablePermissions.find(p => p.id === permissionId)
+                    const isHovered = hoveredPermission === permission?.id
+                    return permission ? (
+                      <motion.span
+                        key={`custom-${permission.id}`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        whileHover={{ 
+                          scale: 1.05,
+                          backgroundColor: '#fecaca',
+                          color: '#991b1b',
+                          borderColor: '#fca5a5'
+                        }}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer border"
+                        style={{
+                          backgroundColor: '#dcfce7',
+                          color: '#166534',
+                          borderColor: '#bbf7d0'
+                        }}
+                        onClick={() => toggleCustomPermission(permission.id)}
+                        onHoverStart={() => setHoveredPermission(permission.id)}
+                        onHoverEnd={() => setHoveredPermission(null)}
+                        title="Click para remover este permiso adicional"
+                      >
+                        <motion.div
+                          animate={{ rotate: isHovered ? 45 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {isHovered ? (
+                            <X className="h-3 w-3 mr-1" />
+                          ) : (
+                            <Plus className="h-3 w-3 mr-1" />
+                          )}
+                        </motion.div>
+                        <span style={{ userSelect: 'none' }}>{permission.name}</span>
+                      </motion.span>
+                    ) : null
+                  })}
+                </AnimatePresence>
+                
+                {/* Botón para agregar más permisos */}
+                {availableToAdd.length > 0 && (
+                  <div className="relative">
+                    <motion.span 
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-600 border border-gray-300 cursor-pointer"
+                      whileHover={{ 
+                        backgroundColor: '#dbeafe', 
+                        color: '#1d4ed8',
+                        borderColor: '#93c5fd',
+                        scale: 1.02
+                      }}
+                      transition={{ duration: 0.2 }}
+                      onHoverStart={() => setShowAddDropdown(true)}
+                      onHoverEnd={() => {
+                        // Delay para permitir hover en el dropdown
+                        setTimeout(() => {
+                          if (!showAddDropdown) return
+                          setShowAddDropdown(false)
+                        }, 100)
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" />
+                      <span style={{ userSelect: 'none' }}>Agregar permiso</span>
+                    </motion.span>
+                    
+                    {/* Dropdown de permisos disponibles */}
+                    <AnimatePresence>
+                      {showAddDropdown && (
+                        <motion.div 
+                          className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-56"
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          onHoverStart={() => setShowAddDropdown(true)}
+                          onHoverEnd={() => setShowAddDropdown(false)}
+                        >
+                          <div className="p-2 max-h-48 overflow-y-auto">
+                            {availableToAdd.map((permission) => (
+                              <motion.button
+                                key={`add-${permission.id}`}
+                                type="button"
+                                onClick={() => {
+                                  toggleCustomPermission(permission.id)
+                                  setShowAddDropdown(false)
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm rounded transition-colors duration-150"
+                                whileHover={{ 
+                                  backgroundColor: '#eff6ff',
+                                  color: '#1d4ed8'
+                                }}
+                                whileTap={{ scale: 0.98 }}
+                              >
+                                <div className="font-medium flex items-center">
+                                  <Plus className="h-3 w-3 mr-2 text-green-600" />
+                                  <span style={{ userSelect: 'none' }}>{permission.name}</span>
+                                </div>
+                                {permission.description && (
+                                  <div className="text-xs text-gray-500 mt-1 ml-5" style={{ userSelect: 'none' }}>{permission.description}</div>
+                                )}
+                              </motion.button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+                
+                {rolePermissions.length === 0 && (formData.customPermissions || []).length === 0 && (
+                  <span className="text-gray-500 text-sm italic">No hay permisos asignados</span>
+                )}
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-3">
+                <span className="inline-flex items-center mr-6">
+                  <Shield className="h-3 w-3 mr-1 text-blue-600" />
+                  <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded text-xs mr-1">Rol</span>
+                  Permisos heredados del rol
+                </span>
+                <span className="inline-flex items-center">
+                  <Plus className="h-3 w-3 mr-1 text-green-600" />
+                  <span className="px-1.5 py-0.5 bg-green-100 text-green-800 rounded text-xs mr-1">Adicional</span>
+                  Permisos personalizados (hover para remover)
+                </span>
+              </p>
             </div>
           </div>
 

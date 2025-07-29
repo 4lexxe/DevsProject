@@ -5,15 +5,15 @@ import { AuthProvider } from './user/contexts'
 import ProtectedRoute from './user/contexts/ProtectedRoute'
 import Layout from './dashboard/layout/Layout'
 import DashboardHome from './dashboard/pages/DashboardHome'
-import StudentsPage from './dashboard/pages/StudentsPage'
-import CoursesPage from './dashboard/pages/CoursesPage'
+import SectionFormPage from './course/pages/SectionFormPage'
+import StudentsPage from './user/pages/StudentsPage'
+import StudentEditPage from './user/pages/StudentEditPage'
+import StudentProfilePage from './user/pages/StudentProfilePage'
+import LoginPage from './user/pages/LoginPage'
+import CoursesPage from './course/pages/CoursesPage'
 import CourseDetailPage from './course/pages/courseDetail'
 import CourseFormPage from './course/pages/CourseFormPage'
-import SectionFormPage from './course/pages/SectionFormPage'
 import ContentPage from './course/pages/ContentPage'
-import LoginPage from './user/pages/LoginPage'
-import StudentProfilePage from './dashboard/pages/StudentProfilePage'
-import StudentEditPage from './dashboard/pages/StudentEditPage'
 import HeaderSectionAdminPage from './header-section/page/HeaderSectionAdminPage'
 import "@/shared/styles/main.css"; // Importa tus estilos globales
 
@@ -38,23 +38,23 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             {/* Rutas protegidas del dashboard */}
-            <Route path="/" /* element={
+            <Route path="/"  element={
               <ProtectedRoute requiredRole={['admin', 'superadmin']}>
                 <Layout />
               </ProtectedRoute>
-            } */>
+            } >
               {/* Aquí dentro ya heredan la protección */}
               <Route index element={<DashboardHome />} />
               <Route path="students" element={<StudentsPage />} />
               <Route path="students/:id" element={<StudentProfilePage />} />
               <Route path="students/:id/edit" element={<StudentEditPage />} />
-              <Route path="dashboard/courses" element={<CoursesPage />} />
-              <Route path="course/:id" element={<CourseDetailPage />} />
-              <Route path="course/:id/edit" element={<CourseFormPage />} />
-              <Route path="course/new" element={<CourseFormPage />} />
-              <Route path="course/:courseId/section/form" element={<SectionFormPage />} />
-              <Route path="course/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
-              <Route path="course/:courseId/section/content/:contentId" element={<ContentPage />} />
+              <Route path="courses" element={<CoursesPage />} />
+              <Route path="courses/:id" element={<CourseDetailPage />} />
+              <Route path="courses/:id/edit" element={<CourseFormPage />} />
+              <Route path="courses/new" element={<CourseFormPage />} />
+              <Route path="courses/:courseId/section/form" element={<SectionFormPage />} />
+              <Route path="courses/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
+              <Route path="courses/:courseId/section/content/:contentId" element={<ContentPage />} />
               <Route path="header-section" element={<HeaderSectionAdminPage />} />
               
               <Route path="analytics" element={
