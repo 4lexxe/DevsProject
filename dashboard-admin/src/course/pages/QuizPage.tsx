@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { getQuizById } from "@/course/services";
+import { getQuizById } from "../services/contentServices";
 import { useParams } from "react-router-dom";
 
-import { PaginationQuiz as QuizComponent } from "@/course/components";
+import QuizComponent from "../components/Quiz/PaginationQuiz";
 
 function QuizPage() {
   const { contentId } = useParams<{ contentId: string }>();

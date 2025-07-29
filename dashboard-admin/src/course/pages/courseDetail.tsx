@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getById } from "../services/courseServices";
-import {
-  HeroCourse,
-  CourseOverview,
-  LearningOutcomes,
-  Prerequisites,
-  SectionList,
-  AddSectionButton
-} from "@/course/components";
-import type { Course } from "@/course/interfaces";
+
+import { Course } from "@/course/interfaces/ViewnerCourse";
+import HeroCourse from "@/course/components/CourseDetail/HeroCourse";
+import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
+import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
+import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
+import SectionList from "@/course/components/CourseDetail/SectionList";
+import AddSectionButton from "@/course/components/CourseDetail/AddSectionButton";
+import AddToCartButton from '@/course/components/CourseDetail/AddToCartButton';
+
+import { getById } from "@/course/services/courseServices";
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -64,6 +65,7 @@ const CourseDetails: React.FC = () => {
           image={course.image}
           categories={course.categories}
           courseId={id}
+          pricing={course.pricing}
         />
       </div>
 
@@ -80,6 +82,15 @@ const CourseDetails: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
               <LearningOutcomes outcomes={course.learningOutcomes} />
             </div>
+            {id && (
+            <div className="mt-6">
+              <AddToCartButton 
+                courseId={id}
+                className="shadow-lg"
+              />
+            </div>
+          )}
+            
           </div>
 
           {/* Main content */}

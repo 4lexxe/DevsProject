@@ -1,4 +1,4 @@
-import type { IContent, IContentInput } from "./Content";
+import { IContent, IContentInput } from "./Content";
 
 // Curso ----------------------------------------------------------------------------------------------------------------------------
 export interface ICourseInput {

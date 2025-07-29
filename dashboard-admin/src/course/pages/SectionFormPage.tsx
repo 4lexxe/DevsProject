@@ -1,16 +1,18 @@
-import { SectionFormList, SectionForm, QuizForm } from "@/course/components";
+import SectionList from "../components/SectionForm/SectionList";
+import SectionForm from "../components/SectionForm/SectionForm";
 
 import {
   SectionProvider,
   useSectionContext,
-  QuizProvider,
-  useQuizContext
-} from "@/course/context";
+} from "../context/SectionFormContext";
+import { QuizProvider, useQuizContext } from "../context/QuizFormContext";
+import QuizForm from "../components/SectionForm/QuizForm";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getSectionById } from "@/course/services/sectionServices";
+import { getSectionById } from "../services/sectionServices";
 
-import type { ISection, IContent } from "@/course/interfaces";
+import { ISection } from "../interfaces/CourseForm";
+import { IContent } from "../interfaces/Content";
 
 function SectionManager() {
   const { courseId, sectionId } = useParams<string>();
@@ -89,9 +91,9 @@ function SectionManager() {
               <SectionForm />
             ) : courseId ? (
               sectionId ? (
-                <SectionFormList courseId={courseId} sectionId={sectionId} />
+                <SectionList courseId={courseId} sectionId={sectionId} />
               ) : (
-                <SectionFormList courseId={courseId} />
+                <SectionList courseId={courseId} />
               )
             ) : (
               <p>Cargando...</p>

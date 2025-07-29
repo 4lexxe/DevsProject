@@ -1,4 +1,4 @@
-import type { IContentApi } from "./Content";
+import { IContentApi } from "./Content";
 
 export interface Category{
   id: string;
@@ -29,6 +29,22 @@ export interface Course {
   isInDevelopment: boolean;
   adminId: number; 
   createdAt: string;
+  price?: number;
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    activeDiscount?: {
+      id: number;
+      event: string;
+      description: string;
+      percentage: number;
+      amount: number;
+      startDate: string;
+      endDate: string;
+    };
+    savings: number;
+  };
 }
 
 export interface Section {

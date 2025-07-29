@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import type {
+import {
   ISection,
   ISectionInput,
   ISectionState,
 } from "../interfaces/CourseForm";
-import type { IContent, IContentInput } from "../interfaces/Content";
+import { IContent, IContentInput } from "../interfaces/Content";
 
 interface SectionContextType {
   state: ISectionState;

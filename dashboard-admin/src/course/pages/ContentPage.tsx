@@ -1,7 +1,8 @@
 import type React from "react";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { SideNavigationLoading, ContentLoading } from "@/course/components";
+import SideNavigationLoading from "../components/Content/SideNavigationLoading";
+import ContentLoading from "../components/Content/ContentLoading";
 
 const ContentPage: React.FC = () => {
   const { contentId } = useParams<{ contentId: string }>();

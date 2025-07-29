@@ -277,21 +277,21 @@ const CoursesPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        to={`/courses/${course.id}`}
+                        to={`/course/${course.id}`}
                         className="text-blue-600 hover:text-blue-900 p-1"
                         title="Ver curso"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
                       <Link
-                        to={`/courses/${course.id}/edit`}
+                        to={`/course/${course.id}/edit`}
                         className="text-green-600 hover:text-green-900 p-1"
                         title="Editar curso"
                       >
                         <Edit2 className="h-4 w-4" />
                       </Link>
                       <button
-                        onClick={() => handleDelete(course.id.toString(), course.title)}
+                       onClick={() => handleDelete(course.id.toString(), course.title)}
                         className="text-red-600 hover:text-red-900 p-1"
                         title="Eliminar curso"
                         disabled={deleteMutation.isPending}
@@ -319,7 +319,7 @@ const CoursesPage = () => {
             {!searchTerm && filterStatus === 'all' && (
               <div className="mt-6">
                 <Link
-                  to="/courses/new"
+                  to="/course/new"
                   className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                 >
                   <Plus className="h-4 w-4 mr-2" />
