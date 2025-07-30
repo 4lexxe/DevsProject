@@ -501,21 +501,32 @@ class CartController extends BaseController {
         throw new Error(`El curso ${course.title} tiene un precio inválido`);
       }
 
-      // Buscar descuentos activos para el curso
-      const activeDiscount = await CourseDiscountEvent.findOne({
-        where: {
-          courseId: course.id,
-          isActive: true,
-          startDate: { [Op.lte]: new Date() },
-          endDate: { [Op.gte]: new Date() },
-        },
-        order: [["value", "DESC"]], // Obtener el mayor descuento
+      // Buscar descuentos activos para el curso usando la relación muchos a muchos
+      const courseWithDiscounts = await Course.findByPk(course.id, {
+        include: [
+          {
+            model: CourseDiscountEvent,
+            as: "discountEvents",
+            where: {
+              isActive: true,
+              startDate: { [Op.lte]: new Date() },
+              endDate: { [Op.gte]: new Date() },
+            },
+            required: false, // LEFT JOIN para incluir cursos sin descuentos
+          },
+        ],
       });
 
       let finalPrice = originalPrice;
       let discountApplied = null;
 
-      if (activeDiscount) {
+      // Si el curso tiene descuentos activos, aplicar el mayor
+      const courseData = courseWithDiscounts as any;
+      if (courseData?.discountEvents && courseData.discountEvents.length > 0) {
+        // Ordenar por valor descendente y tomar el mayor descuento
+        const activeDiscounts = courseData.discountEvents.sort((a: any, b: any) => b.value - a.value);
+        const activeDiscount = activeDiscounts[0];
+        
         const discountAmount = (originalPrice * activeDiscount.value) / 100;
         finalPrice = originalPrice - discountAmount;
         discountApplied = {

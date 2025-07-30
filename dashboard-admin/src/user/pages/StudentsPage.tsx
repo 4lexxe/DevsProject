@@ -24,7 +24,7 @@ import {
 import type { User } from '@/user/services/auth.service'
 import { Link } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useDebounce } from '../hooks/useDebounce'
+import { useDebounce } from '../../dashboard/hooks/useDebounce'
 
 interface Role {
   id: number

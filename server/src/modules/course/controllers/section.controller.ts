@@ -5,44 +5,9 @@ import Course from "../models/Course";
 import Content from "../models/Content";
 import User from "../../user/User";
 import { Sequelize, Op } from "sequelize";
-import { validationResult } from "express-validator";
+import { BaseController } from "./BaseController";
 
-// Función para generar metadata
-const metadata = (req: Request, res: Response) => {
-  return {
-    statusCode: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-    method: req.method,
-  };
-};
-
-// Función para manejar errores de validación
-const handleValidationErrors = (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json({
-      ...metadata(req, res),
-      status: "error",
-      message: "Errores de validación",
-      errors: errors.array(),
-    });
-    return false;
-  }
-  return true;
-};
-
-// Función para manejar errores internos del servidor
-const handleServerError = (res: Response, req: Request, error: any, message: string) => {
-  console.error(message, error);
-  res.status(500).json({
-    ...metadata(req, res),
-    status: "error",
-    message,
-    error: error.message,
-  });
-};
-
-export default class SectionController {
+export default class SectionController extends BaseController {
   // Crear una nueva sección
   static create: RequestHandler = async (req, res) => {
     try {
@@ -52,22 +17,14 @@ export default class SectionController {
       // Verificar que el curso existe
       const course = await Course.findByPk(courseId);
       if (!course) {
-        res.status(400).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        SectionController.sendError(res, req, "Curso no encontrado", 400);
         return;
       }
 
       // Verificar permisos adicionales para crear contenido del curso
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para crear secciones de curso",
-        });
+        SectionController.forbidden(res, req, "No tienes permisos para crear secciones de curso");
         return;
       }
 
@@ -80,20 +37,15 @@ export default class SectionController {
         colorGradient,
       });
 
-      res.status(201).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Sección creada correctamente",
-        data: newSection,
-      });
+      SectionController.created(res, req, newSection, "Sección creada correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al crear la sección");
+      SectionController.handleServerError(res, req, error, "Error al crear la sección");
     }
   };
 
   // Crear una sección y sus contenidos
   static createSectionAndContents: RequestHandler = async (req, res) => {
-    if (!handleValidationErrors(req, res)) return;
+    if (!SectionController.handleValidationErrors(req, res)) return;
 
     const transaction = await sequelize.transaction();
     try {
@@ -134,20 +86,16 @@ export default class SectionController {
       }
 
       await transaction.commit();
-      res.status(201).json({
-        ...metadata(req, res),
-        message: "Sección y contenidos creados exitosamente",
-        data: newSection,
-      });
+      SectionController.created(res, req, newSection, "Sección y contenidos creados exitosamente");
     } catch (error) {
       await transaction.rollback();
-      handleServerError(res, req, error, "Error al crear la sección y contenidos");
+      SectionController.handleServerError(res, req, error, "Error al crear la sección y contenidos");
     }
   };
 
   // Actualizar una sección y sus contenidos
   static updateSectionAndContents: RequestHandler = async (req, res) => {
-    if (!handleValidationErrors(req, res)) return;
+    if (!SectionController.handleValidationErrors(req, res)) return;
 
     const transaction = await sequelize.transaction();
     try {
@@ -157,11 +105,7 @@ export default class SectionController {
       const existingSection = await Section.findByPk(id, { transaction });
       if (!existingSection) {
         await transaction.rollback();
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "La sección no existe",
-        });
+        SectionController.notFound(res, req, "Sección");
         return;
       }
 
@@ -229,15 +173,10 @@ export default class SectionController {
       await Promise.all(contentUpdates);
       await transaction.commit();
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Sección y contenidos actualizados exitosamente",
-        data: existingSection,
-      });
+      SectionController.updated(res, req, existingSection, "Sección y contenidos actualizados exitosamente");
     } catch (error) {
       await transaction.rollback();
-      handleServerError(res, req, error, "Error al actualizar la sección y contenidos");
+      SectionController.handleServerError(res, req, error, "Error al actualizar la sección y contenidos");
     }
   };
 
@@ -251,21 +190,13 @@ export default class SectionController {
       // Verificar permisos adicionales
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para actualizar secciones de curso",
-        });
+        SectionController.forbidden(res, req, "No tienes permisos para actualizar secciones de curso");
         return;
       }
 
       const section = await Section.findByPk(id);
       if (!section) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Sección no encontrada",
-        });
+        SectionController.notFound(res, req, "Sección");
         return;
       }
 
@@ -278,14 +209,9 @@ export default class SectionController {
         colorGradient,
       });
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Sección actualizada correctamente",
-        data: section,
-      });
+      SectionController.updated(res, req, section, "Sección actualizada correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al actualizar la sección");
+      SectionController.handleServerError(res, req, error, "Error al actualizar la sección");
     }
   };
 
@@ -298,33 +224,20 @@ export default class SectionController {
       // Verificar que el usuario tenga permisos para eliminar contenido
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('delete:content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para eliminar secciones",
-        });
-        return;
+        SectionController.forbidden(res, req, "No tienes permisos para eliminar secciones");
       }
 
       const section = await Section.findByPk(id);
       if (!section) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Sección no encontrada",
-        });
+        SectionController.notFound(res, req, "Sección");
         return;
       }
 
       await section.destroy();
       
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Sección eliminada correctamente",
-      });
+      SectionController.deleted(res, req, "Sección eliminada correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al eliminar la sección");
+      SectionController.handleServerError(res, req, error, "Error al eliminar la sección");
     }
   };
 }

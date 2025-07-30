@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../user/User';
 import Role from '../role/Role';
+import Permission from '../role/Permission';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 
@@ -144,17 +145,27 @@ export class UserController {
         },
         include: [{
           model: Role,
-          as: 'Role',
-          attributes: ['id', 'name', 'description']
+          as: 'Role', // Usa el alias definido en la relación
+          attributes: ['id', 'name', 'description'],
+          include: [{
+            model: Permission,
+            through: { attributes: [] }, // Excluir datos de la tabla intermedia
+            attributes: ['id', 'name', 'description']
+          }]
         }] 
       });
       
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Usuarios obtenidos correctamente",
-        data: users
+      // Transformar los datos para incluir permisos en el formato esperado
+      const usersData = users.map(user => {
+        const userData = user.toJSON();
+        if (userData.Role && userData.Role.Permissions) {
+          userData.Role.permissions = userData.Role.Permissions.map((permission: any) => permission.name);
+          delete userData.Role.Permissions; // Eliminar la propiedad original
+        }
+        return userData;
       });
+      
+      res.json(usersData);
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener usuarios");
     }
@@ -194,8 +205,13 @@ export class UserController {
         },
         include: [{
           model: Role,
-          as: 'Role',
-          attributes: ['id', 'name', 'description']
+          as: 'Role', // Usa el alias definido en la relación
+          attributes: ['id', 'name', 'description'],
+          include: [{
+            model: Permission,
+            through: { attributes: [] }, // Excluir datos de la tabla intermedia
+            attributes: ['id', 'name', 'description']
+          }]
         }]
       });
 
@@ -208,12 +224,14 @@ export class UserController {
         return;
       }
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Usuario obtenido correctamente",
-        data: targetUser
-      });
+      // Transformar los datos para incluir permisos en el formato esperado
+      const userData = user.toJSON();
+      if (userData.Role && userData.Role.Permissions) {
+        userData.Role.permissions = userData.Role.Permissions.map((permission: any) => permission.name);
+        delete userData.Role.Permissions; // Eliminar la propiedad original
+      }
+
+      res.json(userData);
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener usuario");
     }

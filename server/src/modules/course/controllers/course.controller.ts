@@ -1,49 +1,14 @@
 import { Request, Response, RequestHandler } from "express";
 import Course, { CourseCategory } from "../models/Course";
 import Category from "../models/Category";
-import { validationResult } from "express-validator";
 import User from "../../user/User";
+import { BaseController } from "./BaseController";
 
-// Función para generar metadata
-const metadata = (req: Request, res: Response) => {
-  return {
-    statusCode: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-    method: req.method,
-  };
-};
-
-// Función para manejar errores de validación
-const handleValidationErrors = (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(400).json({
-      ...metadata(req, res),
-      status: "error",
-      message: "Error de validaciones",
-      errors: errors.array(),
-    });
-    return false; // Indica que hay errores
-  }
-  return true; // Indica que no hay errores
-};
-
-// Función para manejar errores internos del servidor
-const handleServerError = (res: Response, req: Request, error: any, message: string) => {
-  console.error(message, error);
-  res.status(500).json({
-    ...metadata(req, res),
-    status: "error",
-    message,
-    error: error.message,
-  });
-};
-
-export default class CourseController {
+export default class CourseController extends BaseController {
   
   // Crear un nuevo curso con categorías
   static create: RequestHandler = async (req, res) => {
-    if (!handleValidationErrors(req, res)) return;
+    if (!CourseController.handleValidationErrors(req, res)) return;
 
     try {
       const {
@@ -79,11 +44,7 @@ export default class CourseController {
         });
 
         if (activeCategories.length !== categoryIds.length) {
-          res.status(400).json({
-            ...metadata(req, res),
-            status: "error",
-            message: "Una o más categorías no están activas",
-          });
+          CourseController.sendError(res, req, "Una o más categorías no están activas", 400);
           return;
         }
 
@@ -95,20 +56,15 @@ export default class CourseController {
         await CourseCategory.bulkCreate(courseCategories);
       }
 
-      res.status(201).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Curso creado correctamente",
-        data: newCourse,
-      });
+      CourseController.created(res, req, newCourse, "Curso creado correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al crear el curso");
+      CourseController.handleServerError(res, req, error, "Error al crear el curso");
     }
   };
 
   // Actualizar un curso por ID
   static update: RequestHandler = async (req, res) => {
-    if (!handleValidationErrors(req, res)) return;
+    if (!CourseController.handleValidationErrors(req, res)) return;
 
     try {
       const { id } = req.params;
@@ -128,11 +84,7 @@ export default class CourseController {
 
       const course = await Course.findByPk(id);
       if (!course) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        CourseController.notFound(res, req, "Curso");
         return;
       }
 
@@ -162,14 +114,9 @@ export default class CourseController {
         include: [{ model: Category, as: "categories" }],
       });
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Curso actualizado correctamente",
-        data: updatedCourse,
-      });
+      CourseController.updated(res, req, updatedCourse, "Curso actualizado correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al actualizar el curso");
+      CourseController.handleServerError(res, req, error, "Error al actualizar el curso");
     }
   };
 
@@ -182,33 +129,21 @@ export default class CourseController {
       // Verificar que el usuario tenga permisos para eliminar cursos
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('delete:courses') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para eliminar cursos",
-        });
+        CourseController.forbidden(res, req, "No tienes permisos para eliminar cursos");
         return;
       }
 
       const course = await Course.findByPk(id);
       if (!course) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        CourseController.notFound(res, req, "Curso");
         return;
       }
 
       await course.destroy();
       
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Curso eliminado correctamente",
-      });
+      CourseController.deleted(res, req, "Curso eliminado correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al eliminar el curso");
+      CourseController.handleServerError(res, req, error, "Error al eliminar el curso");
     }
   };
 }

@@ -4,28 +4,9 @@ import Section from "../models/Section";
 import Course from "../models/Course";
 import Content from "../models/Content";
 import { Op } from "sequelize";
+import { BaseController } from "./BaseController";
 
-// Función para generar metadata
-const metadata = (req: Request, res: Response) => {
-  return {
-    statusCode: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-    method: req.method,
-  };
-};
-
-// Función para manejar errores internos del servidor
-const handleServerError = (res: Response, req: Request, error: any, message: string) => {
-  console.error(message, error);
-  res.status(500).json({
-    ...metadata(req, res),
-    status: "error",
-    message,
-    error: error.message,
-  });
-};
-
-export default class SectionGetController {
+export default class SectionGetController extends BaseController {
   // Obtener todas las secciones
   static getAll: RequestHandler = async (req, res) => {
     try {
@@ -33,13 +14,9 @@ export default class SectionGetController {
         include: [{ model: Course, as: "course" }],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Secciones obtenidas correctamente",
-        data: sections,
-      });
+      SectionGetController.sendSuccess(res, req, sections, "Secciones obtenidas correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener las secciones");
+      SectionGetController.handleServerError(res, req, error, "Error al obtener las secciones");
     }
   };
 
@@ -50,20 +27,12 @@ export default class SectionGetController {
         include: ["course", "contents"],
       });
       if (!section) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Sección no encontrada",
-        });
+        SectionGetController.notFound(res, req, "Sección");
         return;
       }
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Sección obtenida correctamente",
-        data: section,
-      });
+      SectionGetController.sendSuccess(res, req, section, "Sección obtenida correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener la sección");
+      SectionGetController.handleServerError(res, req, error, "Error al obtener la sección");
     }
   };
 
@@ -78,13 +47,9 @@ export default class SectionGetController {
         ],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Secciones obtenidas correctamente",
-        data: sections,
-      });
+      SectionGetController.sendSuccess(res, req, sections, "Secciones obtenidas correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener las secciones del curso");
+      SectionGetController.handleServerError(res, req, error, "Error al obtener las secciones del curso");
     }
   };
 
@@ -92,13 +57,9 @@ export default class SectionGetController {
   static getSectionCount: RequestHandler = async (req, res) => {
     try {
       const count = await Section.count();
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Conteo de secciones obtenido correctamente",
-        data: { count },
-      });
+      SectionGetController.sendSuccess(res, req, { count }, "Conteo de secciones obtenido correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener el conteo de secciones");
+      SectionGetController.handleServerError(res, req, error, "Error al obtener el conteo de secciones");
     }
   };
 }

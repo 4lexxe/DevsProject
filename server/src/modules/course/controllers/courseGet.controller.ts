@@ -6,30 +6,11 @@ import Section from "../models/Section";
 import Content from "../models/Content";
 import CourseDiscountEvent from "../../purchase/models/CourseDiscountEvent";
 import { Op } from "sequelize";
+import { BaseController } from "./BaseController";
 // Importar asociaciones para asegurar que están cargadas
 import "../../purchase/models/Associations";
 
-// Función para generar metadata
-const metadata = (req: Request, res: Response) => {
-  return {
-    statusCode: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-    method: req.method,
-  };
-};
-
-// Función para manejar errores internos del servidor
-const handleServerError = (res: Response, req: Request, error: any, message: string) => {
-  console.error(message, error);
-  res.status(500).json({
-    ...metadata(req, res),
-    status: "error",
-    message,
-    error: error.message,
-  });
-};
-
-export default class CourseGetController{
+export default class CourseGetController extends BaseController {
     // Obtener todos los cursos
   static getAll: RequestHandler = async (req, res) => {
     try {
@@ -40,14 +21,9 @@ export default class CourseGetController{
         ],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos obtenidos correctamente",
-        length: courses.length,
-        data: courses,
-      });
+      CourseGetController.sendSuccess(res, req, courses, "Cursos obtenidos correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos");
     }
   };
 
@@ -68,7 +44,6 @@ export default class CourseGetController{
               endDate: { [Op.gte]: new Date() },
             },
             required: false, // LEFT JOIN para incluir cursos sin descuentos
-            order: [["value", "DESC"]], // Obtener el mayor descuento
           },
         ],
         order: [["id", "ASC"]],
@@ -82,8 +57,9 @@ export default class CourseGetController{
         let activeDiscount = null;
 
         if (courseData.discountEvents && courseData.discountEvents.length > 0) {
-          // Tomar el primer descuento (el mayor por el ORDER BY)
-          const discount = courseData.discountEvents[0];
+          // Ordenar descuentos por valor descendente y tomar el mayor
+          const sortedDiscounts = courseData.discountEvents.sort((a: any, b: any) => b.value - a.value);
+          const discount = sortedDiscounts[0];
           const discountAmount = (originalPrice * discount.value) / 100;
           finalPrice = originalPrice - discountAmount;
           activeDiscount = {
@@ -109,14 +85,9 @@ export default class CourseGetController{
         };
       });
 
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos activos obtenidos correctamente",
-        length: coursesWithPricing.length,
-        data: coursesWithPricing,
-      });
+      CourseGetController.sendSuccess(res, req, coursesWithPricing, "Cursos activos obtenidos correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos activos");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos activos");
     }
   };
 
@@ -131,14 +102,9 @@ export default class CourseGetController{
         ],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos en desarrollo obtenidos correctamente",
-        length: courses.length,
-        data: courses,
-      });
+      CourseGetController.sendSuccess(res, req, courses, "Cursos en desarrollo obtenidos correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos en desarrollo");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos en desarrollo");
     }
   };
 
@@ -155,14 +121,9 @@ export default class CourseGetController{
         ],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos obtenidos correctamente para el admin especificado",
-        length: courses.length,
-        data: courses,
-      });
+      CourseGetController.sendSuccess(res, req, courses, "Cursos obtenidos correctamente para el admin especificado");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos del admin");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos del admin");
     }
   };
 
@@ -178,21 +139,13 @@ export default class CourseGetController{
         ],
       });
       if (!course) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        CourseGetController.notFound(res, req, "Curso");
         return;
       }
 
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Curso obtenido correctamente",
-        data: course,
-      });
+      CourseGetController.sendSuccess(res, req, course, "Curso obtenido correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener el curso");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener el curso");
     }
   };
 
@@ -214,16 +167,11 @@ export default class CourseGetController{
               endDate: { [Op.gte]: new Date() },
             },
             required: false, // LEFT JOIN para incluir cursos sin descuentos
-            order: [["value", "DESC"]], // Obtener el mayor descuento
           },
         ],
       });
       if (!course) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        CourseGetController.notFound(res, req, "Curso");
         return;
       }
 
@@ -234,8 +182,9 @@ export default class CourseGetController{
       let activeDiscount = null;
 
       if (courseData.discountEvents && courseData.discountEvents.length > 0) {
-        // Tomar el primer descuento (el mayor por el ORDER BY)
-        const discount = courseData.discountEvents[0];
+        // Ordenar descuentos por valor descendente y tomar el mayor
+        const sortedDiscounts = courseData.discountEvents.sort((a: any, b: any) => b.value - a.value);
+        const discount = sortedDiscounts[0];
         const discountAmount = (originalPrice * discount.value) / 100;
         finalPrice = originalPrice - discountAmount;
         activeDiscount = {
@@ -261,13 +210,9 @@ export default class CourseGetController{
         },
       };
 
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Curso obtenido correctamente",
-        data: responseData,
-      });
+      CourseGetController.sendSuccess(res, req, responseData, "Curso obtenido correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener el curso");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener el curso");
     }
   };
 
@@ -298,21 +243,13 @@ export default class CourseGetController{
       });
 
       if (!course) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Curso no encontrado",
-        });
+        CourseGetController.notFound(res, req, "Curso");
         return;
       }
 
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Curso obtenido correctamente",
-        data: course,
-      });
+      CourseGetController.sendSuccess(res, req, course, "Curso obtenido correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener el curso para navegación");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener el curso para navegación");
     }
   };
 
@@ -326,14 +263,9 @@ export default class CourseGetController{
           { model: CareerType, as: "careerType" },
         ],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos obtenidos correctamente por categoría",
-        length: courses.length,
-        data: courses,
-      });
+      CourseGetController.sendSuccess(res, req, courses, "Cursos obtenidos correctamente por categoría");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos por categoría");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos por categoría");
     }
   };
 
@@ -347,14 +279,9 @@ export default class CourseGetController{
           { model: CareerType, as: "careerType", where: { id: careerTypeId } },
         ],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Cursos obtenidos correctamente por tipo de carrera",
-        length: courses.length,
-        data: courses,
-      });
+      CourseGetController.sendSuccess(res, req, courses, "Cursos obtenidos correctamente por tipo de carrera");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener los cursos por tipo de carrera");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos por tipo de carrera");
     }
   };
 
@@ -362,15 +289,10 @@ export default class CourseGetController{
   static getTotalCount: RequestHandler = async (req, res) => {
     try {
       const count = await Course.count();
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Conteo total de cursos obtenido correctamente",
-        total: count,
-      });
+      CourseGetController.sendSuccess(res, req, { total: count }, "Conteo total de cursos obtenido correctamente");
     } catch (error) {
-      handleServerError(res, req, error, "Error al obtener el conteo de cursos");
+      CourseGetController.handleServerError(res, req, error, "Error al obtener el conteo de cursos");
     }
   };
-
 
 }

@@ -6,6 +6,12 @@ import {
   getCourseDiscountEventByIdValidation,
   deleteCourseDiscountEventValidation,
   getCourseDiscountEventsValidation,
+  addCoursesToDiscountEventValidation,
+  updateCoursesForDiscountEventValidation,
+  removeCoursesFromDiscountEventValidation,
+  getCoursesForDiscountEventValidation,
+  getActiveDiscountsForCourseValidation,
+  toggleDiscountEventValidation,
 } from "../validators/courseDiscountEvent.validators";
 
 const router = Router();
@@ -80,7 +86,7 @@ router.delete('/:id',
  * @access  Private (Admin/Content Manager)
  */
 router.patch('/:id/activate',
-  getCourseDiscountEventByIdValidation,
+  toggleDiscountEventValidation,
   CourseDiscountEventController.activateDiscountEvent
 );
 
@@ -90,7 +96,7 @@ router.patch('/:id/activate',
  * @access  Private (Admin/Content Manager)
  */
 router.patch('/:id/deactivate',
-  getCourseDiscountEventByIdValidation,
+  toggleDiscountEventValidation,
   CourseDiscountEventController.deactivateDiscountEvent
 );
 
@@ -100,8 +106,50 @@ router.patch('/:id/deactivate',
  * @access  Public
  */
 router.get('/course/:courseId/active',
-  getCourseDiscountEventByIdValidation,
+  getActiveDiscountsForCourseValidation,
   CourseDiscountEventController.getActiveDiscountsForCourse
+);
+
+// ==================== RUTAS DE ASOCIACIONES M:N ====================
+
+/**
+ * @route   POST /api/course-discount-events/:eventId/courses
+ * @desc    Asociar cursos a un evento de descuento
+ * @access  Private (Admin/Content Manager)
+ */
+router.post('/:eventId/courses',
+  addCoursesToDiscountEventValidation,
+  CourseDiscountEventController.addCoursesToDiscountEvent
+);
+
+/**
+ * @route   PUT /api/course-discount-events/:eventId/courses
+ * @desc    Actualizar completamente las asociaciones de cursos de un evento de descuento
+ * @access  Private (Admin/Content Manager)
+ */
+router.put('/:eventId/courses',
+  updateCoursesForDiscountEventValidation,
+  CourseDiscountEventController.updateCoursesForDiscountEvent
+);
+
+/**
+ * @route   DELETE /api/course-discount-events/:eventId/courses
+ * @desc    Desasociar cursos de un evento de descuento
+ * @access  Private (Admin/Content Manager)
+ */
+router.delete('/:eventId/courses',
+  removeCoursesFromDiscountEventValidation,
+  CourseDiscountEventController.removeCoursesFromDiscountEvent
+);
+
+/**
+ * @route   GET /api/course-discount-events/:eventId/courses
+ * @desc    Obtener todos los cursos asociados a un evento de descuento
+ * @access  Public/Private
+ */
+router.get('/:eventId/courses',
+  getCoursesForDiscountEventValidation,
+  CourseDiscountEventController.getCoursesForDiscountEvent
 );
 
 export default router;

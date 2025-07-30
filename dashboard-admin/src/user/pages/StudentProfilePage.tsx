@@ -237,24 +237,29 @@ const StudentProfilePage = () => {
                   }`}>
                     {user.Role?.description || user.Role?.name || 'Usuario'}
                   </span>
-                  {user.Role?.permissions && user.Role.permissions.length > 0 && (
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-500 mb-1">Permisos:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {user.Role.permissions.map((permission: string, index: number) => (
-                          <span 
-                            key={index}
-                            className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
-                          >
-                            {permission}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
+            
+            {/* Mostrar permisos si existen */}
+            {user.Role?.permissions && user.Role.permissions.length > 0 && (
+              <div className="flex items-start">
+                <Shield className="h-5 w-5 text-gray-400 mr-3 mt-1" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-500 mb-2">Permisos</p>
+                  <div className="flex flex-wrap gap-2">
+                    {user.Role.permissions.map((permission: string, index: number) => (
+                      <span 
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                      >
+                        {permission}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

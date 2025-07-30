@@ -2,31 +2,16 @@ import { Request, Response, RequestHandler } from "express";
 import Category from "../models/Category";
 import Course from "../models/Course";
 import { Sequelize } from "sequelize";
+import { BaseController } from "./BaseController";
 
-const metadata = (req: any, res: any) => {
-  return {
-    status: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-  };
-};
-
-export default class CategoryController {
+export default class CategoryController extends BaseController {
   // Obtener todas las categorías
   static getAll: RequestHandler = async (req, res) => {
     try {
       const categories = await Category.findAll({ order: [["id", "ASC"]] });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Categorías obtenidas correctamente",
-        length: categories.length,
-        data: categories,
-      });
+      CategoryController.sendSuccess(res, req, categories, "Categorías obtenidas correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener las categorías",
-        error,
-      });
+      CategoryController.handleServerError(res, req, error, "Error al obtener las categorías");
     }
   };
 
@@ -53,18 +38,9 @@ export default class CategoryController {
       group: ["Category.id"], // Agrupar por categoría
     });
 
-    res.status(200).json({
-      ...metadata(req, res),
-      message: "Categorías obtenidas correctamente",
-      length: categories.length,
-      data: categories,
-    });
+    CategoryController.sendSuccess(res, req, categories, "Categorías obtenidas correctamente");
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Error al obtener las categorías",
-      error,
-    });
+    CategoryController.handleServerError(res, req, error, "Error al obtener las categorías");
   }
 };
 
@@ -97,18 +73,9 @@ static getAllActivesLimited: RequestHandler = async (req, res) => {
       limit: limit,
     });
 
-    res.status(200).json({
-      ...metadata(req, res),
-      message: "Categorías obtenidas correctamente",
-      length: categories.length,
-      data: categories,
-    });
+    CategoryController.sendSuccess(res, req, categories, "Categorías obtenidas correctamente");
   } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Error al obtener las categorías",
-      error,
-    });
+    CategoryController.handleServerError(res, req, error, "Error al obtener las categorías");
   }
 };
 
@@ -122,20 +89,12 @@ static getAllActivesLimited: RequestHandler = async (req, res) => {
       const { id } = req.params;
       const category = await Category.findByPk(id);
       if (!category) {
-        res.status(404).json({ status: "error", message: "Categoría no encontrada" });
+        CategoryController.notFound(res, req, "Categoría");
         return;
       }
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Categoría obtenida correctamente",
-        data: category,
-      });
+      CategoryController.sendSuccess(res, req, category, "Categoría obtenida correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener la categoría",
-        error,
-      });
+      CategoryController.handleServerError(res, req, error, "Error al obtener la categoría");
     }
   };
 
@@ -144,17 +103,9 @@ static getAllActivesLimited: RequestHandler = async (req, res) => {
     try {
       const { name, icon, description, isActive } = req.body;
       const newCategory = await Category.create({ name, icon, description, isActive });
-      res.status(201).json({
-        ...metadata(req, res),
-        message: "Categoría creada correctamente",
-        data: newCategory,
-      });
+      CategoryController.created(res, req, newCategory, "Categoría creada correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al crear la categoría",
-        error,
-      });
+      CategoryController.handleServerError(res, req, error, "Error al crear la categoría");
     }
   };
 
@@ -165,21 +116,13 @@ static getAllActivesLimited: RequestHandler = async (req, res) => {
       const { name, icon, description, isActive } = req.body;
       const category = await Category.findByPk(id);
       if (!category) {
-        res.status(404).json({ status: "error", message: "Categoría no encontrada" });
+        CategoryController.notFound(res, req, "Categoría");
         return;
       }
       await category.update({ name, icon, description, isActive });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Categoría actualizada correctamente",
-        data: category,
-      });
+      CategoryController.updated(res, req, category, "Categoría actualizada correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al actualizar la categoría",
-        error,
-      });
+      CategoryController.handleServerError(res, req, error, "Error al actualizar la categoría");
     }
   };
 
@@ -189,20 +132,13 @@ static getAllActivesLimited: RequestHandler = async (req, res) => {
       const { id } = req.params;
       const category = await Category.findByPk(id);
       if (!category) {
-        res.status(404).json({ status: "error", message: "Categoría no encontrada" });
+        CategoryController.notFound(res, req, "Categoría");
         return;
       }
       await category.destroy();
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Categoría eliminada correctamente",
-      });
+      CategoryController.deleted(res, req, "Categoría eliminada correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al eliminar la categoría",
-        error,
-      });
+      CategoryController.handleServerError(res, req, error, "Error al eliminar la categoría");
     }
   };
 }

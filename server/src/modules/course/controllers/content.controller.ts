@@ -2,15 +2,9 @@ import { Request, Response, RequestHandler } from "express";
 import Content from "../models/Content";
 import Section from "../models/Section";
 import User from "../../user/User";
+import { BaseController } from "./BaseController";
 
-const metadata = (req: any, res: any) => {
-  return {
-    status: res.statusCode,
-    url: req.protocol + "://" + req.get("host") + req.originalUrl,
-  };
-};
-
-export default class ContentController {
+export default class ContentController extends BaseController {
   // Obtener todos los contenidos
   static getAll: RequestHandler = async (req, res) => {
     try {
@@ -18,18 +12,9 @@ export default class ContentController {
         include: [{ model: Section, as: "section" }],
         order: [["id", "ASC"]],
       });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Contenidos obtenidos correctamente",
-        length: contents.length,
-        data: contents,
-      });
+      ContentController.sendSuccess(res, req, contents, "Contenidos obtenidos correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener los contenidos",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al obtener los contenidos");
     }
   };
 
@@ -41,20 +26,12 @@ export default class ContentController {
         include: [{ model: Section, as: "section" }],
       });
       if (!content) {
-        res.status(404).json({ status: "error", message: "Contenido no encontrado" });
+        ContentController.notFound(res, req, "Contenido");
         return;
       }
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Contenido obtenido correctamente",
-        data: content,
-      });
+      ContentController.sendSuccess(res, req, content, "Contenido obtenido correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener el contenido",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al obtener el contenido");
     }
   };
 
@@ -66,21 +43,14 @@ export default class ContentController {
       });
 
       if (!content) {
-          res.status(404).json({ status: "error", message: "Contenido no encontrado" });
+          ContentController.notFound(res, req, "Contenido");
           return;
       }
 
-      res.status(200).json({
-          ...metadata(req, res),
-          message: content.quiz ? "Quiz obtenido correctamente" : "No hay quiz disponible para este contenido",
-          data: content, // Si es null, se mantiene explícitamente
-      });
+      const message = content.quiz ? "Quiz obtenido correctamente" : "No hay quiz disponible para este contenido";
+      ContentController.sendSuccess(res, req, content, message);
   } catch (error) {
-      res.status(500).json({
-          status: "error",
-          message: "Error al obtener el quiz",
-          error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al obtener el quiz");
   }
 };
 
@@ -93,7 +63,7 @@ export default class ContentController {
       });
 
       if (!content) {
-        res.status(404).json({ status: "error", message: "Contenido no encontrado" });
+        ContentController.notFound(res, req, "Contenido");
         return;
       }
 
@@ -106,21 +76,15 @@ export default class ContentController {
       const previousContentId = currentIndex > 0 ? sectionContents[currentIndex - 1].id : null;
       const nextContentId = currentIndex < sectionContents.length - 1 ? sectionContents[currentIndex + 1].id : null;
 
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Contenido obtenido correctamente",
-        data: {
-          content,
-          previousContentId,
-          nextContentId,
-        },
-      });
+      const navigationData = {
+        content,
+        previousContentId,
+        nextContentId,
+      };
+
+      ContentController.sendSuccess(res, req, navigationData, "Contenido obtenido correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener el contenido",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al obtener el contenido");
     }
   };
 
@@ -129,18 +93,9 @@ export default class ContentController {
     try {
       const { sectionId } = req.params;
       const contents = await Content.findAll({ where: { sectionId } });
-      res.status(200).json({
-        ...metadata(req, res),
-        message: "Contenidos obtenidos correctamente para la sección especificada",
-        length: contents.length,
-        data: contents,
-      });
+      ContentController.sendSuccess(res, req, contents, "Contenidos obtenidos correctamente para la sección especificada");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al obtener los contenidos de la sección",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al obtener los contenidos de la sección");
     }
   };
 
@@ -153,11 +108,7 @@ export default class ContentController {
       // Verificar permisos adicionales para crear contenido del curso
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para crear contenido de curso",
-        });
+        ContentController.forbidden(res, req, "No tienes permisos para crear contenido de curso");
         return;
       }
 
@@ -174,18 +125,9 @@ export default class ContentController {
         sectionId,
       });
 
-      res.status(201).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Contenido creado correctamente",
-        data: content,
-      });
+      ContentController.created(res, req, content, "Contenido creado correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al crear el contenido",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al crear el contenido");
     }
   };
 
@@ -199,21 +141,13 @@ export default class ContentController {
       // Verificar permisos adicionales para actualizar contenido del curso
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('manage:course_content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para actualizar contenido de curso",
-        });
+        ContentController.forbidden(res, req, "No tienes permisos para actualizar contenido de curso");
         return;
       }
 
       const content = await Content.findByPk(id);
       if (!content) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Contenido no encontrado",
-        });
+        ContentController.notFound(res, req, "Contenido");
         return;
       }
       
@@ -230,18 +164,9 @@ export default class ContentController {
         sectionId,
       });
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Contenido actualizado correctamente",
-        data: content,
-      });
+      ContentController.updated(res, req, content, "Contenido actualizado correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al actualizar el contenido",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al actualizar el contenido");
     }
   };
 
@@ -254,37 +179,21 @@ export default class ContentController {
       // Verificar que el usuario tenga permisos para eliminar contenido
       const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
       if (!userPermissions.includes('delete:content') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "No tienes permisos para eliminar contenido",
-        });
+        ContentController.forbidden(res, req, "No tienes permisos para eliminar contenido");
         return;
       }
 
       const content = await Content.findByPk(id);
       if (!content) {
-        res.status(404).json({
-          ...metadata(req, res),
-          status: "error",
-          message: "Contenido no encontrado",
-        });
+        ContentController.notFound(res, req, "Contenido");
         return;
       }
       
       await content.destroy();
 
-      res.status(200).json({
-        ...metadata(req, res),
-        status: "success",
-        message: "Contenido eliminado correctamente",
-      });
+      ContentController.deleted(res, req, "Contenido eliminado correctamente");
     } catch (error) {
-      res.status(500).json({
-        status: "error",
-        message: "Error al eliminar el contenido",
-        error,
-      });
+      ContentController.handleServerError(res, req, error, "Error al eliminar el contenido");
     }
   };
 }
