@@ -1,7 +1,6 @@
 import React from 'react';
-import { Tag, DollarSign, Percent } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { Category } from '@/course/interfaces/ViewnerCourse';
-import EditCourseButton from './EditCourseButton';
 
 interface HeroCourseProps {
   title: string;
@@ -9,21 +8,6 @@ interface HeroCourseProps {
   image: string;
   categories: Category[];
   courseId?: string;
-  pricing?: {
-    originalPrice: number;
-    finalPrice: number;
-    hasDiscount: boolean;
-    activeDiscount?: {
-      id: number;
-      event: string;
-      description: string;
-      percentage: number;
-      amount: number;
-      startDate: string;
-      endDate: string;
-    };
-    savings: number;
-  };
 }
 
 export default function HeroCourse({
@@ -32,7 +16,6 @@ export default function HeroCourse({
   image,
   categories,
   courseId,
-  pricing,
 }: HeroCourseProps) {
   return (
     <div className="relative min-h-[400px]">
@@ -108,49 +91,6 @@ export default function HeroCourse({
           >
             {description}
           </p>
-
-          {/* Información de precios */}
-          {pricing && (
-            <div className="mb-6">
-              <div className="flex items-center gap-4 mb-3">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-400" />
-                  {pricing.hasDiscount ? (
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-green-400">
-                        ${pricing.finalPrice.toFixed(2)}
-                      </span>
-                      <span className="text-lg line-through text-gray-400">
-                        ${pricing.originalPrice.toFixed(2)}
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-2xl font-bold text-green-400">
-                      ${pricing.finalPrice.toFixed(2)}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Badge de descuento */}
-              {pricing.hasDiscount && pricing.activeDiscount && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-full text-sm font-medium">
-                    <Percent className="w-4 h-4" />
-                    <span>{pricing.activeDiscount.percentage}% OFF</span>
-                  </div>
-                  <span className="text-sm text-gray-300">
-                    {pricing.activeDiscount.event}
-                  </span>
-                  {pricing.savings > 0 && (
-                    <span className="text-sm text-green-400 font-medium">
-                      Ahorras ${pricing.savings.toFixed(2)}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
           
         </div>
       </div>
@@ -158,7 +98,9 @@ export default function HeroCourse({
       {/* Botón "Editar curso" en la esquina superior derecha */}
       {courseId && (
         <div className="absolute top-4 right-4">
-          <EditCourseButton courseId={courseId} />
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+            Editar Curso
+          </button>
         </div>
       )}
     </div>

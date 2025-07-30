@@ -7,8 +7,8 @@ import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
 import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
 import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
 import SectionList from "@/course/components/CourseDetail/SectionList";
-import AddSectionButton from "@/course/components/CourseDetail/AddSectionButton";
-import AddToCartButton from '@/course/components/CourseDetail/AddToCartButton';
+import AddToCartButton from "@/course/components/CourseDetail/AddToCartButton";
+import PricingCard from "@/course/components/CourseDetail/PricingCard";
 
 import { getById } from "@/course/services/courseServices";
 
@@ -65,7 +65,6 @@ const CourseDetails: React.FC = () => {
           image={course.image}
           categories={course.categories}
           courseId={id}
-          pricing={course.pricing}
         />
       </div>
 
@@ -82,15 +81,13 @@ const CourseDetails: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
               <LearningOutcomes outcomes={course.learningOutcomes} />
             </div>
+
+            <PricingCard pricing={course.pricing} />
             {id && (
-            <div className="mt-6">
-              <AddToCartButton 
-                courseId={id}
-                className="shadow-lg"
-              />
-            </div>
-          )}
-            
+              <div className="mt-6">
+                <AddToCartButton courseId={id} className="shadow-lg" />
+              </div>
+            )}
           </div>
 
           {/* Main content */}
@@ -101,7 +98,7 @@ const CourseDetails: React.FC = () => {
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />
-            
+
             {/* Sections header */}
             <div className="flex items-center justify-between mb-6 mt-8">
               <div className="flex items-center gap-4">
@@ -109,7 +106,6 @@ const CourseDetails: React.FC = () => {
                   Módulos del Curso
                 </h2>
               </div>
-              <AddSectionButton courseId={id || ""} />
             </div>
 
             {/* Sections List */}

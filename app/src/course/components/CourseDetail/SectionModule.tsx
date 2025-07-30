@@ -6,7 +6,6 @@ import {
 } from "lucide-react";
 import ContentViewer from "./ContentViewer";
 import { Section } from "@/course/interfaces/ViewnerCourse";
-import EditSectionButton from "./EditSectionButton";
 
 interface SectionModuleProps {
   section: Section;
@@ -44,11 +43,6 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
               }}
             />
 
-            {/* Edit button */}
-            <EditSectionButton
-              courseId={section.course.id.toString()}
-              sectionId={section.id.toString()}
-            />
             {/* Module icon */}
             <div className="absolute -bottom-6 left-6">
               <div className="bg-white p-3 rounded-lg shadow-md">
