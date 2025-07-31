@@ -53,6 +53,22 @@ export default class SectionGetController extends BaseController {
     }
   };
 
+  // Obtener una seccion con sus contenidos por ID de la seccion
+  static getByIdWithContents: RequestHandler = async (req, res) => {
+    try {
+      const section = await Section.findByPk(req.params.id, {
+        include: ["contents"],
+      });
+      if (!section) {
+        SectionGetController.notFound(res, req, "Sección");
+        return;
+      }
+      SectionGetController.sendSuccess(res, req, section, "Sección obtenida correctamente");
+    } catch (error) {
+      SectionGetController.handleServerError(res, req, error, "Error al obtener la sección");
+    }
+  };
+
   // Obtener el conteo de secciones
   static getSectionCount: RequestHandler = async (req, res) => {
     try {

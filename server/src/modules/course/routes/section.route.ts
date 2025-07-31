@@ -12,6 +12,7 @@ router.get('/sections', SectionGetController.getAll);
 router.get('/sections/count', SectionGetController.getSectionCount);
 router.get('/sections/:id', SectionGetController.getById);
 router.get('/sections/course/:courseId', SectionGetController.getByCourseId);
+router.get('/sections/:id/contents', SectionGetController.getByIdWithContents);
 
 // Rutas protegidas (requieren autenticación y permisos)
 router.post('/sections', 

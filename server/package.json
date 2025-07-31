@@ -37,6 +37,7 @@
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
     "geoip-lite": "^1.4.10",
+    "googleapis": "^154.1.0",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mercadopago": "^2.3.0",

@@ -99,5 +99,600 @@
       "updatedAt": "2025-03-22T01:02:00.398Z",
       "deletedAt": null
     }
+  ],
+  "courses": [
+    {
+      "title": "Curso de Node.js",
+      "image": "https://logos-download.com/wp-content/uploads/2016/09/Node_logo_NodeJS.png",
+      "summary": "Aprende Node.js desde cero.",
+      "about": "Este curso cubre los fundamentos y conceptos avanzados de Node.js.",
+      "careerTypeId": 1,
+      "prerequesites": [
+        "Conocimientos fundamentales sobre el lenguaje de javascript"
+      ],
+      "learningOutcomes": ["Manejo de Express", "Uso de Sequelize"],
+      "isActive": true,
+      "isInDevelopment": false,
+      "adminId": 1,
+      "categoryIds": [1, 2],
+      "price": 100,
+      "sections": [
+        {
+          "title": "Introducción al Curso",
+          "description": "Esta sección introduce los fundamentos del curso.",
+          "courseId": 1,
+          "coverImage": "https://example.com/cover1.jpg",
+          "moduleType": "Introductorio",
+          "contents": [
+            {
+              "title": "Introducción al curso",
+              "text": "Video explicativo",
+              "markdown": "## Introducción al curso\nEste es un video explicativo sobre los fundamentos de Node.js.",
+              "resources": [],
+              "quiz": [],
+              "duration": 30,
+              "position": 1,
+              "sectionId": 1
+            }
+          ]
+        },
+        {
+          "title": "Fundamentos de Node.js",
+          "description": "Esta sección cubre los conceptos básicos de Node.js.",
+          "courseId": 1,
+          "coverImage": "https://example.com/cover2.jpg",
+          "moduleType": "Principiante",
+          "contents": [
+            {
+              "title": "Módulos en Node.js",
+              "text": "Aprende a usar módulos en Node.js",
+              "markdown": "## Módulos en Node.js\nLos módulos te permiten organizar y reutilizar código.",
+              "resources": [],
+              "quiz": [],
+              "duration": 25,
+              "position": 1,
+              "sectionId": 2
+            },
+            {
+              "title": "Event Loop en Node.js",
+              "text": "Explicación del Event Loop",
+              "markdown": "## Event Loop en Node.js\nEl Event Loop es fundamental para entender cómo funciona Node.js.",
+              "resources": [],
+              "quiz": [],
+              "duration": 30,
+              "position": 2,
+              "sectionId": 2
+            }
+          ]
+        },
+        {
+          "title": "Conceptos Intermedios de Node.js",
+          "description": "Esta sección cubre conceptos intermedios de Node.js.",
+          "courseId": 1,
+          "coverImage": "https://example.com/cover3.jpg",
+          "moduleType": "Intermedio",
+          "contents": [
+            {
+              "title": "Uso de Express.js",
+              "text": "Aprende a crear servidores con Express.js",
+              "markdown": "## Uso de Express.js\nExpress.js es un framework para crear aplicaciones web en Node.js.",
+              "resources": [],
+              "quiz": [],
+              "duration": 35,
+              "position": 1,
+              "sectionId": 3
+            },
+            {
+              "title": "Middleware en Express.js",
+              "text": "Explicación del uso de middleware",
+              "markdown": "## Middleware en Express.js\nEl middleware permite ejecutar funciones antes de llegar a las rutas.",
+              "resources": [],
+              "quiz": [],
+              "duration": 25,
+              "position": 2,
+              "sectionId": 3
+            },
+            {
+              "title": "Prueba de conceptos intermedios",
+              "text": "Este cuestionario evalúa tus conocimientos sobre conceptos intermedios de Node.js.",
+              "markdown": "## Prueba de conceptos intermedios\nResponde las siguientes preguntas para evaluar tus conocimientos.",
+              "quiz": [
+                {
+                  "id": 1,
+                  "question": "¿Qué es Node.js?",
+                  "description": "Pregunta sobre la definición de Node.js",
+                  "text": "",
+                  "image": "",
+                  "type": "Single",
+                  "order": 1,
+                  "points": 10,
+                  "markdown": "## Conceptos Clave sobre Node.js\n\nNode.js es una **tecnología fundamental** en el desarrollo moderno. Considera estos puntos:\n\n- ✅ Basado en el motor **V8** de Google Chrome\n- ✅ Permite crear aplicaciones del lado del **servidor**\n- ✅ Utiliza un modelo de **E/O no bloqueante**\n- ❌ **NO** es un lenguaje de programación independiente",
+                  "explanation": "Node.js es un entorno de ejecución para JavaScript en el servidor, construido sobre el motor V8 de Chrome.",
+                  "metadata": {
+                    "difficulty": "beginner",
+                    "tags": ["node.js", "definición", "fundamentos"],
+                    "category": "conceptos-basicos",
+                    "estimatedTime": 30
+                  },
+                  "answers": [
+                    {
+                      "id": 1,
+                      "text": "Un entorno de ejecución para JavaScript",
+                      "isCorrect": true,
+                      "explanation": "Correcto. Node.js permite ejecutar JavaScript fuera del navegador."
+                    },
+                    {
+                      "id": 2,
+                      "text": "Un lenguaje de programación",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Node.js no es un lenguaje, sino un entorno de ejecución."
+                    },
+                    {
+                      "id": 3,
+                      "text": "Un framework para aplicaciones móviles",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Node.js se enfoca en aplicaciones del lado del servidor."
+                    },
+                    {
+                      "id": 4,
+                      "text": "Un gestor de bases de datos",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Node.js no es un gestor de bases de datos."
+                    }
+                  ]
+                },
+                {
+                  "id": 2,
+                  "question": "¿Cuáles de los siguientes son módulos nativos de Node.js?",
+                  "description": "Identificar módulos nativos de Node.js",
+                  "text": "",
+                  "image": "",
+                  "type": "MultipleChoice",
+                  "order": 2,
+                  "points": 15,
+                  "markdown": "### Módulos Nativos vs Externos\n\n**Módulos Nativos** (incluidos con Node.js):\n```javascript\nconst fs = require('fs');        // Sistema de archivos\nconst http = require('http');    // Servidor HTTP\nconst path = require('path');    // Rutas de archivos\n```\n\n**Módulos Externos** (requieren instalación):\n```javascript\nconst express = require('express'); // Framework web\nconst mongoose = require('mongoose'); // ODM para MongoDB\n```",
+                  "explanation": "Node.js incluye varios módulos nativos como fs para sistema de archivos, http para servidor web, y path para rutas.",
+                  "metadata": {
+                    "difficulty": "intermediate",
+                    "tags": ["módulos", "core", "apis"],
+                    "category": "modulos-nativos",
+                    "estimatedTime": 45
+                  },
+                  "answers": [
+                    {
+                      "id": 5,
+                      "text": "fs (File System)",
+                      "isCorrect": true,
+                      "explanation": "Correcto. fs es un módulo nativo para operaciones del sistema de archivos."
+                    },
+                    {
+                      "id": 6,
+                      "text": "http",
+                      "isCorrect": true,
+                      "explanation": "Correcto. http es un módulo nativo para crear servidores web."
+                    },
+                    {
+                      "id": 7,
+                      "text": "express",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Express es un framework externo, no un módulo nativo."
+                    },
+                    {
+                      "id": 8,
+                      "text": "path",
+                      "isCorrect": true,
+                      "explanation": "Correcto. path es un módulo nativo para trabajar con rutas de archivos."
+                    }
+                  ]
+                },
+                {
+                  "id": 3,
+                  "question": "Conceptos fundamentales de Node.js",
+                  "description": "Evalúa el conocimiento sobre conceptos clave",
+                  "text": "Indica si las siguientes afirmaciones son verdaderas o falsas",
+                  "image": "",
+                  "type": "TrueOrFalse",
+                  "order": 3,
+                  "points": 20,
+                  "explanation": "Es importante entender las características principales de Node.js para su uso efectivo.",
+                  "metadata": {
+                    "difficulty": "intermediate",
+                    "tags": ["características", "asíncrono", "single-thread"],
+                    "category": "conceptos-avanzados",
+                    "estimatedTime": 60
+                  },
+                  "answers": [
+                    {
+                      "id": 9,
+                      "text": "Node.js es un entorno de ejecución para JavaScript",
+                      "isCorrect": true,
+                      "explanation": "Verdadero. Node.js permite ejecutar JavaScript en el servidor."
+                    },
+                    {
+                      "id": 10,
+                      "text": "Node.js solo puede ejecutarse en el navegador",
+                      "isCorrect": false,
+                      "explanation": "Falso. Node.js se ejecuta en el servidor, no en el navegador."
+                    },
+                    {
+                      "id": 11,
+                      "text": "Node.js es un lenguaje de programación",
+                      "isCorrect": false,
+                      "explanation": "Falso. Node.js es un entorno de ejecución, no un lenguaje."
+                    },
+                    {
+                      "id": 12,
+                      "text": "Node.js soporta programación asíncrona",
+                      "isCorrect": true,
+                      "explanation": "Verdadero. Node.js está diseñado para operaciones asíncronas."
+                    }
+                  ]
+                },
+                {
+                  "id": 4,
+                  "question": "¿Qué comando se usa para iniciar un proyecto de Node.js?",
+                  "description": "Comando básico para inicializar proyectos",
+                  "text": "",
+                  "image": "",
+                  "type": "ShortAnswer",
+                  "order": 4,
+                  "points": 5,
+                  "explanation": "npm init es el comando estándar para crear un nuevo proyecto Node.js con package.json.",
+                  "metadata": {
+                    "difficulty": "beginner",
+                    "tags": ["npm", "inicialización", "package.json"],
+                    "category": "comandos-basicos",
+                    "estimatedTime": 20
+                  },
+                  "answers": [
+                    {
+                      "id": 13,
+                      "text": "npm init",
+                      "isCorrect": true,
+                      "explanation": "Correcto. Este comando inicializa un nuevo proyecto Node.js."
+                    }
+                  ]
+                }
+              ],
+              "resources": [],
+              "duration": 30,
+              "position": 3,
+              "sectionId": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Curso de React.js",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg",
+      "summary": "Domina React.js desde los conceptos básicos hasta técnicas avanzadas.",
+      "about": "Este curso completo te enseñará React.js, la biblioteca más popular para crear interfaces de usuario modernas y dinámicas.",
+      "careerTypeId": 1,
+      "prerequesites": [
+        "Conocimientos sólidos de JavaScript ES6+",
+        "Familiaridad con HTML y CSS",
+        "Conceptos básicos de programación web"
+      ],
+      "learningOutcomes": ["Componentes funcionales y de clase", "Hooks de React", "Gestión del estado", "React Router"],
+      "isActive": true,
+      "isInDevelopment": false,
+      "adminId": 1,
+      "categoryIds": [1, 3],
+      "price": 150,
+      "sections": [
+        {
+          "title": "Fundamentos de React",
+          "description": "Aprende los conceptos básicos de React.js",
+          "courseId": 2,
+          "coverImage": "https://example.com/react-cover1.jpg",
+          "moduleType": "Principiante",
+          "contents": [
+            {
+              "title": "¿Qué es React?",
+              "text": "Introducción a React y su ecosistema",
+              "markdown": "## ¿Qué es React?\nReact es una biblioteca de JavaScript para construir interfaces de usuario, especialmente aplicaciones web de una sola página.",
+              "resources": [],
+              "quiz": [],
+              "duration": 20,
+              "position": 1,
+              "sectionId": 4
+            },
+            {
+              "title": "JSX y Componentes",
+              "text": "Aprende JSX y cómo crear componentes",
+              "markdown": "## JSX y Componentes\nJSX es una extensión de sintaxis para JavaScript que te permite escribir HTML en JavaScript.",
+              "resources": [],
+              "quiz": [
+                {
+                  "id": 5,
+                  "question": "¿Qué es JSX en React?",
+                  "description": "Comprende el concepto de JSX",
+                  "text": "",
+                  "image": "",
+                  "type": "Single",
+                  "order": 1,
+                  "points": 10,
+                  "markdown": "## JSX - JavaScript XML\n\n**JSX** permite escribir elementos que parecen HTML dentro de JavaScript:\n\n### ✅ Con JSX:\n```jsx\nconst elemento = <h1>¡Hola, mundo!</h1>;\n```\n\n### ❌ Sin JSX (JavaScript puro):\n```javascript\nconst elemento = React.createElement('h1', null, '¡Hola, mundo!');\n```\n\n> **Nota**: JSX se transpila a JavaScript antes de ejecutarse en el navegador.",
+                  "explanation": "JSX es una extensión de sintaxis que permite escribir HTML dentro de JavaScript de manera más legible.",
+                  "metadata": {
+                    "difficulty": "beginner",
+                    "tags": ["jsx", "sintaxis", "react"],
+                    "category": "fundamentos",
+                    "estimatedTime": 30
+                  },
+                  "answers": [
+                    {
+                      "id": 14,
+                      "text": "Una extensión de sintaxis para JavaScript",
+                      "isCorrect": true,
+                      "explanation": "Correcto. JSX permite escribir HTML en JavaScript."
+                    },
+                    {
+                      "id": 15,
+                      "text": "Un nuevo lenguaje de programación",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. JSX es una extensión, no un lenguaje independiente."
+                    },
+                    {
+                      "id": 16,
+                      "text": "Una librería de CSS",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. JSX no está relacionado con CSS."
+                    }
+                  ]
+                }
+              ],
+              "duration": 35,
+              "position": 2,
+              "sectionId": 4
+            }
+          ]
+        },
+        {
+          "title": "Hooks y Estado",
+          "description": "Manejo del estado con React Hooks",
+          "courseId": 2,
+          "coverImage": "https://example.com/react-cover2.jpg",
+          "moduleType": "Intermedio",
+          "contents": [
+            {
+              "title": "useState Hook",
+              "text": "Aprende a manejar el estado local",
+              "markdown": "## useState Hook\nEl hook useState te permite añadir estado a componentes funcionales.",
+              "resources": [],
+              "quiz": [
+                {
+                  "id": 6,
+                  "question": "¿Para qué se utiliza el hook useState?",
+                  "description": "Comprende el propósito de useState",
+                  "text": "",
+                  "image": "",
+                  "type": "MultipleChoice",
+                  "order": 1,
+                  "points": 15,
+                  "explanation": "useState permite manejar estado local en componentes funcionales de React.",
+                  "metadata": {
+                    "difficulty": "intermediate",
+                    "tags": ["hooks", "estado", "useState"],
+                    "category": "estado-componentes",
+                    "estimatedTime": 45
+                  },
+                  "answers": [
+                    {
+                      "id": 17,
+                      "text": "Manejar estado local en componentes funcionales",
+                      "isCorrect": true,
+                      "explanation": "Correcto. useState es para estado local."
+                    },
+                    {
+                      "id": 18,
+                      "text": "Realizar efectos secundarios",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Para efectos secundarios se usa useEffect."
+                    },
+                    {
+                      "id": 19,
+                      "text": "Optimizar renderizado",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. Para optimización se usan otros hooks como useMemo."
+                    }
+                  ]
+                }
+              ],
+              "duration": 40,
+              "position": 1,
+              "sectionId": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Curso de Python Básico",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg",
+      "summary": "Aprende Python desde cero con ejemplos prácticos.",
+      "about": "Un curso completo de Python que cubre desde la sintaxis básica hasta conceptos avanzados como programación orientada a objetos.",
+      "careerTypeId": 2,
+      "prerequesites": [
+        "Conocimientos básicos de lógica de programación",
+        "Familiaridad con el uso de computadoras"
+      ],
+      "learningOutcomes": ["Sintaxis de Python", "Estructuras de datos", "Programación orientada a objetos", "Manejo de archivos"],
+      "isActive": true,
+      "isInDevelopment": false,
+      "adminId": 1,
+      "categoryIds": [2, 4],
+      "price": 120,
+      "sections": [
+        {
+          "title": "Introducción a Python",
+          "description": "Conceptos básicos y sintaxis de Python",
+          "courseId": 3,
+          "coverImage": "https://example.com/python-cover1.jpg",
+          "moduleType": "Principiante",
+          "contents": [
+            {
+              "title": "Instalación y primer programa",
+              "text": "Configura tu entorno de desarrollo Python",
+              "markdown": "## Instalación y primer programa\nAprende a instalar Python y ejecutar tu primer programa 'Hola Mundo'.",
+              "resources": [],
+              "quiz": [],
+              "duration": 25,
+              "position": 1,
+              "sectionId": 6
+            },
+            {
+              "title": "Variables y tipos de datos",
+              "text": "Comprende los tipos de datos fundamentales",
+              "markdown": "## Variables y tipos de datos\nPython maneja diferentes tipos de datos: int, float, str, bool, list, dict, etc.",
+              "resources": [],
+              "quiz": [
+                {
+                  "id": 7,
+                  "question": "¿Cuáles son tipos de datos básicos en Python?",
+                  "description": "Identifica los tipos de datos fundamentales",
+                  "text": "",
+                  "image": "",
+                  "type": "MultipleChoice",
+                  "order": 1,
+                  "points": 15,
+                  "explanation": "Python tiene varios tipos básicos: int para números enteros, str para texto, bool para verdadero/falso, y float para decimales.",
+                  "metadata": {
+                    "difficulty": "beginner",
+                    "tags": ["tipos-datos", "variables", "básicos"],
+                    "category": "fundamentos-python",
+                    "estimatedTime": 40
+                  },
+                  "answers": [
+                    {
+                      "id": 20,
+                      "text": "int (entero)",
+                      "isCorrect": true,
+                      "explanation": "Correcto. int representa números enteros."
+                    },
+                    {
+                      "id": 21,
+                      "text": "str (cadena de texto)",
+                      "isCorrect": true,
+                      "explanation": "Correcto. str representa texto."
+                    },
+                    {
+                      "id": 22,
+                      "text": "bool (booleano)",
+                      "isCorrect": true,
+                      "explanation": "Correcto. bool representa True o False."
+                    },
+                    {
+                      "id": 23,
+                      "text": "html (página web)",
+                      "isCorrect": false,
+                      "explanation": "Incorrecto. HTML no es un tipo de dato de Python."
+                    }
+                  ]
+                }
+              ],
+              "duration": 30,
+              "position": 2,
+              "sectionId": 6
+            }
+          ]
+        },
+        {
+          "title": "Estructuras de Control",
+          "description": "If, loops y estructuras de control en Python",
+          "courseId": 3,
+          "coverImage": "https://example.com/python-cover2.jpg",
+          "moduleType": "Principiante",
+          "contents": [
+            {
+              "title": "Condicionales y bucles",
+              "text": "Aprende if/else y loops for/while",
+              "markdown": "## Condicionales y bucles\nLas estructuras de control permiten tomar decisiones y repetir código.",
+              "resources": [],
+              "quiz": [
+                {
+                  "id": 8,
+                  "question": "¿Qué estructura usarías para repetir código un número específico de veces?",
+                  "description": "Selecciona la estructura de control adecuada",
+                  "text": "",
+                  "image": "",
+                  "type": "Single",
+                  "order": 1,
+                  "points": 10,
+                  "explanation": "El bucle 'for' es ideal cuando conoces exactamente cuántas veces quieres repetir el código.",
+                  "metadata": {
+                    "difficulty": "beginner",
+                    "tags": ["bucles", "for", "while", "control"],
+                    "category": "estructuras-control",
+                    "estimatedTime": 35
+                  },
+                  "answers": [
+                    {
+                      "id": 24,
+                      "text": "Bucle for",
+                      "isCorrect": true,
+                      "explanation": "Correcto. For es ideal para un número conocido de iteraciones."
+                    },
+                    {
+                      "id": 25,
+                      "text": "Bucle while",
+                      "isCorrect": false,
+                      "explanation": "While es mejor cuando no sabes exactamente cuántas iteraciones necesitas."
+                    },
+                    {
+                      "id": 26,
+                      "text": "Condicional if",
+                      "isCorrect": false,
+                      "explanation": "If es para tomar decisiones, no para repetir código."
+                    }
+                  ]
+                },
+                {
+                  "id": 9,
+                  "question": "Conceptos de programación en Python",
+                  "description": "Evalúa conceptos fundamentales",
+                  "text": "Indica si las siguientes afirmaciones son verdaderas o falsas",
+                  "image": "",
+                  "type": "TrueOrFalse",
+                  "order": 2,
+                  "points": 20,
+                  "explanation": "Es fundamental entender estos conceptos para programar efectivamente en Python.",
+                  "metadata": {
+                    "difficulty": "intermediate",
+                    "tags": ["conceptos", "python", "programación"],
+                    "category": "fundamentos-generales",
+                    "estimatedTime": 60
+                  },
+                  "answers": [
+                    {
+                      "id": 27,
+                      "text": "Python es un lenguaje interpretado",
+                      "isCorrect": true,
+                      "explanation": "Verdadero. Python ejecuta código línea por línea en tiempo de ejecución."
+                    },
+                    {
+                      "id": 28,
+                      "text": "Las variables en Python deben declararse con un tipo específico",
+                      "isCorrect": false,
+                      "explanation": "Falso. Python tiene tipado dinámico, infiere el tipo automáticamente."
+                    },
+                    {
+                      "id": 29,
+                      "text": "La indentación es importante en Python",
+                      "isCorrect": true,
+                      "explanation": "Verdadero. Python usa indentación para definir bloques de código."
+                    }
+                  ]
+                }
+              ],
+              "duration": 45,
+              "position": 1,
+              "sectionId": 7
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

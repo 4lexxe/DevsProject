@@ -33,7 +33,7 @@ import Cart from "./modules/purchase/models/Cart";
 import CartCourse from "./modules/purchase/models/CartCourse";
 import Preference from "./modules/purchase/models/Preference";
 import PreferencePayment from "./modules/purchase/models/PreferencePayment";
-import CourseDiscountEvent from "./modules/purchase/models/CourseDiscountEvent";
+import CourseDiscountEvent, { CourseDiscountEventAssociation } from "./modules/purchase/models/CourseDiscountEvent";
 import CourseAccess from "./modules/purchase/models/CourseAccess";
 
 import MPWebhookEvent from "./modules/webhook/MPWebhookEvent";
@@ -86,6 +86,7 @@ async function syncDatabase() {
 
     // Area de compras de cursos
     await CourseDiscountEvent.sync({ force: true });
+    await CourseDiscountEventAssociation.sync({ force: true });
     await CourseAccess.sync({ force: true });
     await Preference.sync({ force: true });
     await Cart.sync({ force: true });

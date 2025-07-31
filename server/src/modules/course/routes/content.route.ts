@@ -2,6 +2,7 @@ import { Router } from "express";
 import ContentController from "../controllers/content.controller";
 import { authMiddleware } from "../../../shared/middleware/authMiddleware";
 import { permissionsMiddleware } from "../../../shared/middleware/permissionsMiddleware";
+import { validateQuiz } from "../validators/QuizValidation";
 
 const router = Router();
 
@@ -23,6 +24,19 @@ router.put("/contents/:id",
   authMiddleware,
   permissionsMiddleware(['manage:course_content']),
   ContentController.update
+);
+
+router.put("/contents/:contentId/quiz", 
+  authMiddleware,
+  permissionsMiddleware(['manage:course_content']),
+  validateQuiz,
+  ContentController.updateContentQuiz
+);
+
+router.delete("/contents/:contentId/quiz", 
+  authMiddleware,
+  permissionsMiddleware(['manage:course_content']),
+  ContentController.deleteQuiz
 );
 
 router.delete("/contents/:id", 

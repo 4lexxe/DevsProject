@@ -1,4 +1,5 @@
 import { Request, Response, RequestHandler } from "express";
+import { validationResult } from "express-validator";
 import Content from "../models/Content";
 import Section from "../models/Section";
 import User from "../../user/User";
@@ -102,7 +103,7 @@ export default class ContentController extends BaseController {
   // Crear un contenido
   static create: RequestHandler = async (req, res) => {
     try {
-      const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
+      const { title, text, markdown, quiz, resources, duration, position, sectionId } = req.body;
       const user = req.user as User;
 
       // Verificar permisos adicionales para crear contenido del curso
@@ -116,8 +117,6 @@ export default class ContentController extends BaseController {
         title,
         text,
         markdown,
-        linkType,
-        link,
         quiz,
         resources,
         duration,
@@ -129,13 +128,13 @@ export default class ContentController extends BaseController {
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al crear el contenido");
     }
-  };
+  }
 
   // Actualizar un contenido por ID
   static update: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, text, markdown, linkType, link, quiz, resources, duration, position, sectionId } = req.body;
+      const { title, text, markdown, quiz, resources, duration, position, sectionId } = req.body;
       const user = req.user as User;
 
       // Verificar permisos adicionales para actualizar contenido del curso
@@ -155,8 +154,6 @@ export default class ContentController extends BaseController {
         title,
         text,
         markdown,
-        linkType,
-        link,
         quiz,
         resources,
         duration,
@@ -169,6 +166,59 @@ export default class ContentController extends BaseController {
       ContentController.handleServerError(res, req, error, "Error al actualizar el contenido");
     }
   };
+
+  static updateContentQuiz: RequestHandler = async (req, res) => {
+    try {
+      // Verificar errores de validación
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        res.status(400).json({
+          success: false,
+          message: "Errores de validación",
+          errors: errors.array()
+        });
+        return;
+      }
+
+      const { contentId } = req.params;
+      const { quiz } = req.body;
+
+      // Verificar que el contenido exista
+      const content = await Content.findByPk(contentId);
+      if (!content) {
+        ContentController.notFound(res, req, "Contenido");
+        return;
+      }
+
+      // Actualizar el contenido con el nuevo quiz
+      await content.update({ quiz });
+
+      ContentController.updated(res, req, content, "Quiz actualizado correctamente");
+    } catch (error) {
+      ContentController.handleServerError(res, req, error, "Error al actualizar el quiz del contenido");
+    }
+  }
+
+  // Eliminar un quiz de un contenido por ID
+  static deleteQuiz: RequestHandler = async (req, res) => {
+    try {
+      const { contentId } = req.params;
+
+      // Verificar que el contenido exista
+      const content = await Content.findByPk(contentId);
+      if (!content) {
+        ContentController.notFound(res, req, "Contenido");
+        return;
+      }
+
+      // Eliminar el quiz del contenido
+      await content.update({ quiz: null });
+
+      ContentController.updated(res, req, content, "Quiz eliminado del contenido correctamente");
+    } catch (error) {
+      ContentController.handleServerError(res, req, error, "Error al eliminar el quiz del contenido");
+    }
+  }
 
   // Eliminar un contenido por ID
   static delete: RequestHandler = async (req, res) => {

@@ -4,25 +4,32 @@ import Section from "./Section";
 
 type quizType = "Single" | "MultipleChoice" | "TrueOrFalse" | "ShortAnswer";
 
-type linkType = "video" | "pagina" | "imagen" | "documento";
-
 class Content extends Model {
   public id!: bigint;
   public sectionId!: bigint;
   public title!: string;
   public text!: string;
   public markdown?: string;
-  public linkType?: string;
-  public link?: string;
   public quiz?: Array<{
+    id: string;
     question: string; // Pregunta
-    text?: string;
+    description: string;
+    order: number;
+    points: number; // Puntos que vale la pregunta
+    markdown?: string;
+    explanation?: string;
     image?: string;
     type: quizType;
     answers: Array<{
-      answer: string; // Respuesta
-      isCorrect: boolean; // Indica si es una respuesta correcta
+      id?: string;
+      text: string; // Respuesta
+      isCorrect: boolean; 
+      explanation?: string; 
     }>;
+    metadata?: {
+    difficulty?: 'easy' | 'medium' | 'hard';
+    tags?: string[];
+  };
   }>;
   public resources?: Array<{
     title: string;
@@ -51,14 +58,6 @@ Content.init(
     },
     markdown: {
       type: DataTypes.TEXT,
-      allowNull: true,
-    },
-    linkType: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    link: {
-      type: DataTypes.STRING,
       allowNull: true,
     },
     quiz: {

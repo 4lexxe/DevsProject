@@ -19,6 +19,7 @@ export default class CourseController extends BaseController {
         careerTypeId,
         prerequisites,
         learningOutcomes,
+        price,
         isActive,
         isInDevelopment,
         adminId,
@@ -33,6 +34,7 @@ export default class CourseController extends BaseController {
         careerTypeId,
         prerequisites,
         learningOutcomes,
+        price,
         isActive,
         isInDevelopment,
         adminId,
@@ -79,6 +81,7 @@ export default class CourseController extends BaseController {
         isActive,
         isInDevelopment,
         adminId,
+        price,
         categoryIds,
       } = req.body;
 
@@ -99,6 +102,7 @@ export default class CourseController extends BaseController {
         isActive,
         isInDevelopment,
         adminId,
+        price,
       });
 
       if (Array.isArray(categoryIds)) {

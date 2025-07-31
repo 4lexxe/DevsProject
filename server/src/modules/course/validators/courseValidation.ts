@@ -20,6 +20,9 @@ export const validateCourse = [
   body("careerTypeId")
     .optional()
     .isInt().withMessage("careerTypeId debe ser un número."),
+  
+  body("price")
+    .isInt({ min: 0 }).withMessage("El precio debe ser un número entero positivo o cero."),
 
   body("learningOutcomes")
     .isArray({ min: 1 }).withMessage("Debe haber al menos un resultado de aprendizaje.").bail()

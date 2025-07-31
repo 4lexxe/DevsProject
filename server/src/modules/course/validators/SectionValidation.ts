@@ -20,13 +20,13 @@ export const validateSectionAndContents = [
     .notEmpty()
     .withMessage("La descripción de la sección es obligatoria")
     .isLength({ min: 10, max: 1000 })
-    .withMessage("La descripción debe tener entre 10 y 1000 caracteres"),
+    .withMessage("La descripción de la seccióndebe tener entre 10 y 1000 caracteres"),
 
   // 📌 Validar la imagen de portada (si existe, debe ser una URL válida)
   body("section.coverImage")
     .optional()
     .isURL()
-    .withMessage("La imagen de portada debe ser una URL válida"),
+    .withMessage("La imagen de portada de la sección debe ser una URL válida"),
 
   // 📌 Validar el tipo de módulo
   body("section.moduleType")
@@ -38,7 +38,7 @@ export const validateSectionAndContents = [
       "Experto",
       "Insano Hardcore",
     ])
-    .withMessage("El tipo de módulo debe ser un valor válido"),
+    .withMessage("El tipo de módulo de la sección debe ser un valor válido"),
 
   // 📌 Validar que los contenidos sean un array
   body("section.contents")
@@ -65,22 +65,9 @@ export const validateSectionAndContents = [
   body("section.contents.*.markdown")
     .optional()
     .isString()
-    .withMessage("El campo markdown debe ser una cadena de texto")
+    .withMessage("El campo markdown del contenido debe ser una cadena de texto")
     .isLength({ max: 10000 })
-    .withMessage("El campo markdown no puede superar los 10000 caracteres"),
-
-  body("section.contents.*.linkType")
-    .optional()
-    .isString()
-    .withMessage("El campo linkType debe ser una cadena de texto")
-    .isLength({ max: 50 })
-    .withMessage("El linkType no puede superar los 50 caracteres"),
-
-  body("section.contents.*.link")
-    .optional()
-    .if((value) => value !== "") // Solo aplica la validación de URL si el valor no es un string vacío
-    .isURL()
-    .withMessage("El campo link debe ser una URL válida"),
+    .withMessage("El campo markdown del contenido no puede superar los 10000 caracteres"),
 
   // 📌 Validar el quiz si existe
   body("section.contents.*.quiz")
@@ -93,32 +80,6 @@ export const validateSectionAndContents = [
       throw new Error("El campo quiz debe ser un array o null");
     })
     .withMessage("El campo quiz debe ser un array"),
-
-  body("section.contents.*.quiz.*.question")
-    .trim()
-    .notEmpty()
-    .withMessage("Cada pregunta del quiz debe tener un texto")
-    .isLength({ min: 5, max: 255 })
-    .withMessage("Cada pregunta debe tener entre 5 y 255 caracteres"),
-
-  body("section.contents.*.quiz.*.type")
-    .isIn(["Single", "MultipleChoice", "TrueOrFalse", "ShortAnswer"])
-    .withMessage("El tipo de pregunta del quiz debe ser válido"),
-
-  body("section.contents.*.quiz.*.answers")
-    .isArray({ min: 1 })
-    .withMessage("Cada pregunta del quiz debe tener al menos una respuesta"),
-
-  body("section.contents.*.quiz.*.answers.*.answer")
-    .trim()
-    .notEmpty()
-    .withMessage("Cada respuesta del quiz debe tener un texto")
-    .isLength({ min: 1, max: 255 })
-    .withMessage("Cada respuesta debe tener entre 1 y 255 caracteres"),
-
-  body("section.contents.*.quiz.*.answers.*.isCorrect")
-    .isBoolean()
-    .withMessage("El campo isCorrect debe ser un booleano"),
 
   // 📌 Validar recursos si existen
   body("section.contents.*.resources")

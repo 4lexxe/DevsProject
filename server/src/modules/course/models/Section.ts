@@ -36,7 +36,7 @@ Section.init(
     },
     coverImage: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
     moduleType: {
       type: DataTypes.ENUM('Introductorio', 'Principiante', 'Intermedio', 'Avanzado', 'Experto', 'Insano Hardcore'),

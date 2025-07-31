@@ -398,12 +398,12 @@ class CartController extends BaseController {
             body: {
               items,
               back_urls: {
-                success: `${process.env.FRONTEND_URL}/payment/success`,
-                failure: `${process.env.FRONTEND_URL}/payment/failure`,
-              pending: `${process.env.FRONTEND_URL}/payment/pending`,
-            },
-            auto_return: "approved",
-            external_reference: cart.id.toString(),
+                success: `${process.env.MP_PAYMENT_SUCCESS_URL}`,
+                failure: `${process.env.MP_PAYMENT_FAILURE_URL}`,
+                pending: `${process.env.MP_PAYMENT_PENDING_URL}`,
+              },
+              auto_return: "approved",
+              external_reference: cart.id.toString(),
             metadata: {
               cart_id: cart.id.toString(),
               user_id: userId.toString(),
@@ -418,7 +418,7 @@ class CartController extends BaseController {
               installments: 1, // Permitir hasta 12 cuotas
               default_installments: 1, // Cuota por defecto
             },
-            notification_url: `${process.env.BACKEND_URL}/api/webhook/mercadopago`,
+            notification_url: `${process.env.MP_WEBHOOK_URL}`,
             expires: true,
             expiration_date_from: new Date().toISOString(),
             expiration_date_to: new Date(
@@ -468,7 +468,7 @@ class CartController extends BaseController {
   );
 
   /**
-   * Calcula los totales del carrito aplicando descuentos activos
+   * Calcula los totales del carrito aplicando TODOS los descuentos activos
    */
   private static async calculateCartTotals(cart: any) {
     const cartCourses = await CartCourse.findAll({
@@ -501,7 +501,7 @@ class CartController extends BaseController {
         throw new Error(`El curso ${course.title} tiene un precio inválido`);
       }
 
-      // Buscar descuentos activos para el curso usando la relación muchos a muchos
+      // Buscar TODOS los descuentos activos para el curso usando la relación muchos a muchos
       const courseWithDiscounts = await Course.findByPk(course.id, {
         include: [
           {
@@ -518,27 +518,46 @@ class CartController extends BaseController {
       });
 
       let finalPrice = originalPrice;
-      let discountApplied = null;
+      let totalDiscountPercentage = 0;
+      let totalDiscountAmount = 0;
+      let appliedDiscounts = [];
 
-      // Si el curso tiene descuentos activos, aplicar el mayor
+      // Si el curso tiene descuentos activos, sumar TODOS los descuentos
       const courseData = courseWithDiscounts as any;
       if (courseData?.discountEvents && courseData.discountEvents.length > 0) {
-        // Ordenar por valor descendente y tomar el mayor descuento
-        const activeDiscounts = courseData.discountEvents.sort((a: any, b: any) => b.value - a.value);
-        const activeDiscount = activeDiscounts[0];
-        
-        const discountAmount = (originalPrice * activeDiscount.value) / 100;
-        finalPrice = originalPrice - discountAmount;
-        discountApplied = {
-          id: activeDiscount.id,
-          event: activeDiscount.event,
-          percentage: activeDiscount.value,
-          amount: discountAmount,
-        };
+        // Sumar todos los porcentajes de descuento activos
+        totalDiscountPercentage = courseData.discountEvents.reduce((total: number, discount: any) => {
+          return total + discount.value;
+        }, 0);
+
+        // Calcular el monto total de descuento
+        totalDiscountAmount = (originalPrice * totalDiscountPercentage) / 100;
+        finalPrice = originalPrice - totalDiscountAmount;
+
+        // Asegurar que el precio final no sea negativo
+        if (finalPrice < 0) {
+          finalPrice = 0;
+          totalDiscountAmount = originalPrice;
+        }
+
+        // Preparar lista de descuentos aplicados
+        appliedDiscounts = courseData.discountEvents.map((discount: any) => ({
+          id: discount.id,
+          event: discount.event,
+          description: discount.description,
+          value: discount.value,
+          startDate: discount.startDate,
+          endDate: discount.endDate,
+          isActive: discount.isActive,
+        }));
       }
 
+      // Redondear el precio final a 2 decimales
+      finalPrice = Math.round(finalPrice * 100) / 100;
+      totalDiscountAmount = Math.round(totalDiscountAmount * 100) / 100;
+
       console.log(
-        `Curso: ${course.title}, Precio final después de descuento: ${finalPrice}`
+        `Curso: ${course.title}, Descuento total: ${totalDiscountPercentage}%, Precio final: ${finalPrice}`
       ); // Debug
 
       totalOriginal += originalPrice;
@@ -552,10 +571,18 @@ class CartController extends BaseController {
           description: course.summary,
           originalPrice,
           finalPrice,
-          discountApplied,
+          hasDiscount: appliedDiscounts.length > 0,
+          discountEvents: appliedDiscounts,
+          totalDiscountPercentage,
+          savings: totalDiscountAmount,
         },
       });
     }
+
+    // Redondear totales finales
+    totalOriginal = Math.round(totalOriginal * 100) / 100;
+    totalWithDiscounts = Math.round(totalWithDiscounts * 100) / 100;
+    const totalSavings = Math.round((totalOriginal - totalWithDiscounts) * 100) / 100;
 
     return {
       id: cart.id,
@@ -564,7 +591,7 @@ class CartController extends BaseController {
       summary: {
         totalOriginal,
         totalWithDiscounts,
-        totalSavings: totalOriginal - totalWithDiscounts,
+        totalSavings,
         courseCount: courses.length,
       },
       // Para compatibilidad con código existente
