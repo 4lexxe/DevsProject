@@ -1,7 +1,7 @@
 import React from "react";
 import { IContentApi } from "@/course/interfaces/Content";
 import { Clock, ArrowLeft, BookOpen } from "lucide-react";
-import MarkdownPreview from "../SectionForm/MarkdownPreview";
+import MarkdownPreview from "./MarkdownPreview";
 import { Link } from "react-router-dom";
 
 function ContentDetail({ content, courseId }: { content: IContentApi, courseId: string }) {
@@ -19,22 +19,6 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
         <p className="text-slate-700 mb-6 text-lg leading-relaxed">
           {content.text}
         </p>
-
-        {content.link && (
-          <div className="mb-8 bg-gradient-to-r from-cyan-50 to-slate-100 p-6 rounded-xl">
-            <h3 className="text-xl font-semibold mb-3 bg-gradient-to-r from-cyan-600 to-blue-900 bg-clip-text text-transparent">
-              Recurso principal
-            </h3>
-            <a
-              href={content.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block bg-gradient-to-r from-cyan-600 to-blue-900 text-white px-6 py-3 rounded-lg hover:from-cyan-700 hover:to-blue-950 transition-all duration-300 shadow-md hover:shadow-lg"
-            >
-              Ver {content.linkType === "video" ? "video" : "recurso"}
-            </a>
-          </div>
-        )}
 
         {content.resources && content.resources.length > 0 && (
           <div className="mb-8">

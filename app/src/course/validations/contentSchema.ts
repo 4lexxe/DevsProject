@@ -30,8 +30,6 @@ export const contentSchema = z.object({
   title: z.string().min(1, "El título es obligatorio"),
   text: z.string().min(10, "El texto debe tener minimo 10 caracteres"),
   markdown: z.string().optional(),
-  linkType: z.string().optional(),
-  link: z.string().url("Debe ser una URL válida").optional().or(z.literal("")),
 
   resources: z.array(resourceSchema).optional(),
   duration: z.number().positive("La duración debe ser mayor a 0").default(1),

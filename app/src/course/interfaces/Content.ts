@@ -1,6 +1,3 @@
-export const linkTypes = ["Video", "Página", "Imagen", "Documento"] as const;
-export type linkType = (typeof linkTypes)[number];
-
 export const quizTypes = [
   "Single",
   "MultipleChoice",
@@ -29,8 +26,6 @@ export interface IContentInput {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: linkType;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
@@ -42,8 +37,6 @@ export interface IContent {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: linkType;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
@@ -63,8 +56,6 @@ export interface IContentApi {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: string;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
