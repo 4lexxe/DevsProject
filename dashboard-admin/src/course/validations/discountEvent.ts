@@ -11,7 +11,7 @@ export const discountEventSchema = z
     endDate: z.date({
       message: "La fecha de fin es requerida",
     }),
-    isActive: z.boolean().default(true),
+    isActive: z.boolean(),
   })
   .refine((data) => data.endDate > data.startDate, {
     message: "La fecha de fin debe ser posterior a la fecha de inicio",

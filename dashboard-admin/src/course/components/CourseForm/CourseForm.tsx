@@ -4,14 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
-  Image as ImageIcon,
   GraduationCap,
-  ListChecks,
   FileText,
-  Info,
-  Target,
   Tags,
-  Briefcase,
   Loader2,
   CheckCircle2,
   XCircle,
@@ -24,9 +19,9 @@ import CheckInput from "@/shared/components/inputs/CheckInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import SelectInput from "@/shared/components/inputs/SelectInput";
 import MultiSelectInput from "@/shared/components/inputs/MultiSelectInput";
-import ImagePreview from "@/course/components/CourseForm/ImagePreview";
+import ImagePreview from "./ImagePreview";
 
-import { ICourseInput, ICourse } from "@/course/interfaces/CourseForm";
+import { ICourseFormData, ICourse } from "@/course/interfaces/CourseForm";
 import { courseSchema } from "@/course/validations/courseSchema";
 
 import { createFullCourse } from "@/course/services/courseFormService";
@@ -58,7 +53,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
     watch,
     control,
     formState: { errors },
-  } = useForm<ICourseInput>({
+  } = useForm<ICourseFormData>({
     resolver: zodResolver(courseSchema),
     defaultValues: course || {
       title: "",
@@ -69,6 +64,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
       summary: "",
       about: "",
       learningOutcomes: "",
+      price: undefined,
       isActive: false,
       isInDevelopment: false,
       adminId: "1",
@@ -112,14 +108,14 @@ export default function CourseForm({ course }: { course?: ICourse }) {
 
       if (response.statusCode === (course ? 200 : 201)) {
         setTimeout(() => {
-          navigate(`/course/${response.data.id}`);
+          navigate(`/courses/${response.data.id}`);
         }, 500);
       }
     } catch (err: any) {
       setMessage(err.response?.data?.message || "Error desconocido");
       setStatus("error");
       if (err.response?.data?.errors) {
-        setErrors2(err.response.data.errors.map((error: any) => error.msg));
+        setErrors2(err.response.data.errors.raw.map((error: any) => error.msg));
       }
       console.error("Error al guardar el curso:", err);
     } finally {
@@ -127,13 +123,14 @@ export default function CourseForm({ course }: { course?: ICourse }) {
     }
   };
 
-  const onSubmit: SubmitHandler<ICourseInput> = (data) => {
+  const onSubmit: SubmitHandler<ICourseFormData> = (data) => {
     setTimeout(() => {
       handleSubmitCourse({
         ...data,
         categoryIds: data.categoryIds?.map(Number) ?? [],
         careerTypeId: data.careerTypeId ? Number(data.careerTypeId) : null,
         adminId: Number(data.adminId),
+        price: data.price ? Number(data.price) : undefined,
       });
     }, 500);
   };
@@ -189,10 +186,21 @@ export default function CourseForm({ course }: { course?: ICourse }) {
                 error={errors["image"]?.message}
                 labelText="URL de la imagen"
               />
+
+              <CustomInput
+                name="price"
+                register={register}
+                type="number"
+                error={errors["price"]?.message}
+                labelText="Precio del Curso"
+                placeholder="0.00"
+                step="1000"
+                min="0"
+              />
             </div>
 
             <div className="space-y-4">
-              <ImagePreview watchContentImage={watch("image")} />
+              <ImagePreview watchContentImage={watch("image") || ""} />
             </div>
           </div>
 

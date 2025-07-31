@@ -13,7 +13,7 @@ import {
 } from "@dnd-kit/sortable";
 import { restrictToParentElement } from "@dnd-kit/modifiers";
 
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import type { IContent } from "@/course/interfaces/Content";
 
 import DraggableItem from "@/course/components/SectionForm/DraggableItem";

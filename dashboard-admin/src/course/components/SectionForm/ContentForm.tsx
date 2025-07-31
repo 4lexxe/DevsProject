@@ -1,14 +1,12 @@
 import { useForm, type SubmitHandler, useFieldArray } from "react-hook-form";
-import { type IContentInput, linkTypes } from "@/course/interfaces/Content";
+import { type IContentFormData } from "@/course/interfaces/Content";
 
 import MarkdownPreview from "./MarkdownPreview";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
-import SelectInput from "@/shared/components/inputs/SelectInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
 import { Save, X, Plus, Trash2 } from "lucide-react";
 import { useSectionContext } from "@/course/context/SectionFormContext";
-import { useQuizContext } from "@/course/context/QuizFormContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { contentSchema } from "@/course/validations/contentSchema";
 
@@ -22,14 +20,12 @@ export default function ContentForm() {
     watch,
     control,
     formState: { errors },
-  } = useForm<IContentInput>({
+  } = useForm<IContentFormData>({
     resolver: zodResolver(contentSchema),
     defaultValues: {
       title: initialData?.title || "",
       text: initialData?.text || "",
       markdown: initialData?.markdown || undefined,
-      linkType: initialData?.linkType || undefined,
-      link: initialData?.link || undefined,
       resources: initialData?.resources || [],
       duration: initialData?.duration || undefined,
       position: initialData?.position || 0,
@@ -47,7 +43,7 @@ export default function ContentForm() {
     name: "resources",
   });
 
-  const onSubmit: SubmitHandler<IContentInput> = async (data) => {
+  const onSubmit: SubmitHandler<IContentFormData> = async (data) => {
     saveContent(data);
   };
 
@@ -69,26 +65,6 @@ export default function ContentForm() {
             labelText="Texto"
             register={register}
             error={errors.text?.message}
-          />
-
-          <SelectInput
-            name="linkType"
-            register={register}
-            labelText="Tipo de Link"
-            placeholder="Seleccione algún tipo"
-            error={errors.linkType?.message}
-            options={linkTypes.map((linkType) => ({
-              value: linkType,
-              label: linkType,
-            }))}
-          />
-
-          <CustomInput
-            name="link"
-            type="text"
-            labelText="Link"
-            register={register}
-            error={errors.link?.message}
           />
 
           <TextAreaInput

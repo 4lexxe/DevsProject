@@ -38,14 +38,15 @@ export default function SectionList({
 
       if (response.statusCode === (sectionId ? 200 : 201)) {
         setTimeout(() => {
-          navigate(`/course/${response.data.courseId}`);
+          navigate(`/courses/${response.data.courseId}`);
         }, 500);
       }
     } catch (err: any) {
       setMessage(err.response?.data?.message || "Error desconocido");
       setStatus("error");
       if (err.response?.data?.errors) {
-        setErrors2(err.response.data.errors.map((error: any) => error.msg));
+        
+        setErrors2(err.response.data.errors.raw.map((error: any) => error.msg));
       }
       console.log("Error al crear la sección. Inténtalo nuevamente.", err);
     } finally {
@@ -73,8 +74,6 @@ export default function SectionList({
       ...sectionState.section,
       contents: sectionState.section.contents.map(({ id, ...rest }) => rest),
     };
-
-    console.log(sectionData)
 
     const dataToSend = { section: sectionData, courseId };
     handleCreateSection(dataToSend);
@@ -181,6 +180,13 @@ export default function SectionList({
 
       {!sectionState.isAddingContent && !sectionState.isEditingSection && !sectionState.isEditingContent && (
         <div className="mt-6 flex justify-end">
+          <button 
+            onClick={() => { navigate(-1)}}
+            className="inline-flex items-center px-4 py-2 mr-4 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200 ease-in-out"
+          >
+            Cancelar
+          </button>
+
           <button
             onClick={onSubmit}
             disabled={isLoading}

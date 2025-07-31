@@ -28,13 +28,20 @@ export const courseSchema = z
       .min(20, { message: "La descripción debe tener al menos 20 caracteres" })
       .optional(),
 
-    prerequisites: z.array(z.string()).optional().or(z.literal(null)),
+    prerequisites: z.array(z.string()).optional().or(z.literal("")).or(z.literal(null)),
 
     careerTypeId: z.string().optional().or(z.literal(null)),
 
     learningOutcomes: z
       .array(z.string(), { message: "Tipo invalido" })
-      .min(1, { message: "Debe haber al menos un resultado de aprendizaje" }),
+      .min(1, { message: "Debe haber al menos un resultado de aprendizaje" })
+      .or(z.literal("")),
+
+    price: z
+      .number({ message: "El precio debe ser un número" })
+      .min(0, { message: "El precio debe ser mayor o igual a 0" })
+      .max(999999, { message: "El precio no puede ser mayor a 999,999" })
+      .optional(),
 
     isActive: z.boolean(),
     isInDevelopment: z.boolean(),

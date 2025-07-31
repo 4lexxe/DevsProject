@@ -19,7 +19,6 @@ interface SectionContextType {
   saveContent: (contentData: IContentInput) => void;
   cancelEdit: () => void;
   updateContentPosition: (contentId: string, newPosition: number) => void;
-  addQuizToContent: (contentId: string, quiz: any[]) => void;
 }
 
 const SectionContext = createContext<SectionContextType | undefined>(undefined);
@@ -156,21 +155,6 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const addQuizToContent = useCallback((contentId: string, quiz: any[]) => {
-    setState((prev) => {
-      if (!prev.section) return prev;
-      return {
-        ...prev,
-        section: {
-          ...prev.section,
-          contents: prev.section.contents.map((content) =>
-            content.id === contentId ? { ...content, quiz } : content
-          ),
-        },
-      };
-    });
-  }, []);
-
   const cancelEdit = useCallback(() => {
     setState((prev) => ({
       ...prev,
@@ -197,7 +181,6 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         saveContent,
         cancelEdit,
         updateContentPosition,
-        addQuizToContent,
       }}
     >
       {children}

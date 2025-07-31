@@ -58,9 +58,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
                         setValueAs: (value): number => (value === "" ? 0 : Number(value)),
                     }),
                 })}
-                // Pasamos el resto de las props específicas según el tipo
-                {...(type === "number" ? (rest as NumberInputProps) : (rest as DefaultInputProps))}
-
+                // Aplicamos todas las props específicas del tipo
+                {...rest}
                 disabled={disabled}
             />
 

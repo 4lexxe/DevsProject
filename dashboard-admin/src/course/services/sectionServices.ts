@@ -13,6 +13,16 @@ export const getSectionsByCourse = async (courseId: string) => {
   }
 };
 
+export const getSectionByIdWithContents = async (sectionId: string) => {
+  try {
+    const response = await api.get(`${SECTIONS_ENDPOINT}/${sectionId}/contents`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener la sección con contenidos:', error);
+    throw error;
+  }
+}
+
 // Crear una nueva sección
 export const createSection = async (sectionData: any) => {
   try {

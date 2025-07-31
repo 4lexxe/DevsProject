@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSectionById } from "@/course/services/sectionServices";
 import { useSectionContext } from "@/course/context/SectionFormContext";
-import { ISectionInput } from "@/course/interfaces/CourseForm";
+import { ISectionFormData } from "@/course/interfaces/CourseForm";
 import { sectionSchema, moduleTypes } from "@/course/validations/sectionSchema";
 import {
   BookOpen,
@@ -16,8 +16,8 @@ import {
   Save as SaveIcon,
   Palette,
 } from "lucide-react";
-import { ColorSelector } from "./ColorSelector";
-import { ColorPicker } from "./ColorPicker";
+import { ColorSelector } from "../SectionForm/ColorSelector";
+import { ColorPicker } from "../SectionForm/ColorPicker";
 
 export default function SectionForm() {
   const navigate = useNavigate();
@@ -40,12 +40,12 @@ export default function SectionForm() {
     setValue,
     watch,
     formState: { errors },
-  } = useForm<ISectionInput>({
+  } = useForm<ISectionFormData>({
     resolver: zodResolver(sectionSchema),
     defaultValues: {
       title: sectionState.section?.title || "",
       description: sectionState.section?.description || "",
-      moduleType: sectionState.section?.moduleType || "",
+      moduleType: (sectionState.section?.moduleType as ISectionFormData['moduleType']) || "Introductorio",
       coverImage: sectionState.section?.coverImage || "",
       colorGradient: sectionState.section?.colorGradient || ["#FFFFFF", "#000000"],
     },
@@ -58,7 +58,7 @@ export default function SectionForm() {
       reset({
         title: sectionState.section?.title || "",
         description: sectionState.section?.description || "",
-        moduleType: sectionState.section?.moduleType || "",
+        moduleType: (sectionState.section?.moduleType as ISectionFormData['moduleType']) || "Introductorio",
         coverImage: sectionState.section?.coverImage || "",
         colorGradient: sectionState.section?.colorGradient || ["#FFFFFF", "#000000"],
       });
@@ -78,6 +78,7 @@ export default function SectionForm() {
           startEditingSection();
           reset({
             ...sectionData,
+            moduleType: sectionData.moduleType as ISectionFormData['moduleType'],
             colorGradient: sectionData.colorGradient || ["#FFFFFF", "#000000"],
           });
         } catch (error) {
@@ -95,7 +96,7 @@ export default function SectionForm() {
       reset({
         title: sectionState.section.title,
         description: sectionState.section.description,
-        moduleType: sectionState.section.moduleType,
+        moduleType: sectionState.section.moduleType as ISectionFormData['moduleType'],
         coverImage: sectionState.section.coverImage,
         colorGradient: sectionState.section.colorGradient,
       });
@@ -110,11 +111,16 @@ export default function SectionForm() {
     setPickerType("default");
   };
 
-  const onSubmit = (data: ISectionInput) => {
+  const onSubmit = (data: ISectionFormData) => {
+    const formattedData = {
+      ...data,
+      colorGradient: data.colorGradient as [string, string]
+    };
+    
     if (!sectionState.isEditingSection) {
-      setSection({ ...data, contents: [] });
+      setSection({ ...formattedData, contents: [] });
     } else {
-      editSection(data);
+      editSection(formattedData);
     }
     /* handleCancel(); */
   };
@@ -207,6 +213,7 @@ export default function SectionForm() {
               {...register("description")}
               placeholder="Describa la sección"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[100px]"
+              style={{ resize: "none" }}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>

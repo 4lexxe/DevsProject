@@ -1,5 +1,4 @@
-import React from 'react';
-import type { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister } from 'react-hook-form';
 
 interface Option {
   value: string;

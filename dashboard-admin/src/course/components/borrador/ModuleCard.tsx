@@ -1,4 +1,3 @@
-import React from 'react';
 import { Brain, Rocket, Code, Zap } from 'lucide-react';
 import ModuleContent from './ModuleContent';
 

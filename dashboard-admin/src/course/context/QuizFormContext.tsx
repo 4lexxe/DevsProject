@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
+import { createContentQuiz } from "../services/contentServices";
+import { Quiz } from "../interfaces/Content";
 
 interface QuizState {
   contentId: string;
@@ -11,6 +13,7 @@ interface QuizContextType {
   startAddingQuiz: (contentId: string) => void;
   startEditingQuiz: (contentId: string) => void;
   cancelQuizAction: () => void;
+  saveQuiz: (quizData: Quiz[]) => Promise<void>;
 }
 
 const QuizContext = createContext<QuizContextType | undefined>(undefined);
@@ -41,6 +44,17 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
     setIsEditingQuiz(false);
   };
 
+  // Guardar quiz usando el servicio
+  const saveQuiz = async (quizData: Quiz[]) => {
+    try {
+      await createContentQuiz(quizState.contentId, { quiz: quizData });
+      cancelQuizAction();
+    } catch (error) {
+      console.error("Error al guardar el quiz:", error);
+      throw error;
+    }
+  };
+
   return (
     <QuizContext.Provider
       value={{
@@ -50,6 +64,7 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
         startAddingQuiz,
         startEditingQuiz,
         cancelQuizAction,
+        saveQuiz,
       }}
     >
       {children}

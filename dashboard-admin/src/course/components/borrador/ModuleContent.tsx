@@ -1,4 +1,3 @@
-import React from 'react';
 import { PlayCircle, FileText, Code, ChevronUp, ChevronDown, Image as ImageIcon } from 'lucide-react';
 
 interface ModuleContentProps {

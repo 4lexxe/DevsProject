@@ -10,7 +10,6 @@ export default function ImagePreview({watchContentImage}: { watchContentImage: s
   if (!watchContentImage) return null
   return (
     <div className="mt-6 rounded-lg p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">Previsualización de la Imagen:</h3>
       <div className="max-w-2xl mx-auto h-64 overflow-auto rounded-lg bg-white">
         {!imageError ? (
           <div className="flex items-center justify-center h-full shadow-md" >

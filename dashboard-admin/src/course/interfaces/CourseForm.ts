@@ -1,4 +1,11 @@
+import { z } from "zod";
+import { courseSchema } from "../validations/courseSchema";
+import { sectionSchema } from "../validations/sectionSchema";
 import { IContent, IContentInput } from "./Content";
+
+// Interfaz inferida del esquema de validación para garantizar consistencia
+export type ICourseFormData = z.infer<typeof courseSchema>;
+export type ISectionFormData = z.infer<typeof sectionSchema>;
 
 // Curso ----------------------------------------------------------------------------------------------------------------------------
 export interface ICourseInput {

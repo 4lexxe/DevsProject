@@ -5,10 +5,8 @@ import {
   SectionProvider,
   useSectionContext,
 } from "../context/SectionFormContext";
-import { QuizProvider, useQuizContext } from "../context/QuizFormContext";
-import QuizForm from "../components/SectionForm/QuizForm";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { getSectionById } from "../services/sectionServices";
 
 import { ISection } from "../interfaces/CourseForm";
@@ -17,7 +15,6 @@ import { IContent } from "../interfaces/Content";
 function SectionManager() {
   const { courseId, sectionId } = useParams<string>();
   const { state: sectionState } = useSectionContext();
-  const { isAddingQuiz, isEditingQuiz } = useQuizContext();
 
   useEffect(() => {
     const getSection = async () => {
@@ -39,9 +36,9 @@ function SectionManager() {
       event.preventDefault();
       event.returnValue = "Tienes cambios sin guardar. ¿Estás seguro de salir?";
     };
-  
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-  
+
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
@@ -60,8 +57,6 @@ function SectionManager() {
           title: content.title,
           text: content.text,
           markdown: content.markdown,
-          linkType: content.linkType,
-          link: content.link,
           quiz:
             content.quiz && typeof content.quiz === "string"
               ? JSON.parse(content.quiz)
@@ -77,30 +72,24 @@ function SectionManager() {
     };
   };
 
-  console.log("El estado de la seccino es: ", sectionState)
+  console.log("El estado de la seccino es: ", sectionState);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <div className="w-4/5 p-5 border rounded-xl shadow-md bg-white mt-20 mb-20">
-        
-        {isAddingQuiz || isEditingQuiz ? (
-          <QuizForm />
-        ) : (
-          <>
-            {sectionState.section === null || sectionState.isEditingSection ? (
-              <SectionForm />
-            ) : courseId ? (
-              sectionId ? (
-                <SectionList courseId={courseId} sectionId={sectionId} />
-              ) : (
-                <SectionList courseId={courseId} />
-              )
+        <>
+          {sectionState.section === null || sectionState.isEditingSection ? (
+            <SectionForm />
+          ) : courseId ? (
+            sectionId ? (
+              <SectionList courseId={courseId} sectionId={sectionId} />
             ) : (
-              <p>Cargando...</p>
-            )}
-          </>
-        )}
-      
+              <SectionList courseId={courseId} />
+            )
+          ) : (
+            <p>Cargando...</p>
+          )}
+        </>
       </div>
     </div>
   );
@@ -109,9 +98,7 @@ function SectionManager() {
 function SectionsAndContentsPage() {
   return (
     <SectionProvider>
-      <QuizProvider>
-        <SectionManager />
-      </QuizProvider>
+      <SectionManager />
     </SectionProvider>
   );
 }

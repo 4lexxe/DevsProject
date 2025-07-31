@@ -1,9 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Edit, Trash2, GripVertical, Plus } from "lucide-react";
+import { Edit, Trash2, GripVertical } from "lucide-react";
 import type { IContent } from "@/course/interfaces/Content";
-import { useQuizContext } from "@/course/context/QuizFormContext";
-import { useSectionContext } from "@/course/context/SectionFormContext";
 
 export default function DraggableItem({
   item,
@@ -18,8 +16,6 @@ export default function DraggableItem({
   onDelete: any;
   isDragging?: boolean;
 }) {
-  const { quizState, startAddingQuiz, startEditingQuiz } = useQuizContext();
-  const { state: sectionState } = useSectionContext();
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.id });
 
@@ -65,38 +61,6 @@ export default function DraggableItem({
 
       {/* Actions Section - No modificar eventos durante el arrastre */}
       <div className={`flex flex-col md:flex-row items-start md:items-center gap-4 w-full md:w-auto ${isDragging ? 'pointer-events-none' : ''}`}>
-        {/* Quiz Actions */}
-        <div className="w-full md:w-auto">
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-gray-700">Cuestionario</span>
-            {item.quiz && item.quiz.length > 0 ? (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => startEditingQuiz(item.id)}
-                  className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                >
-                  <Edit className="w-3.5 h-3.5 mr-1.5" />
-                  Editar
-                </button>
-                <button
-                  onClick={() => startEditingQuiz(item.id)}
-                  className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200"
-                >
-                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-                  Eliminar
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => startAddingQuiz(item.id)}
-                className="flex items-center px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-              >
-                <Plus className="w-3.5 h-3.5 mr-1.5" />
-                Añadir
-              </button>
-            )}
-          </div>
-        </div>
 
         {/* Content Actions */}
         <div className="flex items-center gap-2">

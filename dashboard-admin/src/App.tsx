@@ -14,11 +14,11 @@ import {
   CoursesPage,
   CourseDetail,
   CourseFormPage,
-  QuizPage,
   SectionFormPage,
-  ContentPage,
+  SectionPage,
   CourseDiscountEvent,
   DiscountEventsList,
+  QuizFormPage
 } from "@/course/index";
 
 import HeaderSectionAdminPage from "./header-section/page/HeaderSectionAdminPage";
@@ -75,12 +75,23 @@ function App() {
                 path="courses/:courseId/section/:sectionId/edit"
                 element={<SectionFormPage />}
               />
-              <Route
-                path="courses/:courseId/section/content/:contentId"
-                element={<ContentPage />}
-              />
-              <Route path="courses/:courseId/quiz" element={<QuizPage />} />
               
+              <Route path="sections/:id" element={<SectionPage />} />
+
+              {/* Rutas para Quiz */}
+              <Route
+                path="/contents/:contentId/quiz/new"
+                element={<QuizFormPage />}
+              />
+              <Route
+                path="/contents/:contentId/quiz/edit"
+                element={<QuizFormPage />}
+              />
+              <Route
+                path="courses/:courseId/section/:sectionId/quiz"
+                element={<QuizFormPage />}
+              />
+
               <Route
                 path="courses/discount-events"
                 element={<DiscountEventsList />}
