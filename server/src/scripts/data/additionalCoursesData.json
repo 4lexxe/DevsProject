@@ -1,0 +1,572 @@
+{
+  "careerTypes": [
+    {
+      "id": 6,
+      "name": "Diseño Digital",
+      "icon": "🎨",
+      "description": "Diseño gráfico, UX/UI y multimedia",
+      "isActive": true
+    },
+    {
+      "id": 7,
+      "name": "Desarrollo de Videojuegos",
+      "icon": "🎮",
+      "description": "Programación y diseño de videojuegos",
+      "isActive": true
+    },
+    {
+      "id": 8,
+      "name": "Matemáticas y Ciencias",
+      "icon": "🔬",
+      "description": "Matemáticas, física y ciencias exactas",
+      "isActive": true
+    },
+    {
+      "id": 9,
+      "name": "Idiomas",
+      "icon": "🌍",
+      "description": "Aprendizaje de idiomas extranjeros",
+      "isActive": true
+    },
+    {
+      "id": 10,
+      "name": "Música y Audio",
+      "icon": "🎵",
+      "description": "Producción musical y audio digital",
+      "isActive": true
+    }
+  ],
+  "categories": [
+    {
+      "id": 11,
+      "name": "Unity",
+      "icon": "🎯",
+      "description": "Motor de videojuegos Unity",
+      "isActive": true
+    },
+    {
+      "id": 12,
+      "name": "Unreal Engine",
+      "icon": "🚀",
+      "description": "Motor de videojuegos Unreal Engine",
+      "isActive": true
+    },
+    {
+      "id": 13,
+      "name": "Photoshop",
+      "icon": "🖼️",
+      "description": "Edición de imágenes con Adobe Photoshop",
+      "isActive": true
+    },
+    {
+      "id": 14,
+      "name": "Figma",
+      "icon": "📐",
+      "description": "Diseño de interfaces con Figma",
+      "isActive": true
+    },
+    {
+      "id": 15,
+      "name": "Matemáticas",
+      "icon": "📊",
+      "description": "Matemáticas puras y aplicadas",
+      "isActive": true
+    },
+    {
+      "id": 16,
+      "name": "Física",
+      "icon": "⚛️",
+      "description": "Física teórica y experimental",
+      "isActive": true
+    },
+    {
+      "id": 17,
+      "name": "Inglés",
+      "icon": "🇺🇸",
+      "description": "Idioma inglés",
+      "isActive": true
+    },
+    {
+      "id": 18,
+      "name": "Francés",
+      "icon": "🇫🇷",
+      "description": "Idioma francés",
+      "isActive": true
+    },
+    {
+      "id": 19,
+      "name": "Música",
+      "icon": "🎼",
+      "description": "Teoría musical y composición",
+      "isActive": true
+    },
+    {
+      "id": 20,
+      "name": "3D Modeling",
+      "icon": "🧊",
+      "description": "Modelado 3D y animación",
+      "isActive": true
+    }
+  ],
+  "courses": [
+    {
+      "id": 21,
+      "title": "Unity 3D: Desarrollo de Videojuegos",
+      "image": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800",
+      "summary": "Crea videojuegos 3D profesionales con Unity",
+      "about": "Aprende a desarrollar videojuegos 3D desde cero usando Unity. Cubriremos programación en C#, física, animaciones y publicación en diferentes plataformas.",
+      "careerTypeId": 7,
+      "learningOutcomes": [
+        "Dominar la interfaz de Unity",
+        "Programar gameplay en C#",
+        "Implementar física y animaciones",
+        "Publicar juegos en múltiples plataformas"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de programación",
+        "Lógica de programación"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 149.99,
+      "adminId": 1,
+      "categoryIds": [11]
+    },
+    {
+      "id": 22,
+      "title": "Unreal Engine 5: Juegos AAA",
+      "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800",
+      "summary": "Desarrollo de videojuegos de alta calidad con UE5",
+      "about": "Domina Unreal Engine 5 para crear videojuegos de calidad AAA. Incluye Blueprints, Lumen, Nanite y las últimas tecnologías de Epic Games.",
+      "careerTypeId": 7,
+      "learningOutcomes": [
+        "Usar Blueprints para programación visual",
+        "Implementar Lumen y Nanite",
+        "Crear mundos abiertos",
+        "Optimizar para consolas y PC"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de videojuegos",
+        "Experiencia con motores gráficos"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 179.99,
+      "adminId": 1,
+      "categoryIds": [12]
+    },
+    {
+      "id": 23,
+      "title": "Diseño UX/UI con Figma",
+      "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800",
+      "summary": "Diseña interfaces de usuario modernas y funcionales",
+      "about": "Aprende a diseñar experiencias de usuario excepcionales usando Figma. Desde wireframes hasta prototipos interactivos.",
+      "careerTypeId": 6,
+      "learningOutcomes": [
+        "Crear wireframes y mockups",
+        "Diseñar sistemas de diseño",
+        "Prototipar interacciones",
+        "Colaborar en equipos de diseño"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de diseño",
+        "Principios de usabilidad"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 99.99,
+      "adminId": 1,
+      "categoryIds": [14]
+    },
+    {
+      "id": 24,
+      "title": "Adobe Photoshop: Edición Profesional",
+      "image": "https://images.unsplash.com/photo-1609921212029-bb5a28e60960?w=800",
+      "summary": "Domina Photoshop para edición y retoque profesional",
+      "about": "Curso completo de Adobe Photoshop desde básico hasta avanzado. Aprende retoque fotográfico, composición digital y diseño gráfico.",
+      "careerTypeId": 6,
+      "learningOutcomes": [
+        "Dominar herramientas de Photoshop",
+        "Realizar retoque fotográfico profesional",
+        "Crear composiciones digitales",
+        "Optimizar imágenes para web y print"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de computación",
+        "Interés en diseño gráfico"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 119.99,
+      "adminId": 1,
+      "categoryIds": [13]
+    },
+    {
+      "id": 25,
+      "title": "Cálculo Diferencial e Integral",
+      "image": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800",
+      "summary": "Fundamentos del cálculo matemático",
+      "about": "Domina los conceptos fundamentales del cálculo diferencial e integral. Desde límites hasta aplicaciones en física e ingeniería.",
+      "careerTypeId": 8,
+      "learningOutcomes": [
+        "Entender límites y continuidad",
+        "Calcular derivadas e integrales",
+        "Resolver problemas de optimización",
+        "Aplicar cálculo en problemas reales"
+      ],
+      "prerequisites": [
+        "Álgebra avanzada",
+        "Trigonometría",
+        "Geometría analítica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 89.99,
+      "adminId": 1,
+      "categoryIds": [15]
+    },
+    {
+      "id": 26,
+      "title": "Álgebra Lineal Aplicada",
+      "image": "https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=800",
+      "summary": "Vectores, matrices y transformaciones lineales",
+      "about": "Aprende álgebra lineal con enfoque en aplicaciones prácticas en ciencia de datos, gráficos por computadora y machine learning.",
+      "careerTypeId": 8,
+      "learningOutcomes": [
+        "Operar con vectores y matrices",
+        "Entender transformaciones lineales",
+        "Calcular eigenvalores y eigenvectores",
+        "Aplicar en machine learning"
+      ],
+      "prerequisites": [
+        "Álgebra básica",
+        "Conocimientos de programación básica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 99.99,
+      "adminId": 1,
+      "categoryIds": [15]
+    },
+    {
+      "id": 27,
+      "title": "Física Cuántica para Principiantes",
+      "image": "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=800",
+      "summary": "Introducción a los conceptos de mecánica cuántica",
+      "about": "Explora los fascinantes conceptos de la física cuántica de manera accesible. Desde el principio de incertidumbre hasta la computación cuántica.",
+      "careerTypeId": 8,
+      "learningOutcomes": [
+        "Entender principios cuánticos básicos",
+        "Comprender la dualidad onda-partícula",
+        "Explorar aplicaciones tecnológicas",
+        "Introducción a computación cuántica"
+      ],
+      "prerequisites": [
+        "Física básica",
+        "Matemáticas de bachillerato"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 129.99,
+      "adminId": 1,
+      "categoryIds": [16]
+    },
+    {
+      "id": 28,
+      "title": "Inglés Conversacional Avanzado",
+      "image": "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800",
+      "summary": "Domina la conversación en inglés con fluidez",
+      "about": "Mejora tu inglés conversacional hasta nivel avanzado. Incluye pronunciación, expresiones idiomáticas y conversación en contextos profesionales.",
+      "careerTypeId": 9,
+      "learningOutcomes": [
+        "Conversar con fluidez en inglés",
+        "Dominar pronunciación nativa",
+        "Usar expresiones idiomáticas",
+        "Comunicarse en contextos profesionales"
+      ],
+      "prerequisites": [
+        "Inglés intermedio",
+        "Conocimientos básicos de gramática"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 79.99,
+      "adminId": 1,
+      "categoryIds": [17]
+    },
+    {
+      "id": 29,
+      "title": "Francés desde Cero",
+      "image": "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=800",
+      "summary": "Aprende francés desde nivel principiante",
+      "about": "Curso completo de francés para principiantes. Aprende gramática, vocabulario y conversación con metodología moderna e interactiva.",
+      "careerTypeId": 9,
+      "learningOutcomes": [
+        "Dominar gramática francesa básica",
+        "Construir vocabulario esencial",
+        "Mantener conversaciones básicas",
+        "Entender cultura francófona"
+      ],
+      "prerequisites": [
+        "Ninguno - curso para principiantes"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 89.99,
+      "adminId": 1,
+      "categoryIds": [18]
+    },
+    {
+      "id": 30,
+      "title": "Producción Musical con Ableton Live",
+      "image": "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800",
+      "summary": "Crea música electrónica profesional",
+      "about": "Aprende a producir música electrónica usando Ableton Live. Desde beats básicos hasta tracks completos listos para el club.",
+      "careerTypeId": 10,
+      "learningOutcomes": [
+        "Dominar Ableton Live",
+        "Crear beats y melodías",
+        "Mezclar y masterizar tracks",
+        "Producir diferentes géneros electrónicos"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de música",
+        "Interés en música electrónica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 139.99,
+      "adminId": 1,
+      "categoryIds": [19]
+    },
+    {
+      "id": 31,
+      "title": "Blender 3D: Modelado y Animación",
+      "image": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800",
+      "summary": "Modelado 3D y animación con Blender",
+      "about": "Domina Blender para crear modelos 3D, animaciones y renders fotorrealistas. Desde modelado básico hasta técnicas avanzadas.",
+      "careerTypeId": 6,
+      "learningOutcomes": [
+        "Modelar objetos 3D complejos",
+        "Crear animaciones fluidas",
+        "Renderizar imágenes fotorrealistas",
+        "Usar nodos y materiales avanzados"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de 3D",
+        "Conceptos de arte digital"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 159.99,
+      "adminId": 1,
+      "categoryIds": [20]
+    },
+    {
+      "id": 32,
+      "title": "Teoría Musical y Composición",
+      "image": "https://images.unsplash.com/photo-1507838153414-b4b713384a76?w=800",
+      "summary": "Fundamentos de teoría musical y composición",
+      "about": "Aprende los fundamentos de la teoría musical y composición. Desde escalas y acordes hasta armonía avanzada y análisis musical.",
+      "careerTypeId": 10,
+      "learningOutcomes": [
+        "Entender escalas y modos",
+        "Construir acordes y progresiones",
+        "Componer melodías efectivas",
+        "Analizar obras musicales"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de música",
+        "Saber leer partituras básicas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 99.99,
+      "adminId": 1,
+      "categoryIds": [19]
+    },
+    {
+      "id": 33,
+      "title": "Estadística y Probabilidad",
+      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800",
+      "summary": "Fundamentos de estadística descriptiva e inferencial",
+      "about": "Domina los conceptos fundamentales de estadística y probabilidad. Esencial para ciencia de datos, investigación y toma de decisiones.",
+      "careerTypeId": 8,
+      "learningOutcomes": [
+        "Calcular medidas de tendencia central",
+        "Entender distribuciones de probabilidad",
+        "Realizar pruebas de hipótesis",
+        "Interpretar resultados estadísticos"
+      ],
+      "prerequisites": [
+        "Matemáticas básicas",
+        "Álgebra"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 109.99,
+      "adminId": 1,
+      "categoryIds": [15]
+    },
+    {
+      "id": 34,
+      "title": "Game Design: Mecánicas y Narrativa",
+      "image": "https://images.unsplash.com/photo-1556438064-2d7646166914?w=800",
+      "summary": "Diseño de videojuegos desde la conceptualización",
+      "about": "Aprende los principios fundamentales del diseño de videojuegos. Desde mecánicas de juego hasta narrativa interactiva y balanceado.",
+      "careerTypeId": 7,
+      "learningOutcomes": [
+        "Diseñar mecánicas de juego efectivas",
+        "Crear narrativas interactivas",
+        "Balancear dificultad y progresión",
+        "Documentar diseños de juego"
+      ],
+      "prerequisites": [
+        "Experiencia jugando videojuegos",
+        "Pensamiento creativo"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 129.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 35,
+      "title": "Ilustración Digital con Procreate",
+      "image": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800",
+      "summary": "Arte digital profesional en iPad",
+      "about": "Crea ilustraciones digitales profesionales usando Procreate en iPad. Desde sketches básicos hasta ilustraciones complejas.",
+      "careerTypeId": 6,
+      "learningOutcomes": [
+        "Dominar herramientas de Procreate",
+        "Crear ilustraciones desde cero",
+        "Desarrollar estilo personal",
+        "Preparar arte para diferentes medios"
+      ],
+      "prerequisites": [
+        "iPad con Apple Pencil",
+        "Conocimientos básicos de dibujo"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 89.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 36,
+      "title": "Japonés para Principiantes",
+      "image": "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800",
+      "summary": "Aprende japonés desde hiragana hasta conversación",
+      "about": "Curso completo de japonés para principiantes. Aprende hiragana, katakana, kanji básico y conversación cotidiana.",
+      "careerTypeId": 9,
+      "learningOutcomes": [
+        "Leer y escribir hiragana y katakana",
+        "Conocer kanji básico",
+        "Mantener conversaciones simples",
+        "Entender cultura japonesa"
+      ],
+      "prerequisites": [
+        "Ninguno - curso para principiantes"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 119.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 37,
+      "title": "Fotografía Digital Avanzada",
+      "image": "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=800",
+      "summary": "Técnicas avanzadas de fotografía digital",
+      "about": "Mejora tus habilidades fotográficas con técnicas avanzadas. Desde composición hasta post-procesado profesional.",
+      "careerTypeId": 6,
+      "learningOutcomes": [
+        "Dominar técnicas de composición",
+        "Controlar exposición y iluminación",
+        "Post-procesar en Lightroom",
+        "Desarrollar estilo fotográfico personal"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de fotografía",
+        "Cámara digital o smartphone"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 109.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 38,
+      "title": "Geometría Analítica",
+      "image": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800",
+      "summary": "Geometría en el plano cartesiano",
+      "about": "Estudia la geometría usando coordenadas y álgebra. Desde ecuaciones de rectas hasta cónicas y transformaciones.",
+      "careerTypeId": 8,
+      "learningOutcomes": [
+        "Trabajar con coordenadas cartesianas",
+        "Resolver ecuaciones de rectas y curvas",
+        "Estudiar cónicas y sus propiedades",
+        "Aplicar transformaciones geométricas"
+      ],
+      "prerequisites": [
+        "Álgebra intermedia",
+        "Geometría básica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 79.99,
+      "adminId": 1,
+      "categoryIds": [15]
+    },
+    {
+      "id": 39,
+      "title": "Desarrollo de Juegos 2D con Godot",
+      "image": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800",
+      "summary": "Crea videojuegos 2D con el motor Godot",
+      "about": "Aprende a desarrollar videojuegos 2D usando Godot Engine. Desde plataformeros hasta RPGs, con GDScript y C#.",
+      "careerTypeId": 7,
+      "learningOutcomes": [
+        "Dominar Godot Engine",
+        "Programar en GDScript",
+        "Crear diferentes géneros de juegos 2D",
+        "Implementar física y animaciones"
+      ],
+      "prerequisites": [
+        "Lógica de programación básica",
+        "Conceptos básicos de videojuegos"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 119.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 40,
+      "title": "Mezcla y Masterización de Audio",
+      "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800",
+      "summary": "Técnicas profesionales de audio post-producción",
+      "about": "Aprende las técnicas profesionales de mezcla y masterización de audio. Desde EQ y compresión hasta el master final.",
+      "careerTypeId": 10,
+      "learningOutcomes": [
+        "Dominar técnicas de mezcla",
+        "Usar EQ, compresión y efectos",
+        "Masterizar tracks profesionalmente",
+        "Preparar audio para diferentes formatos"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de audio",
+        "Experiencia con DAW"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 149.99,
+      "adminId": 1,
+      "categoryIds": [19]
+    }
+  ]
+}

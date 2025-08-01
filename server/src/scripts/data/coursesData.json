@@ -1,0 +1,581 @@
+{
+  "careerTypes": [
+    {
+      "id": 1,
+      "name": "Desarrollo Web",
+      "icon": "🌐",
+      "description": "Especialización en desarrollo de aplicaciones web frontend y backend",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Ciencia de Datos",
+      "icon": "📊",
+      "description": "Análisis de datos, machine learning e inteligencia artificial",
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "Desarrollo Móvil",
+      "icon": "📱",
+      "description": "Desarrollo de aplicaciones para dispositivos móviles",
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "DevOps",
+      "icon": "⚙️",
+      "description": "Automatización, infraestructura y despliegue continuo",
+      "isActive": true
+    },
+    {
+      "id": 5,
+      "name": "Ciberseguridad",
+      "icon": "🔒",
+      "description": "Seguridad informática y protección de sistemas",
+      "isActive": true
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "JavaScript",
+      "icon": "⚡",
+      "description": "Lenguaje de programación para desarrollo web",
+      "isActive": true
+    },
+    {
+      "id": 2,
+      "name": "Python",
+      "icon": "🐍",
+      "description": "Lenguaje versátil para desarrollo y ciencia de datos",
+      "isActive": true
+    },
+    {
+      "id": 3,
+      "name": "React",
+      "icon": "⚛️",
+      "description": "Biblioteca para construir interfaces de usuario",
+      "isActive": true
+    },
+    {
+      "id": 4,
+      "name": "Node.js",
+      "icon": "🟢",
+      "description": "Entorno de ejecución para JavaScript en el servidor",
+      "isActive": true
+    },
+    {
+      "id": 5,
+      "name": "Machine Learning",
+      "icon": "🤖",
+      "description": "Algoritmos de aprendizaje automático",
+      "isActive": true
+    },
+    {
+      "id": 6,
+      "name": "Blockchain",
+      "icon": "⛓️",
+      "description": "Tecnología de cadena de bloques y criptomonedas",
+      "isActive": true
+    },
+    {
+      "id": 7,
+      "name": "Docker",
+      "icon": "🐳",
+      "description": "Containerización de aplicaciones",
+      "isActive": true
+    },
+    {
+      "id": 8,
+      "name": "AWS",
+      "icon": "☁️",
+      "description": "Servicios en la nube de Amazon",
+      "isActive": true
+    },
+    {
+      "id": 9,
+      "name": "Flutter",
+      "icon": "🦋",
+      "description": "Framework para desarrollo móvil multiplataforma",
+      "isActive": true
+    },
+    {
+      "id": 10,
+      "name": "Inteligencia Artificial",
+      "icon": "🧠",
+      "description": "Sistemas inteligentes y redes neuronales",
+      "isActive": true
+    }
+  ],
+  "courses": [
+    {
+      "id": 1,
+      "title": "Fundamentos de JavaScript Moderno",
+      "image": "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800",
+      "summary": "Aprende JavaScript desde cero con ES6+ y las mejores prácticas",
+      "about": "Este curso te enseñará JavaScript moderno desde los conceptos básicos hasta técnicas avanzadas. Cubriremos ES6+, programación asíncrona, DOM manipulation y mucho más.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Dominar la sintaxis de JavaScript ES6+",
+        "Entender programación asíncrona con async/await",
+        "Manipular el DOM efectivamente",
+        "Implementar patrones de diseño en JavaScript"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de HTML y CSS",
+        "Lógica de programación básica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 89.99,
+      "adminId": 1,
+      "categoryIds": [1]
+    },
+    {
+      "id": 2,
+      "title": "React.js Completo: De Principiante a Experto",
+      "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800",
+      "summary": "Domina React.js con hooks, context API y mejores prácticas",
+      "about": "Curso completo de React.js que te llevará desde los conceptos básicos hasta el desarrollo de aplicaciones complejas. Incluye hooks, context API, testing y deployment.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Crear aplicaciones React desde cero",
+        "Usar hooks y context API efectivamente",
+        "Implementar testing en aplicaciones React",
+        "Desplegar aplicaciones en producción"
+      ],
+      "prerequisites": [
+        "JavaScript intermedio",
+        "Conocimientos de HTML y CSS"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 129.99,
+      "adminId": 1,
+      "categoryIds": [1, 3]
+    },
+    {
+      "id": 3,
+      "title": "Python para Ciencia de Datos",
+      "image": "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?w=800",
+      "summary": "Análisis de datos con Python, Pandas, NumPy y Matplotlib",
+      "about": "Aprende a analizar datos con Python usando las librerías más populares. Desde manipulación de datos hasta visualización y análisis estadístico.",
+      "careerTypeId": 2,
+      "learningOutcomes": [
+        "Manipular datos con Pandas y NumPy",
+        "Crear visualizaciones con Matplotlib y Seaborn",
+        "Realizar análisis estadístico",
+        "Implementar modelos de machine learning básicos"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de programación",
+        "Matemáticas básicas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 99.99,
+      "adminId": 1,
+      "categoryIds": [2, 5]
+    },
+    {
+      "id": 4,
+      "title": "Node.js y Express: Backend Completo",
+      "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800",
+      "summary": "Desarrollo backend con Node.js, Express y bases de datos",
+      "about": "Construye APIs robustas y escalables con Node.js y Express. Incluye autenticación, bases de datos, testing y deployment.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Crear APIs RESTful con Express",
+        "Implementar autenticación y autorización",
+        "Trabajar con bases de datos SQL y NoSQL",
+        "Desplegar aplicaciones Node.js"
+      ],
+      "prerequisites": [
+        "JavaScript intermedio",
+        "Conocimientos básicos de HTTP"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 119.99,
+      "adminId": 1,
+      "categoryIds": [1, 4]
+    },
+    {
+      "id": 5,
+      "title": "Machine Learning con Python",
+      "image": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800",
+      "summary": "Algoritmos de ML con scikit-learn y TensorFlow",
+      "about": "Domina los algoritmos de machine learning más importantes usando Python. Desde regresión lineal hasta redes neuronales.",
+      "careerTypeId": 2,
+      "learningOutcomes": [
+        "Implementar algoritmos de ML supervisado y no supervisado",
+        "Usar scikit-learn y TensorFlow",
+        "Evaluar y optimizar modelos",
+        "Desplegar modelos en producción"
+      ],
+      "prerequisites": [
+        "Python intermedio",
+        "Estadística básica",
+        "Álgebra lineal básica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 149.99,
+      "adminId": 1,
+      "categoryIds": [2, 5, 10]
+    },
+    {
+      "id": 6,
+      "title": "Desarrollo Blockchain con Solidity",
+      "image": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800",
+      "summary": "Smart contracts y DApps en Ethereum",
+      "about": "Aprende a desarrollar aplicaciones descentralizadas y smart contracts en la blockchain de Ethereum usando Solidity.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Desarrollar smart contracts con Solidity",
+        "Crear DApps con Web3.js",
+        "Entender la arquitectura blockchain",
+        "Implementar tokens ERC-20 y NFTs"
+      ],
+      "prerequisites": [
+        "JavaScript básico",
+        "Conceptos básicos de blockchain"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 179.99,
+      "adminId": 1,
+      "categoryIds": [1, 6]
+    },
+    {
+      "id": 7,
+      "title": "Flutter: Desarrollo Móvil Multiplataforma",
+      "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800",
+      "summary": "Apps nativas para iOS y Android con Flutter",
+      "about": "Desarrolla aplicaciones móviles nativas para iOS y Android usando Flutter y Dart. Desde UI hasta integración con APIs.",
+      "careerTypeId": 3,
+      "learningOutcomes": [
+        "Crear apps móviles con Flutter",
+        "Dominar el lenguaje Dart",
+        "Implementar navegación y estado",
+        "Publicar apps en stores"
+      ],
+      "prerequisites": [
+        "Programación orientada a objetos",
+        "Conocimientos básicos de desarrollo móvil"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 139.99,
+      "adminId": 1,
+      "categoryIds": [9]
+    },
+    {
+      "id": 8,
+      "title": "Docker y Kubernetes: DevOps Completo",
+      "image": "https://images.unsplash.com/photo-1605745341112-85968b19335b?w=800",
+      "summary": "Containerización y orquestación de aplicaciones",
+      "about": "Aprende a containerizar aplicaciones con Docker y orquestarlas con Kubernetes. Incluye CI/CD y mejores prácticas DevOps.",
+      "careerTypeId": 4,
+      "learningOutcomes": [
+        "Containerizar aplicaciones con Docker",
+        "Orquestar contenedores con Kubernetes",
+        "Implementar pipelines CI/CD",
+        "Monitorear aplicaciones en producción"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de Linux",
+        "Experiencia con desarrollo de software"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 159.99,
+      "adminId": 1,
+      "categoryIds": [7]
+    },
+    {
+      "id": 9,
+      "title": "AWS Cloud Practitioner",
+      "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800",
+      "summary": "Fundamentos de computación en la nube con AWS",
+      "about": "Domina los servicios fundamentales de AWS y prepárate para la certificación Cloud Practitioner. Incluye EC2, S3, RDS y más.",
+      "careerTypeId": 4,
+      "learningOutcomes": [
+        "Entender los servicios core de AWS",
+        "Implementar arquitecturas en la nube",
+        "Gestionar costos y seguridad",
+        "Prepararse para la certificación AWS"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de redes",
+        "Conceptos básicos de sistemas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 129.99,
+      "adminId": 1,
+      "categoryIds": [8]
+    },
+    {
+      "id": 10,
+      "title": "Ciberseguridad Ética: Hacking Ético",
+      "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800",
+      "summary": "Pentesting y seguridad informática",
+      "about": "Aprende técnicas de hacking ético y pentesting para proteger sistemas y redes. Incluye herramientas y metodologías profesionales.",
+      "careerTypeId": 5,
+      "learningOutcomes": [
+        "Realizar auditorías de seguridad",
+        "Usar herramientas de pentesting",
+        "Identificar vulnerabilidades",
+        "Implementar medidas de protección"
+      ],
+      "prerequisites": [
+        "Conocimientos de redes",
+        "Sistemas operativos Linux",
+        "Programación básica"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 199.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 11,
+      "title": "Full Stack JavaScript: MERN Stack",
+      "image": "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800",
+      "summary": "MongoDB, Express, React y Node.js",
+      "about": "Desarrolla aplicaciones web completas usando el stack MERN. Desde el frontend con React hasta el backend con Node.js y MongoDB.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Crear aplicaciones full stack",
+        "Integrar frontend y backend",
+        "Trabajar con MongoDB",
+        "Implementar autenticación completa"
+      ],
+      "prerequisites": [
+        "JavaScript intermedio",
+        "Conocimientos de React básico",
+        "Node.js básico"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 169.99,
+      "adminId": 1,
+      "categoryIds": [1, 3, 4]
+    },
+    {
+      "id": 12,
+      "title": "Deep Learning con TensorFlow",
+      "image": "https://images.unsplash.com/photo-1507146426996-ef05306b995a?w=800",
+      "summary": "Redes neuronales profundas y CNN",
+      "about": "Domina el deep learning con TensorFlow. Aprende a construir redes neuronales convolucionales, RNNs y transformers.",
+      "careerTypeId": 2,
+      "learningOutcomes": [
+        "Construir redes neuronales profundas",
+        "Implementar CNNs para visión computacional",
+        "Crear modelos de procesamiento de lenguaje natural",
+        "Optimizar modelos para producción"
+      ],
+      "prerequisites": [
+        "Python avanzado",
+        "Machine Learning básico",
+        "Matemáticas avanzadas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 189.99,
+      "adminId": 1,
+      "categoryIds": [2, 5, 10]
+    },
+    {
+      "id": 13,
+      "title": "React Native: Apps Móviles con JavaScript",
+      "image": "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800",
+      "summary": "Desarrollo móvil nativo con React Native",
+      "about": "Crea aplicaciones móviles nativas para iOS y Android usando React Native. Aprovecha tus conocimientos de React para el desarrollo móvil.",
+      "careerTypeId": 3,
+      "learningOutcomes": [
+        "Desarrollar apps con React Native",
+        "Integrar APIs nativas",
+        "Implementar navegación móvil",
+        "Publicar en App Store y Google Play"
+      ],
+      "prerequisites": [
+        "React.js intermedio",
+        "JavaScript ES6+"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 149.99,
+      "adminId": 1,
+      "categoryIds": [1, 3]
+    },
+    {
+      "id": 14,
+      "title": "Python Web Development con Django",
+      "image": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800",
+      "summary": "Desarrollo web backend con Django",
+      "about": "Construye aplicaciones web robustas con Django. Desde APIs REST hasta aplicaciones web completas con autenticación y bases de datos.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Crear aplicaciones web con Django",
+        "Implementar APIs REST con Django REST Framework",
+        "Gestionar bases de datos con ORM",
+        "Desplegar aplicaciones Django"
+      ],
+      "prerequisites": [
+        "Python intermedio",
+        "Conocimientos básicos de web development"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 139.99,
+      "adminId": 1,
+      "categoryIds": [2]
+    },
+    {
+      "id": 15,
+      "title": "Microservicios con Spring Boot",
+      "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800",
+      "summary": "Arquitectura de microservicios con Java",
+      "about": "Aprende a diseñar y desarrollar arquitecturas de microservicios usando Spring Boot, Spring Cloud y herramientas de containerización.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Diseñar arquitecturas de microservicios",
+        "Implementar servicios con Spring Boot",
+        "Gestionar comunicación entre servicios",
+        "Monitorear y escalar microservicios"
+      ],
+      "prerequisites": [
+        "Java intermedio",
+        "Conocimientos de Spring Framework",
+        "Conceptos de arquitectura de software"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 159.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 16,
+      "title": "Vue.js 3: Framework Progresivo",
+      "image": "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800",
+      "summary": "Desarrollo frontend moderno con Vue.js 3",
+      "about": "Domina Vue.js 3 con Composition API, Pinia para estado global y las mejores prácticas para desarrollo frontend moderno.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Crear aplicaciones SPA con Vue.js 3",
+        "Usar Composition API efectivamente",
+        "Gestionar estado con Pinia",
+        "Implementar routing y testing"
+      ],
+      "prerequisites": [
+        "JavaScript ES6+",
+        "HTML y CSS avanzado"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 119.99,
+      "adminId": 1,
+      "categoryIds": [1]
+    },
+    {
+      "id": 17,
+      "title": "Data Engineering con Apache Spark",
+      "image": "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800",
+      "summary": "Procesamiento de big data con Spark",
+      "about": "Aprende a procesar grandes volúmenes de datos usando Apache Spark, desde ETL hasta análisis en tiempo real.",
+      "careerTypeId": 2,
+      "learningOutcomes": [
+        "Procesar big data con Spark",
+        "Implementar pipelines ETL",
+        "Trabajar con Spark SQL y DataFrames",
+        "Optimizar performance en Spark"
+      ],
+      "prerequisites": [
+        "Python o Scala básico",
+        "Conceptos de bases de datos",
+        "Conocimientos básicos de big data"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 169.99,
+      "adminId": 1,
+      "categoryIds": [2]
+    },
+    {
+      "id": 18,
+      "title": "GraphQL: APIs Modernas",
+      "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800",
+      "summary": "Desarrollo de APIs con GraphQL",
+      "about": "Construye APIs modernas y eficientes con GraphQL. Aprende desde los fundamentos hasta implementaciones avanzadas con Apollo.",
+      "careerTypeId": 1,
+      "learningOutcomes": [
+        "Diseñar esquemas GraphQL",
+        "Implementar resolvers eficientes",
+        "Integrar con bases de datos",
+        "Optimizar queries y mutations"
+      ],
+      "prerequisites": [
+        "JavaScript intermedio",
+        "Conocimientos de APIs REST",
+        "Node.js básico"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 129.99,
+      "adminId": 1,
+      "categoryIds": [1, 4]
+    },
+    {
+      "id": 19,
+      "title": "Kotlin para Android Development",
+      "image": "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?w=800",
+      "summary": "Desarrollo Android nativo con Kotlin",
+      "about": "Desarrolla aplicaciones Android modernas usando Kotlin, Jetpack Compose y las últimas herramientas de Android development.",
+      "careerTypeId": 3,
+      "learningOutcomes": [
+        "Programar en Kotlin para Android",
+        "Crear UIs con Jetpack Compose",
+        "Implementar arquitectura MVVM",
+        "Publicar apps en Google Play"
+      ],
+      "prerequisites": [
+        "Programación orientada a objetos",
+        "Conocimientos básicos de Android"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 149.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 20,
+      "title": "Terraform: Infrastructure as Code",
+      "image": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800",
+      "summary": "Automatización de infraestructura con Terraform",
+      "about": "Aprende a gestionar infraestructura como código usando Terraform. Desde conceptos básicos hasta implementaciones multi-cloud.",
+      "careerTypeId": 4,
+      "learningOutcomes": [
+        "Escribir configuraciones Terraform",
+        "Gestionar estado de infraestructura",
+        "Implementar módulos reutilizables",
+        "Automatizar deployments"
+      ],
+      "prerequisites": [
+        "Conocimientos de cloud computing",
+        "Experiencia con línea de comandos",
+        "Conceptos básicos de redes"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 139.99,
+      "adminId": 1,
+      "categoryIds": [8]
+    }
+  ]
+}
