@@ -18,7 +18,9 @@ const QuizComponent: React.FC<QuizComponentProps> = React.memo(({ quizzes }) => 
     nextQuestion, 
     previousQuestion, 
     submitAnswer, 
-    quizCompleted 
+    quizCompleted,
+    completeQuiz,
+    resetQuiz
   } = useQuiz();
   
   const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -32,47 +34,70 @@ const QuizComponent: React.FC<QuizComponentProps> = React.memo(({ quizzes }) => 
         submitAnswer(currentQuestionIndex, [answerIndex]);
         break;
       case 'MultipleChoice':
-        const currentAnswers = userAnswers[currentQuestionIndex] || [];
+        const currentAnswers = Array.isArray(userAnswers[currentQuestionIndex]) 
+          ? userAnswers[currentQuestionIndex] as number[] 
+          : [];
         const newAnswers = currentAnswers.includes(answerIndex)
           ? currentAnswers.filter((i) => i !== answerIndex)
           : [...currentAnswers, answerIndex];
         submitAnswer(currentQuestionIndex, newAnswers);
         break;
       case 'TrueOrFalse':
-        // Para TrueOrFalse, convertimos el boolean a un índice (0 para false, 1 para true)
-        const answerValue = value ? 1 : 0;
-        submitAnswer(currentQuestionIndex, [answerValue]);
+        // Para TrueOrFalse, guardamos un objeto con las respuestas boolean
+        const currentTrueFalseAnswers = (typeof userAnswers[currentQuestionIndex] === 'object' && !Array.isArray(userAnswers[currentQuestionIndex]))
+          ? userAnswers[currentQuestionIndex] as { [key: number]: boolean }
+          : {};
+        submitAnswer(currentQuestionIndex, {
+          ...currentTrueFalseAnswers,
+          [answerIndex]: value!
+        });
         break;
     }
   }, [currentQuiz, submitAnswer, userAnswers, currentQuestionIndex]);
 
   const handleShortAnswerChange = useCallback((answer: string) => {
     if (currentQuiz) {
-      // Para respuestas cortas, guardamos el texto como respuesta
-      // Esto podría necesitar ajuste según cómo maneje el backend las respuestas de texto
-      submitAnswer(currentQuestionIndex, [0]); // Placeholder, necesita ajuste
+      submitAnswer(currentQuestionIndex, answer);
     }
   }, [currentQuiz, submitAnswer, currentQuestionIndex]);
 
   const handleNext = useCallback(() => {
-    nextQuestion();
-  }, [nextQuestion]);
+    if (currentQuestionIndex < quizzes.length - 1) {
+      nextQuestion();
+    } else {
+      // Es la última pregunta, completar el quiz
+      completeQuiz();
+    }
+  }, [currentQuestionIndex, quizzes.length, nextQuestion, completeQuiz]);
 
   const handlePrevious = useCallback(() => {
     previousQuestion();
   }, [previousQuestion]);
 
   const restartQuiz = useCallback(() => {
-    // El contexto maneja el restart
-    window.location.reload(); // Temporal hasta implementar reset correcto
-  }, []);
+    resetQuiz();
+  }, [resetQuiz]);
 
   if (quizCompleted) {
+    // Mapear las respuestas a índices de quiz para QuizResults
+    const mappedSelectedAnswers: { [key: number]: number[] | { [key: number]: boolean } | string } = {};
+    const shortAnswers: { [key: number]: string } = {};
+    
+    quizzes.forEach((quiz, quizIndex) => {
+      const userAnswer = userAnswers[quizIndex];
+      if (userAnswer !== undefined) {
+        mappedSelectedAnswers[quizIndex] = userAnswer;
+        if (typeof userAnswer === 'string') {
+          shortAnswers[quizIndex] = userAnswer;
+        }
+      }
+    });
+
     return (
       <QuizResults
         quizzes={quizzes}
-        selectedAnswers={userAnswers}
-        shortAnswers={{}} // Necesita ajuste para respuestas cortas
+        selectedAnswers={mappedSelectedAnswers}
+        shortAnswers={shortAnswers}
         onRestart={restartQuiz}
         letters={letters}
       />
@@ -84,13 +109,13 @@ const QuizComponent: React.FC<QuizComponentProps> = React.memo(({ quizzes }) => 
   }
 
   const renderQuestionInput = () => {
-    const currentAnswers = userAnswers[currentQuestionIndex] || [];
+    const userAnswer = userAnswers[currentQuestionIndex];
     
     switch (currentQuiz.type) {
       case 'ShortAnswer':
         return (
           <ShortAnswer
-            value="" // Necesita implementación para respuestas cortas
+            value={typeof userAnswer === 'string' ? userAnswer : ''}
             onChange={handleShortAnswerChange}
           />
         );
@@ -98,10 +123,11 @@ const QuizComponent: React.FC<QuizComponentProps> = React.memo(({ quizzes }) => 
         return (
           <TrueFalse
             quiz={currentQuiz}
-            selectedAnswers={currentAnswers.reduce((acc, answerIndex) => {
-              acc[answerIndex] = answerIndex === 1;
-              return acc;
-            }, {} as { [key: number]: boolean })}
+            selectedAnswers={
+              typeof userAnswer === 'object' && !Array.isArray(userAnswer)
+                ? userAnswer as { [key: number]: boolean }
+                : {}
+            }
             onAnswerSelect={handleAnswerSelect}
           />
         );
@@ -109,7 +135,7 @@ const QuizComponent: React.FC<QuizComponentProps> = React.memo(({ quizzes }) => 
         return (
           <SingleChoice
             quiz={currentQuiz}
-            selectedAnswers={currentAnswers}
+            selectedAnswers={Array.isArray(userAnswer) ? userAnswer : []}
             onAnswerSelect={handleAnswerSelect}
             letters={letters}
           />

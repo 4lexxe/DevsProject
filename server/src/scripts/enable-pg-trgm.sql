@@ -52,9 +52,7 @@ SET pg_trgm.similarity_threshold = 0.3;
 -- WHERE similarity(title, 'cirso de nodejs') > 0.3 
 -- ORDER BY sim DESC;
 
--- SELECT title, similar
-
-ity(title, 'inteligencia artifcial') as sim 
+-- SELECT title, similarity(title, 'inteligencia artifcial') as sim 
 -- FROM "Courses" 
 -- WHERE similarity(title, 'inteligencia artifcial') > 0.3 
 -- ORDER BY sim DESC;

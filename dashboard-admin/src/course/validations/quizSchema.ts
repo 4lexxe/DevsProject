@@ -47,26 +47,15 @@ const questionSchema = z.object({
   answers: z.array(answerSchema).min(1, "Debe haber al menos una respuesta"),
   metadata: metadataSchema.optional(),
 })
-// Validación para TrueOrFalse: debe tener exactamente 2 respuestas
+// Validación para TrueOrFalse: debe tener al menos 1 afirmación
 .refine((data) => {
   if (data.type === "TrueOrFalse") {
-    return data.answers.length === 2;
+    return data.answers.length >= 1;
   }
   return true;
 }, {
-  message: "Las preguntas de Verdadero/Falso deben tener exactamente 2 respuestas",
+  message: "Las preguntas de Verdadero/Falso deben tener al menos 1 afirmación",
   path: ["validation_truefalse_count"]
-})
-// Validación para TrueOrFalse: debe tener exactamente 1 respuesta correcta
-.refine((data) => {
-  if (data.type === "TrueOrFalse") {
-    const correctAnswers = data.answers.filter(answer => answer.isCorrect);
-    return correctAnswers.length === 1;
-  }
-  return true;
-}, {
-  message: "Las preguntas de Verdadero/Falso deben tener exactamente 1 respuesta correcta",
-  path: ["validation_truefalse_correct"]
 })
 // Validación para Single: debe tener exactamente 1 respuesta correcta
 .refine((data) => {

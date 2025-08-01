@@ -61,7 +61,7 @@ const QuizResults: React.FC<QuizResultsProps> = ({
                  value === quiz.answers[parseInt(idx)].isCorrect
                );
       case 'ShortAnswer':
-        const userAnswer = shortAnswers[quizIndex]?.toLowerCase().trim();
+        const userAnswer = (typeof answer === 'string' ? answer : shortAnswers[quizIndex] || '').toLowerCase().trim();
         return quiz.answers.some(a => a.isCorrect && a.answer.toLowerCase().trim() === userAnswer);
       default:
         return false;
@@ -71,7 +71,9 @@ const QuizResults: React.FC<QuizResultsProps> = ({
   const renderResultAnswer = (quiz: Quiz, quizIndex: number) => {
     switch (quiz.type) {
       case 'ShortAnswer':
-        const userAnswer = shortAnswers[quizIndex] || '';
+        const userAnswer = typeof selectedAnswers[quizIndex] === 'string' 
+          ? selectedAnswers[quizIndex] as string 
+          : shortAnswers[quizIndex] || '';
         const correctAnswer = quiz.answers.find(a => a.isCorrect)?.answer || '';
         return (
           <div className="space-y-3">

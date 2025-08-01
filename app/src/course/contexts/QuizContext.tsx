@@ -39,7 +39,7 @@ interface QuizContextState {
   loading: boolean;
   error: string | null;
   currentQuestionIndex: number;
-  userAnswers: Record<number, number[]>; // questionId -> answerIds
+  userAnswers: Record<number, number[] | string | { [key: number]: boolean }>; // questionId -> diferentes tipos de respuestas
   quizCompleted: boolean;
   score: number;
   totalQuestions: number;
@@ -51,7 +51,7 @@ interface QuizContextActions {
   nextQuestion: () => void;
   previousQuestion: () => void;
   goToQuestion: (index: number) => void;
-  submitAnswer: (questionId: number, answerIds: number[]) => void;
+  submitAnswer: (questionId: number, answer: number[] | string | { [key: number]: boolean }) => void;
   completeQuiz: () => void;
   resetQuiz: () => void;
   calculateScore: () => number;
@@ -116,7 +116,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<Record<number, number[]>>({});
+  const [userAnswers, setUserAnswers] = useState<Record<number, number[] | string | { [key: number]: boolean }>>({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
   const [currentContentId, setCurrentContentId] = useState<string | null>(null);
@@ -244,10 +244,10 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     }
   }, [totalQuestions]);
 
-  const submitAnswer = useCallback((questionId: number, answerIds: number[]): void => {
+  const submitAnswer = useCallback((questionId: number, answer: number[] | string | { [key: number]: boolean }): void => {
     setUserAnswers(prev => ({
       ...prev,
-      [questionId]: answerIds
+      [questionId]: answer
     }));
   }, []);
 
@@ -264,9 +264,24 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
         .filter(answer => answer.isCorrect)
         .map(answer => answer.id);
 
-      // Verificar si la respuesta del usuario es correcta
-      const isCorrect = userAnswer.length === correctAnswerIds.length &&
-        userAnswer.every(id => correctAnswerIds.includes(id));
+      let isCorrect = false;
+
+      // Manejar diferentes tipos de respuestas
+      if (Array.isArray(userAnswer)) {
+        // Para MultipleChoice y Single
+        isCorrect = userAnswer.length === correctAnswerIds.length &&
+          userAnswer.every(id => correctAnswerIds.includes(id));
+      } else if (typeof userAnswer === 'string') {
+        // Para ShortAnswer - necesitaría lógica específica del backend
+        // Por ahora, consideramos correcto si hay texto
+        isCorrect = userAnswer.trim().length > 0;
+      } else if (typeof userAnswer === 'object') {
+        // Para TrueOrFalse
+        isCorrect = Object.entries(userAnswer).every(([answerIndex, value]) => {
+          const expectedValue = correctAnswerIds.includes(parseInt(answerIndex));
+          return value === expectedValue;
+        });
+      }
 
       if (isCorrect) {
         totalScore += question.points;

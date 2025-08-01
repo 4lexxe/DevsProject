@@ -51,9 +51,17 @@ const QuizDebugPanel: React.FC<QuizDebugPanelProps> = ({ isVisible = false }) =>
         <div className="font-bold mb-1">Respuestas actuales:</div>
         <div className="max-h-24 overflow-y-auto text-xs">
           {Object.entries(userAnswers).length > 0 ? (
-            Object.entries(userAnswers).map(([questionId, answerIds]) => (
+            Object.entries(userAnswers).map(([questionId, answer]) => (
               <div key={questionId}>
-                Q{questionId}: [{(answerIds as number[]).join(', ')}]
+                Q{questionId}: {
+                  Array.isArray(answer) 
+                    ? `[${answer.join(', ')}]`
+                    : typeof answer === 'string'
+                    ? `"${answer}"`
+                    : typeof answer === 'object'
+                    ? `{${Object.entries(answer).map(([k, v]) => `${k}:${v}`).join(', ')}}`
+                    : String(answer)
+                }
               </div>
             ))
           ) : (
