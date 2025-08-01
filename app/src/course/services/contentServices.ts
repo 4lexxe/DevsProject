@@ -32,7 +32,7 @@ export const getContentById = async (contentId: string) => {
   }
 };
 
-export const getQuizById = async (contentId: string) => {
+export const getQuizByContentId = async (contentId: string) => {
   try {
     console.log(`Obteniendo contenido con ID: ${contentId}`);
     const response = await api.get(`${CONTENT}/${contentId}/quiz`);
