@@ -60,6 +60,7 @@ export default function FuzzySearchInput({
   );
   const [showModeDropdown, setShowModeDropdown] = useState(false);
   const [searchStats, setSearchStats] = useState<any>(null);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,7 +97,10 @@ export default function FuzzySearchInput({
           }
           
           setSuggestions(results);
-          setShowSuggestions(true);
+          if (isFocused) {
+            setShowSuggestions(true);
+          }
+          setSelectedSuggestionIndex(-1); // Reset selection when suggestions change
         } catch (error) {
           console.error('Error al obtener sugerencias:', error);
           setSuggestions([]);
@@ -105,12 +109,16 @@ export default function FuzzySearchInput({
         }
       } else {
         setSuggestions([]);
-        setShowSuggestions(false);
+        // Mantener sugerencias abiertas si el input está enfocado
+        if (!isFocused) {
+          setShowSuggestions(false);
+        }
+        setSelectedSuggestionIndex(-1);
       }
     }, selectedMode.id === 'fuzzy' ? 400 : 300); // Más tiempo para fuzzy
 
     return () => clearTimeout(timeoutId);
-  }, [query, selectedMode]);
+  }, [query, selectedMode, isFocused]);
 
   // Cerrar dropdowns al hacer clic fuera
   useEffect(() => {
@@ -167,20 +175,80 @@ export default function FuzzySearchInput({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setSelectedSuggestionIndex(-1); // Reset selection when typing
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case 'Tab':
+         if (showSuggestions && suggestions.length > 0) {
+           e.preventDefault();
+           setSelectedSuggestionIndex(prev => 
+             prev < suggestions.length - 1 ? prev + 1 : 0
+           );
+         }
+         break;
+      case 'Enter':
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          const selectedSuggestion = suggestions[selectedSuggestionIndex];
+          handleSuggestionClick(selectedSuggestion);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        inputRef.current?.blur();
+        break;
+    }
   };
 
   const handleFocus = () => {
     setIsFocused(true);
-    if (suggestions.length > 0) {
+    setSelectedSuggestionIndex(-1);
+    // Mostrar sugerencias si hay texto o si ya hay sugerencias cargadas
+    if (query.length >= 2 || suggestions.length > 0) {
       setShowSuggestions(true);
     }
   };
 
-  const handleBlur = () => {
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    // No cerrar sugerencias si el foco se mueve a una sugerencia
+    if (suggestionsRef.current && suggestionsRef.current.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    
     setIsFocused(false);
+    // Solo cerrar si no hay query o después de un delay más largo
     setTimeout(() => {
-      setShowSuggestions(false);
-    }, 200);
+      // Verificar si el input sigue sin foco y no hay interacción
+      if (!inputRef.current?.matches(':focus') && !query.trim()) {
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+      } else if (!inputRef.current?.matches(':focus')) {
+        // Si hay texto pero no hay foco, cerrar después de más tiempo
+        setTimeout(() => {
+          if (!inputRef.current?.matches(':focus')) {
+            setShowSuggestions(false);
+            setSelectedSuggestionIndex(-1);
+          }
+        }, 500);
+      }
+    }, 100);
   };
 
   const handleModeSelect = (mode: SearchMode) => {
@@ -267,6 +335,7 @@ export default function FuzzySearchInput({
               type="text"
               value={query}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               onFocus={handleFocus}
               onBlur={handleBlur}
               placeholder={placeholder}
@@ -309,23 +378,33 @@ export default function FuzzySearchInput({
                   Sugerencias con corrección de errores
                 </div>
               )}
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none first:rounded-t-lg last:rounded-b-lg transition-colors"
-                >
-                  <div className="flex items-center">
-                    <span className={selectedMode.color}>
-                      {selectedMode.icon}
-                    </span>
-                    <span className="ml-2">{suggestion}</span>
-                    {selectedMode.id === 'fuzzy' && query !== suggestion && (
-                      <span className="ml-auto text-xs text-purple-500">corregido</span>
-                    )}
-                  </div>
-                </button>
-              ))}
+              {suggestions.map((suggestion, index) => {
+                const isSelected = selectedSuggestionIndex === index;
+                return (
+                  <button
+                     key={index}
+                     onClick={() => handleSuggestionClick(suggestion)}
+                     onMouseDown={(e) => e.preventDefault()} // Prevenir blur del input
+                     className={`w-full px-4 py-2 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg focus:outline-none ${
+                       isSelected 
+                         ? 'bg-blue-100 text-blue-900 border-l-4 border-blue-500' 
+                         : 'text-gray-700 hover:bg-gray-100 focus:bg-gray-100'
+                     }`}
+                   >
+                    <div className="flex items-center">
+                      <span className={isSelected ? 'text-blue-600' : selectedMode.color}>
+                        {selectedMode.icon}
+                      </span>
+                      <span className="ml-2">{suggestion}</span>
+                      {selectedMode.id === 'fuzzy' && query !== suggestion && (
+                        <span className={`ml-auto text-xs ${
+                          isSelected ? 'text-blue-500' : 'text-purple-500'
+                        }`}>corregido</span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </>
           )}
         </div>

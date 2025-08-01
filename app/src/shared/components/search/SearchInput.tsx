@@ -19,6 +19,7 @@ export default function SearchInput({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -41,12 +42,19 @@ export default function SearchInput({
         }
       } else {
         setSuggestions([]);
-        setShowSuggestions(false);
+        if (!isFocused) {
+          setShowSuggestions(false);
+        }
       }
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, isFocused]);
+
+  // Reset selected suggestion when suggestions change
+  useEffect(() => {
+    setSelectedSuggestionIndex(-1);
+  }, [suggestions]);
 
   // Cerrar sugerencias al hacer clic fuera
   useEffect(() => {
@@ -89,21 +97,58 @@ export default function SearchInput({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          const selectedSuggestion = suggestions[selectedSuggestionIndex];
+          setQuery(selectedSuggestion);
+          handleSearch(selectedSuggestion);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+      // Las flechas izquierda/derecha no se interceptan, permitiendo navegación normal en el texto
+    }
   };
 
   const handleFocus = () => {
     setIsFocused(true);
-    if (suggestions.length > 0) {
+    setSelectedSuggestionIndex(-1);
+    if (query.length >= 2 || suggestions.length > 0) {
       setShowSuggestions(true);
     }
   };
 
   const handleBlur = () => {
     setIsFocused(false);
-    // Delay para permitir clicks en sugerencias
+    // Delay más largo para permitir navegación con teclado
     setTimeout(() => {
-      setShowSuggestions(false);
-    }, 200);
+      if (!inputRef.current?.matches(':focus')) {
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+      }
+    }, 300);
   };
 
   return (
@@ -121,6 +166,7 @@ export default function SearchInput({
           onChange={handleInputChange}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
         />
@@ -141,10 +187,17 @@ export default function SearchInput({
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none first:rounded-t-lg last:rounded-b-lg"
+                onMouseDown={(e) => e.preventDefault()}
+                className={`w-full px-4 py-2 text-left text-sm focus:outline-none first:rounded-t-lg last:rounded-b-lg ${
+                  selectedSuggestionIndex === index
+                    ? 'bg-blue-50 text-blue-700 border-l-2 border-blue-500'
+                    : 'text-gray-700 hover:bg-gray-100 focus:bg-gray-100'
+                }`}
               >
                 <div className="flex items-center">
-                  <Search className="h-4 w-4 text-gray-400 mr-2" />
+                  <Search className={`h-4 w-4 mr-2 ${
+                    selectedSuggestionIndex === index ? 'text-blue-500' : 'text-gray-400'
+                  }`} />
                   {suggestion}
                 </div>
               </button>
