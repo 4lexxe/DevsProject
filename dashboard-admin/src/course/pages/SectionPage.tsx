@@ -49,10 +49,10 @@ export default function SectionDetailPage() {
     navigate(`/contents/${contentId}/quiz/edit`)
   }
 
-  const handleDeleteQuiz = async (contentId: string, quizId: string) => {
+  const handleDeleteQuiz = async (contentId: string) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este quiz?')) {
       try {
-        await deleteContentQuiz(contentId, quizId)
+        await deleteContentQuiz(contentId)
         // Refresh section data after deletion
         const sectionData = await getSectionByIdWithContents(sectionId)
         setSection(sectionData)

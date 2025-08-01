@@ -1,4 +1,4 @@
-import { Plus, HelpCircle } from "lucide-react";
+import { Plus, HelpCircle, Trash2, Edit } from "lucide-react";
 import QuizDisplay from "./QuizDisplay";
 
 interface Content {
@@ -25,7 +25,7 @@ interface Content {
       explanation?: string;
     }>;
     metadata?: {
-      difficulty?: 'easy' | 'medium' | 'hard';
+      difficulty?: "easy" | "medium" | "hard";
       tags?: string[];
     };
   }>;
@@ -39,14 +39,14 @@ interface ContentItemDisplayProps {
   content: Content;
   onAddQuiz: (contentId: string) => void;
   onEditQuiz: (contentId: string) => void;
-  onDeleteQuiz: (contentId: string, quizId: string) => void;
+  onDeleteQuiz: (contentId: string) => void;
 }
 
-export default function ContentItemDisplay({ 
-  content, 
-  onAddQuiz, 
-  onEditQuiz, 
-  onDeleteQuiz 
+export default function ContentItemDisplay({
+  content,
+  onAddQuiz,
+  onEditQuiz,
+  onDeleteQuiz,
 }: ContentItemDisplayProps) {
   return (
     <div
@@ -63,47 +63,57 @@ export default function ContentItemDisplay({
       {/* Quiz Management Buttons */}
       <div className="mb-4 pb-3 border-b border-gray-200">
         <div className="flex items-center gap-2 flex-wrap">
-          {content.quiz && content.quiz.length > 0 ? (
-            <>
-              <button
-                onClick={() => onAddQuiz(content.id)}
-                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Añadir Quiz
-              </button>
-              <span className="text-xs text-gray-500">
-                {content.quiz.length} quiz{content.quiz.length !== 1 ? 'zes' : ''} configurado{content.quiz.length !== 1 ? 's' : ''}
-              </span>
-            </>
-          ) : (
+          <>
             <button
               onClick={() => onAddQuiz(content.id)}
-              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200"
             >
               <Plus className="w-3.5 h-3.5" />
-              Añadir primer Quiz
+              Añadir Quiz
             </button>
-          )}
+          </>
         </div>
       </div>
 
       {/* Mostrar Quizzes si existen */}
       {content.quiz && content.quiz.length > 0 && (
         <div className="mt-4 pt-4 border-t" style={{ borderColor: "#1d4ed8" }}>
-          <h5 className="font-semibold mb-3 flex items-center gap-2" style={{ color: "#0c154c" }}>
-            <HelpCircle className="h-5 w-5" />
-            Quizzes ({content.quiz.length})
-          </h5>
-          <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h5
+              className="font-semibold mb-0 flex items-center gap-2"
+              style={{ color: "#0c154c" }}
+            >
+              <HelpCircle className="h-5 w-5" />
+              Quizzes ({content.quiz.length})
+            </h5>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => onEditQuiz(content.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 border border-blue-200"
+                title="Editar quiz"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                Editar
+              </button>
+              <button
+                onClick={() => onDeleteQuiz(content.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 rounded-lg hover:bg-red-100 transition-colors duration-200 border border-red-200"
+                title="Eliminar quiz"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3 mt-4">
             {content.quiz.map((quizItem, quizIndex) => (
               <QuizDisplay
                 key={quizItem.id}
                 quiz={quizItem}
                 quizIndex={quizIndex}
                 contentId={content.id}
-                onEditQuiz={onEditQuiz}
-                onDeleteQuiz={onDeleteQuiz}
               />
             ))}
           </div>
@@ -132,8 +142,12 @@ export default function ContentItemDisplay({
         </div>
       )}
 
-      <div className="text-xs text-gray-500 mt-3 pt-2 border-t" style={{ borderColor: "#1d4ed8" }}>
-        <span>Duración: {content.duration} minutos</span> | <span>Content ID: {content.id}</span> |{" "}
+      <div
+        className="text-xs text-gray-500 mt-3 pt-2 border-t"
+        style={{ borderColor: "#1d4ed8" }}
+      >
+        <span>Duración: {content.duration} minutos</span> |{" "}
+        <span>Content ID: {content.id}</span> |{" "}
         <span>Sección ID: {content.sectionId}</span>
       </div>
     </div>

@@ -25,8 +25,8 @@ export const validateQuiz = [
   body("quiz.*.description")
     .notEmpty()
     .withMessage("Cada pregunta del quiz debe tener una descripción")
-    .isLength({ min: 10, max: 1000 })
-    .withMessage("La descripción debe tener entre 10 y 1000 caracteres"),
+    .isLength({ min: 5, max: 1000 })
+    .withMessage("La descripción debe tener entre 5 y 1000 caracteres"),
 
   // Validar orden de la pregunta
   body("quiz.*.order")
