@@ -49,9 +49,29 @@ export class LoginController {
           return;
         }
 
+        // Configurar cookie HttpOnly con el token
+        const cookieOptions = {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+          maxAge: 24 * 60 * 60 * 1000, // 24 horas
+          path: '/',
+          domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+        };
+        
+        res.cookie('auth_token', authResponse.token, cookieOptions);
+        
+        // Debug: Log para verificar configuración de cookie
+        console.log('🍪 Setting Cookie:', {
+          tokenLength: authResponse.token.length,
+          cookieOptions,
+          userAgent: req.get('User-Agent'),
+          origin: req.get('Origin')
+        });
+
         res.json({
           message: "Inicio de sesión exitoso",
-          ...authResponse,
+          // Ya no enviamos el token en la respuesta JSON por seguridad
           user: {
             ...authResponse.user,
             role: user.dataValues.Role

@@ -17,13 +17,11 @@ const api = axios.create({
   },
 });
 
-// Interceptor para requests - agregar token automáticamente solo si existe
+// Interceptor para requests - las cookies HttpOnly se envían automáticamente
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Ya no necesitamos agregar manualmente el token Authorization
+    // Las cookies HttpOnly se envían automáticamente con cada request
     return config;
   },
   (error) => {

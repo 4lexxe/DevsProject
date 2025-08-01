@@ -8,6 +8,7 @@ import passport from 'passport';
 import session from 'express-session';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 import geoip from 'geoip-lite';
 import { Server, Socket } from 'socket.io';
 import { Request } from 'express';
@@ -88,7 +89,8 @@ app.use(helmet()); // Seguridad de cabeceras HTTP
 app.use(cors({
   origin: [
     process.env.CLIENT_URL || 'http://localhost:5173',           // App principal de usuarios
-    process.env.ADMIN_CLIENT_URL || 'http://localhost:5174',     // App de dashboard admin
+    'http://localhost:5174',                                     // App principal en puerto alternativo
+    process.env.ADMIN_CLIENT_URL || 'http://localhost:5175',     // App de dashboard admin
     'http://localhost:3000'  // Para desarrollo local adicional
   ],
   credentials: true,
@@ -97,6 +99,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser()); // Middleware para parsear cookies
 
 // ==================================================
 // 2. Limitador de peticiones para API pública

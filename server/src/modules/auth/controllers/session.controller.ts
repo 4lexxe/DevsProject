@@ -4,7 +4,8 @@
 
 import { Request, Response } from "express";
 import User from "../../user/User";
-import { userTokens, revokeToken } from "../../../shared/middleware/authMiddleware";
+import { revokeToken } from "../../../shared/middleware/authMiddleware";
+import { SessionService } from "../services/session.service";
 import { SessionUtils } from "../utils/session.utils";
 import { TokenUtils } from "../utils/token.utils";
 
@@ -17,7 +18,7 @@ export class SessionController {
         return;
       }
 
-      const sessions = userTokens.get(userId) || [];
+      const sessions = await SessionService.getUserSessions(userId);
       res.json({ 
         sessions: SessionUtils.formatSessions(sessions)
       });
@@ -40,8 +41,8 @@ export class SessionController {
         return;
       }
 
-      revokeToken(userId, token);
-      const remainingSessions = userTokens.get(userId) || [];
+      await revokeToken(userId, token);
+        const remainingSessions = await SessionService.getUserSessions(userId);
       res.json({ 
         message: "Sesión revocada correctamente",
         remainingSessions: SessionUtils.formatSessions(remainingSessions)
@@ -61,13 +62,18 @@ export class SessionController {
         return;
       }
 
-      const sessions = userTokens.get(userId) || [];
-      const updatedSessions = sessions.filter(session => session.token === currentToken);
-      userTokens.set(userId, updatedSessions);
+      const sessions = await SessionService.getUserSessions(userId);
+      const currentSession = sessions.find(session => session.token === currentToken);
+      
+      // Revocar todas las sesiones excepto la actual
+      await SessionService.revokeAllTokens(userId);
+      if (currentSession) {
+        await SessionService.registerSession(userId, currentSession);
+      }
 
       res.json({ 
         message: "Otras sesiones revocadas correctamente",
-        currentSession: SessionUtils.formatSession(updatedSessions[0])
+        currentSession: currentSession ? SessionUtils.formatSession(currentSession) : null
       });
     } catch (error) {
       console.error("Error revoking other sessions:", error);

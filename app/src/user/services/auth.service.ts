@@ -71,10 +71,8 @@ class AuthService {
 
   // Constructor privado para implementar el patrón Singleton
   private constructor() {
-    this.token = localStorage.getItem('token');
-    if (this.token) {
-      this.setAuthHeader(this.token);
-    }
+    // Ya no obtenemos el token del localStorage, se maneja automáticamente por cookies HttpOnly
+    // El token se enviará automáticamente en las cookies con cada request
   }
 
   // Método estático para obtener la instancia única de AuthService
@@ -85,13 +83,11 @@ class AuthService {
     return AuthService.instance;
   }
 
-  // Configurar el encabezado de autorización en Axios
+  // Ya no necesitamos configurar manualmente el header Authorization
+  // Las cookies HttpOnly se envían automáticamente con cada request
   private setAuthHeader(token: string | null) {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
+    // Método mantenido por compatibilidad pero ya no es necesario
+    // Las cookies HttpOnly manejan la autenticación automáticamente
   }
 
   // Iniciar sesión
@@ -100,8 +96,7 @@ class AuthService {
       const response = await axios.post(`${API_URL}/auth/login`, credentials);
       const { token, user } = response.data;
 
-      // Guardar tanto el token como los datos del usuario
-      this.setToken(token);
+      // Solo guardamos los datos del usuario, el token se maneja automáticamente por cookies HttpOnly
       this.setUser(user);
 
       console.log('🔐 Usuario autenticado:', {
@@ -124,8 +119,7 @@ class AuthService {
       const response = await axios.post(`${API_URL}/auth/register`, data);
       const { token, user } = response.data;
 
-      // Guardar tanto el token como los datos del usuario
-      this.setToken(token);
+      // Solo guardamos los datos del usuario, el token se maneja automáticamente por cookies HttpOnly
       this.setUser(user);
 
       console.log('🔐 Usuario registrado:', {
@@ -172,18 +166,19 @@ class AuthService {
     }
   }
 
-  // Guardar el token en localStorage y configurar el encabezado de autorización
+  // Método mantenido por compatibilidad, pero el token ahora se maneja por cookies HttpOnly
   public setToken(token: string): void {
     this.token = token;
-    localStorage.setItem('token', token);
+    // Ya no guardamos en localStorage, las cookies HttpOnly se manejan automáticamente por el servidor
     this.setAuthHeader(token);
   }
 
-  // Limpiar el token de localStorage y eliminar el encabezado de autorización
+  // Limpiar el token y datos del usuario
   private clearToken(): void {
     this.token = null;
-    localStorage.removeItem('token');
-    localStorage.removeItem('user'); // También limpiar datos del usuario
+    // Ya no necesitamos limpiar localStorage para el token (se maneja por cookies HttpOnly)
+    // Solo limpiamos los datos del usuario que aún se almacenan localmente
+    localStorage.removeItem('user');
     this.setAuthHeader(null);
   }
 
