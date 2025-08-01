@@ -85,9 +85,17 @@ export class RootLoginController {
           return;
         }
 
+        // Configurar cookie HttpOnly con el token
+        res.cookie('auth_token', authResponse.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          maxAge: 24 * 60 * 60 * 1000, // 24 horas
+          path: '/'
+        });
+
         res.json({
           message: "Inicio de sesión de super administrador exitoso",
-          ...authResponse,
           user: {
             ...authResponse.user,
             Role: {

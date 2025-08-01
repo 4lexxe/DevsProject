@@ -76,9 +76,18 @@ export class DiscordController {
         if (!redirectUrl) {
           return res.status(400).json({ error: "URL de redirección no proporcionada" });
         }
+
+        // Configurar cookie HttpOnly con el token
+        res.cookie('auth_token', authResponse.token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          maxAge: 24 * 60 * 60 * 1000, // 24 horas
+          path: '/'
+        });
   
-        const frontendUrl = `${redirectUrl}?token=${authResponse.token}`;
-        res.redirect(frontendUrl);
+        // Redirigir sin el token en la URL por seguridad
+        res.redirect(redirectUrl);
       } catch (error) {
         console.error("Error al procesar datos del usuario:", error);
         return res.status(500).json({ error: "Error procesando datos del usuario" });

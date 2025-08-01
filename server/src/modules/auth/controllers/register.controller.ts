@@ -49,12 +49,21 @@ export class RegisterController {
       });
 
       // Generar la respuesta de autenticación con un token
-      const authResponse = TokenUtils.getAuthResponse(user, req);
+      const authResponse = await TokenUtils.getAuthResponse(user, req);
 
-      // Responder con el mensaje de éxito y los tokens de autenticación
+      // Configurar cookie HttpOnly con el token
+      res.cookie('auth_token', authResponse.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000, // 24 horas
+        path: '/'
+      });
+
+      // Responder con el mensaje de éxito (sin enviar el token en JSON)
       res.status(201).json({
         message: "Usuario registrado correctamente",
-        ...authResponse,
+        user: authResponse.user,
       });
     } catch (error) {
       console.error("Error de registro:", error);

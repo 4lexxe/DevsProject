@@ -6,6 +6,7 @@ import Permission from "./modules/role/Permission";
 import RolePermission from "./modules/role/RolePermission";
 import User from "./modules/user/User";
 import Admin from "./modules/admin/Admin";
+import Session from "./modules/auth/models/Session";
 import SectionHeader from "./modules/headerSection/HeaderSection";
 import Recourse from "./modules/resource/Resource";
 import Rating from "./modules/resource/rating/Rating";
@@ -54,8 +55,8 @@ async function syncDatabase() {
     await seedInitialData();
 
     await User.sync({ force: true });
-
     await Admin.sync({ force: true });
+    await Session.sync({ force: true });
 
     await SectionHeader.sync({ force: true });
 

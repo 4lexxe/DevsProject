@@ -18,7 +18,10 @@ export class LogoutController {
         return;
       }
 
-      const token = req.headers.authorization?.split(" ")[1];
+      const cookieToken = req.cookies?.auth_token;
+      const authHeader = req.headers.authorization;
+      const headerToken = authHeader?.split(" ")[1];
+      const token = cookieToken || headerToken;
       
       // Revocar token si está presente
       if (token) {
@@ -98,8 +101,14 @@ export class LogoutController {
           return res.status(500).json({ error: "Error al cerrar sesión" });
         }
 
-        // Limpiar cookie de sesión
+        // Limpiar cookies de sesión y autenticación
         res.clearCookie("sessionId");
+        res.clearCookie("auth_token", {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+          path: '/'
+        });
         
         res.json({
           message: "✅ Sesión cerrada correctamente",

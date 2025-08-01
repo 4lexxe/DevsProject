@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Cookies</title>
+</head>
+<body>
+    <h1>Test de Cookies HttpOnly</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <button onclick="testVerify()">Test Verify</button>
+    <div id="result"></div>
+
+    <script>
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h3>Verify Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <h3>Cookies:</h3>
+                    <pre>${document.cookie}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        async function testVerify() {
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/verify', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <h3>Verify Response:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <h3>Response Headers:</h3>
+                    <pre>${Array.from(response.headers.entries()).map(([k,v]) => `${k}: ${v}`).join('\n')}</pre>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
