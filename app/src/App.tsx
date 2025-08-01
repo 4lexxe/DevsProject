@@ -13,7 +13,7 @@ import Home from "./home/home";
 
 import "@/shared/assets/styles/main.css";
 
-import { CoursesPage, CourseDetail, QuizPage, Profile, ContentPage }from '@/course/index';
+import { CoursesPage, CourseDetail, QuizPage, Profile, ContentPage, SearchResultsPage }from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./user/auth";
 import AboutUs from "./shared/components/navigation/AboutUs";
@@ -60,6 +60,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="cursos" element={<CoursesPage />} />
+              <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/course/:id" element={<CourseDetail />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />

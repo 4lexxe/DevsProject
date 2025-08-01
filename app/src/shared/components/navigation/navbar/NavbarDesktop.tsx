@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { LogOut, User, Settings, LogIn, UserPlus, CreditCard, Search, Bell, BookOpen, Route, FolderOpen, ShoppingCart } from 'lucide-react';
+import { LogOut, User, Settings, LogIn, UserPlus, CreditCard, Bell, BookOpen, Route, FolderOpen, ShoppingCart } from 'lucide-react';
+import SearchInput from '../../search/SearchInput';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/user/contexts/AuthContext';
 import NavLink from '../navbar/NavLink';
@@ -9,7 +10,7 @@ export default function DesktopNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
+
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,18 +56,7 @@ export default function DesktopNavbar() {
 
           {/* Search bar */}
           <div className="flex-1 max-w-md mx-8">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className={`h-5 w-5 transition-colors ${isSearchFocused ? 'text-blue-500' : 'text-gray-400'}`} />
-              </div>
-              <input
-                type="text"
-                placeholder="Buscar cursos, recursos..."
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => setIsSearchFocused(false)}
-              />
-            </div>
+            <SearchInput placeholder="Buscar cursos, recursos..." />
           </div>
 
           {/* Navigation links */}
