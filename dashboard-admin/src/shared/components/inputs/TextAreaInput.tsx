@@ -18,8 +18,17 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({
   error, 
   placeholder,
   arrayValue = false,
-  rows = 3
+  rows = 1
 }: TextAreaInputProps) => {
+
+  const autoResize = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  };
+
+  const handleTextareaInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    autoResize(e.currentTarget);
+  };
 
     return (
     <div className="space-y-1">
@@ -31,15 +40,14 @@ const TextAreaInput: React.FC<TextAreaInputProps> = ({
       </label>
       <textarea
         id={name}
-
         {...register(name, {
           setValueAs: (value: string) =>
             arrayValue ? (value === "" ? [] : value.split("\n")) : value
         })}
-
+        onInput={handleTextareaInput}
         rows={rows}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+        className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none overflow-hidden min-h-[42px] ${
           error
             ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
             : 'border-gray-300'

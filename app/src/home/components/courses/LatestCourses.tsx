@@ -13,7 +13,24 @@ interface Course {
   image: string;
   createdAt: string; // Asegúrate de que la API retorne este campo
   category: string; // Añadir la categoría
-  careerType: string; // Añadir el tipo de carrera relacionada
+  careerType: {
+    name: string;
+  }; // Añadir el tipo de carrera relacionada
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    activeDiscount?: {
+      id: number;
+      event: string;
+      description: string;
+      percentage: number;
+      amount: number;
+      startDate: string;
+      endDate: string;
+    };
+    savings: number;
+  };
 }
 
 export default function LatestCourses() {
@@ -64,6 +81,7 @@ export default function LatestCourses() {
             courseName={course.category} // Muestra la categoría
             image={course.image}
             careerType={course.careerType.name} // Muestra el tipo de carrera relacionada
+            pricing={course.pricing} // Pasar información de precios
           />          
           ))}
         </div>

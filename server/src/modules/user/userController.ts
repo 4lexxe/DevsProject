@@ -18,9 +18,29 @@ interface UpdatableUserFields {
   identificationNumber?: string | null;
   identificationType?: string | null;
   password?: string;
-  isActiveSession?: boolean; // Nuevo campo para actualizar sesión activa
-  lastActiveAt?: Date; // Campo para la última actividad
+  isActiveSession?: boolean;
+  lastActiveAt?: Date;
 }
+
+// Función para generar metadata
+const metadata = (req: Request, res: Response) => {
+  return {
+    statusCode: res.statusCode,
+    url: req.protocol + "://" + req.get("host") + req.originalUrl,
+    method: req.method,
+  };
+};
+
+// Función para manejar errores internos del servidor
+const handleServerError = (res: Response, req: Request, error: any, message: string) => {
+  console.error(message, error);
+  res.status(500).json({
+    ...metadata(req, res),
+    status: "error",
+    message,
+    error: error.message,
+  });
+};
 
 // Extensión del tipo Request de Express
 declare module 'express' {
@@ -42,9 +62,76 @@ declare module 'express' {
 
 export class UserController {
 
-  // Obtener todos los usuarios (público)
-  static async getUsers(_req: Request, res: Response): Promise<void> {
+  // Obtener datos públicos básicos de todos los usuarios (público)
+  static async getPublicUsers(req: Request, res: Response): Promise<void> {
     try {
+      const users = await User.findAll({
+        attributes: ['id', 'name', 'username', 'displayName', 'avatar'], // Agregamos avatar
+        where: {
+          // Opcional: agregar filtros adicionales como usuarios activos
+          // isActive: true
+        }
+      });
+      
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: "Usuarios públicos obtenidos correctamente",
+        data: users
+      });
+    } catch (error) {
+      handleServerError(res, req, error, "Error al obtener usuarios públicos");
+    }
+  }
+
+  // Obtener datos públicos básicos de un usuario por ID (público)
+  static async getPublicUserById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await User.findByPk(id, {
+        attributes: ['id', 'name', 'username', 'displayName', 'avatar'] // Agregamos avatar
+      });
+
+      if (!user) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'Usuario no encontrado'
+        });
+        return;
+      }
+
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: "Usuario público obtenido correctamente",
+        data: user
+      });
+    } catch (error) {
+      handleServerError(res, req, error, "Error al obtener usuario público");
+    }
+  }
+
+  // Obtener todos los usuarios (solo para roles importantes)
+  static async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const canViewAllUsers = userPermissions.includes('read:users') || 
+                             userPermissions.includes('manage:all_users') || 
+                             user.Role?.name === 'superadmin';
+
+      if (!canViewAllUsers) {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para ver información completa de usuarios'
+        });
+        return;
+      }
+
       const users = await User.findAll({
         attributes: { 
           exclude: [
@@ -80,16 +167,32 @@ export class UserController {
       
       res.json(usersData);
     } catch (error) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ error: 'Error al obtener usuarios' });
+      handleServerError(res, req, error, "Error al obtener usuarios");
     }
   }
 
-  // Obtener un usuario por ID (público)
+  // Obtener un usuario por ID (solo para roles importantes)
   static async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = await User.findByPk(id, {
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const canViewUserDetails = userPermissions.includes('read:users') || 
+                                userPermissions.includes('manage:all_users') || 
+                                user.Role?.name === 'superadmin';
+
+      if (!canViewUserDetails) {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para ver información completa de usuarios'
+        });
+        return;
+      }
+
+      const targetUser = await User.findByPk(id, {
         attributes: { 
           exclude: [
             'password', 
@@ -111,8 +214,13 @@ export class UserController {
           }]
         }]
       });
-      if (!user) {
-        res.status(404).json({ error: 'Usuario no encontrado' });
+
+      if (!targetUser) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'Usuario no encontrado'
+        });
         return;
       }
 
@@ -125,8 +233,7 @@ export class UserController {
 
       res.json(userData);
     } catch (error) {
-      console.error('Error fetching user by ID:', error);
-      res.status(500).json({ error: 'Error al obtener usuario' });
+      handleServerError(res, req, error, "Error al obtener usuario");
     }
   }
 
@@ -134,11 +241,24 @@ export class UserController {
   static async getUserSecurityDetails(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      if (!(req.user as User)?.hasPermission('VIEW_SECURITY_DETAILS')) {
-        res.status(403).json({ error: 'No autorizado' });
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const canViewSecurityDetails = userPermissions.includes('read:users') || 
+                                   userPermissions.includes('manage:all_users') || 
+                                   user.Role?.name === 'superadmin';
+
+      if (!canViewSecurityDetails) {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para ver detalles de seguridad'
+        });
         return;
       }
-      const user = await User.findByPk(id, {
+
+      const targetUser = await User.findByPk(id, {
         attributes: [
           'id',
           'registrationIp',
@@ -151,36 +271,46 @@ export class UserController {
         ],
         include: [{
           model: Role,
-          as: 'Role', // Usa el alias definido en la relación
+          as: 'Role',
           attributes: ['name']
         }]
       });
-      if (!user) {
-        res.status(404).json({ error: 'Usuario no encontrado' });
+
+      if (!targetUser) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'Usuario no encontrado'
+        });
         return;
       }
-      res.json({
-        id: user.id,
-        role: user.Role?.name,
-        registrationGeo: user.registrationGeo,
-        lastLoginIp: user.lastLoginIp,
-        registrationLocation: user.registrationGeo ? {
-          city: user.registrationGeo.city,
-          country: user.registrationGeo.country,
-          coordinates: user.registrationGeo.loc
-        } : null,
-        lastLoginLocation: user.lastLoginGeo ? {
-          city: user.lastLoginGeo.city,
-          country: user.lastLoginGeo.country,
-          coordinates: user.lastLoginGeo.loc
-        } : null,
-        suspiciousActivities: user.suspiciousActivities.length,
-        isActiveSession: user.isActiveSession, // Incluir isActiveSession
-        lastActiveAt: user.lastActiveAt,       // Incluir lastActiveAt
+
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: "Detalles de seguridad obtenidos correctamente",
+        data: {
+          id: targetUser.id,
+          role: targetUser.Role?.name,
+          registrationGeo: targetUser.registrationGeo,
+          lastLoginIp: targetUser.lastLoginIp,
+          registrationLocation: targetUser.registrationGeo ? {
+            city: targetUser.registrationGeo.city,
+            country: targetUser.registrationGeo.country,
+            coordinates: targetUser.registrationGeo.loc
+          } : null,
+          lastLoginLocation: targetUser.lastLoginGeo ? {
+            city: targetUser.lastLoginGeo.city,
+            country: targetUser.lastLoginGeo.country,
+            coordinates: targetUser.lastLoginGeo.loc
+          } : null,
+          suspiciousActivities: targetUser.suspiciousActivities.length,
+          isActiveSession: targetUser.isActiveSession,
+          lastActiveAt: targetUser.lastActiveAt,
+        }
       });
     } catch (error) {
-      console.error('Error fetching security details:', error);
-      res.status(500).json({ error: 'Error al obtener detalles de seguridad' });
+      handleServerError(res, req, error, "Error al obtener detalles de seguridad");
     }
   }
 
@@ -189,9 +319,15 @@ export class UserController {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        res.status(400).json({ errors: errors.array() });
+        res.status(400).json({
+          ...metadata(req, res),
+          status: "error",
+          message: "Errores de validación",
+          errors: errors.array()
+        });
         return;
       }
+
       const { id } = req.params;
       const { 
         name, 
@@ -201,13 +337,36 @@ export class UserController {
         password,
         username,
         displayName,
-        isActiveSession, // Permitir actualizar isActiveSession
+        isActiveSession, 
       } = req.body;
-      const user = await User.findByPk(id);
-      if (!user) {
-        res.status(404).json({ error: 'Usuario no encontrado' });
+
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const canUpdateUsers = userPermissions.includes('write:users') || 
+                           userPermissions.includes('manage:all_users') || 
+                           user.Role?.name === 'superadmin';
+
+      if (!canUpdateUsers) {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para actualizar usuarios'
+        });
         return;
       }
+
+      const targetUser = await User.findByPk(id);
+      if (!targetUser) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'Usuario no encontrado'
+        });
+        return;
+      }
+
       const updatableFields: UpdatableUserFields = {
         name,
         email,
@@ -215,17 +374,21 @@ export class UserController {
         roleId,
         username,
         displayName,
-        isActiveSession, // Actualizar isActiveSession si está presente
+        isActiveSession,
       };
+
       if (password) {
         const salt = await bcrypt.genSalt(10);
         updatableFields.password = await bcrypt.hash(password, salt);
       }
+
       // Si se proporciona isActiveSession, actualizar lastActiveAt también
       if (isActiveSession !== undefined) {
         updatableFields.lastActiveAt = new Date();
       }
-      await user.update(updatableFields);
+
+      await targetUser.update(updatableFields);
+
       const updatedUser = await User.findByPk(id, {
         attributes: { 
           exclude: [
@@ -239,14 +402,19 @@ export class UserController {
         },
         include: [{
           model: Role,
-          as: 'Role', // Usa el alias definido en la relación
+          as: 'Role',
           attributes: ['id', 'name', 'description']
         }]
       });
-      res.json(updatedUser);
+
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: "Usuario actualizado correctamente",
+        data: updatedUser
+      });
     } catch (error) {
-      console.error('Error updating user:', error);
-      res.status(500).json({ error: 'Error al actualizar usuario' });
+      handleServerError(res, req, error, "Error al actualizar usuario");
     }
   }
 
@@ -302,18 +470,47 @@ export class UserController {
   static async deleteUser(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = await User.findByPk(id);
-      if (!user) {
-        res.status(404).json({ error: 'Usuario no encontrado' });
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      if (!userPermissions.includes('delete:users') && user.Role?.name !== 'superadmin') {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para eliminar usuarios'
+        });
         return;
       }
+
+      const targetUser = await User.findByPk(id);
+      if (!targetUser) {
+        res.status(404).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'Usuario no encontrado'
+        });
+        return;
+      }
+
+      // Prevenir eliminación del propio usuario
+      if (user.id === targetUser.id) {
+        res.status(400).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No puedes eliminar tu propia cuenta'
+        });
+        return;
+      }
+
       // Marcar la sesión como inactiva antes de eliminar el usuario
-      user.isActiveSession = false;
-      user.lastActiveAt = new Date();
-      await user.save();
-      await user.update({
+      targetUser.isActiveSession = false;
+      targetUser.lastActiveAt = new Date();
+      await targetUser.save();
+
+      await targetUser.update({
         suspiciousActivities: [
-          ...user.suspiciousActivities,
+          ...targetUser.suspiciousActivities,
           {
             type: 'ACCOUNT_DELETED',
             ip: req.ip || 'unknown',
@@ -322,11 +519,16 @@ export class UserController {
           }
         ]
       });
-      await user.destroy();
-      res.json({ message: 'Usuario eliminado correctamente' });
+
+      await targetUser.destroy();
+
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: 'Usuario eliminado correctamente'
+      });
     } catch (error) {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ error: 'Error al eliminar usuario' });
+      handleServerError(res, req, error, "Error al eliminar usuario");
     }
   }
 }

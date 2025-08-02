@@ -17,7 +17,7 @@ export const sectionSchema = z.object({
   moduleType: z.enum(moduleTypes, {
     message: "Categoría inválida"
   }),
-  coverImage: z.string().url("Debe ser una URL válida").optional(),
+  coverImage: z.string().url("Debe ser una URL válida").or(z.literal("")),
 }).and(z.object({
   colorGradient: z
     .array(z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, "Color inválido"))

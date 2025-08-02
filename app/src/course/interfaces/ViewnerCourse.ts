@@ -15,6 +15,23 @@ export type CareerType = {
   isActive: boolean;
 }
 
+export interface DiscountEvent {
+  id: string;
+  event: string;
+  description: string;
+  value: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  CourseDiscountEventAssociation: {
+    courseId: string;
+    discountEventId: string;
+  };
+}
+
 export interface Course {
   id: number;
   title: string;
@@ -29,6 +46,15 @@ export interface Course {
   isInDevelopment: boolean;
   adminId: number; 
   createdAt: string;
+  price?: number;
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    discountEvents: DiscountEvent[];
+    totalDiscountPercentage: number;
+    savings: number;
+  };
 }
 
 export interface Section {

@@ -2,8 +2,6 @@ import { z } from "zod";
 
 export const courseSchema = z
   .object({
-    id: z.string().optional(),
-    
     title: z
       .string()
       .min(5, { message: "El título debe tener al menos 5 caracteres" })
@@ -12,35 +10,38 @@ export const courseSchema = z
     image: z
       .string()
       .url({ message: "Debe ser una URL válida" })
-      .or(z.literal("")),
+      .nonempty({ message: "Este campo no puede estar vacío" })
+      .optional(),
 
     categoryIds: z
       .array(z.string(), { message: "Tipo invalido" })
-      .min(1, { message: "Debe haber almenos una categoría seleccionada" }),
+      .min(1, { message: "Debe haber almenos una categoría seleccionada" })
+      .optional(),
 
     summary: z
       .string()
       .min(10, { message: "El resumen debe tener al menos 10 caracteres" })
-      .or(z.literal("")),
+      .optional(),
 
     about: z
       .string()
       .min(20, { message: "La descripción debe tener al menos 20 caracteres" })
-      .or(z.literal("")),
-
-    prerequisites: z
-      .array(z.string())
-      .optional()
-      .or(z.literal("")),
-
-    careerTypeId: z
-      .string()
       .optional(),
+
+    prerequisites: z.array(z.string()).optional().or(z.literal("")).or(z.literal(null)),
+
+    careerTypeId: z.string().optional().or(z.literal(null)),
 
     learningOutcomes: z
       .array(z.string(), { message: "Tipo invalido" })
       .min(1, { message: "Debe haber al menos un resultado de aprendizaje" })
       .or(z.literal("")),
+
+    price: z
+      .number({ message: "El precio debe ser un número" })
+      .min(0, { message: "El precio debe ser mayor o igual a 0" })
+      .max(999999, { message: "El precio no puede ser mayor a 999,999" })
+      .optional(),
 
     isActive: z.boolean(),
     isInDevelopment: z.boolean(),

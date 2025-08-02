@@ -1,7 +1,6 @@
 import cron from "node-cron";
 import { Op } from "sequelize";
-import DiscountEvent from "../../modules/subscription/models/DiscountEvent";
-import MPSubPlan from "../../modules/subscription/models/MPSubPlan";
+import DiscountEvent from "../../modules/subscription/models/PlanDiscountEvent";
 import Plan from "../../modules/subscription/models/Plan";
 import Subscription from "../../modules/subscription/models/Subscription";
 import { PreApprovalPlan } from "mercadopago";
@@ -28,9 +27,7 @@ const updateExpiredDiscounts = async () => {
       await discount.update({ isActive: false });
       console.log(`Descuento con ID ${discount.id} ha sido desactivado.`);
 
-      const plan = await Plan.findByPk(discount.planId, {
-        include: [{ model: MPSubPlan, as: "mpSubPlan" }],
-      });
+      const plan = await Plan.findByPk(discount.planId);
 
       if (!plan) {
         console.error(
@@ -38,32 +35,6 @@ const updateExpiredDiscounts = async () => {
         );
         continue;
       }
-
-      if (!plan.mpSubPlan) {
-        console.error(
-          `No se encontró el plan de MercadoPago asociado con el plan ID ${plan.id}`
-        );
-        continue;
-      }
-
-      const mpPlanResponse = await retryWithExponentialBackoff(() =>
-        preApprovalPlan.update({
-          id: plan.mpSubPlan!.id,
-          updatePreApprovalPlanRequest: {
-            auto_recurring: {
-              transaction_amount: plan.installmentPrice,
-            },
-          },
-        })
-      );
-
-      await plan.mpSubPlan.update({
-        reason: mpPlanResponse.reason,
-        status: mpPlanResponse.status,
-        initPoint: mpPlanResponse.init_point,
-        autoRecurring: mpPlanResponse.auto_recurring,
-        data: mpPlanResponse,
-      });
     }
   } catch (error) {
     console.error(

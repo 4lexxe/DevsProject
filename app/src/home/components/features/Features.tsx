@@ -25,15 +25,6 @@ export default function Features() {
   return (
     <section className="px-2 sm:px-4 py-6 sm:py-8 bg-[#FFFF]">
       <div className="max-w-3xl mx-auto text-center">
-        {/* Título y Descripción */}
-        <h2 className="mb-2 text-lg sm:text-xl font-bold text-black">
-          Diseñado Para Estudiantes Como Tú
-        </h2>
-        <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-black/80">
-          Desde organizar tus materias hasta conectarte con otros estudiantes, 
-          nuestra plataforma tiene todo lo que necesitas para avanzar en tu aprendizaje.
-        </p>
-
         {/* Contenedor de las características */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {features.map((feature) => (

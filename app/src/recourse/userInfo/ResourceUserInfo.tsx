@@ -1,9 +1,10 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
 
 interface UserInfo {
   id: number;
   name: string;
+  username?: string;
+  displayName?: string;
   avatar?: string;
 }
 
@@ -13,29 +14,43 @@ interface ResourceUserInfoProps {
 }
 
 const ResourceUserInfo: React.FC<ResourceUserInfoProps> = ({ user, createdAt }) => {
+  // NO hacer llamadas al UserService aquí
+  // Solo usar los datos que vienen en las props
+
+  const getUserDisplayName = (): string => {
+    return user?.displayName || user?.name || user?.username || 'Usuario desconocido';
+  };
+
+  const formatDate = (dateString: string): string => {
+    try {
+      return new Date(dateString).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Fecha desconocida';
+    }
+  };
+
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:space-x-6">
-      <div className="flex items-center group/user">
-        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm group-hover/user:shadow-md transition-shadow">
-          <img
-            src={user.avatar || "/placeholder.svg"}
-            alt={user.name}
-            className="w-full h-full object-cover"
+    <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="flex items-center gap-2">
+        {user?.avatar ? (
+          <img 
+            src={user.avatar} 
+            alt={getUserDisplayName()} 
+            className="w-5 h-5 rounded-full object-cover"
           />
-        </div>
-        <div className="ml-3">
-          <span className="text-xs text-gray-500 block">Publicado por</span>
-          <span className="text-sm font-medium text-gray-900 group-hover/user:text-gray-700 transition-colors">
-            {user.name}
-          </span>
-        </div>
+        ) : (
+          <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+            {getUserDisplayName().charAt(0).toUpperCase()}
+          </div>
+        )}
+        <span className="font-medium">{getUserDisplayName()}</span>
       </div>
-      <div className="flex items-center text-gray-500 sm:border-l border-gray-200 sm:pl-6">
-        <Calendar className="w-4 h-4 mr-2" />
-        <span className="text-xs">
-          {new Date(createdAt).toLocaleDateString()}
-        </span>
-      </div>
+      <span className="text-gray-400">•</span>
+      <span>{formatDate(createdAt)}</span>
     </div>
   );
 };

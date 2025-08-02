@@ -13,23 +13,32 @@ import Comment from "./modules/resource/comment/Comment";
 import RoadMap from "./modules/roadmap/RoadMap";
 
 /* Modelos relacionados con el area de cursos */
-import Category from "./modules/category/Category";
-import CareerType from "./modules/careerType/CareerType";
-import Course from "./modules/course/Course";
-import { CourseCategory } from "./modules/course/Course";
-import Section from "./modules/section/Section";
-import Content from "./modules/content/Content";
+import Category from "./modules/course/models/Category";
+import CareerType from "./modules/course/models/CareerType";
+import Course from "./modules/course/models/Course";
+import { CourseCategory } from "./modules/course/models/Course";
+import Section from "./modules/course/models/Section";
+import Content from "./modules/course/models/Content";
 
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
-import DiscountEvent from "./modules/subscription/models/DiscountEvent";
+import PlanDiscountEvent from "./modules/subscription/models/PlanDiscountEvent";
 import Invoice from "./modules/subscription/models/Invoice";
 import Subscription from "./modules/subscription/models/Subscription";
 import MPSubscription from "./modules/subscription/models/MPSubscription";
-import MPSubPlan from "./modules/subscription/models/MPSubPlan";
-import Payment from "./modules/subscription/models/Payment";
+import SubscriptionPayment from "./modules/subscription/models/SubscriptionPayment";
 import Plan from "./modules/subscription/models/Plan";
-import Refund from "./modules/subscription/models/Refund";
-import WebhookEvent from "./modules/subscription/models/WebhookEvent";
+
+/* Modelos relacionados con las compras de cursos */
+import Cart from "./modules/purchase/models/Cart";
+import CartCourse from "./modules/purchase/models/CartCourse";
+import Preference from "./modules/purchase/models/Preference";
+import PreferencePayment from "./modules/purchase/models/PreferencePayment";
+import CourseDiscountEvent, { CourseDiscountEventAssociation } from "./modules/purchase/models/CourseDiscountEvent";
+import CourseAccess from "./modules/purchase/models/CourseAccess";
+
+import MPWebhookEvent from "./modules/webhook/MPWebhookEvent";
+// Importar las asociaciones
+import "./modules/purchase/models/Associations";
 
 // sync.ts
 async function syncDatabase() {
@@ -67,15 +76,22 @@ async function syncDatabase() {
     await Content.sync({ force: true });
 
     // Area de pagos
-    await WebhookEvent.sync({ force: true })
+    await MPWebhookEvent.sync({ force: true });
     await Plan.sync({ force: true });
-    await DiscountEvent.sync({ force: true });
+    await PlanDiscountEvent.sync({ force: true });
     await MPSubscription.sync({ force: true });
-    await MPSubPlan.sync({ force: true });
     await Subscription.sync({ force: true }); 
-    await Payment.sync({ force: true });
+    await SubscriptionPayment.sync({ force: true });
     await Invoice.sync({ force: true });
-    await Refund.sync({ force: true });
+
+    // Area de compras de cursos
+    await CourseDiscountEvent.sync({ force: true });
+    await CourseDiscountEventAssociation.sync({ force: true });
+    await CourseAccess.sync({ force: true });
+    await Preference.sync({ force: true });
+    await Cart.sync({ force: true });
+    await CartCourse.sync({ force: true });
+    await PreferencePayment.sync({ force: true });
 
     console.log("¡Sincronización exitosa!");
   } catch (error) {

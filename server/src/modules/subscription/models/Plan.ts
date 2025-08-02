@@ -1,6 +1,5 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import MPSubPlan from "./MPSubPlan"; // Import MPSubPlan model
 
 class Plan extends Model {
   public id!: bigint;
@@ -21,8 +20,6 @@ class Plan extends Model {
   public position!: number; // Indica la posicion en que se mostrara el plan
 
   public discountEvent?: any; // Evento de descuento asociado al plan, si existe
-
-  public mpSubPlan?: MPSubPlan; // Relacion con el modelo de MPSubPlan
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;

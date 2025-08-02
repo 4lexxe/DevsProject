@@ -11,14 +11,22 @@ export default function CarouselButton({ direction, onClick, className = '' }: C
   return (
     <button
       onClick={onClick}
-      className={`${className} group p-3 rounded-full bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-all duration-300 transform hover:scale-110`}
-      aria-label={direction === 'left' ? 'Previous slide' : 'Next slide'}
+      className={`${className} group relative p-4 rounded-2xl bg-white/90 backdrop-blur-sm shadow-lg hover:shadow-xl border border-gray-200 hover:border-indigo-300 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1`}
+      aria-label={direction === 'left' ? 'Diapositiva anterior' : 'Siguiente diapositiva'}
     >
-      {direction === 'left' ? (
-        <ChevronLeft className="w-8 h-8 text-white group-hover:text-[#00D7FF] transition-colors" />
-      ) : (
-        <ChevronRight className="w-8 h-8 text-white group-hover:text-[#00D7FF] transition-colors" />
-      )}
+      <div className="relative z-10">
+        {direction === 'left' ? (
+          <ChevronLeft className="w-6 h-6 text-gray-700 group-hover:text-indigo-600 transition-colors duration-300" />
+        ) : (
+          <ChevronRight className="w-6 h-6 text-gray-700 group-hover:text-indigo-600 transition-colors duration-300" />
+        )}
+      </div>
+      
+      {/* Gradient hover effect */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+      
+      {/* Animated border on hover */}
+      <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-indigo-300/50 transition-all duration-300" />
     </button>
   );
 }

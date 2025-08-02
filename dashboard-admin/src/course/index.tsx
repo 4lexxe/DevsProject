@@ -1,18 +1,10 @@
+export { default as CoursesPage } from './pages/CoursesPage'
+export { default as CourseFormPage } from './pages/CourseFormPage'
+export { default as CourseDetail } from './pages/courseDetail'
 
-// Course module barrel exports
+export { default as SectionFormPage } from './pages/SectionFormPage'
 
-// Pages
-export { default as CoursesPage } from './pages/CoursesPage';
-export { default as CourseFormPage } from './pages/CourseFormPage';
-export { default as CourseDetail } from './pages/courseDetail';
-export { default as QuizPage } from './pages/QuizPage';
-export { default as SectionFormPage } from './pages/SectionFormPage';
-export { default as ContentPage } from './pages/ContentPage';
-
-// Re-export components, services, types, etc.
-export * from './components';
-export * from './services';
-export * from './types';
-export * from './interfaces';
-export * from './validations';
-export * from './context';
+export { default as SectionPage } from './pages/SectionPage'
+export { default as CourseDiscountEvent } from './pages/CourseDiscountEvent'
+export { default as DiscountEventsList } from './pages/DiscountEventsList'
+export { default as QuizFormPage } from './pages/QuizForm'

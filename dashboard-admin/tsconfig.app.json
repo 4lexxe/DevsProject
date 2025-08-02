@@ -34,5 +34,5 @@
       "@/home/*": ["./src/home/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../app/src/course/components/Content/MarkdownPreview.tsx"]
 }

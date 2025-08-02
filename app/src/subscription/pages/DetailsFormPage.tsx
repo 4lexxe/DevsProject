@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import DetailForm from "../components/detailsForm/DetailForm";
+import DetailForm from "../components/DetailForm/DetailForm";
 import { userData } from "../services/userService";
 import { getPlanById } from "../services/planService";
 import { useAuth } from "@/user/contexts/AuthContext";

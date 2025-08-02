@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getById } from "../services/courseServices";
-import HeroCourse from "../components/courses/HeroCourse";
-import CourseOverview from "../components/courses/CourseOverview";
-import LearningOutcomes from "../components/courses/LearningOutcomes";
-import Prerequisites from "../components/courses/Prerequisites";
-import SectionList from "../components/courses/SectionList";
-import AddSectionButton from "../components/courses/AddSectionButton";
-import { Course } from "../interfaces/ViewnerCourse";
+
+import { Course } from "@/course/interfaces/ViewnerCourse";
+import HeroCourse from "@/course/components/CourseDetail/HeroCourse";
+import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
+import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
+import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
+import SectionList from "@/course/components/CourseDetail/SectionList";
+import AddToCartButton from "@/course/components/CourseDetail/AddToCartButton";
+import PricingCard from "@/course/components/CourseDetail/PricingCard";
+
+import { getById } from "@/course/services/courseServices";
 
 const CourseDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -78,6 +81,13 @@ const CourseDetails: React.FC = () => {
             <div className="border border-gray-200 rounded-lg p-6 bg-white shadow-sm">
               <LearningOutcomes outcomes={course.learningOutcomes} />
             </div>
+
+            <PricingCard pricing={course.pricing} />
+            {id && (
+              <div className="mt-6">
+                <AddToCartButton courseId={id} className="shadow-lg" />
+              </div>
+            )}
           </div>
 
           {/* Main content */}
@@ -88,7 +98,7 @@ const CourseDetails: React.FC = () => {
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />
-            
+
             {/* Sections header */}
             <div className="flex items-center justify-between mb-6 mt-8">
               <div className="flex items-center gap-4">
@@ -96,7 +106,6 @@ const CourseDetails: React.FC = () => {
                   Módulos del Curso
                 </h2>
               </div>
-              <AddSectionButton courseId={id || ""} />
             </div>
 
             {/* Sections List */}

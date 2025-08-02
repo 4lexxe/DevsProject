@@ -27,11 +27,7 @@ import roleRoutes from './modules/role/roleRoutes';
 
 // Rutas de Contenido
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
-import careerTypeRoutes from './modules/careerType/CareerTypeRoutes';
-import categoryRoutes from './modules/category/CategoryRoutes';
-import courseRoutes from './modules/course/courseRoutes';
-import sectionRoutes from './modules/section/sectionRoutes';
-import contentRoutes from './modules/content/contentRoutes';
+import courseRoutes from './modules/course/routes';
 
 // Rutas de Recursos
 import recourseRoutes from './modules/resource/routes/resource.routes';
@@ -43,12 +39,15 @@ import uploadRoutes from './modules/resource/routes/upload.routes';
 import roadMapRoutes from './modules/roadmap/roadMapRoutes';
 
 // Rutas para las subscripciones
-import mercadopagoRoutes from './modules/subscription/routes/mercadopagoRoutes'
-import discountEventRoutes from './modules/subscription/routes/discountRoutes'
-import planRoutes from './modules/subscription/routes/planRoutes'
-import subscriptionRoutes from './modules/subscription/routes/subscriptionRoutes'
-import invoiceRoutes from './modules/subscription/routes/invoiceRoutes';
+import discountEventRoutes from './modules/subscription/routes/discount.route'
+import planRoutes from './modules/subscription/routes/plan.route'
+import subscriptionRoutes from './modules/subscription/routes/subscription.route'
+import invoiceRoutes from './modules/subscription/routes/invoice.route';
 
+// Rutas para compras
+import purchaseRoutes from './modules/purchase/routes';
+
+import webhookRoute from './modules/webhook/webhook.route';
 // ==================================================
 // Importaciones de utilidades y configuraciones
 // ==================================================
@@ -220,10 +219,13 @@ app.use((req, res, next) => {
 
 // Rutas para las suscripciones
 app.use('/api', invoiceRoutes);
-app.use('/api', mercadopagoRoutes);
+app.use('/api', webhookRoute);
 app.use('/api', discountEventRoutes);
 app.use('/api', planRoutes);
 app.use('/api', subscriptionRoutes);
+
+// Rutas para compras
+app.use('/api', purchaseRoutes);
 
 // --------------------------
 // 7.1 Rutas de Autenticación
@@ -265,12 +267,8 @@ app.use('/api/comment', commentRoutes);
 // Rutas de Contenido en el hero
 app.use('/api', HeaderSectionRoutes);
 
-// Rutas de Cursos
+// Rutas de Cursos (unificadas)
 app.use('/api', courseRoutes);
-app.use('/api', sectionRoutes);
-app.use('/api', careerTypeRoutes);
-app.use('/api', categoryRoutes);
-app.use('/api', contentRoutes);
 
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);

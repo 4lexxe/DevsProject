@@ -10,11 +10,33 @@ export class CommentController {
     body('content').notEmpty().withMessage('El contenido del comentario es obligatorio'),
   ];
 
+  // Función helper para verificar permisos de propietario o moderador
+  private static canModifyComment(user: User, comment: any): { canModify: boolean; reason?: string } {
+    const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+    const isOwner = comment.userId === user.id;
+    const canModerateAll = userPermissions.includes('moderate:all_comments') || user.Role?.name === 'superadmin';
+    const canManageOwn = userPermissions.includes('manage:own_comments');
+
+    if (canModerateAll) {
+      return { canModify: true };
+    }
+
+    if (isOwner && canManageOwn) {
+      return { canModify: true };
+    }
+
+    if (!isOwner) {
+      return { canModify: false, reason: 'Solo el propietario del comentario puede modificarlo' };
+    }
+
+    return { canModify: false, reason: 'No tienes permisos para gestionar comentarios' };
+  }
+
   // Crear un nuevo comentario (requiere autenticación)
   static async createComment(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      const user = req.user as User;
+      if (!user) {
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
@@ -26,7 +48,6 @@ export class CommentController {
       }
 
       const { resourceId, content } = req.body;
-      const user = req.user as User;
       const userId = user.id;
 
       // Verificar si el recurso existe
@@ -69,7 +90,7 @@ export class CommentController {
           {
             model: User,
             as: 'User',
-            attributes: ['id', 'name'], // Incluir solo los campos necesarios del usuario
+            attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
           },
         ],
       });
@@ -81,11 +102,11 @@ export class CommentController {
     }
   }
 
-  // Actualizar un comentario (requiere autenticación y permisos)
+  // Actualizar un comentario (requiere ser propietario o tener permisos de moderador)
   static async updateComment(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      const user = req.user as User;
+      if (!user) {
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
@@ -99,30 +120,26 @@ export class CommentController {
       const { id } = req.params;
       const { content } = req.body;
 
-      // Buscar el comentario por ID
       const comment = await Comment.findByPk(id);
       if (!comment) {
         res.status(404).json({ error: 'Comentario no encontrado' });
         return;
       }
 
-      const user = req.user as User;
-      const userId = user.id;
-
-      // Verificar si el usuario autenticado es el propietario del comentario o es superAdmin
-      if (comment.userId !== userId && user.Role?.name !== 'superAdmin') {
-        res.status(403).json({ error: 'No tienes permiso para actualizar este comentario' });
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = CommentController.canModifyComment(user, comment);
+      if (!canModify) {
+        res.status(403).json({ error: reason });
         return;
       }
 
-      // Actualizar el comentario
       await comment.update({ content });
 
       res.json(await Comment.findByPk(id, {
         include: [{
           model: User,
           as: 'User',
-          attributes: ['id', 'name'],
+          attributes: ['id', 'name', 'username', 'displayName', 'avatar'],
         }],
       }));
     } catch (error) {
@@ -131,34 +148,30 @@ export class CommentController {
     }
   }
 
-  // Eliminar un comentario (requiere autenticación y permisos)
+  // Eliminar un comentario (requiere ser propietario o tener permisos de moderador)
   static async deleteComment(req: Request, res: Response): Promise<void> {
     try {
-      // Verificar si el usuario está autenticado
-      if (!req.isAuthenticated()) {
+      const user = req.user as User;
+      if (!user) {
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
       const { id } = req.params;
 
-      // Buscar el comentario por ID
       const comment = await Comment.findByPk(id);
       if (!comment) {
         res.status(404).json({ error: 'Comentario no encontrado' });
         return;
       }
 
-      const user = req.user as User;
-      const userId = user.id;
-
-      // Verificar si el usuario autenticado es el propietario del comentario o es superAdmin
-      if (comment.userId !== userId && user.Role?.name !== 'superAdmin') {
-        res.status(403).json({ error: 'No tienes permiso para eliminar este comentario' });
+      // Verificar permisos usando la función helper
+      const { canModify, reason } = CommentController.canModifyComment(user, comment);
+      if (!canModify) {
+        res.status(403).json({ error: reason });
         return;
       }
 
-      // Eliminar el comentario
       await comment.destroy();
       res.json({ message: 'Comentario eliminado correctamente' });
     } catch (error) {

@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { ResourceService } from "../../services/resource.service";
-import { UserService } from "../../../user/components/profile/services/user.service";
 import ResourceListHeader from "../../navigation/ResourceListHeader";
 import ResourceCard from "../../components/ResourceCard";
-
 
 interface Resource {
   id: number;
@@ -13,12 +11,21 @@ interface Resource {
   url: string;
   coverImage?: string;
   userId: number;
-  createdAt: string; // Fecha de creación del recurso
+  User?: {
+    id: number;
+    name: string;
+    username?: string;
+    displayName?: string;
+    avatar?: string;
+  };
+  createdAt: string;
 }
 
 interface UserInfo {
   id: number;
   name: string;
+  username?: string;
+  displayName?: string;
   avatar?: string;
 }
 
@@ -28,62 +35,66 @@ const ResourceListPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función para obtener información del usuario
-  const fetchUserInfo = useCallback(async (userId: number) => {
-    try {
-      const userInfo = await UserService.getUserById(userId);
-      return {
-        id: userInfo.id,
-        name: userInfo.name,
-        avatar:
-          userInfo.avatar ||
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(userInfo.name)}&background=random`,
-      };
-    } catch (error) {
-      console.error(`Error fetching user info for userId ${userId}:`, error);
-      return {
-        id: userId,
-        name: `Usuario ${userId}`,
-        avatar: `https://ui-avatars.com/api/?name=U${userId}&background=random`,
-      };
-    }
-  }, []);
-
-  // Procesar información de usuarios para todos los recursos
-  const processUserInfo = useCallback(
-    async (resources: Resource[]) => {
-      const userIds = [...new Set(resources.map((resource) => resource.userId))];
-      const userInfoMap: Record<number, UserInfo> = {};
-      await Promise.all(
-        userIds.map(async (userId) => {
-          userInfoMap[userId] = await fetchUserInfo(userId);
-        })
-      );
-      setUsers(userInfoMap);
-    },
-    [fetchUserInfo]
-  );
-
   // Obtener recursos y ordenarlos por fecha de creación (más reciente primero)
   const fetchResources = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      console.log('🔍 Obteniendo recursos públicos...');
       const data = await ResourceService.getResources();
+      
+      // Los recursos ya incluyen la información del usuario del backend
+      let resourceArray: Resource[] = [];
+      if (Array.isArray(data)) {
+        resourceArray = data;
+      } else if (data && Array.isArray(data.data)) {
+        resourceArray = data.data;
+      } else {
+        console.warn('Estructura de datos inesperada:', data);
+        resourceArray = [];
+      }
 
-      // Ordenar los recursos por createdAt en orden descendente
-      const sortedResources: Resource[] = data.sort(
+      const sortedResources: Resource[] = resourceArray.sort(
         (a: Resource, b: Resource) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
       setResources(sortedResources);
-      await processUserInfo(sortedResources);
+      
+      // Extraer información del usuario directamente de los recursos (ya incluida por el backend)
+      const userInfoMap: Record<number, UserInfo> = {};
+      sortedResources.forEach(resource => {
+        if (resource.User) {
+          userInfoMap[resource.userId] = {
+            id: resource.User.id,
+            name: resource.User.name,
+            username: resource.User.username,
+            displayName: resource.User.displayName,
+            avatar: resource.User.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              resource.User.displayName || resource.User.name || resource.User.username || `Usuario ${resource.User.id}`
+            )}&background=random`,
+          };
+        } else {
+          // Si por alguna razón no viene la información del usuario, crear datos básicos
+          userInfoMap[resource.userId] = {
+            id: resource.userId,
+            name: `Usuario ${resource.userId}`,
+            username: undefined,
+            displayName: undefined,
+            avatar: `https://ui-avatars.com/api/?name=Usuario+${resource.userId}&background=random`,
+          };
+        }
+      });
+      setUsers(userInfoMap);
+      
+      console.log('✅ Recursos y usuarios procesados correctamente');
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching resources:", err);
+      console.error("❌ Error fetching resources:", err);
       setError("Error al cargar los recursos. Por favor, intenta nuevamente.");
       setLoading(false);
     }
-  }, [processUserInfo]);
+  }, []);
 
   useEffect(() => {
     fetchResources();

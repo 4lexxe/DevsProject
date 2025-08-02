@@ -1,9 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../../modules/user/User';
 
+/**
+ * @deprecated Este middleware está obsoleto. Usa permissionsMiddleware en su lugar.
+ * @example
+ * // En lugar de:
+ * // checkRole(['admin', 'superadmin'])
+ * // Usa:
+ * // permissionsMiddleware(['manage:specific_permission'])
+ */
 export const checkRole = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      console.warn('DEPRECATION WARNING: checkRole middleware está obsoleto. Usa permissionsMiddleware en su lugar.');
+
       // Verificar que el usuario esté autenticado
       const user = req.user as User;
       if (!user) {
@@ -35,7 +45,10 @@ export const checkRole = (allowedRoles: string[]) => {
       if (allowedRoles.includes(userRole)) {
         next();
       } else {
-        res.status(403).json({ error: 'No tienes permisos para realizar esta acción' });
+        res.status(403).json({ 
+          error: 'No tienes permisos para realizar esta acción',
+          suggestion: 'Este endpoint debería migrar a permissionsMiddleware'
+        });
       }
     } catch (error) {
       console.error('Error checking role:', error);

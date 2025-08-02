@@ -6,22 +6,32 @@ import {
   updateHeaderSection,
   deleteHeaderSection,
 } from '../headerSection/headerSectionController';
+import { authMiddleware } from '../../shared/middleware/authMiddleware';
+import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
-// Ruta para crear una nueva sección de encabezado (requiere autenticación)
-router.post('/header-sections', createHeaderSection);
-
-// Ruta para obtener todas las secciones de encabezado (sin autenticación)
+// Rutas públicas (sin autenticación)
 router.get('/header-sections', getHeaderSections);
-
-// Ruta para obtener una sección de encabezado por ID (sin autenticación)
 router.get('/header-sections/:id', getHeaderSectionById);
 
-// Ruta para actualizar una sección de encabezado por ID (requiere autenticación)
-router.put('/header-sections/:id', updateHeaderSection);
+// Rutas protegidas (requieren autenticación y permisos)
+router.post('/header-sections', 
+  authMiddleware,
+  permissionsMiddleware(['manage:system_settings']),
+  createHeaderSection
+);
 
-// Ruta para eliminar una sección de encabezado por ID (requiere autenticación)
-router.delete('/header-sections/:id', deleteHeaderSection);
+router.put('/header-sections/:id', 
+  authMiddleware,
+  permissionsMiddleware(['manage:system_settings']),
+  updateHeaderSection
+);
+
+router.delete('/header-sections/:id', 
+  authMiddleware,
+  permissionsMiddleware(['manage:system_settings']),
+  deleteHeaderSection
+);
 
 export default router;

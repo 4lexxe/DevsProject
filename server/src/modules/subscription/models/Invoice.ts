@@ -1,6 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import Payment from "./Payment";
+import SubscriptionPayment from "./SubscriptionPayment";
 
 class Invoice extends Model {
   public id!: bigint;
@@ -18,19 +18,14 @@ Invoice.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    mpSubscriptionId: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     paymentId: {
       type: DataTypes.BIGINT,
       allowNull: false,
-      references: { model: "Payments", key: "id" }, // Relación con la tabla Subscription
+      references: { model: "SubscriptionPayments", key: "id" },
     },
-    data: {
-      type: DataTypes.JSONB, // Almacena datos JSON (información de MercadoPago)
-      allowNull: false,
-      comment: "Datos de la factura o pago autorizado (MercadoPago)",
+    mpSubscriptionId: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     issueDate: {
       type: DataTypes.DATE,
@@ -43,6 +38,11 @@ Invoice.init(
       defaultValue: 0, // Valor por defecto para el número de intentos de reintento
       comment: "Reintentos",
     },
+    data: {
+      type: DataTypes.JSONB, // Almacena datos JSON (información de MercadoPago)
+      allowNull: false,
+      comment: "Datos de la factura o pago autorizado (MercadoPago)",
+    },
   },
   {
     sequelize,
@@ -52,7 +52,7 @@ Invoice.init(
   }
 );
 
-Invoice.belongsTo(Payment, { foreignKey: "paymentId", as: "payment" });
-Payment.hasOne(Invoice, { foreignKey: "paymentId", as: "invoice" });
+Invoice.belongsTo(SubscriptionPayment, { foreignKey: "paymentId", as: "payment" });
+SubscriptionPayment.hasOne(Invoice, { foreignKey: "paymentId", as: "invoice" });
 
 export default Invoice;

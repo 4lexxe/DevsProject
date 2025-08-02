@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import StatusBadge from "../components/mySuscription/StatusBadge";
-import PlanDetails from "../components/mySuscription/PlanDetail";
-import SubscriptionInfo from "../components/mySuscription/SubscriptionInfo";
-import NextPayment from "../components/mySuscription/NextPayment";
-import PaymentHistory from "../components/mySuscription/InvoiceHistory";
-import CancelDialog from "../components/mySuscription/CancelDialog";
-import TabNavigation from "../components/mySuscription/TabNavigation";
-import NoSubscription from "../components/mySuscription/NoSubscription";
+import StatusBadge from "../components/MySubscription/StatusBadge";
+import PlanDetails from "../components/MySubscription/PlanDetail";
+import SubscriptionInfo from "../components/MySubscription/SubscriptionInfo";
+import NextPayment from "../components/MySubscription/NextPayment";
+import PaymentHistory from "../components/MySubscription/InvoiceHistory";
+import CancelDialog from "../components/MySubscription/CancelDialog";
+import TabNavigation from "../components/MySubscription/TabNavigation";
+import NoSubscription from "../components/MySubscription/NoSubscription";
 import type { Subscription } from "../interfaces/subscription";
 
 import { getSubscriptionData, cancelSubscription } from "../services/subscriptionService";

@@ -1,6 +1,7 @@
-import { Search, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/user/contexts/AuthContext';
+import SearchInput from '../../search/SearchInput';
 
 const getPageTitle = (pathname: string) => {
   switch (pathname) {
@@ -30,16 +31,16 @@ export default function TopNavbar() {
           <img
             src="https://i.ibb.co/dQ09SsH/logoDev2.png"
             alt="Dev's Project"
-            className="h-16 w-16 object-contain"
+            className="h-12 w-12 object-contain"
           />
           <h1 className="text-xl font-semibold">{pageTitle}</h1>
         </div>
   
-        {/* Botones de búsqueda y notificaciones */}
-        <div className="flex items-center space-x-6">
-          <button className="p-3 hover:bg-gray-100 rounded-full">
-            <Search className="h-7 w-7 text-gray-600" />
-          </button>
+        {/* Búsqueda y notificaciones */}
+        <div className="flex items-center space-x-4">
+          <div className="w-64">
+            <SearchInput placeholder="Buscar cursos..." />
+          </div>
           {user && (
             <button className="p-3 hover:bg-gray-100 rounded-full relative">
               <Bell className="h-7 w-7 text-gray-600" />

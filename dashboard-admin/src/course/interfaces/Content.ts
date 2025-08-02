@@ -1,23 +1,34 @@
-export const linkTypes = ["Video", "Página", "Imagen", "Documento"] as const;
-export type linkType = (typeof linkTypes)[number];
+import { z } from "zod";
+import { contentSchema } from "../validations/contentSchema";
 
 export const quizTypes = [
   "Single",
-  "MultipleChoice",
+  "MultipleChoice", 
   "TrueOrFalse",
   "ShortAnswer",
 ] as const;
 export type quizType = (typeof quizTypes)[number];
 
 export type Quiz = {
+  id: string;
   question: string; // Pregunta
-  text?: string;
+  description: string;
+  order: number;
+  points: number; // Puntos que vale la pregunta
+  markdown?: string; // Contenido markdown opcional
+  explanation?: string;
   image?: string;
   type: quizType;
   answers: Array<{
-    answer: string; // Respuesta
+    id?: string;
+    text: string; // Respuesta
     isCorrect: boolean; // Indica si es una respuesta correcta
+    explanation?: string;
   }>;
+  metadata?: {
+    difficulty?: 'easy' | 'medium' | 'hard';
+    tags?: string[];
+  };
 };
 
 export type Resource = {
@@ -25,12 +36,13 @@ export type Resource = {
   url: string;
 }
 
+// Interfaz inferida del esquema de validación para garantizar consistencia
+export type IContentFormData = z.infer<typeof contentSchema>;
+
 export interface IContentInput {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: linkType;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
@@ -42,8 +54,6 @@ export interface IContent {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: linkType;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
@@ -63,8 +73,6 @@ export interface IContentApi {
   title: string;
   text: string;
   markdown?: string;
-  linkType?: string;
-  link?: string;
   quiz?: Quiz[];
   resources?: Resource[];
   duration: number;
