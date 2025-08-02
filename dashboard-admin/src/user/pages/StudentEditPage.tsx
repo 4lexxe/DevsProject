@@ -447,21 +447,27 @@ const StudentEditPage = () => {
                     return permission ? (
                       <motion.span
                         key={`custom-${permission.id}`}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        whileHover={{ 
-                          scale: 1.05,
-                          backgroundColor: '#fecaca',
-                          color: '#991b1b',
-                          borderColor: '#fca5a5'
-                        }}
+                        initial={{
+    opacity: 1,
+    scale: 1,
+    backgroundColor: '#dcfce7',
+    color: '#166534',
+    borderColor: '#bbf7d0'
+  }}
+  animate={{
+    opacity: 1,
+    scale: 1,
+    backgroundColor: '#dcfce7',
+    color: '#166534',
+    borderColor: '#bbf7d0'
+  }}
+  whileHover={{ 
+    scale: 1.05,
+    backgroundColor: '#fecaca',
+    color: '#991b1b',
+    borderColor: '#fca5a5'
+  }}
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer border"
-                        style={{
-                          backgroundColor: '#dcfce7',
-                          color: '#166534',
-                          borderColor: '#bbf7d0'
-                        }}
                         onClick={() => toggleCustomPermission(permission.id)}
                         onHoverStart={() => setHoveredPermission(permission.id)}
                         onHoverEnd={() => setHoveredPermission(null)}
