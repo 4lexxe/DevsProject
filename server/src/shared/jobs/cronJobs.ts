@@ -8,6 +8,7 @@ import { PreApproval } from "mercadopago";
 import { MpConfig } from "../../infrastructure/config/mercadopagoConfig";
 import { retryWithExponentialBackoff } from "../utils/retryService";
 import MPSubscription from "../../modules/subscription/models/MPSubscription";
+import { SessionService } from "../../modules/auth/services/session.service";
 
 const preApprovalPlan = new PreApprovalPlan(MpConfig);
 
@@ -77,8 +78,25 @@ const updateExpiredSubscriptions = async () => {
   }
 };
 
-// Configurar el cron job para que se ejecute cada día a medianoche
+// Limpiar sesiones expiradas cada hora
+const cleanupExpiredSessions = async () => {
+  try {
+    await SessionService.cleanupExpiredSessions();
+    console.log("Sesiones expiradas limpiadas exitosamente");
+  } catch (error) {
+    console.error("Error al limpiar sesiones expiradas:", error);
+  }
+};
+
+// Ejecutar tareas diarias a medianoche
 cron.schedule("0 0 * * *", () => {
+  console.log("Ejecutando tareas programadas diarias...");
   updateExpiredDiscounts();
   updateExpiredSubscriptions();
+});
+
+// Ejecutar limpieza de sesiones cada hora
+cron.schedule("0 * * * *", () => {
+  console.log("Ejecutando limpieza de sesiones...");
+  cleanupExpiredSessions();
 });

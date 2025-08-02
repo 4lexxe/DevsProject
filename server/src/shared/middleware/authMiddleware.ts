@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../modules/user/User";
 import Role from "../../modules/role/Role";
-import { GeoUtils } from "../../modules/auth/utils/geo.utils"; // Importar GeoUtils
+import { GeoUtils } from "../../modules/auth/utils/geo.utils";
+import { SessionService } from "../../modules/auth/services/session.service";
 
 declare global {
   namespace Express {
@@ -48,24 +49,14 @@ interface UserWithRole extends User {
   Role?: Role;
 }
 
-// Almacén en memoria actualizado
-export const userTokens = new Map<number, TokenSession[]>();
-
-const updateTokenUsage = (userId: number, token: string): void => {
-  const userSessions = userTokens.get(userId) || [];
-  const sessionIndex = userSessions.findIndex(s => s.token === token);
-  
-  if (sessionIndex !== -1) {
-    userSessions[sessionIndex].lastUsed = new Date();
-    userTokens.set(userId, userSessions);
-  }
+// Funciones auxiliares para manejar sesiones persistentes
+const updateTokenUsage = async (userId: number, token: string): Promise<void> => {
+  await SessionService.updateTokenUsage(userId, token);
 };
 
-const cleanupExpiredTokens = (userId: number): void => {
-  const userSessions = userTokens.get(userId) || [];
-  const now = new Date();
-  const validSessions = userSessions.filter(session => session.expiresAt > now);
-  userTokens.set(userId, validSessions);
+const cleanupExpiredTokens = async (userId: number): Promise<void> => {
+  // La limpieza se maneja automáticamente en el servicio de sesiones
+  await SessionService.cleanupExpiredSessions();
 };
 
 export const authMiddleware = async (
@@ -74,8 +65,20 @@ export const authMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Intentar obtener el token desde las cookies HttpOnly primero, luego desde el header Authorization como fallback
+    const cookieToken = req.cookies?.auth_token;
     const authHeader = req.headers.authorization;
-    const token = authHeader?.split(" ")[1];
+    const headerToken = authHeader?.split(" ")[1];
+    const token = cookieToken || headerToken;
+    
+    // Debug: Log para verificar cookies
+    console.log('🍪 Debug Cookies:', {
+      allCookies: req.cookies,
+      authToken: cookieToken,
+      hasAuthHeader: !!authHeader,
+      finalToken: token ? 'Token presente' : 'No token',
+      url: req.url
+    });
     
     if (!token && !req.user) {
       res.status(401).json({ 
@@ -92,8 +95,9 @@ export const authMiddleware = async (
       try {
         decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
         
-        const userSessions = userTokens.get(decodedToken.id) || [];
-        if (!userSessions.some(session => session.token === token)) {
+        // Verificar si el token existe y está activo en la base de datos
+        const isValidToken = await SessionService.validateToken(decodedToken.id, token);
+        if (!isValidToken) {
           res.status(401).json({ 
             message: "Token inválido o expirado",
             details: "Por favor, inicie sesión nuevamente"
@@ -101,7 +105,7 @@ export const authMiddleware = async (
           return;
         }
 
-        updateTokenUsage(decodedToken.id, token);
+        await updateTokenUsage(decodedToken.id, token);
         
         user = await User.findByPk(decodedToken.id, {
           include: [{
@@ -136,12 +140,15 @@ export const authMiddleware = async (
       return;
     }
 
-    cleanupExpiredTokens(user.id);
+    await cleanupExpiredTokens(user.id);
+
+    // Obtener sesiones del usuario desde la base de datos
+    const userSessions = await SessionService.getUserSessions(user.id);
 
     req.tokenInfo = {
       token: token || undefined,
       decoded: decodedToken,
-      sessions: userTokens.get(user.id) || []
+      sessions: userSessions
     };
 
     req.user = user;
@@ -156,7 +163,7 @@ export const authMiddleware = async (
   }
 };
 
-// Función de registro actualizada con geolocalización
+// Función de registro actualizada con geolocalización y persistencia
 export const registerToken = async (userId: number, token: string, req: Request): Promise<void> => {
   try {
     const ip = req.ip || req.connection.remoteAddress || '';
@@ -180,9 +187,8 @@ export const registerToken = async (userId: number, token: string, req: Request)
       }
     };
 
-    const userSessions = userTokens.get(userId) || [];
-    userSessions.push(session);
-    userTokens.set(userId, userSessions);
+    // Registrar sesión en la base de datos
+    await SessionService.registerSession(userId, session);
   } catch (error) {
     console.error('Error registrando token con geolocalización:', error);
     // Fallback sin datos geográficos
@@ -195,18 +201,16 @@ export const registerToken = async (userId: number, token: string, req: Request)
       ipAddress: req.ip
     };
 
-    const userSessions = userTokens.get(userId) || [];
-    userSessions.push(session);
-    userTokens.set(userId, userSessions);
+    // Registrar sesión en la base de datos como fallback
+    await SessionService.registerSession(userId, session);
   }
 };
 
-// Funciones existentes se mantienen igual
-export const revokeToken = (userId: number, token: string): void => {
-  const userSessions = userTokens.get(userId) || [];
-  userTokens.set(userId, userSessions.filter(s => s.token !== token));
+// Funciones actualizadas para usar persistencia
+export const revokeToken = async (userId: number, token: string): Promise<void> => {
+  await SessionService.revokeToken(userId, token);
 };
 
-export const revokeAllTokens = (userId: number): void => {
-  userTokens.delete(userId);
+export const revokeAllTokens = async (userId: number): Promise<void> => {
+  await SessionService.revokeAllTokens(userId);
 };

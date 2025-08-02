@@ -45,8 +45,8 @@ export default function LForm() {
     try {
       const response = await AuthService.login(data);
       
-      if (response.token) {
-        AuthService.setToken(response.token);
+      // Ya no necesitamos verificar el token, las cookies HttpOnly se manejan automáticamente
+      if (response.user) {
         window.location.href = "/";
       }
     } catch (error: unknown) {

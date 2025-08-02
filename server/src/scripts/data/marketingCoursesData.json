@@ -1,0 +1,294 @@
+{
+  "careerTypes": [
+    {
+      "id": 11,
+      "name": "Finanzas y Trading",
+      "icon": "💰",
+      "description": "Trading, inversiones y finanzas personales",
+      "isActive": true
+    },
+    {
+      "id": 12,
+      "name": "Marketing Digital",
+      "icon": "📈",
+      "description": "Marketing online, redes sociales y publicidad digital",
+      "isActive": true
+    },
+    {
+      "id": 13,
+      "name": "Emprendimiento",
+      "icon": "🚀",
+      "description": "Creación y gestión de empresas",
+      "isActive": true
+    }
+  ],
+  "categories": [
+    {
+      "id": 21,
+      "name": "Trading",
+      "icon": "📊",
+      "description": "Trading e inversiones financieras",
+      "isActive": true
+    },
+    {
+      "id": 22,
+      "name": "Criptomonedas",
+      "icon": "₿",
+      "description": "Bitcoin, Ethereum y criptomonedas",
+      "isActive": true
+    },
+    {
+      "id": 23,
+      "name": "Social Media",
+      "icon": "📱",
+      "description": "Redes sociales y marketing digital",
+      "isActive": true
+    },
+    {
+      "id": 24,
+      "name": "SEO",
+      "icon": "🔍",
+      "description": "Optimización para motores de búsqueda",
+      "isActive": true
+    },
+    {
+      "id": 25,
+      "name": "E-commerce",
+      "icon": "🛒",
+      "description": "Comercio electrónico y ventas online",
+      "isActive": true
+    }
+  ],
+  "courses": [
+    {
+      "id": 41,
+      "title": "Aprende Trading en 3 Meses: De Principiante a Rentable",
+      "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800",
+      "summary": "Domina el trading desde cero y genera ingresos consistentes",
+      "about": "Programa intensivo de 3 meses para aprender trading profesional. Incluye análisis técnico, gestión de riesgo, psicología del trading y estrategias probadas para generar ingresos consistentes en los mercados financieros.",
+      "careerTypeId": 11,
+      "learningOutcomes": [
+        "Dominar análisis técnico y fundamental",
+        "Desarrollar estrategias de trading rentables",
+        "Gestionar riesgo profesionalmente",
+        "Controlar emociones en el trading"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de matemáticas",
+        "Acceso a plataforma de trading"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 299.99,
+      "adminId": 1,
+      "categoryIds": [21]
+    },
+    {
+      "id": 42,
+      "title": "Conviértete en Master de Criptomonedas: Bitcoin a Ethereum",
+      "image": "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=800",
+      "summary": "Domina el mundo cripto y maximiza tus inversiones",
+      "about": "Curso completo para convertirte en experto en criptomonedas. Aprende sobre Bitcoin, Ethereum, DeFi, NFTs y cómo construir un portafolio cripto rentable y diversificado.",
+      "careerTypeId": 11,
+      "learningOutcomes": [
+        "Entender tecnología blockchain profundamente",
+        "Invertir inteligentemente en criptomonedas",
+        "Usar protocolos DeFi avanzados",
+        "Crear y comercializar NFTs"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de finanzas",
+        "Wallet de criptomonedas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 249.99,
+      "adminId": 1,
+      "categoryIds": [22, 6]
+    },
+    {
+      "id": 43,
+      "title": "Domina Instagram en 30 Días: 10K Seguidores Garantizados",
+      "image": "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=800",
+      "summary": "Estrategias probadas para hacer crecer tu Instagram exponencialmente",
+      "about": "Programa intensivo de 30 días para hacer crecer tu Instagram de 0 a 10K seguidores. Incluye creación de contenido viral, algoritmo de Instagram, colaboraciones y monetización.",
+      "careerTypeId": 12,
+      "learningOutcomes": [
+        "Crear contenido viral consistentemente",
+        "Entender y aprovechar el algoritmo",
+        "Conseguir colaboraciones pagadas",
+        "Monetizar tu audiencia efectivamente"
+      ],
+      "prerequisites": [
+        "Cuenta de Instagram activa",
+        "Smartphone con cámara"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 179.99,
+      "adminId": 1,
+      "categoryIds": [23]
+    },
+    {
+      "id": 44,
+      "title": "SEO Master Class: Posiciona en Google en 60 Días",
+      "image": "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=800",
+      "summary": "Lleva tu sitio web al #1 de Google con SEO avanzado",
+      "about": "Curso avanzado de SEO para posicionar cualquier sitio web en los primeros resultados de Google. Incluye SEO técnico, link building, contenido optimizado y herramientas profesionales.",
+      "careerTypeId": 12,
+      "learningOutcomes": [
+        "Optimizar sitios web para Google",
+        "Crear estrategias de link building",
+        "Usar herramientas SEO profesionales",
+        "Generar tráfico orgánico masivo"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de web",
+        "Sitio web propio o acceso a uno"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 199.99,
+      "adminId": 1,
+      "categoryIds": [24]
+    },
+    {
+      "id": 45,
+      "title": "Lanza tu E-commerce Exitoso: $10K en 90 Días",
+      "image": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800",
+      "summary": "Crea y escala un negocio online rentable desde cero",
+      "about": "Programa completo para lanzar un e-commerce exitoso. Desde la selección de productos hasta alcanzar $10K en ventas en 90 días. Incluye Shopify, Facebook Ads y estrategias de conversión.",
+      "careerTypeId": 13,
+      "learningOutcomes": [
+        "Crear tienda online profesional",
+        "Encontrar productos ganadores",
+        "Dominar Facebook e Instagram Ads",
+        "Optimizar conversiones y ventas"
+      ],
+      "prerequisites": [
+        "Capital inicial para inventario",
+        "Dedicación de tiempo completo"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 399.99,
+      "adminId": 1,
+      "categoryIds": [25]
+    },
+    {
+      "id": 46,
+      "title": "Conviértete en YouTuber Millonario: Monetiza tu Canal",
+      "image": "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800",
+      "summary": "Estrategias secretas para hacer dinero en YouTube",
+      "about": "Aprende cómo los YouTubers más exitosos generan millones. Desde creación de contenido viral hasta múltiples fuentes de ingresos: AdSense, patrocinios, productos propios y más.",
+      "careerTypeId": 12,
+      "learningOutcomes": [
+        "Crear contenido viral en YouTube",
+        "Optimizar para el algoritmo de YouTube",
+        "Conseguir patrocinios lucrativos",
+        "Diversificar fuentes de ingresos"
+      ],
+      "prerequisites": [
+        "Canal de YouTube creado",
+        "Equipo básico de grabación"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 279.99,
+      "adminId": 1,
+      "categoryIds": [23]
+    },
+    {
+      "id": 47,
+      "title": "Dropshipping Master: Gana $5K Mensuales Sin Inventario",
+      "image": "https://images.unsplash.com/photo-1556740758-90de374c12ad?w=800",
+      "summary": "Construye un imperio de dropshipping automatizado",
+      "about": "Sistema completo de dropshipping para generar $5K mensuales sin manejar inventario. Incluye investigación de productos, proveedores, automatización y escalado de campañas publicitarias.",
+      "careerTypeId": 13,
+      "learningOutcomes": [
+        "Encontrar productos de alta demanda",
+        "Conectar con proveedores confiables",
+        "Automatizar procesos de venta",
+        "Escalar campañas publicitarias rentables"
+      ],
+      "prerequisites": [
+        "Presupuesto para publicidad",
+        "Conocimientos básicos de e-commerce"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 349.99,
+      "adminId": 1,
+      "categoryIds": [25]
+    },
+    {
+      "id": 48,
+      "title": "Freelancer de Élite: $100/Hora en 6 Meses",
+      "image": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800",
+      "summary": "Transforma tus habilidades en un negocio freelance premium",
+      "about": "Programa para convertirte en freelancer de élite cobrando $100+ por hora. Incluye posicionamiento, portfolio premium, negociación avanzada y sistemas de productividad.",
+      "careerTypeId": 13,
+      "learningOutcomes": [
+        "Posicionarte como experto premium",
+        "Crear portfolio que vende",
+        "Negociar tarifas altas con confianza",
+        "Sistematizar y escalar servicios"
+      ],
+      "prerequisites": [
+        "Habilidad técnica específica",
+        "Portfolio básico existente"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 229.99,
+      "adminId": 1,
+      "categoryIds": []
+    },
+    {
+      "id": 49,
+      "title": "Invierte como Warren Buffett: Estrategias de Valor",
+      "image": "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=800",
+      "summary": "Aprende las estrategias de inversión del Oracle de Omaha",
+      "about": "Domina las estrategias de inversión de valor de Warren Buffett. Aprende a analizar empresas, encontrar acciones infravaloradas y construir riqueza a largo plazo como los grandes inversores.",
+      "careerTypeId": 11,
+      "learningOutcomes": [
+        "Analizar estados financieros como experto",
+        "Identificar empresas infravaloradas",
+        "Construir portafolio de valor",
+        "Pensar como inversor a largo plazo"
+      ],
+      "prerequisites": [
+        "Conocimientos básicos de finanzas",
+        "Capital para invertir"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 189.99,
+      "adminId": 1,
+      "categoryIds": [21]
+    },
+    {
+      "id": 50,
+      "title": "Copywriting Persuasivo: Vende Cualquier Cosa con Palabras",
+      "image": "https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800",
+      "summary": "Domina el arte de vender con copywriting de alto impacto",
+      "about": "Conviértete en copywriter de élite y aprende a vender cualquier producto o servicio usando solo palabras. Incluye psicología del consumidor, fórmulas probadas y casos de estudio reales.",
+      "careerTypeId": 12,
+      "learningOutcomes": [
+        "Escribir copy que convierte",
+        "Aplicar psicología del consumidor",
+        "Crear embudos de venta efectivos",
+        "Cobrar tarifas premium por copy"
+      ],
+      "prerequisites": [
+        "Habilidades básicas de escritura",
+        "Interés en marketing y ventas"
+      ],
+      "isActive": true,
+      "isInDevelopment": false,
+      "price": 159.99,
+      "adminId": 1,
+      "categoryIds": [23]
+    }
+  ]
+}

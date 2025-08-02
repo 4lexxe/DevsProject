@@ -11,8 +11,8 @@ export interface AuthRequest extends Request {
   user?: User & { id: string | number };
 }
 
-import { TokenSession } from "../types/auth.types";
-import { userTokens } from "../../../shared/middleware/authMiddleware";
+import { TokenSession } from "../../../shared/middleware/authMiddleware";
+import { SessionService } from "../services/session.service";
 
 export class VerifyController {
   static async handle(req: AuthRequest, res: Response): Promise<void> {
@@ -47,7 +47,7 @@ export class VerifyController {
       }
 
       const token = req.headers.authorization?.split(" ")[1];
-      const sessions = userTokens.get(user.id) || [];
+      const sessions = await SessionService.getUserSessions(user.id);
       const currentSession = token 
         ? sessions.find((s: TokenSession) => s.token === token) ?? null 
         : null;

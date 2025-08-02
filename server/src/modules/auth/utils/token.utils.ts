@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import { Request } from "express";
 import User from "../../user/User";
-import { registerToken, userTokens } from "../../../shared/middleware/authMiddleware";
+import { registerToken, TokenSession } from "../../../shared/middleware/authMiddleware";
 import { GeoUtils } from "./geo.utils";
-import { TokenSession } from "../../../shared/types/auth.types";
+import { SessionService } from "../services/session.service";
 
 export class TokenUtils {
   static generateToken(user: User, isSuperAdmin: boolean = false): string {
@@ -52,11 +52,10 @@ export class TokenUtils {
       }
     };
 
-    registerToken(user.id, token, req);
+    await registerToken(user.id, token, req);
     
-    const sessions = userTokens.get(user.id) || [];
-    sessions.push(sessionData);
-    userTokens.set(user.id, sessions);
+    // Obtener sesiones del usuario desde la base de datos
+    const sessions = await SessionService.getUserSessions(user.id);
 
     return {
       token,
@@ -68,7 +67,7 @@ export class TokenUtils {
         roleId: user.roleId,
         authProvider: user.authProvider,
       },
-      sessions: sessions.map(session => ({
+      sessions: sessions.map((session: TokenSession) => ({
         token: session.token,
         createdAt: session.createdAt,
         expiresAt: session.expiresAt,

@@ -23,6 +23,12 @@ interface SearchResult {
   totalResults: number;
   searchTerm: string;
   appliedFilters: Partial<SearchOptions>;
+  searchMetadata?: {
+    algorithm: string;
+    searchTime: number;
+    suggestions?: string[];
+    fuzzyMatches?: boolean;
+  };
   pagination: PaginationInfo;
 }
 
@@ -62,7 +68,7 @@ export class CourseSearchService {
   }
 
   /**
-   * Búsqueda avanzada de cursos con filtros
+   * Búsqueda unificada que combina automáticamente búsqueda tradicional, inteligente y fuzzy
    */
   static async advancedSearch(options: SearchOptions): Promise<SearchResult> {
     try {
@@ -81,14 +87,88 @@ export class CourseSearchService {
       const response = await fetch(`${API_BASE_URL}/search/courses/advanced?${params}`);
       
       if (!response.ok) {
-        throw new Error(`Error en la búsqueda avanzada: ${response.status}`);
+        throw new Error(`Error en la búsqueda: ${response.status}`);
       }
 
       const data = await response.json();
       return data.data;
     } catch (error) {
-      console.error('Error al realizar búsqueda avanzada:', error);
+      console.error('Error al realizar búsqueda:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Búsqueda fuzzy específica con corrección de errores tipográficos
+   */
+  static async fuzzySearch(query: string, threshold: number = 0.3, page: number = 1, limit: number = 30): Promise<SearchResult> {
+    try {
+      const params = new URLSearchParams({
+        q: query,
+        threshold: threshold.toString(),
+        page: page.toString(),
+        limit: limit.toString()
+      });
+
+      const response = await fetch(`${API_BASE_URL}/search/courses/fuzzy?${params}`);
+      
+      if (!response.ok) {
+        throw new Error(`Error en la búsqueda fuzzy: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error al realizar búsqueda fuzzy:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene sugerencias fuzzy mejoradas
+   */
+  static async getFuzzySuggestions(query: string, limit: number = 10): Promise<string[]> {
+    try {
+      if (query.length < 2) return [];
+
+      // Usar el endpoint fuzzy para obtener sugerencias con corrección
+      const fuzzyResult = await this.fuzzySearch(query, 0.3, 1, limit);
+      
+      // Extraer sugerencias de los metadatos o usar títulos de cursos
+      if (fuzzyResult.searchMetadata?.suggestions) {
+        return fuzzyResult.searchMetadata.suggestions;
+      }
+      
+      // Fallback: usar títulos de cursos encontrados
+      return fuzzyResult.courses.slice(0, limit).map(course => course.title);
+    } catch (error) {
+      console.error('Error al obtener sugerencias fuzzy:', error);
+      // Fallback a sugerencias tradicionales
+      return this.getSuggestions(query);
+    }
+  }
+
+  /**
+   * Obtiene estadísticas de rendimiento de búsqueda
+   */
+  static async getStatistics(): Promise<any> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/search/courses/statistics`);
+      
+      if (!response.ok) {
+        throw new Error(`Error al obtener estadísticas: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error al obtener estadísticas:', error);
+      return {
+        totalSearches: 0,
+        avgSearchTime: 0,
+        fuzzySearches: 0,
+        intelligentSearches: 0
+      };
     }
   }
 

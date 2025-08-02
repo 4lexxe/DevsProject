@@ -37,9 +37,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setShowWelcomeMessage(true);
             sessionStorage.setItem('hasShownWelcome', 'true');
           }
+        } else {
+          // Si la respuesta indica que no está autenticado, limpiar el estado
+          setUser(null);
+          setShowWelcomeMessage(false);
+          sessionStorage.removeItem('hasShownWelcome');
         }
       } catch (err) {
         console.error("Error verifying auth:", err);
+        // Si hay un error en la verificación, limpiar el estado del usuario
+        setUser(null);
+        setShowWelcomeMessage(false);
+        sessionStorage.removeItem('hasShownWelcome');
       } finally {
         setLoading(false);
         setInitialCheckDone(true);

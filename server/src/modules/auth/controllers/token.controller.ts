@@ -24,7 +24,7 @@ export class TokenController {
         return;
       }
 
-      revokeToken(userId, oldToken);
+      await revokeToken(userId, oldToken);
       const authResponse = TokenUtils.getAuthResponse(user, req);
 
       res.json({
