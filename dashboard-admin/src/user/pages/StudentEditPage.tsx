@@ -148,13 +148,36 @@ const StudentEditPage = () => {
     })
   }
 
+  // Función para restaurar un permiso denegado del rol
+  const restoreDeniedPermission = (permissionId: number) => {
+    setFormData(prev => {
+      const currentCustom = prev.customPermissions || []
+      return {
+        ...prev,
+        customPermissions: currentCustom.filter(id => id !== -permissionId)
+      }
+    })
+  }
+
+  // Permisos del rol que no han sido denegados
+  const activeRolePermissions = useMemo(() => {
+    const deniedPermissions = (formData.customPermissions || []).filter(id => id < 0).map(id => -id)
+    return rolePermissions.filter(permission => !deniedPermissions.includes(permission.id))
+  }, [rolePermissions, formData.customPermissions])
+
+  // Permisos denegados del rol
+  const deniedRolePermissions = useMemo(() => {
+    const deniedIds = (formData.customPermissions || []).filter(id => id < 0).map(id => -id)
+    return rolePermissions.filter(permission => deniedIds.includes(permission.id))
+  }, [rolePermissions, formData.customPermissions])
+
   // Permisos disponibles para agregar (que no están en el rol actual)
   const availableToAdd = useMemo(() => {
     return allAvailablePermissions.filter(permission => 
-      !rolePermissions.some(p => p.id === permission.id) && 
-      !(formData.customPermissions || []).includes(permission.id)
+      !activeRolePermissions.some(p => p.id === permission.id) && 
+      !(formData.customPermissions || []).filter(id => id > 0).includes(permission.id)
     )
-  }, [allAvailablePermissions, rolePermissions, formData.customPermissions])
+  }, [allAvailablePermissions, activeRolePermissions, formData.customPermissions])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
@@ -428,16 +451,62 @@ const StudentEditPage = () => {
                 Permisos del usuario:
               </h4>
               <div className="flex flex-wrap gap-2">
-                {/* Permisos del rol */}
-                {rolePermissions.map((permission) => (
-                  <span
-                    key={`role-${permission.id}`}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 border border-blue-200"
-                  >
-                    <Shield className="h-3 w-3 mr-1" />
-                    {permission.name}
-                  </span>
-                ))}
+                {/* Permisos del rol activos */}
+                {activeRolePermissions.map((permission) => {
+                  const isHovered = hoveredPermission === permission.id
+                  return (
+                    <motion.span
+                      key={`role-${permission.id}`}
+                      initial={{
+                        opacity: 1,
+                        scale: 1,
+                        backgroundColor: '#dbeafe',
+                        color: '#1e40af',
+                        borderColor: '#93c5fd'
+                      }}
+                      animate={{
+                        opacity: 1,
+                        scale: 1,
+                        backgroundColor: '#dbeafe',
+                        color: '#1e40af',
+                        borderColor: '#93c5fd'
+                      }}
+                      whileHover={{ 
+                        scale: 1.05,
+                        backgroundColor: '#fecaca',
+                        color: '#991b1b',
+                        borderColor: '#fca5a5'
+                      }}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer border"
+                      onHoverStart={() => setHoveredPermission(permission.id)}
+                      onHoverEnd={() => setHoveredPermission(null)}
+                      onClick={() => {
+                        // Agregar el permiso a la lista de permisos personalizados como "denegado"
+                        // Esto efectivamente "elimina" el permiso del rol para este usuario
+                        const currentCustom = formData.customPermissions || []
+                        if (!currentCustom.includes(-permission.id)) {
+                          setFormData(prev => ({
+                            ...prev,
+                            customPermissions: [...currentCustom, -permission.id] // Negativo indica denegación
+                          }))
+                        }
+                      }}
+                      title="Click para denegar este permiso del rol"
+                    >
+                      <motion.div
+                        animate={{ rotate: isHovered ? 45 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {isHovered ? (
+                          <X className="h-3 w-3 mr-1" />
+                        ) : (
+                          <Shield className="h-3 w-3 mr-1" />
+                        )}
+                      </motion.div>
+                      <span style={{ userSelect: 'none' }}>{permission.name}</span>
+                    </motion.span>
+                  )
+                })}
                 
                 {/* Permisos personalizados */}
                 <AnimatePresence>
@@ -486,6 +555,55 @@ const StudentEditPage = () => {
                         <span style={{ userSelect: 'none' }}>{permission.name}</span>
                       </motion.span>
                     ) : null
+                  })}
+                </AnimatePresence>
+                
+                {/* Permisos denegados del rol */}
+                <AnimatePresence>
+                  {deniedRolePermissions.map((permission) => {
+                    const isHovered = hoveredPermission === `denied-${permission.id}`
+                    return (
+                      <motion.span
+                        key={`denied-${permission.id}`}
+                        initial={{
+                          opacity: 1,
+                          scale: 1,
+                          backgroundColor: '#fee2e2',
+                          color: '#991b1b',
+                          borderColor: '#fca5a5'
+                        }}
+                        animate={{
+                          opacity: 1,
+                          scale: 1,
+                          backgroundColor: '#fee2e2',
+                          color: '#991b1b',
+                          borderColor: '#fca5a5'
+                        }}
+                        whileHover={{ 
+                          scale: 1.05,
+                          backgroundColor: '#dcfce7',
+                          color: '#166534',
+                          borderColor: '#bbf7d0'
+                        }}
+                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium cursor-pointer border"
+                        onClick={() => restoreDeniedPermission(permission.id)}
+                        onHoverStart={() => setHoveredPermission(`denied-${permission.id}`)}
+                        onHoverEnd={() => setHoveredPermission(null)}
+                        title="Click para restaurar este permiso del rol"
+                      >
+                        <motion.div
+                          animate={{ rotate: isHovered ? 0 : 45 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {isHovered ? (
+                            <Plus className="h-3 w-3 mr-1" />
+                          ) : (
+                            <X className="h-3 w-3 mr-1" />
+                          )}
+                        </motion.div>
+                        <span style={{ userSelect: 'none' }}>{permission.name} (denegado)</span>
+                      </motion.span>
+                    )
                   })}
                 </AnimatePresence>
                 
