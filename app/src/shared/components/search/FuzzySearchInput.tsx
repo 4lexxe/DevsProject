@@ -59,7 +59,10 @@ export default function FuzzySearchInput({
     searchModes.find(mode => mode.id === defaultMode) || searchModes[2]
   );
   const [showModeDropdown, setShowModeDropdown] = useState(false);
-  const [searchStats, setSearchStats] = useState<any>(null);
+  const [searchStats, setSearchStats] = useState<{
+    totalSearches: number;
+    avgSearchTime: number;
+  } | null>(null);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   
   const navigate = useNavigate();
