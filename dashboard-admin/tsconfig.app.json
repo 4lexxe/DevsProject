@@ -29,6 +29,7 @@
       "@/*": ["./src/*"],
       "@/shared/*": ["./src/shared/*"],
       "@/course/*": ["./src/course/*"],
+      "@/career-type/*": ["./src/career-type/*"],
       "@/dashboard/*": ["./src/dashboard/*"],
       "@/user/*": ["./src/user/*"],
       "@/home/*": ["./src/home/*"]

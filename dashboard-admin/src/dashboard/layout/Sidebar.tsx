@@ -6,7 +6,9 @@ import {
   BarChart3, 
   Settings,
   GraduationCap,
-  Image
+  Image,
+  Briefcase,
+  Tag
 } from 'lucide-react'
 // Update the import path to the correct relative location
 import { cn } from '../utils/cn'
@@ -15,6 +17,8 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
   { icon: Users, label: 'Estudiantes', path: '/students' },
   { icon: BookOpen, label: 'Cursos', path: '/courses' },
+  { icon: Tag, label: 'Categorías', path: '/categories' },
+  { icon: Briefcase, label: 'Tipos de Carrera', path: '/career-types' },
   { icon: Image, label: 'Secciones Hero', path: '/header-section' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },
   { icon: Settings, label: 'Configuración', path: '/settings' },
@@ -33,7 +37,8 @@ const Sidebar = () => {
       <nav className="mt-6">
         {menuItems.map((item) => {
           const Icon = item.icon
-          const isActive = location.pathname === item.path
+          const isActive = location.pathname === item.path || 
+                          (item.path !== '/' && location.pathname.startsWith(item.path))
           
           return (
             <Link

@@ -21,6 +21,15 @@ import {
   QuizFormPage
 } from "@/course/index";
 
+import {
+  CareerTypesPage,
+  CareerTypeFormPage
+} from "@/career-type/index";
+
+import {
+  CategoriesPage
+} from "@/category/index";
+
 import HeaderSectionAdminPage from "./header-section/page/HeaderSectionAdminPage";
 import "@/shared/styles/main.css"; // Importa tus estilos globales
 
@@ -104,6 +113,14 @@ function App() {
                 path="courses/discount-event/edit"
                 element={<CourseDiscountEvent />}
               />
+
+              {/* Rutas para Tipos de Carrera */}
+              <Route path="career-types" element={<CareerTypesPage />} />
+              <Route path="career-types/new" element={<CareerTypeFormPage />} />
+              <Route path="career-types/:id/edit" element={<CareerTypeFormPage />} />
+
+              {/* Rutas para Categorías */}
+              <Route path="categories" element={<CategoriesPage />} />
 
               <Route
                 path="analytics"
