@@ -12,6 +12,7 @@ import {
   CreditCard,
   X,
   LogOut,
+  ShoppingCart,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/user/contexts/AuthContext";
@@ -36,7 +37,7 @@ export default function BottomNavbar() {
       path: user ? "/profile" : "#",
       isProfile: true,
     },
-    { icon: Library, label: "Recursos", path: "/recursos" },
+    { icon: ShoppingCart, label: "Carrito", path: "/cart" },
   ];
 
   interface NavItem {
@@ -49,11 +50,9 @@ export default function BottomNavbar() {
   const menuItems = [
     { icon: Home, label: "Inicio", path: "/" },
     { icon: BookOpen, label: "Cursos", path: "/cursos" },
-    { icon: Library, label: "Recursos", path: "/recursos" },
     { icon: Settings, label: "Ajustes", path: "/ajustes" },
     { icon: MessageCircle, label: "Foro", path: "/foro" },
     { icon: CreditCard, label: "Planes", path: "/plans" },
-    { icon: Map, label: "Ruta de Aprendizaje", path: "/ruta-aprendizaje" },
     { icon: User, label: "Perfil", path: "/profile" },
   ];
 

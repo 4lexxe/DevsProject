@@ -67,12 +67,6 @@ export default function DesktopNavbar() {
             <NavLink href="/plans" icon={<CreditCard className="w-4 h-4" />}>
               Planes
             </NavLink>
-            <NavLink href="/ruta-aprendizaje" icon={<Route className="w-4 h-4" />}>
-              Ruta
-            </NavLink>
-            <NavLink href="/recursos" icon={<FolderOpen className="w-4 h-4" />}>
-              Recursos
-            </NavLink>
             <NavLink href="/cart" icon={<ShoppingCart className="w-4 h-4" />}>
               Carrito
             </NavLink>

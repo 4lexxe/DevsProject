@@ -12,10 +12,6 @@ const getPageTitle = (pathname: string) => {
       return 'Inicio';
     case '/cursos':
       return 'Cursos';
-    case '/ruta-aprendizaje':
-      return 'Ruta de Aprendizaje';
-    case '/recursos':
-      return 'Recursos';
     default:
       return 'Inicio';
   }

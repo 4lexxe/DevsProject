@@ -9,6 +9,12 @@ interface Course {
   image: string;
   categories: Category[];
   careerType: CareerType;
+  pricing?: {
+    originalPrice: number;
+    finalPrice: number;
+    hasDiscount: boolean;
+    savings: number;
+  };
 }
 
 export default function CoursesList({ courses }: { courses: Course[] }) {
@@ -31,6 +37,7 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
                 key={course.id}
                 {...course}
                 categories={course.categories}
+                pricing={course.pricing}
               />
             ))
           )}

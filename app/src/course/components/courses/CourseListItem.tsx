@@ -9,9 +9,15 @@ interface CourseListItemProps {
   categories: Category[]
   image: string
   careerType: CareerType
+  pricing?: {
+    originalPrice: number
+    finalPrice: number
+    hasDiscount: boolean
+    savings: number
+  }
 }
 
-const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, categories, image, careerType }) => {
+const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, categories, image, careerType, pricing }) => {
   return (
     <div
       className="group w-full flex gap-4 p-4 border-b border-gray-200 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer"
@@ -56,6 +62,29 @@ const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, cat
               ))}
             </div>
           </div>
+          
+          {/* Pricing section - visible on mobile */}
+          {pricing && (
+            <div className="mt-2 flex items-center gap-2">
+              {pricing.hasDiscount ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-green-600">
+                    ${pricing.finalPrice.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-gray-500 line-through">
+                    ${pricing.originalPrice.toLocaleString()}
+                  </span>
+                  <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">
+                    -{Math.round(((pricing.originalPrice - pricing.finalPrice) / pricing.originalPrice) * 100)}%
+                  </span>
+                </div>
+              ) : (
+                <span className="text-lg font-bold text-gray-900">
+                  ${pricing.finalPrice.toLocaleString()}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
