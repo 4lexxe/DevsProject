@@ -13,7 +13,6 @@ export class SecureVideoController {
     try {
       const { contentFileId } = req.params;
       const { range } = req.headers;
-      const userId = (req as any).user?.id; // Obtener ID del usuario autenticado
 
       if (!contentFileId) {
         res.status(400).json({ error: 'Content File ID es requerido' });
@@ -24,21 +23,8 @@ export class SecureVideoController {
       console.log(`📊 Headers recibidos:`, {
         range: range,
         userAgent: req.headers['user-agent'],
-        origin: req.headers.origin,
-        userId: userId || 'anónimo'
+        origin: req.headers.origin
       });
-
-      // Verificar acceso del usuario al archivo
-      const accessCheck = await contentFileService.verifyUserAccess(contentFileId, userId);
-      if (!accessCheck.hasAccess) {
-        res.status(403).json({ 
-          error: 'Acceso denegado',
-          reason: accessCheck.reason 
-        });
-        return;
-      }
-
-      console.log(`✅ Acceso verificado: ${accessCheck.reason}`);
 
       // Obtener stream del video
       const streamResult = await contentFileService.getVideoStreamByContentFileId(
@@ -67,8 +53,7 @@ export class SecureVideoController {
         'Cross-Origin-Resource-Policy': 'cross-origin',
         'Cross-Origin-Embedder-Policy': 'unsafe-none',
         // Headers informativos
-        'X-Content-File-ID': contentFileId,
-        'X-Access-Reason': accessCheck.reason
+        'X-Content-File-ID': contentFileId
       });
 
       if (streamResult.contentRange) {
@@ -107,7 +92,6 @@ export class SecureVideoController {
   async getVideoMetadata(req: Request, res: Response): Promise<void> {
     try {
       const { contentFileId } = req.params;
-      const userId = (req as any).user?.id;
 
       if (!contentFileId) {
         res.status(400).json({ error: 'Content File ID es requerido' });
@@ -115,16 +99,6 @@ export class SecureVideoController {
       }
 
       console.log(`📋 Obteniendo metadatos de video por ContentFile: ${contentFileId}`);
-
-      // Verificar acceso del usuario al archivo
-      const accessCheck = await contentFileService.verifyUserAccess(contentFileId, userId);
-      if (!accessCheck.hasAccess) {
-        res.status(403).json({ 
-          error: 'Acceso denegado',
-          reason: accessCheck.reason 
-        });
-        return;
-      }
 
       // Obtener metadatos del video
       const metadata = await contentFileService.getVideoMetadataByContentFileId(contentFileId);
@@ -163,87 +137,6 @@ export class SecureVideoController {
     }
   }
 
-  /**
-   * Verifica acceso del usuario al archivo de video
-   */
-  async verifyVideoAccess(req: Request, res: Response): Promise<void> {
-    try {
-      const { contentFileId } = req.params;
-      const userId = (req as any).user?.id;
-
-      if (!contentFileId) {
-        res.status(400).json({ error: 'Content File ID es requerido' });
-        return;
-      }
-
-      console.log(`🔐 Verificando acceso de usuario a ContentFile: ${contentFileId}`);
-
-      const accessCheck = await contentFileService.verifyUserAccess(contentFileId, userId);
-      
-      res.json({
-        success: true,
-        hasAccess: accessCheck.hasAccess,
-        reason: accessCheck.reason,
-        contentFileInfo: accessCheck.contentFileInfo,
-        proxyUrl: accessCheck.hasAccess ? `/api/video/secure/stream/${contentFileId}` : null
-      });
-
-    } catch (error: any) {
-      console.error('❌ Error en verifyVideoAccess:', error);
-      res.status(500).json({ 
-        error: 'Error al verificar acceso al video',
-        details: error.message 
-      });
-    }
-  }
-
-  /**
-   * Obtiene todos los videos de un contenido específico
-   */
-  async getContentVideos(req: Request, res: Response): Promise<void> {
-    try {
-      const { contentId } = req.params;
-      const userId = (req as any).user?.id;
-
-      if (!contentId) {
-        res.status(400).json({ error: 'Content ID es requerido' });
-        return;
-      }
-
-      console.log(`📹 Obteniendo videos del contenido: ${contentId}`);
-
-      const videoFiles = await contentFileService.getVideoFilesByContentId(contentId);
-      
-      // Filtrar videos según acceso del usuario
-      const accessibleVideos = [];
-      for (const video of videoFiles) {
-        const accessCheck = await contentFileService.verifyUserAccess(video.id, userId);
-        if (accessCheck.hasAccess) {
-          accessibleVideos.push({
-            ...video,
-            proxyUrl: `/api/video/secure/stream/${video.id}`,
-            hybridUrl: `/api/video/secure/hybrid/${video.id}`,
-            accessReason: accessCheck.reason
-          });
-        }
-      }
-
-      res.json({
-        success: true,
-        contentId,
-        totalVideos: videoFiles.length,
-        accessibleVideos: accessibleVideos.length,
-        videos: accessibleVideos
-      });
-
-    } catch (error: any) {
-      console.error('❌ Error en getContentVideos:', error);
-      res.status(500).json({ 
-        error: 'Error al obtener videos del contenido',
-        details: error.message 
-      });
-    }
-  }
 }
 
 export const secureVideoController = new SecureVideoController();

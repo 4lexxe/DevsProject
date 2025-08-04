@@ -15,7 +15,6 @@ import { contentFileService } from '../services/contentFileService';
 export const getVideo = async (req: Request, res: Response): Promise<void> => {
   try {
     const { contentFileId } = req.params;
-    const userId = (req.user as any)?.id;
     const userCount = parseInt(req.query.userCount as string) || 0;
 
     if (!contentFileId) {
@@ -23,23 +22,12 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (!userId) {
-      res.status(401).json({ error: 'Usuario no autenticado' });
-      return;
-    }
+    console.log(`🎯 Analizando estrategia óptima para contentFileId: ${contentFileId}`);
 
-    console.log(`🎯 Analizando estrategia óptima para contentFileId: ${contentFileId}, userId: ${userId}`);
-
-    // Verificar acceso del usuario al archivo
+    // Obtener ContentFile
     const contentFile = await contentFileService.getContentFileById(contentFileId);
     if (!contentFile) {
       res.status(404).json({ error: 'Archivo no encontrado' });
-      return;
-    }
-
-    const hasAccess = await contentFileService.verifyUserAccess(contentFileId, userId);
-    if (!hasAccess) {
-      res.status(403).json({ error: 'No tienes acceso a este archivo' });
       return;
     }
 
@@ -108,19 +96,6 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
 export const forceCache = async (req: Request, res: Response): Promise<void> => {
   try {
     const { contentFileId } = req.params;
-    const userId = (req.user as any)?.id;
-
-    if (!userId) {
-      res.status(401).json({ error: 'Usuario no autenticado' });
-      return;
-    }
-
-    // Verificar acceso
-    const hasAccess = await contentFileService.verifyUserAccess(contentFileId, userId);
-    if (!hasAccess) {
-      res.status(403).json({ error: 'No tienes acceso a este archivo' });
-      return;
-    }
 
     const contentFile = await contentFileService.getContentFileById(contentFileId);
     if (!contentFile) {
@@ -225,23 +200,10 @@ export const updateConfig = async (req: Request, res: Response): Promise<void> =
 export const analyzeStrategy = async (req: Request, res: Response): Promise<void> => {
   try {
     const { contentFileId } = req.params;
-    const userId = (req.user as any)?.id;
     const userCount = parseInt(req.query.userCount as string) || 0;
 
     if (!contentFileId) {
       res.status(400).json({ error: 'ContentFile ID es requerido' });
-      return;
-    }
-
-    if (!userId) {
-      res.status(401).json({ error: 'Usuario no autenticado' });
-      return;
-    }
-
-    // Verificar acceso
-    const hasAccess = await contentFileService.verifyUserAccess(contentFileId, userId);
-    if (!hasAccess) {
-      res.status(403).json({ error: 'No tienes acceso a este archivo' });
       return;
     }
 

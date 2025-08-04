@@ -31,13 +31,7 @@ export class ContentFilesController extends BaseController {
     // Obtener archivos ordenados por posición
     const files = await ContentFiles.findAll({
       where: { contentId },
-      order: [['position', 'ASC'], ['createdAt', 'ASC']],
-      attributes: [
-        'id', 'contentId', 'fileName', 'originalName', 'fileType', 
-        'fileSize', 'mimeType', 'driveFileId', 'driveUrl', 
-        'thumbnailLink', 'driveWebViewLink', 'driveWebContentLink', 'description', 
-        'isPublic', 'allowDownload', 'position', 'createdAt', 'updatedAt'
-      ]
+      order: [['position', 'ASC'], ['createdAt', 'ASC']],      
     });
 
     this.sendSuccess(res, req, files, `Archivos del contenido obtenidos exitosamente (${files.length} archivos)`);
@@ -145,25 +139,7 @@ export class ContentFilesController extends BaseController {
         
         // Determinar si se permite descarga basado en configuración del usuario
         const shouldAllowDownload = false; // Por defecto false (no descarga)
-
-        // Preparar URLs basadas en permisos de descarga
-        let driveWebContentLink: string | undefined = undefined;
-        let driveUrl = uploadResult.shareableLink || driveFile.webViewLink || `https://drive.google.com/file/d/${driveFile.id}/view`; // Usar shareableLink público
         
-        // Generar drivePreviewLink público que no requiere autenticación
-        const publicPreviewLink = uploadResult.shareableLink 
-          ? `https://drive.google.com/file/d/${driveFile.id}/preview?usp=sharing`
-          : `https://drive.google.com/file/d/${driveFile.id}/preview`;
-        
-        if (shouldAllowDownload) {
-          // Si se permite descarga, guardar el enlace de descarga directa
-          // NOTA: Esto solo funcionará si se deshabilitan las restricciones máximas en Drive
-          driveWebContentLink = driveFile.webContentLink;
-        } else {
-          // Si no se permite descarga, usar solo enlace público de vista/preview 
-          // Los archivos tienen restricciones máximas: sin descarga, copia ni impresión
-          driveUrl = uploadResult.shareableLink || driveFile.webViewLink || `https://drive.google.com/file/d/${driveFile.id}/view`;
-        }
 
         // Crear registro en la base de datos
         const contentFile = await ContentFiles.create({
@@ -174,13 +150,11 @@ export class ContentFilesController extends BaseController {
           fileSize: file.size,
           mimeType: file.mimetype,
           driveFileId: driveFile.id,
-          driveUrl: driveUrl,
           thumbnailLink: driveFile.thumbnailLink,
           driveWebViewLink: driveFile.webViewLink,
-          driveWebContentLink: driveWebContentLink, // Solo se guarda si se permite descarga
-          drivePreviewLink: publicPreviewLink, // URL de preview público que no requiere autenticación
+          driveWebContentLink: driveFile.webContentLink, // Solo se guarda si se permite descarga
+          drivePreviewLink: `https://drive.google.com/file/d/${driveFile.id}/preview`, // URL de preview público que no requiere autenticación
           description,
-          isPublic: Boolean(isPublic),
           allowDownload: shouldAllowDownload,
           uploadedBy: BigInt(userId),
           position: maxPosition + i + 1
@@ -340,12 +314,6 @@ export class ContentFilesController extends BaseController {
       const reorderedFiles = await ContentFiles.findAll({
         where: { contentId },
         order: [['position', 'ASC'], ['createdAt', 'ASC']],
-        attributes: [
-          'id', 'contentId', 'fileName', 'originalName', 'fileType', 
-          'fileSize', 'mimeType', 'driveFileId', 'driveUrl', 
-          'thumbnailLink', 'driveWebViewLink', 'driveWebContentLink', 'description', 
-          'isPublic', 'allowDownload', 'position', 'createdAt', 'updatedAt'
-        ]
       });
 
       this.sendSuccess(res, req, reorderedFiles, `${updatedFiles.length} archivo(s) reordenado(s) exitosamente`);

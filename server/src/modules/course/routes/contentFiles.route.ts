@@ -12,6 +12,9 @@ import {
   uploadMultipleFiles
 } from '../../drive/middlewares/driveMiddleware';
 
+import { authMiddleware } from "../../../shared/middleware/authMiddleware";
+import { auth } from 'googleapis/build/src/apis/abusiveexperiencereport';
+
 const router = Router();
 
 /**
@@ -21,6 +24,7 @@ const router = Router();
  */
 router.get(
   '/contents/:contentId/files',
+  authMiddleware,
   validateContentId,
   ContentFilesController.getContentFiles
 );
@@ -32,6 +36,7 @@ router.get(
  */
 router.get(
   '/content-files/:fileId',
+  authMiddleware,
   validateFileId,
   ContentFilesController.getFileById
 );
@@ -43,6 +48,7 @@ router.get(
  */
 router.put(
   '/contents/:contentId/files/reorder',
+  authMiddleware,
   validateContentId,
   // TODO: Agregar validación específica para reorder cuando se necesite
   ContentFilesController.reorderFilesEndpoint
@@ -56,6 +62,7 @@ router.put(
 
 router.post(
   '/contents/:contentId/files/upload',
+  authMiddleware,
   validateContentId,
   uploadMultipleFiles,
   validateFileUpload,
@@ -69,6 +76,7 @@ router.post(
  */
 router.delete(
   '/content-files/:fileId',
+  authMiddleware,
   validateFileId,
   ContentFilesController.deleteFile
 );

@@ -23,7 +23,6 @@ export interface UploadResult {
   success: boolean;
   file?: DriveFileResult;
   error?: string;
-  shareableLink?: string;
 }
 
 /**
@@ -80,21 +79,17 @@ export default class DriveService {
       const response = await uploadPromise;
 
       const driveFile = response.data;
-      console.log("✅ Response datos subido exitosamente: ", driveFile);
       
       if (!driveFile.id) {
         throw new Error('No se pudo obtener el ID del archivo subido');
       }
 
       console.log(`✅ Archivo subido exitosamente: ${driveFile.name} (ID: ${driveFile.id})`);
-
-      // Hacer público automáticamente (solo vista, sin descarga)
-      let shareableLink: string | undefined;
+      let permission;
       try {
         const publicResult = await this.makeFilePublic(driveFile.id);
-        if (publicResult.success && publicResult.shareableLink) {
-          shareableLink = publicResult.shareableLink;
-        }
+        permission = publicResult?.permission || 'reader'; // Asignar permiso por defecto si no se pudo hacer público
+        
       } catch (publicError: any) {
         console.warn(`⚠️ No se pudo hacer público el archivo ${driveFile.id}:`, publicError.message);
         // Continuar sin hacer público
@@ -111,7 +106,6 @@ export default class DriveService {
           webContentLink: undefined, // Nunca permitir descarga directa con restricciones máximas
           thumbnailLink: driveFile.thumbnailLink || undefined
         },
-        shareableLink
       };
 
     } catch (error: any) {
@@ -141,7 +135,7 @@ export default class DriveService {
             
             if (timeDiff < 60000) { // Menos de 1 minuto
               console.log("✅ Archivo confirmado como recién subido");
-              this.makeFilePublic(recoveredFile.id!); // Hacerlo público automáticamente
+              const makePublicResult = await this.makeFilePublic(recoveredFile.id!); // Hacerlo público automáticamente
 
               return {
                 success: true,
@@ -154,7 +148,6 @@ export default class DriveService {
                   webContentLink: recoveredFile.webContentLink || undefined,
                   thumbnailLink: recoveredFile.thumbnailLink || undefined
                 },
-                shareableLink: undefined
               };
             } else {
               console.log("⚠️ El archivo encontrado es muy antiguo, no es el que acabamos de subir");
@@ -200,7 +193,7 @@ export default class DriveService {
   /**
    * Hace un archivo público solo para visualización (sin descarga, copia ni impresión)
    */
-  async makeFilePublic(fileId: string): Promise<{ success: boolean; shareableLink?: string; error?: string }> {
+  async makeFilePublic(fileId: string): Promise<{ success: boolean; permission?: string; error?: string }> {
     try {
       console.log(`🌐 Haciendo público el archivo: ${fileId}`);
 
@@ -268,7 +261,8 @@ export default class DriveService {
 
       return {
         success: false,
-        error: errorMessage
+        error: errorMessage,
+        permission: "reader"
       };
     }
   }
@@ -299,39 +293,6 @@ export default class DriveService {
       
       return false;
     }
-  }
-
-  /**
-   * Aplica restricciones máximas a un archivo existente
-   */
-  async applyMaximumRestrictionsToFile(fileId: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      console.log(`🔒 Aplicando restricciones máximas a archivo existente: ${fileId}`);
-
-      // Aplicar todas las restricciones disponibles
-      await this.applyMaximumRestrictions(fileId);
-
-      console.log(`✅ Restricciones máximas aplicadas a archivo existente: ${fileId}`);
-      return { success: true };
-
-    } catch (error: any) {
-      console.error(`❌ Error al aplicar restricciones máximas: ${error.message}`);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Método auxiliar para aplicar restricciones máximas de seguridad
-   */
-  private async applyMaximumRestrictions(fileId: string): Promise<void> {
-    await this.drive.files.update({
-      fileId: fileId,
-      requestBody: {
-        copyRequiresWriterPermission: true,
-        viewersCanCopyContent: false,
-        writersCanShare: false
-      }
-    });
   }
 }
 

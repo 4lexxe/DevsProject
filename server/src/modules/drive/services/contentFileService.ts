@@ -8,7 +8,6 @@ export interface ContentFileInfo {
   fileSize: number;
   driveFileId: string;
   isVideo: boolean;
-  isPublic: boolean;
   allowDownload: boolean;
 }
 
@@ -39,27 +38,13 @@ export class ContentFileService {
         mimeType: contentFile.mimeType,
         fileSize: contentFile.fileSize,
         driveFileId: contentFile.driveFileId,
-        isVideo: contentFile.isVideoFile(),
-        isPublic: contentFile.isPublic,
+        isVideo: contentFile.fileType === 'video',
         allowDownload: contentFile.allowDownload
       };
 
     } catch (error: any) {
       console.error(`❌ Error al obtener archivo de contenido ${contentFileId}:`, error.message);
       return null;
-    }
-  }
-
-  /**
-   * Verifica si un archivo de contenido es un video
-   */
-  async isVideoFile(contentFileId: string): Promise<boolean> {
-    try {
-      const contentFile = await ContentFiles.findByPk(contentFileId);
-      return contentFile ? contentFile.isVideoFile() : false;
-    } catch (error: any) {
-      console.error(`❌ Error al verificar tipo de archivo ${contentFileId}:`, error.message);
-      return false;
     }
   }
 
@@ -91,7 +76,6 @@ export class ContentFileService {
         contentFileId: contentFileInfo.id,
         fileName: contentFileInfo.fileName,
         fileSize: contentFileInfo.fileSize,
-        isPublic: contentFileInfo.isPublic,
         allowDownload: contentFileInfo.allowDownload
       };
 
@@ -116,15 +100,6 @@ export class ContentFileService {
         return {
           hasAccess: false,
           reason: 'Archivo de contenido no encontrado'
-        };
-      }
-
-      // Si el archivo es público, permitir acceso
-      if (contentFileInfo.isPublic) {
-        return {
-          hasAccess: true,
-          reason: 'Archivo público',
-          contentFileInfo
         };
       }
 
@@ -184,35 +159,6 @@ export class ContentFileService {
     }
   }
 
-  /**
-   * Obtiene todos los archivos de video de un contenido específico
-   */
-  async getVideoFilesByContentId(contentId: string): Promise<ContentFileInfo[]> {
-    try {
-      const contentFiles = await ContentFiles.findAll({
-        where: {
-          contentId: contentId,
-          fileType: 'video'
-        },
-        order: [['position', 'ASC']]
-      });
-
-      return contentFiles.map(file => ({
-        id: file.id,
-        fileName: file.fileName,
-        mimeType: file.mimeType,
-        fileSize: file.fileSize,
-        driveFileId: file.driveFileId,
-        isVideo: file.isVideoFile(),
-        isPublic: file.isPublic,
-        allowDownload: file.allowDownload
-      }));
-
-    } catch (error: any) {
-      console.error(`❌ Error al obtener archivos de video del contenido ${contentId}:`, error.message);
-      return [];
-    }
-  }
 }
 
 export const contentFileService = new ContentFileService();
