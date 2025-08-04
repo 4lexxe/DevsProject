@@ -86,48 +86,6 @@ export class ContentFileService {
   }
 
   /**
-   * Verifica acceso del usuario a un archivo de contenido
-   */
-  async verifyUserAccess(contentFileId: string, userId?: string): Promise<{
-    hasAccess: boolean;
-    reason: string;
-    contentFileInfo?: ContentFileInfo;
-  }> {
-    try {
-      const contentFileInfo = await this.getContentFileById(contentFileId);
-      
-      if (!contentFileInfo) {
-        return {
-          hasAccess: false,
-          reason: 'Archivo de contenido no encontrado'
-        };
-      }
-
-      // TODO: Implementar lógica de verificación de acceso basada en suscripciones/compras
-      // Por ahora, permitir acceso si el usuario está autenticado
-      if (userId) {
-        return {
-          hasAccess: true,
-          reason: 'Usuario autenticado',
-          contentFileInfo
-        };
-      }
-
-      return {
-        hasAccess: false,
-        reason: 'Acceso denegado - archivo privado y usuario no autenticado'
-      };
-
-    } catch (error: any) {
-      console.error(`❌ Error al verificar acceso ${contentFileId}:`, error.message);
-      return {
-        hasAccess: false,
-        reason: `Error al verificar acceso: ${error.message}`
-      };
-    }
-  }
-
-  /**
    * Obtiene stream de video usando el ID del content file
    */
   async getVideoStreamByContentFileId(
