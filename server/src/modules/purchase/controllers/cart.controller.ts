@@ -569,6 +569,7 @@ class CartController extends BaseController {
           id: course.id,
           title: course.title,
           description: course.summary,
+          image: course.image,
           originalPrice,
           finalPrice,
           hasDiscount: appliedDiscounts.length > 0,

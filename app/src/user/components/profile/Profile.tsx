@@ -30,13 +30,10 @@ const Profile = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow overflow-hidden">
-          {/* Encabezado/Banner */}
-          <div className="h-32 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-          
           {/* Información del Perfil */}
-          <div className="relative px-6 pb-6">
+          <div className="px-6 py-6">
             <div className="flex flex-col sm:flex-row items-center">
-              <div className="-mt-16 relative">
+              <div className="relative">
                 <img
                   src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`}
                   alt={user.name}
@@ -103,18 +100,6 @@ const Profile = () => {
                   <p className="text-sm font-medium text-gray-500">Autenticación</p>
                   <p className="text-sm text-gray-900 capitalize">{user.authProvider}</p>
                 </div>
-              </div>
-            </div>
-
-            {/* Permisos del Usuario */}
-            <div className="mt-8">
-              <h2 className="text-lg font-medium text-gray-900">Permisos</h2>
-              <div className="mt-4 space-y-2">
-                {user.role?.permissions?.map((permission) => (
-                  <span key={permission} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                    {permission}
-                  </span>
-                ))}
               </div>
             </div>
 

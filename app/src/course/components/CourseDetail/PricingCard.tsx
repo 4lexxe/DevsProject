@@ -45,26 +45,33 @@ export default function PricingCard({ pricing }: PricingCardProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
       <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">
           Precio del Curso
         </h3>
         
         {/* Precio principal */}
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <DollarSign className="w-6 h-6 text-green-500" />
+        <div className="mb-4">
           {pricing.hasDiscount ? (
-            <div className="flex items-center gap-3">
-              <span className="text-3xl font-bold text-green-600">
-                ${pricing.finalPrice.toFixed(2)}
-              </span>
-              <span className="text-xl line-through text-gray-400">
-                ${pricing.originalPrice.toFixed(2)}
-              </span>
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-2xl line-through text-gray-400">
+                  ${pricing.originalPrice.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <DollarSign className="w-6 h-6 text-green-500" />
+                <span className="text-4xl font-bold text-green-600">
+                  ${pricing.finalPrice.toFixed(2)}
+                </span>
+              </div>
             </div>
           ) : (
-            <span className="text-3xl font-bold text-green-600">
-              ${pricing.finalPrice.toFixed(2)}
-            </span>
+            <div className="flex items-center justify-center gap-2">
+              <DollarSign className="w-6 h-6 text-green-500" />
+              <span className="text-4xl font-bold text-green-600">
+                ${pricing.finalPrice.toFixed(2)}
+              </span>
+            </div>
           )}
         </div>
 
@@ -140,14 +147,7 @@ export default function PricingCard({ pricing }: PricingCardProps) {
         </div>
       )}
 
-      {/* Mensaje cuando no hay descuentos */}
-      {!pricing.hasDiscount && (
-        <div className="border-t border-gray-200 pt-4">
-          <div className="text-center text-gray-500 text-sm">
-            <p>Precio regular del curso</p>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

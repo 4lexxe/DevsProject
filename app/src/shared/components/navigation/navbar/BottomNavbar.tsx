@@ -12,7 +12,7 @@ import {
   CreditCard,
   X,
   LogOut,
-  ShoppingCart,
+  Crown,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/user/contexts/AuthContext";
@@ -37,7 +37,7 @@ export default function BottomNavbar() {
       path: user ? "/profile" : "#",
       isProfile: true,
     },
-    { icon: ShoppingCart, label: "Carrito", path: "/cart" },
+    { icon: Crown, label: "Planes", path: "/plans" },
   ];
 
   interface NavItem {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { ArrowLeft, CreditCard, Calendar, CheckCircle, Clock, XCircle } from "lucide-react"
+import { CreditCard, Calendar, CheckCircle, Clock, XCircle, FileText, ShoppingCart, Target, Wallet, Zap, Building2, Ticket, Smartphone, Info } from "lucide-react"
 import { Link, Navigate } from "react-router-dom"
 import { cartService } from "../services/cartService"
 import { paymentService } from "../services"
@@ -208,43 +208,81 @@ export default function MyOrdersAndPayments() {
 
     // Si es dinero en cuenta, solo mostrar eso
     if (paymentMethodId?.toLowerCase() === 'account_money' || paymentTypeId?.toLowerCase() === 'account_money') {
-      return "💰 Dinero en cuenta MercadoPago"
+      return (
+        <span className="flex items-center gap-2">
+          <Wallet className="h-4 w-4" />
+          Dinero en cuenta MercadoPago
+        </span>
+      )
     }
 
     // Si es PIX, solo mostrar eso
     if (paymentMethodId?.toLowerCase() === 'pix' || paymentTypeId?.toLowerCase() === 'pix') {
-      return "⚡ PIX - Transferencia Instantánea"
+      return (
+        <span className="flex items-center gap-2">
+          <Zap className="h-4 w-4" />
+          PIX - Transferencia Instantánea
+        </span>
+      )
     }
 
     // Si es DEBIN, solo mostrar eso
     if (paymentMethodId?.toLowerCase() === 'debin') {
-      return "🏦 Débito inmediato (DEBIN)"
+      return (
+        <span className="flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          Débito inmediato (DEBIN)
+        </span>
+      )
     }
 
     // Para tarjetas, mostrar tipo + método
     if (paymentTypeId?.toLowerCase().includes('card')) {
-      const cardIcon = paymentTypeId?.toLowerCase() === 'credit_card' ? '💳' : 
-                       paymentTypeId?.toLowerCase() === 'debit_card' ? '💳' : '🎫'
-      return `${cardIcon} ${type} ${method}`
+      return (
+        <span className="flex items-center gap-2">
+          <CreditCard className="h-4 w-4" />
+          {type} {method}
+        </span>
+      )
     }
 
     // Para efectivo
     if (paymentTypeId?.toLowerCase() === 'ticket') {
-      return `🎫 ${method}`
+      return (
+        <span className="flex items-center gap-2">
+          <Ticket className="h-4 w-4" />
+          {method}
+        </span>
+      )
     }
 
     // Para transferencias bancarias
     if (paymentTypeId?.toLowerCase() === 'bank_transfer') {
-      return `🏦 ${method}`
+      return (
+        <span className="flex items-center gap-2">
+          <Building2 className="h-4 w-4" />
+          {method}
+        </span>
+      )
     }
 
     // Para wallets digitales
     if (paymentTypeId?.toLowerCase() === 'digital_wallet') {
-      return `📱 ${method}`
+      return (
+        <span className="flex items-center gap-2">
+          <Smartphone className="h-4 w-4" />
+          {method}
+        </span>
+      )
     }
 
     // Default: mostrar tipo y método
-    return `${type} - ${method}`
+    return (
+      <span className="flex items-center gap-2">
+        <CreditCard className="h-4 w-4" />
+        {type} - {method}
+      </span>
+    )
   }
 
   const getStatusColor = (status: string) => {
@@ -268,16 +306,16 @@ export default function MyOrdersAndPayments() {
     switch (status) {
       case "paid":
       case "approved":
-        return "✅"
+        return <CheckCircle className="h-4 w-4" />
       case "active":
-        return "🟢"
+        return <CheckCircle className="h-4 w-4" />
       case "pending":
-        return "⏳"
+        return <Clock className="h-4 w-4" />
       case "cancelled":
       case "rejected":
-        return "❌"
+        return <XCircle className="h-4 w-4" />
       default:
-        return "❓"
+        return <Clock className="h-4 w-4" />
     }
   }
 
@@ -409,13 +447,6 @@ export default function MyOrdersAndPayments() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link 
-            to="/dashboard" 
-            className="inline-flex items-center gap-2 px-4 py-2 text-blue-600 hover:opacity-80 transition-opacity mb-4"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Volver al Dashboard
-          </Link>
           <h1 className="text-4xl font-bold mb-2" style={{ color: "#0c154c" }}>
             Mis Compras
           </h1>
@@ -435,7 +466,7 @@ export default function MyOrdersAndPayments() {
               style={activeTab === 'orders' ? { backgroundColor: "#42d7c7" } : {}}
             >
               <span className="flex items-center justify-center gap-2">
-                <span>📋</span>
+                <FileText className="h-4 w-4" />
                 Mis Órdenes
               </span>
             </button>
@@ -449,7 +480,7 @@ export default function MyOrdersAndPayments() {
               style={activeTab === 'payments' ? { backgroundColor: "#42d7c7" } : {}}
             >
               <span className="flex items-center justify-center gap-2">
-                <span>💳</span>
+                <CreditCard className="h-4 w-4" />
                 Mis Pagos
               </span>
             </button>
@@ -462,7 +493,9 @@ export default function MyOrdersAndPayments() {
           <div className="space-y-6">
             {sortedOrders.length === 0 ? (
               <div className="text-center py-16">
-                <div className="text-6xl mb-4">📋</div>
+                <div className="mb-4">
+                  <FileText className="h-16 w-16 mx-auto text-gray-400" />
+                </div>
                 <h2 className="text-2xl font-bold mb-4" style={{ color: "#0c154c" }}>
                   No tienes órdenes aún
                 </h2>
@@ -493,11 +526,11 @@ export default function MyOrdersAndPayments() {
                         </h3>
                         <div className="flex items-center gap-4 text-sm text-gray-600">
                           <span className="flex items-center gap-1">
-                            <span>📅</span>
+                            <Calendar className="h-4 w-4" />
                             {formatDate(order.createdAt)}
                           </span>
                           <span className="flex items-center gap-1">
-                            <span>🛒</span>
+                            <ShoppingCart className="h-4 w-4" />
                             {order.courses.length} {order.courses.length === 1 ? "curso" : "cursos"}
                           </span>
                         </div>
@@ -535,8 +568,9 @@ export default function MyOrdersAndPayments() {
                               </div>
                               <div className="text-sm text-gray-600 mt-1">{courseItem.course.description}</div>
                               {courseItem.course.discountApplied && (
-                                <div className="text-xs text-green-600 mt-1">
-                                  🎯 Descuento: {courseItem.course.discountApplied.percentage}% 
+                                <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                                  <Target className="h-3 w-3" />
+                                  Descuento: {courseItem.course.discountApplied.percentage}% 
                                   ({courseItem.course.discountApplied.event})
                                 </div>
                               )}
@@ -588,7 +622,7 @@ export default function MyOrdersAndPayments() {
                             style={{ backgroundColor: "#42d7c7" }}
                           >
                             <span className="flex items-center justify-center gap-2">
-                              <span>💳</span>
+                              <CreditCard className="h-4 w-4" />
                               Completar Pago
                             </span>
                           </button>
@@ -607,7 +641,7 @@ export default function MyOrdersAndPayments() {
                                 </>
                               ) : (
                                 <>
-                                  <span>❌</span>
+                                  <XCircle className="h-4 w-4" />
                                   Cancelar Orden
                                 </>
                               )}
@@ -623,7 +657,7 @@ export default function MyOrdersAndPayments() {
                           style={{ borderColor: "#1d4ed8", color: "#1d4ed8", backgroundColor: "white" }}
                         >
                           <span className="flex items-center justify-center gap-2">
-                            <span>ℹ️</span>
+                            <Info className="h-4 w-4" />
                             Ver Información del Pago
                           </span>
                         </button>
@@ -639,7 +673,9 @@ export default function MyOrdersAndPayments() {
           <div className="space-y-4">
             {payments.length === 0 ? (
               <div className="text-center py-16">
-                <div className="text-6xl mb-4">💳</div>
+                <div className="mb-4">
+                  <CreditCard className="h-16 w-16 mx-auto text-gray-400" />
+                </div>
                 <h2 className="text-2xl font-bold mb-4" style={{ color: "#0c154c" }}>
                   No tienes pagos registrados
                 </h2>
@@ -760,7 +796,9 @@ export default function MyOrdersAndPayments() {
                 <div className="space-y-4">
                   <div className="p-4 rounded-lg" style={{ backgroundColor: "#eff6ff" }}>
                     <div className="text-center">
-                      <div className="text-4xl mb-2">✅</div>
+                      <div className="mb-2">
+                        <CheckCircle className="h-10 w-10 mx-auto text-green-500" />
+                      </div>
                       <div className="font-bold text-lg" style={{ color: "#42d7c7" }}>
                         Pago Aprobado
                       </div>

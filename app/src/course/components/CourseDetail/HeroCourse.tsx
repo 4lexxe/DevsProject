@@ -95,14 +95,7 @@ export default function HeroCourse({
         </div>
       </div>
 
-      {/* Botón "Editar curso" en la esquina superior derecha */}
-      {courseId && (
-        <div className="absolute top-4 right-4">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
-            Editar Curso
-          </button>
-        </div>
-      )}
+
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { Link } from "react-router-dom"
-import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag, AlertTriangle, X, BookOpen } from "lucide-react"
+import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag, AlertTriangle, X, BookOpen, Loader2, Heart, Star, Clock } from "lucide-react"
 import { useEffect, useState } from "react"
 import { cartService } from "../services"
 import type { CartSummary } from "../services/cartService"
@@ -142,10 +142,17 @@ export default function CartPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#eff6ff" }}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
         <div className="container mx-auto px-4 py-8">
-          <div className="flex justify-center items-center h-64">
-            <div className="text-lg" style={{ color: "#0c154c" }}>Cargando carrito...</div>
+          <div className="flex flex-col justify-center items-center h-64">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+              <ShoppingBag className="w-6 h-6 text-blue-600 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+            </div>
+            <div className="mt-6 text-center">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Cargando tu carrito</h3>
+              <p className="text-gray-600">Preparando tus cursos seleccionados...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -154,30 +161,47 @@ export default function CartPage() {
 
   if (!cartData || cartData.courses.length === 0) {
     return (
-      <div className="min-h-screen" style={{ backgroundColor: "#eff6ff" }}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
         <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto text-center">
-            <Link to="/">
-              <button className="inline-flex items-center justify-center rounded-md font-medium transition-colors bg-transparent hover:bg-gray-100 h-10 px-4 py-2 mb-6 hover:opacity-80" style={{ color: "#1d4ed8" }}>
+          <div className="max-w-lg mx-auto text-center">
+            <Link to="/cursos">
+              <button className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 bg-white h-12 px-6 py-2 mb-8 shadow-sm border-2 text-gray-800 hover:shadow-md" style={{borderColor: "rgb(66, 215, 199)"}}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver a cursos
+                Explorar Cursos
               </button>
             </Link>
 
-            <div className="p-8 rounded-full w-32 h-32 mx-auto mb-6" style={{ backgroundColor: "#42d7c7" }}>
-              <ShoppingBag className="w-16 h-16" style={{ color: "#0c154c" }} />
+            <div className="relative mb-8">
+              <div className="w-32 h-32 mx-auto bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full flex items-center justify-center shadow-lg">
+                <ShoppingBag className="w-16 h-16 text-blue-600" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-md">
+                <Star className="w-4 h-4 text-yellow-600" />
+              </div>
             </div>
 
-            <h1 className="text-3xl font-bold mb-4" style={{ color: "#0c154c" }}>
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
               Tu carrito está vacío
             </h1>
-            <p className="text-gray-600 mb-8">¡Explora nuestros cursos y encuentra el perfecto para ti!</p>
+            <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+              ¡Descubre cursos increíbles y comienza tu viaje de aprendizaje hoy mismo!
+            </p>
 
-            <Link to="/">
-              <button className="inline-flex items-center justify-center rounded-md font-medium transition-colors h-10 px-4 py-2 text-white" style={{ backgroundColor: "#1d4ed8" }}>
-                Ver Cursos
-              </button>
-            </Link>
+            <div className="space-y-4">
+              <Link to="/cursos">
+                <button className="w-full sm:w-auto inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-300 h-12 px-8 py-2 bg-white border-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-gray-800" style={{borderColor: "rgb(66, 215, 199)"}}>
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Ver Todos los Cursos
+                </button>
+              </Link>
+              
+              <div className="flex items-center justify-center mt-6">
+                <div className="flex items-center bg-white border-2 rounded-lg px-4 py-2 text-sm text-gray-600" style={{borderColor: "rgb(66, 215, 199)"}}>
+                  <Clock className="w-4 h-4 mr-2" />
+                  <span>Acceso de por vida</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -188,91 +212,118 @@ export default function CartPage() {
   const totalSavings = cartData.summary.totalSavings
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#eff6ff" }}>
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Link to="/">
-            <button className="inline-flex items-center justify-center rounded-md font-medium transition-colors bg-transparent hover:bg-gray-100 h-10 px-4 py-2 mb-4 hover:opacity-80" style={{ color: "#1d4ed8" }}>
+        <div className="mb-6 sm:mb-8">
+          <Link to="/cursos">
+            <button className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 bg-white hover:bg-blue-50 h-10 sm:h-12 px-4 sm:px-6 py-2 mb-4 sm:mb-6 shadow-sm border border-blue-200 text-blue-600 hover:text-blue-700 hover:shadow-md">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Continuar comprando
+              <span className="hidden sm:inline">Continuar comprando</span>
+              <span className="sm:hidden">Volver</span>
             </button>
           </Link>
 
-          <h1 className="text-4xl font-bold mb-2" style={{ color: "#0c154c" }}>
-            Carrito de Compras
-          </h1>
-          <p className="text-gray-600">
-            {cartData.summary.courseCount} {cartData.summary.courseCount === 1 ? "curso" : "cursos"} en tu carrito
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                Mi Carrito
+              </h1>
+              <div className="flex items-center gap-2 text-gray-600">
+                <ShoppingBag className="w-4 h-4" />
+                <p className="text-sm sm:text-base">
+                  {cartData.summary.courseCount} {cartData.summary.courseCount === 1 ? "curso" : "cursos"} seleccionado{cartData.summary.courseCount === 1 ? "" : "s"}
+                </p>
+              </div>
+            </div>
+            
+            {totalSavings > 0 && (
+              <div className="bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200 rounded-lg px-4 py-2 text-center">
+                <p className="text-sm font-medium text-green-800">¡Estás ahorrando!</p>
+                <p className="text-lg font-bold text-green-600">${totalSavings}</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {cartData.courses.map((item) => {
               const hasActiveDiscount = item.course.discountApplied !== null
 
               return (
                 <div
                   key={item.cartCourseId}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 border-2"
-                  style={{ borderColor: "#42d7c7" }}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300"
                 >
-                  <div className="p-6">
-                    <div className="flex gap-6">
-                      {/* Course Image */}
+                  <div className="p-3 sm:p-4">
+                    <div className="flex gap-3">
+                      {/* Course Image - Smaller for mobile */}
                       <div className="relative flex-shrink-0">
-                        <div 
-                          className="w-[120px] h-[80px] rounded-lg flex items-center justify-center text-white font-bold"
-                          style={{ backgroundColor: "#1d4ed8" }}
-                        >
-                          {item.course.title.substring(0, 2).toUpperCase()}
+                        <div className="w-20 h-12 sm:w-24 sm:h-14 rounded-lg overflow-hidden">
+                          {item.course.image ? (
+                            <img
+                              src={item.course.image}
+                              alt={item.course.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm bg-gradient-to-br from-blue-600 to-cyan-600">
+                              {item.course.title.substring(0, 2).toUpperCase()}
+                            </div>
+                          )}
                         </div>
                         {hasActiveDiscount && (
-                          <span className="absolute -top-2 -right-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium border-0" style={{ backgroundColor: "#02ffff", color: "#0c154c" }}>
-                            <Tag className="w-3 h-3 mr-1" />
-                            {item.course.discountApplied?.percentage}% OFF
-                          </span>
+                          <div className="absolute -top-1 -right-1 rounded-full px-2 py-0.5 text-xs font-bold" style={{backgroundColor: "rgb(66, 215, 199)", color: "#0c154c"}}>
+                            {item.course.discountApplied?.percentage}
+                          </div>
                         )}
                       </div>
 
-                      {/* Course Details */}
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-2" style={{ color: "#0c154c" }}>
+                      {/* Course Details - Simplified */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm sm:text-base font-semibold mb-1 text-gray-800 truncate">
                           {item.course.title}
                         </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {item.course.description || "Descripción del curso"}
-                        </p>
+                        
+                        {/* Category badge - smaller */}
+                        <div className="mb-2">
+                          <span className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">
+                            {item.course.category || "Curso"}
+                          </span>
+                        </div>
 
                         <div className="flex items-center justify-between">
-                          {/* Price */}
-                          <div className="flex items-center gap-3">
+                          {/* Price - Simplified */}
+                          <div className="flex items-center gap-2">
                             {hasActiveDiscount ? (
                               <>
-                                <span className="text-lg line-through text-gray-400">
+                                <span className="text-xs line-through text-gray-400">
                                   ${item.course.originalPrice}
                                 </span>
-                                <span className="text-2xl font-bold" style={{ color: "#1d4ed8" }}>
+                                <span className="text-lg font-bold text-gray-800">
                                   ${item.course.finalPrice}
                                 </span>
                               </>
                             ) : (
-                              <span className="text-2xl font-bold" style={{ color: "#1d4ed8" }}>
+                              <span className="text-lg font-bold text-gray-800">
                                 ${item.course.finalPrice}
                               </span>
                             )}
                           </div>
 
-                          {/* Remove Button */}
+                          {/* Remove Button - Smaller */}
                           <button
                             onClick={() => removeFromCart(item.course.id)}
                             disabled={removing === item.course.id}
-                            className="inline-flex items-center justify-center rounded-md font-medium transition-colors bg-transparent hover:bg-red-50 h-10 px-4 py-2 text-red-500 hover:text-red-700"
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 disabled:opacity-50"
                           >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {removing === item.course.id ? "Eliminando..." : "Eliminar"}
+                            {removing === item.course.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-4 h-4" />
+                            )}
                           </button>
                         </div>
                       </div>
@@ -285,86 +336,114 @@ export default function CartPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm sticky top-24 border-2" style={{ borderColor: "#42d7c7" }}>
-              <div className="p-6 pb-0 text-white" style={{ backgroundColor: "#0c154c" }}>
-                <h3 className="font-semibold leading-none tracking-tight flex items-center gap-2 text-xl">
+            <div className="bg-white rounded-xl shadow-lg sticky top-6 border border-gray-200 overflow-hidden">
+              <div className="p-4 sm:p-6 bg-white border-b-2" style={{borderColor: "rgb(66, 215, 199)", color: "#0c154c"}}>
+                <h3 className="font-bold text-lg sm:text-xl flex items-center gap-2">
                   <ShoppingBag className="w-5 h-5" />
                   Resumen del Pedido
                 </h3>
+                <p className="text-sm mt-1" style={{color: "#0c154c", opacity: 0.8}}>
+                  {cartData.summary.courseCount} {cartData.summary.courseCount === 1 ? "artículo" : "artículos"}
+                </p>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-4 sm:p-6 space-y-4">
                 {/* Course List */}
-                <div className="space-y-3">
+                <div className="space-y-2 max-h-48 overflow-y-auto">
                   {cartData.courses.map((item) => (
                     <div
                       key={item.cartCourseId}
-                      className="flex justify-between items-center text-sm p-3 rounded-lg"
-                      style={{ backgroundColor: "#eff6ff" }}
+                      className="flex justify-between items-start text-sm p-2 sm:p-3 rounded-lg border transition-all duration-300 bg-white"
+                      style={{borderColor: "rgb(66, 215, 199)"}}
                     >
                       <div className="flex-1 min-w-0 mr-3">
-                        <div className="font-medium truncate" style={{ color: "#0c154c" }}>
-                          {item.course.title}
-                        </div>
-                      </div>
-                      <div className="font-bold" style={{ color: "#1d4ed8" }}>
-                        ${item.course.finalPrice}
-                      </div>
+                         <div className="font-semibold truncate mb-1 text-gray-800">
+                           {item.course.title}
+                         </div>
+                         {item.course.discountApplied && (
+                           <div className="text-xs text-green-600 font-medium">
+                             {item.course.discountApplied.percentage}% descuento
+                           </div>
+                         )}
+                       </div>
+                       <div className="text-right">
+                         {item.course.discountApplied ? (
+                           <>
+                             <div className="text-xs line-through text-gray-400">
+                               ${item.course.originalPrice}
+                             </div>
+                             <div className="font-bold text-gray-800">
+                               ${item.course.finalPrice}
+                             </div>
+                           </>
+                         ) : (
+                           <div className="font-bold text-gray-800">
+                             ${item.course.finalPrice}
+                           </div>
+                         )}
+                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="h-px w-full bg-gray-200" />
+                <div className="border-t border-gray-200 pt-4">
+                  {/* Price Breakdown */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span>Subtotal ({cartData.summary.courseCount} cursos)</span>
+                      <span className="font-medium">${cartData.summary.totalOriginal}</span>
+                    </div>
 
-                {/* Price Breakdown */}
-                <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span>Subtotal ({cartData.summary.courseCount} cursos)</span>
-                    <span>${cartData.summary.totalOriginal}</span>
+                    {totalSavings > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-green-600 font-medium">Descuentos aplicados</span>
+                        <span className="text-green-600 font-bold">-${totalSavings}</span>
+                      </div>
+                    )}
+
+                    <div className="border-t border-gray-200 pt-3">
+                      <div className="flex justify-between text-lg font-bold">
+                        <span className="text-gray-800">Total</span>
+                        <span className="text-2xl text-blue-600">
+                          ${cartData.summary.totalWithDiscounts}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   {totalSavings > 0 && (
-                    <div className="flex justify-between text-sm text-green-600">
-                      <span>Descuentos aplicados</span>
-                      <span>-${totalSavings}</span>
+                    <div className="mt-4 text-center p-3 rounded-lg bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200">
+                      <div className="flex items-center justify-center gap-2">
+                        <Star className="w-4 h-4 text-green-600" />
+                        <p className="text-sm font-bold text-green-800">
+                          ¡Estás ahorrando ${totalSavings}!
+                        </p>
+                      </div>
                     </div>
                   )}
-
-                  <div className="h-px w-full bg-gray-200" />
-
-                  <div className="flex justify-between text-lg font-bold">
-                    <span style={{ color: "#0c154c" }}>Total</span>
-                    <span style={{ color: "#1d4ed8" }}>
-                      ${cartData.summary.totalWithDiscounts}
-                    </span>
-                  </div>
                 </div>
-
-                {totalSavings > 0 && (
-                  <div className="text-center p-3 rounded-lg" style={{ backgroundColor: "#02ffff" }}>
-                    <p className="text-sm font-medium" style={{ color: "#0c154c" }}>
-                      ¡Ahorras ${totalSavings}!
-                    </p>
-                  </div>
-                )}
               </div>
 
-              <div className="p-6 pt-0 space-y-3">
+              <div className="p-4 sm:p-6 pt-0 space-y-3 bg-gray-50">
                 <button
                   onClick={proceedToPayment}
                   disabled={processingPayment}
-                  className="w-full inline-flex items-center justify-center rounded-md font-medium transition-colors h-10 px-4 py-2 text-white"
-                  style={{ backgroundColor: "#1d4ed8" }}
+                  className="w-full inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-300 h-12 px-4 py-2 bg-white border-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  style={{borderColor: "rgb(66, 215, 199)", color: "#0c154c"}}
                 >
-                  <CreditCard className="w-4 h-4 mr-2" />
+                  {processingPayment ? (
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  ) : (
+                    <CreditCard className="w-5 h-5 mr-2" />
+                  )}
                   {processingPayment ? "Procesando..." : "Proceder al Pago"}
                 </button>
 
                 <button
                   onClick={clearCart}
-                  className="w-full inline-flex items-center justify-center rounded-md font-medium transition-colors border border-gray-300 bg-transparent hover:bg-gray-50 h-10 px-4 py-2"
-                  style={{ borderColor: "#42d7c7", color: "#1d4ed8" }}
+                  className="w-full inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 h-10 px-4 py-2 text-gray-600 hover:text-gray-700"
                 >
+                  <Trash2 className="w-4 h-4 mr-2" />
                   Vaciar Carrito
                 </button>
               </div>
@@ -382,52 +461,56 @@ export default function CartPage() {
 
         {/* Modal de error de cursos con acceso */}
         {courseAccessError && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: "#fef3c7" }}>
-                  <AlertTriangle className="w-6 h-6" style={{ color: "#d97706" }} />
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 sm:p-8 transform transition-all duration-300 scale-100">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-6 h-6 text-orange-600" />
                 </div>
-                <h3 className="text-lg font-semibold" style={{ color: "#0c154c" }}>
-                  Cursos ya adquiridos
-                </h3>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800 mb-2">
+                    Cursos ya adquiridos
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Ya tienes acceso a algunos cursos en tu carrito. No puedes comprar cursos que ya posees.
+                  </p>
+                </div>
               </div>
 
-              <p className="text-gray-600 mb-4">
-                Ya tienes acceso a algunos cursos en tu carrito. No puedes comprar cursos que ya posees.
-              </p>
-
               {/* Lista de cursos con acceso */}
-              <div className="space-y-2 mb-6">
+              <div className="space-y-3 mb-6 max-h-48 overflow-y-auto">
                 {courseAccessError.coursesWithAccess.map((course) => (
                   <div 
                     key={course.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border"
-                    style={{ backgroundColor: "#eff6ff", borderColor: "#42d7c7" }}
+                    className="flex items-center gap-3 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 hover:from-blue-100 hover:to-cyan-100 transition-all duration-300"
                   >
-                    <BookOpen className="w-5 h-5" style={{ color: "#1d4ed8" }} />
-                    <span className="font-medium" style={{ color: "#0c154c" }}>
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="font-medium text-gray-800 flex-1">
                       {course.title}
                     </span>
+                    <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                      Adquirido
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={handleRemoveCoursesWithAccess}
-                  className="flex-1 inline-flex items-center justify-center rounded-md font-medium transition-colors h-10 px-4 py-2 text-white"
-                  style={{ backgroundColor: "#1d4ed8" }}
+                  className="flex-1 inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-300 h-12 px-4 py-2 text-white bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Eliminar del carrito
                 </button>
                 <button
                   onClick={handleDismissCourseAccessError}
-                  className="inline-flex items-center justify-center rounded-md font-medium transition-colors border border-gray-300 bg-transparent hover:bg-gray-50 h-10 px-4 py-2"
-                  style={{ color: "#6b7280" }}
+                  className="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 h-12 px-4 py-2 text-gray-600 hover:text-gray-700"
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Cerrar</span>
                 </button>
               </div>
             </div>
