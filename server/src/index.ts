@@ -47,6 +47,10 @@ import invoiceRoutes from './modules/subscription/routes/invoice.route';
 // Rutas para compras
 import purchaseRoutes from './modules/purchase/routes';
 
+// Rutas para proxy de videos
+import videoProxyRoutes from './modules/drive/routes/videoProxyRoutes';
+import hybridVideoRoutes from './modules/drive/routes/hybridVideoRoutes';
+
 import webhookRoute from './modules/webhook/webhook.route';
 // ==================================================
 // Importaciones de utilidades y configuraciones
@@ -92,8 +96,9 @@ app.use(cors({
     'http://localhost:3000'  // Para desarrollo local adicional
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For', 'Range', 'Accept-Ranges'],
+  exposedHeaders: ['Content-Range', 'Accept-Ranges', 'Content-Length']
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -273,6 +278,12 @@ app.use('/api', courseRoutes);
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);
 
+// Rutas de proxy de videos (seguras)
+app.use('/api/video', videoProxyRoutes);
+
+// Rutas del sistema híbrido de video (cache + streaming)
+app.use('/api/video', hybridVideoRoutes);
+
 // Endpoint de estado del sistema
 app.get('/api/status', (req: Request, res) => {
   res.json({
@@ -316,7 +327,7 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
 // ==================================================
 // 9. Configuración del servidor web
 // ==================================================
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Estado geolocalización:', GeoUtils.checkServiceStatus());

@@ -107,7 +107,7 @@
       "summary": "Aprende Node.js desde cero.",
       "about": "Este curso cubre los fundamentos y conceptos avanzados de Node.js.",
       "careerTypeId": 1,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos fundamentales sobre el lenguaje de javascript"
       ],
       "learningOutcomes": ["Manejo de Express", "Uso de Sequelize"],
@@ -116,6 +116,7 @@
       "adminId": 1,
       "categoryIds": [1, 2],
       "price": 100,
+      "driveFolderId": "11H0M5vwSKDrBH-2tQgShKnTeqcjjzyjY",
       "sections": [
         {
           "title": "Introducción al Curso",
@@ -369,7 +370,7 @@
       "summary": "Domina React.js desde los conceptos básicos hasta técnicas avanzadas.",
       "about": "Este curso completo te enseñará React.js, la biblioteca más popular para crear interfaces de usuario modernas y dinámicas.",
       "careerTypeId": 1,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos sólidos de JavaScript ES6+",
         "Familiaridad con HTML y CSS",
         "Conceptos básicos de programación web"
@@ -380,6 +381,7 @@
       "adminId": 1,
       "categoryIds": [1, 3],
       "price": 150,
+      "driveFolderId": "1m3WcBtOUQefsQO0Ygd54Esdpo0Q6p0IP",
       "sections": [
         {
           "title": "Fundamentos de React",
@@ -514,7 +516,7 @@
       "summary": "Aprende Python desde cero con ejemplos prácticos.",
       "about": "Un curso completo de Python que cubre desde la sintaxis básica hasta conceptos avanzados como programación orientada a objetos.",
       "careerTypeId": 2,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos básicos de lógica de programación",
         "Familiaridad con el uso de computadoras"
       ],
@@ -524,6 +526,7 @@
       "adminId": 1,
       "categoryIds": [2, 4],
       "price": 120,
+      "driveFolderId": "1TWDmgBADWiQEFEQlwXc5Ven973fLXEHA",
       "sections": [
         {
           "title": "Introducción a Python",

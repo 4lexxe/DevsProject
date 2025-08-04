@@ -17,6 +17,7 @@ class Course extends Model {
   public isInDevelopment!: boolean;
   public price!: number; // Precio del curso
   public adminId!: bigint;
+  public driveFolderId?: string; // ID de la carpeta en Google Drive para el curso
   public readonly createdAt!: Date; 
   public readonly updatedAt!: Date; 
 }
@@ -75,6 +76,11 @@ Course.init(
       type: DataTypes.DECIMAL(10, 2), 
       allowNull: false,
       defaultValue: 100, // Precio por defecto
+    },
+    driveFolderId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "ID de la carpeta en Google Drive para el curso",
     },
   },
   {

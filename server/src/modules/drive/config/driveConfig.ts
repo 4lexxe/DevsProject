@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import path from 'path';
 
 export interface DriveConfig {
   clientId: string;
@@ -15,8 +14,23 @@ const clientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
 const refreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
 const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || '';  
 
+// Logging de configuración (sin mostrar valores sensibles)
+console.log('🔧 Configuración de Google Drive:', {
+  clientIdConfigured: !!clientId,
+  clientSecretConfigured: !!clientSecret,
+  refreshTokenConfigured: !!refreshToken,
+  folderIdConfigured: !!folderId,
+  clientIdLength: clientId.length,
+  refreshTokenLength: refreshToken.length
+});
+
 if(!clientId || !clientSecret || !refreshToken) {
-  throw new Error('Faltan variables de entorno necesarias para la configuración de Google Drive');
+  const missingVars = [];
+  if (!clientId) missingVars.push('GOOGLE_DRIVE_CLIENT_ID');
+  if (!clientSecret) missingVars.push('GOOGLE_DRIVE_CLIENT_SECRET');
+  if (!refreshToken) missingVars.push('GOOGLE_DRIVE_REFRESH_TOKEN');
+  
+  throw new Error(`Faltan variables de entorno necesarias para la configuración de Google Drive: ${missingVars.join(', ')}`);
 }
 
 
@@ -57,27 +71,6 @@ export function createDriveClient() {
 }
 
 /**
- * Valida que todas las variables de entorno necesarias estén configuradas
- */
-export function validateDriveConfig(): { isValid: boolean; missingVars: string[] } {
-  const requiredVars = [
-    clientId,
-    clientSecret,
-    refreshToken
-  ];
-
-  const missingVars = requiredVars.filter(varName => {
-    const value = process.env[varName];
-    return !value || value.trim() === '';
-  });
-
-  return {
-    isValid: missingVars.length === 0,
-    missingVars
-  };
-}
-
-/**
  * Configuración de tipos de archivo permitidos
  */
 export const allowedFileTypes = {
@@ -97,6 +90,15 @@ export const allowedFileTypes = {
     'video/webm',
     'video/mkv'
   ],
+  audio: [
+    'audio/mp3',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/ogg',
+    'audio/aac',
+    'audio/flac',
+    'audio/m4a'
+  ],
   documents: [
     'application/pdf',
     'application/msword',
@@ -108,6 +110,21 @@ export const allowedFileTypes = {
     'text/plain',
     'text/csv'
   ],
+  archives: [
+    'application/zip',
+    'application/x-rar-compressed',
+    'application/x-tar',
+    'application/gzip',
+    'application/x-7z-compressed'
+  ],
+  code: [
+    'text/javascript',
+    'text/html',
+    'text/css',
+    'application/json',
+    'application/xml',
+    'text/xml'
+  ]
 };
 
 /**
@@ -133,7 +150,10 @@ export function getAllowedMimeTypes(): string[] {
   return [
     ...allowedFileTypes.images,
     ...allowedFileTypes.videos,
+    ...allowedFileTypes.audio,
     ...allowedFileTypes.documents,
+    ...allowedFileTypes.archives,
+    ...allowedFileTypes.code,
   ];
 }
 
@@ -150,6 +170,9 @@ export function isMimeTypeAllowed(mimeType: string): boolean {
 export function getFileTypeFromMime(mimeType: string): string {
   if (allowedFileTypes.images.includes(mimeType)) return 'image';
   if (allowedFileTypes.videos.includes(mimeType)) return 'video';
+  if (allowedFileTypes.audio.includes(mimeType)) return 'audio';
+  if (allowedFileTypes.archives.includes(mimeType)) return 'archive';
+  if (allowedFileTypes.code.includes(mimeType)) return 'code';
   if (allowedFileTypes.documents.includes(mimeType)) return 'document';
   if (mimeType === 'application/pdf') return 'pdf';
   if (mimeType.includes('presentation')) return 'presentation';
@@ -161,7 +184,7 @@ export default {
   driveConfig,
   createDriveAuth,
   createDriveClient,
-  validateDriveConfig,
+  /* validateDriveConfig, */
   allowedFileTypes,
   fileLimits,
   getAllowedMimeTypes,

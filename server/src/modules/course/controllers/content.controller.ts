@@ -4,6 +4,7 @@ import Content from "../models/Content";
 import Section from "../models/Section";
 import User from "../../user/User";
 import { BaseController } from "./BaseController";
+import ContentFiles from "../models/ContentFiles";
 
 export default class ContentController extends BaseController {
   // Obtener todos los contenidos
@@ -60,7 +61,7 @@ export default class ContentController extends BaseController {
     try {
       const { id } = req.params;
       const content = await Content.findByPk(id, {
-        include: [{ model: Section, as: "section" }],
+        include: [{ model: Section, as: "section" }, { model: ContentFiles, as: "files", separate: true, order: [["position", "ASC"]] }],
       });
 
       if (!content) {
@@ -99,6 +100,7 @@ export default class ContentController extends BaseController {
       ContentController.handleServerError(res, req, error, "Error al obtener los contenidos de la sección");
     }
   };
+
 
   // Crear un contenido
   static create: RequestHandler = async (req, res) => {

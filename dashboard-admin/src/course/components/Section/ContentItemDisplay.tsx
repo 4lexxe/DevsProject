@@ -1,4 +1,4 @@
-import { Plus, HelpCircle, Trash2, Edit } from "lucide-react";
+import { Plus, HelpCircle, Trash2, Edit, FolderOpen, Upload } from "lucide-react";
 import QuizDisplay from "./QuizDisplay";
 
 interface Content {
@@ -40,6 +40,8 @@ interface ContentItemDisplayProps {
   onAddQuiz: (contentId: string) => void;
   onEditQuiz: (contentId: string) => void;
   onDeleteQuiz: (contentId: string) => void;
+  onManageFiles?: (contentId: string) => void;
+  onUploadFiles?: (contentId: string) => void;
 }
 
 export default function ContentItemDisplay({
@@ -47,6 +49,8 @@ export default function ContentItemDisplay({
   onAddQuiz,
   onEditQuiz,
   onDeleteQuiz,
+  onManageFiles,
+  onUploadFiles,
 }: ContentItemDisplayProps) {
   return (
     <div
@@ -74,6 +78,32 @@ export default function ContentItemDisplay({
           </>
         </div>
       </div>
+
+      {/* File Management Buttons */}
+      {(onManageFiles || onUploadFiles) && (
+        <div className="mb-4 pb-3 border-b border-gray-200">
+          <div className="flex items-center gap-2 flex-wrap">
+            {onUploadFiles && (
+              <button
+                onClick={() => onUploadFiles(content.id)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                Subir Archivos
+              </button>
+            )}
+            {onManageFiles && (
+              <button
+                onClick={() => onManageFiles(content.id)}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors duration-200"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                Gestionar Archivos
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Mostrar Quizzes si existen */}
       {content.quiz && content.quiz.length > 0 && (

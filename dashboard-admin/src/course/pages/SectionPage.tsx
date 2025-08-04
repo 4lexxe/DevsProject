@@ -63,6 +63,18 @@ export default function SectionDetailPage() {
     }
   }
 
+  // File management functions
+  const handleUploadFiles = (contentId: string) => {
+    // Aquí puedes abrir un modal para subir archivos
+    // Por ahora solo navegamos a una página de gestión de archivos
+    navigate(`/contents/${contentId}/files/upload`)
+  }
+
+  const handleManageFiles = (contentId: string) => {
+    // Navegamos a la página de gestión de archivos del contenido
+    navigate(`/contents/${contentId}/files`)
+  }
+
   // Loading and error states
   if (loading || error || !section) {
     return (
@@ -101,6 +113,8 @@ export default function SectionDetailPage() {
                     onAddQuiz={handleAddQuiz}
                     onEditQuiz={handleEditQuiz}
                     onDeleteQuiz={handleDeleteQuiz}
+                    onUploadFiles={handleUploadFiles}
+                    onManageFiles={handleManageFiles}
                   />
                 ))}
               </div>

@@ -5,7 +5,7 @@ import Content from "./Content";
 type fileType = "video" | "audio" | "document" | "image" | "pdf" | "presentation" | "spreadsheet" | "code" | "archive" | "other";
 
 interface ContentFilesAttributes {
-  id: bigint;
+  id: string; // Cambiado a string para UUID
   contentId: bigint;
   fileName: string;
   originalName: string;
@@ -14,20 +14,23 @@ interface ContentFilesAttributes {
   mimeType: string;
   driveFileId: string; // ID del archivo en Google Drive
   driveUrl: string; // URL de visualización/descarga de Google Drive
+  thumbnailLink?: string; // URL de la miniatura del archivo (si aplica)
   driveWebViewLink?: string; // URL para vista web del archivo
   driveWebContentLink?: string; // URL de descarga directa
+  drivePreviewLink?: string; // URL de preview embebido del archivo
   description?: string;
   isPublic: boolean; // Si el archivo es público o privado
+  allowDownload: boolean; // Si se permite descargar el archivo desde la preview
   uploadedBy: bigint; // ID del admin que subió el archivo
   position: number; // Orden de los archivos en el contenido
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface ContentFilesCreationAttributes extends Optional<ContentFilesAttributes, 'id' | 'driveWebViewLink' | 'driveWebContentLink' | 'description' | 'createdAt' | 'updatedAt'> {}
+interface ContentFilesCreationAttributes extends Optional<ContentFilesAttributes, 'id' | 'driveWebViewLink' | 'driveWebContentLink' | 'drivePreviewLink' | 'description' | 'createdAt' | 'updatedAt'> {}
 
 class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAttributes> implements ContentFilesAttributes {
-  public id!: bigint;
+  public id!: string; // Cambiado a string para UUID
   public contentId!: bigint;
   public fileName!: string;
   public originalName!: string;
@@ -38,8 +41,10 @@ class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAtt
   public driveUrl!: string;
   public driveWebViewLink?: string;
   public driveWebContentLink?: string;
+  public drivePreviewLink?: string;
   public description?: string;
   public isPublic!: boolean;
+  public allowDownload!: boolean;
   public uploadedBy!: bigint;
   public position!: number;
   public readonly createdAt!: Date;
@@ -55,7 +60,12 @@ class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAtt
   }
 
   public getDriveEmbedLink(): string {
-    return `https://drive.google.com/file/d/${this.driveFileId}/preview`;
+    // Usar drivePreviewLink si está disponible, sino generar el enlace público estándar
+    if (this.drivePreviewLink) {
+      return this.drivePreviewLink;
+    }
+    // Generar enlace público de preview
+    return `https://drive.google.com/file/d/${this.driveFileId}/preview?usp=sharing`;
   }
 
   public getFormattedFileSize(): string {
@@ -84,13 +94,74 @@ class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAtt
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     ].includes(this.mimeType);
   }
+
+  public canBeDownloaded(): boolean {
+    return this.allowDownload && !!this.driveWebContentLink;
+  }
+
+  public getAccessibleUrl(): string {
+    // Si se permite descarga y hay enlace disponible, usar el enlace de descarga
+    if (this.allowDownload && this.driveWebContentLink) {
+      return this.driveWebContentLink;
+    }
+    // Solo vista/preview
+    return this.getDriveEmbedLink();
+  }
+
+  public getSecureAccessInfo(): {
+    canDownload: boolean;
+    hasDownloadLink: boolean;
+    accessUrl: string;
+    accessType: 'download' | 'view-only';
+    message: string;
+  } {
+    const hasDownloadLink = !!this.driveWebContentLink;
+    const canDownload = this.allowDownload && hasDownloadLink;
+    
+    return {
+      canDownload,
+      hasDownloadLink,
+      accessUrl: this.getAccessibleUrl(),
+      accessType: canDownload ? 'download' : 'view-only',
+      message: canDownload 
+        ? 'Archivo disponible para descarga'
+        : hasDownloadLink 
+          ? 'Descarga deshabilitada - solo vista/preview'
+          : 'Solo vista/preview disponible'
+    };
+  }
+
+  /**
+   * Obtiene información segura para video streaming
+   */
+  public getSecureVideoInfo(): {
+    contentFileId: string;
+    driveFileId: string;
+    fileName: string;
+    mimeType: string;
+    fileSize: number;
+    isVideo: boolean;
+    isPublic: boolean;
+    allowDownload: boolean;
+  } {
+    return {
+      contentFileId: this.id,
+      driveFileId: this.driveFileId,
+      fileName: this.fileName,
+      mimeType: this.mimeType,
+      fileSize: this.fileSize,
+      isVideo: this.isVideoFile(),
+      isPublic: this.isPublic,
+      allowDownload: this.allowDownload
+    };
+  }
 }
 
 ContentFiles.init(
   {
     id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     contentId: {
@@ -139,6 +210,11 @@ ContentFiles.init(
       allowNull: false,
       comment: 'URL principal del archivo en Google Drive',
     },
+    thumbnailLink: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: 'URL de la miniatura del archivo (si aplica)',
+    },
     driveWebViewLink: {
       type: DataTypes.TEXT,
       allowNull: true,
@@ -148,6 +224,11 @@ ContentFiles.init(
       type: DataTypes.TEXT,
       allowNull: true,
       comment: 'URL de descarga directa del archivo desde Google Drive',
+    },
+    drivePreviewLink: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: 'URL de preview embebido del archivo desde Google Drive',
     },
     description: {
       type: DataTypes.TEXT,
@@ -159,6 +240,12 @@ ContentFiles.init(
       allowNull: false,
       defaultValue: false,
       comment: 'Indica si el archivo es público o privado',
+    },
+    allowDownload: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+      comment: 'Indica si se permite descargar el archivo desde la preview',
     },
     uploadedBy: {
       type: DataTypes.BIGINT,
@@ -185,6 +272,7 @@ ContentFiles.init(
     modelName: "ContentFiles",
     tableName: "ContentFiles",
     timestamps: true,
+    paranoid: true,
     indexes: [
       {
         fields: ['contentId'],
@@ -197,9 +285,6 @@ ContentFiles.init(
         fields: ['fileType'],
       },
       {
-        fields: ['isPublic'],
-      },
-      {
         fields: ['position'],
       },
       {
@@ -207,32 +292,6 @@ ContentFiles.init(
         name: 'content_files_order',
       },
     ],
-    hooks: {
-      beforeValidate: (contentFile: ContentFiles) => {
-        // Determinar el tipo de archivo basado en el mimeType si no se especifica
-        if (!contentFile.fileType && contentFile.mimeType) {
-          if (contentFile.mimeType.startsWith('video/')) {
-            contentFile.fileType = 'video';
-          } else if (contentFile.mimeType.startsWith('audio/')) {
-            contentFile.fileType = 'audio';
-          } else if (contentFile.mimeType.startsWith('image/')) {
-            contentFile.fileType = 'image';
-          } else if (contentFile.mimeType === 'application/pdf') {
-            contentFile.fileType = 'pdf';
-          } else if (['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'document';
-          } else if (['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'presentation';
-          } else if (['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'spreadsheet';
-          } else if (contentFile.mimeType.includes('zip') || contentFile.mimeType.includes('rar') || contentFile.mimeType.includes('tar')) {
-            contentFile.fileType = 'archive';
-          } else {
-            contentFile.fileType = 'other';
-          }
-        }
-      },
-    },
   }
 );
 
