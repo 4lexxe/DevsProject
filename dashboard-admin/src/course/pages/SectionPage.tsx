@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { Clock } from "lucide-react"
-import { getSectionByIdWithContents } from "../services/sectionServices"
+import { getSectionByIdWithContents, deleteSection } from "../services/sectionServices"
 import { deleteContentQuiz } from "../services/contentServices"
 import { Section as SectionType } from "../interfaces/ViewnerCourse"
 import {
@@ -75,6 +75,30 @@ export default function SectionDetailPage() {
     navigate(`/contents/${contentId}/files`)
   }
 
+  // Section management functions
+  const handleDeleteSection = async (sectionId: number) => {
+    const confirmMessage = `¿Estás seguro de que quieres eliminar esta sección completa?\n\n` +
+      `Esto eliminará:\n` +
+      `• La sección "${section?.title}"\n` +
+      `• Todos sus contenidos (${section?.contents.length || 0} contenidos)\n` +
+      `• Todos los archivos asociados\n` +
+      `• Todas las carpetas de Google Drive\n\n` +
+      `Esta acción NO SE PUEDE DESHACER.`
+
+    if (window.confirm(confirmMessage)) {
+      try {
+        setLoading(true)
+        await deleteSection(sectionId.toString())
+        // Redirigir al dashboard después de eliminar
+        navigate("/")
+      } catch (err) {
+        console.error('Error deleting section:', err)
+        setError('Error al eliminar la sección')
+        setLoading(false)
+      }
+    }
+  }
+
   // Loading and error states
   if (loading || error || !section) {
     return (
@@ -93,6 +117,7 @@ export default function SectionDetailPage() {
         <SectionHeader 
           section={section} 
           onBack={() => navigate("/")} 
+          onDeleteSection={handleDeleteSection}
         />
 
         {/* Contenidos de la sección */}

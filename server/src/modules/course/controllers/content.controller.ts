@@ -5,8 +5,10 @@ import Section from "../models/Section";
 import User from "../../user/User";
 import { BaseController } from "./BaseController";
 import ContentFiles from "../models/ContentFiles";
+import DriveService from "../../drive/services/driveService";
 
 export default class ContentController extends BaseController {
+  static driveService = new DriveService();
   // Obtener todos los contenidos
   static getAll: RequestHandler = async (req, res) => {
     try {
@@ -133,6 +135,14 @@ export default class ContentController extends BaseController {
         return;
       }
 
+      const section = await Section.findByPk(sectionId);
+      if (!section) {
+        ContentController.notFound(res, req, "Sección");
+        return;
+      }
+
+      const response = await this.driveService.createFolder(title, section.driveFolderId);
+
       const content = await Content.create({
         title,
         text,
@@ -142,6 +152,7 @@ export default class ContentController extends BaseController {
         duration,
         position,
         sectionId,
+        driveFolderId: response.folderId,
       });
 
       ContentController.created(res, req, content, "Contenido creado correctamente");
@@ -257,6 +268,10 @@ export default class ContentController extends BaseController {
       if (!content) {
         ContentController.notFound(res, req, "Contenido");
         return;
+      }
+
+      if(content.driveFolderId) {
+        await this.driveService.deleteFolder(content.driveFolderId);
       }
       
       await content.destroy();

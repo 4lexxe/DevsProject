@@ -35,7 +35,15 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
 
   /*** 🔹 MÉTODOS PARA SECCIÓN ***/
   const setSection = useCallback((section: ISection) => {
-    setState((prev) => ({ ...prev, section, isEditingSection: false }));
+    // Asegurar que cada contenido tenga un contentId temporal
+    const sectionWithContentIds = {
+      ...section,
+      contents: section.contents.map(content => ({
+        ...content,
+        contentId: content.contentId || crypto.randomUUID() // Solo asignar si no tiene uno
+      }))
+    };
+    setState((prev) => ({ ...prev, section: sectionWithContentIds, isEditingSection: false }));
   }, []);
 
   const editSection = useCallback((sectionData: ISectionInput) => {
@@ -87,7 +95,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
         section: {
           ...prev.section,
           contents: prev.section.contents
-            .filter((content) => content.id !== contentId)
+            .filter((content) => content.contentId !== contentId)
             .map((content, index) => ({ ...content, position: index })),
         },
       };
@@ -105,7 +113,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
           section: {
             ...section,
             contents: section.contents.map((content) =>
-              content.id === editingContent.id
+              content.contentId === editingContent.contentId
                 ? { ...content, ...contentData }
                 : content
             ),
@@ -119,7 +127,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
           ? Math.max(...section.contents.map((c) => c.position))
           : 0;
         const newContent: IContent = {
-          id: crypto.randomUUID(),
+          contentId: crypto.randomUUID(), // ID temporal para el frontend
           ...contentData,
           position: lastPosition + 1,
         };
@@ -145,7 +153,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
           ...prev.section,
           contents: prev.section.contents
             .map((content) =>
-              content.id === contentId
+              content.contentId === contentId
                 ? { ...content, position: newPosition }
                 : content
             )

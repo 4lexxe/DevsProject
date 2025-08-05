@@ -11,6 +11,7 @@ export default function FileUploadPage() {
   const [uploadingFiles, setUploadingFiles] = useState<string[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [errorFiles, setErrorFiles] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [allowDownload, setAllowDownload] = useState(false); // Por defecto no permitir descarga
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -21,21 +22,25 @@ export default function FileUploadPage() {
     const validFiles: File[] = [];
     const invalidFiles: string[] = [];
     
+    // Clear previous validation errors
+    setValidationErrors([]);
+    
     // Validate each file
     fileArray.forEach(file => {
       const validation = validateFileType(file);
       if (validation.isValid) {
         validFiles.push(file);
       } else {
-        invalidFiles.push(validation.message || `Error en archivo ${file.name}`);
+        const errorMessage = validation.message || `Error en archivo ${file.name}`;
+        invalidFiles.push(errorMessage);
         setErrorFiles(prev => [...prev, file.name]);
       }
     });
     
-    // Show validation errors if any
+    // Set validation errors to display them
     if (invalidFiles.length > 0) {
+      setValidationErrors(invalidFiles);
       console.error('Archivos inválidos:', invalidFiles);
-      // Here you could show a toast or alert with the errors
     }
     
     setSelectedFiles(prev => [...prev, ...validFiles]);
@@ -68,6 +73,7 @@ export default function FileUploadPage() {
     const fileNames = selectedFiles.map(f => f.name);
     setUploadingFiles(fileNames);
     setErrorFiles([]);
+    setValidationErrors([]); // Clear validation errors when starting upload
 
     try {
       // Upload all files at once using the service
@@ -169,6 +175,31 @@ export default function FileUploadPage() {
               className="hidden"
             />
           </div>
+
+          {/* Validation errors */}
+          {validationErrors.length > 0 && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-5 w-5 text-red-500" />
+                <h3 className="text-sm font-medium text-red-800">
+                  Errores de validación
+                </h3>
+              </div>
+              <div className="space-y-1">
+                {validationErrors.map((error, index) => (
+                  <p key={index} className="text-sm text-red-700">
+                    • {error}
+                  </p>
+                ))}
+              </div>
+              <button
+                onClick={() => setValidationErrors([])}
+                className="mt-2 text-xs text-red-600 hover:text-red-800 underline"
+              >
+                Cerrar
+              </button>
+            </div>
+          )}
 
           {/* Upload options */}
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">

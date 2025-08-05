@@ -124,6 +124,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover1.jpg",
           "moduleType": "Introductorio",
+          "driveFolderId": "1kVws1bHk3om3acnSzwH57mdBKJsxCOj-",
           "contents": [
             {
               "title": "Introducción al curso",
@@ -143,6 +144,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover2.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1Xe4RQssFAnZUt-CDQLKPb_KFohisEFeF",
           "contents": [
             {
               "title": "Módulos en Node.js",
@@ -172,6 +174,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover3.jpg",
           "moduleType": "Intermedio",
+          "driveFolderId": "1jGNOH5sJYxQTEvGJ9d4WSuSCKwt6qgjn",
           "contents": [
             {
               "title": "Uso de Express.js",
@@ -389,6 +392,7 @@
           "courseId": 2,
           "coverImage": "https://example.com/react-cover1.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1P-sRH1_HvbydZsFoY3iyhVraC73q52bt",
           "contents": [
             {
               "title": "¿Qué es React?",
@@ -457,6 +461,7 @@
           "courseId": 2,
           "coverImage": "https://example.com/react-cover2.jpg",
           "moduleType": "Intermedio",
+          "driveFolderId": "1EDRj4Cmfs3XcT6KpHqoUcWQISUulme6N",
           "contents": [
             {
               "title": "useState Hook",
@@ -534,6 +539,7 @@
           "courseId": 3,
           "coverImage": "https://example.com/python-cover1.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1EDRj4Cmfs3XcT6KpHqoUcWQISUulme6N",
           "contents": [
             {
               "title": "Instalación y primer programa",
@@ -607,6 +613,7 @@
           "courseId": 3,
           "coverImage": "https://example.com/python-cover2.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "11S-BKtyemk31gggOBn5nI0uvc_OW0lfE",
           "contents": [
             {
               "title": "Condicionales y bucles",

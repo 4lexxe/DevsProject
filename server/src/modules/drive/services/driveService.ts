@@ -116,9 +116,14 @@ export default class DriveService {
         console.log("🔍 Error 500 detectado, intentando recuperar archivo subido...");
         
         try {
-          // Buscar archivos recientes con el mismo nombre en la carpeta
+          // Buscar archivos recientes con el mismo nombre en la carpeta específica
+          const parentFolder = options?.parents?.[0] || driveConfig.folderId;
+          const searchQuery = parentFolder 
+            ? `name='${options.name}' and '${parentFolder}' in parents`
+            : `name='${options.name}'`;
+            
           const searchResult = await this.drive.files.list({
-            q: `name='${options.name}' and parents in '${driveConfig.folderId}'`,
+            q: searchQuery,
             orderBy: 'createdTime desc',
             pageSize: 1,
             fields: 'files(id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime)'
@@ -292,6 +297,100 @@ export default class DriveService {
       }
       
       return false;
+    }
+  }
+
+  /**
+   * Crea una carpeta en Google Drive y devuelve su ID
+   */
+  async createFolder(name: string, parentFolderId?: string): Promise<{ success: boolean; folderId?: string; error?: string }> {
+    try {
+      console.log(`📁 Creando carpeta: ${name}${parentFolderId ? ` en carpeta: ${parentFolderId}` : ''}`);
+      
+      // Preparar metadata de la carpeta
+      const folderMetadata: drive_v3.Schema$File = {
+        name: name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: parentFolderId ? [parentFolderId] : (driveConfig.folderId ? [driveConfig.folderId] : undefined)
+      };
+
+      // Crear la carpeta
+      const response = await this.drive.files.create({
+        requestBody: folderMetadata,
+        fields: 'id,name,parents'
+      });
+
+      const folder = response.data;
+      
+      if (!folder.id) {
+        throw new Error('No se pudo obtener el ID de la carpeta creada');
+      }
+
+      console.log(`✅ Carpeta creada exitosamente: ${folder.name} (ID: ${folder.id})`);
+      
+      return {
+        success: true,
+        folderId: folder.id
+      };
+
+    } catch (error: any) {
+      console.error(`❌ Error al crear carpeta ${name}:`, error.message);
+      
+      return {
+        success: false,
+        error: error.message || 'Error desconocido al crear carpeta'
+      };
+    }
+  }
+
+  /**
+   * Elimina una carpeta de Google Drive incluyendo todos sus archivos y subcarpetas
+   */
+  async deleteFolder(folderId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log(`🗑️ Eliminando carpeta de Drive: ${folderId}`);
+      
+      // Verificar que la carpeta existe y obtener su información
+      try {
+        const folderInfo = await this.drive.files.get({
+          fileId: folderId,
+          fields: 'id,name,mimeType'
+        });
+        
+        if (folderInfo.data.mimeType !== 'application/vnd.google-apps.folder') {
+          throw new Error('El ID proporcionado no corresponde a una carpeta');
+        }
+        
+        console.log(`📋 Eliminando carpeta: ${folderInfo.data.name} (ID: ${folderId})`);
+      } catch (getError: any) {
+        if (getError.code === 404) {
+          console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+          return { success: true };
+        }
+        throw getError;
+      }
+      
+      // Eliminar la carpeta (Google Drive elimina automáticamente todo el contenido)
+      await this.drive.files.delete({
+        fileId: folderId
+      });
+      
+      console.log(`✅ Carpeta eliminada exitosamente: ${folderId}`);
+      return { success: true };
+
+    } catch (error: any) {
+      console.error(`❌ Error al eliminar carpeta ${folderId}:`, error.message);
+      
+      // Si la carpeta no existe, considerarlo como "eliminado exitosamente"
+      if (error.code === 404) {
+        console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+        return { success: true };
+      }
+      
+      return {
+        success: false,
+        error: error.message || 'Error desconocido al eliminar carpeta'
+      };
     }
   }
 }
