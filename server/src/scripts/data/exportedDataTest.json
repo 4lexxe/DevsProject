@@ -134,7 +134,8 @@
               "quiz": [],
               "duration": 30,
               "position": 1,
-              "sectionId": 1
+              "sectionId": 1,
+              "driveFolderId": "1Hd0Z1wQDbpkol-r8VjktTpiuoC_9er4P"
             }
           ]
         },
@@ -154,7 +155,8 @@
               "quiz": [],
               "duration": 25,
               "position": 1,
-              "sectionId": 2
+              "sectionId": 2,
+              "driveFolderId": "1lMYavdBZx4t0xDIuI_EwKr2d9RlKofzr"
             },
             {
               "title": "Event Loop en Node.js",
@@ -164,7 +166,8 @@
               "quiz": [],
               "duration": 30,
               "position": 2,
-              "sectionId": 2
+              "sectionId": 2,
+              "driveFolderId": "1r8jIpYlogzI89suWJAelImrYuUeOZvhy"
             }
           ]
         },
@@ -184,7 +187,8 @@
               "quiz": [],
               "duration": 35,
               "position": 1,
-              "sectionId": 3
+              "sectionId": 3,
+              "driveFolderId": "1zz61tdi2FBjLMCqMbLYC0mecNgvICJVe"
             },
             {
               "title": "Middleware en Express.js",
@@ -194,12 +198,14 @@
               "quiz": [],
               "duration": 25,
               "position": 2,
-              "sectionId": 3
+              "sectionId": 3,
+              "driveFolderId": "1HEgpddPe99iBnj7T7kp8VbI_2kIHhHRX"
             },
             {
               "title": "Prueba de conceptos intermedios",
               "text": "Este cuestionario evalúa tus conocimientos sobre conceptos intermedios de Node.js.",
               "markdown": "## Prueba de conceptos intermedios\nResponde las siguientes preguntas para evaluar tus conocimientos.",
+              "driveFolderId": "1sRPZfs740xVBF2eiXgOPzQq0bRREU80_",
               "quiz": [
                 {
                   "id": 1,
