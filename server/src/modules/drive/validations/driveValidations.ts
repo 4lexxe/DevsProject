@@ -260,8 +260,6 @@ export const getFileTypesByCategory = (category: string): string[] => {
     case 'videos':
     case 'video':
       return allowedFileTypes.videos;
-    case 'audio':
-      return allowedFileTypes.audio;
     case 'documents':
     case 'document':
       return allowedFileTypes.documents;

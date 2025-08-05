@@ -4,8 +4,7 @@ import api from '../../shared/api/axios';
 const CONTENT = "/contents"
 
 export const getContentBySection = async (sectionId: string) => {
-  try {
-    console.log(`Obteniendo contenido para la sección ID: ${sectionId}`);
+  try {    
     const response = await api.get(`${CONTENT}/section/${sectionId}`);
     return response.data.data;
   } catch (error: any) {
@@ -20,7 +19,6 @@ export const getContentBySection = async (sectionId: string) => {
 // Obtiene un contenido específico por ID y su navegacion
 export const getContentById = async (contentId: string) => {
   try {
-    console.log(`Obteniendo contenido con ID: ${contentId}`);
     const response = await api.get(`${CONTENT}/navigate/${contentId}`);
     return response.data.data;
   } catch (error: any) {
@@ -34,7 +32,6 @@ export const getContentById = async (contentId: string) => {
 
 export const getQuizByContentId = async (contentId: string) => {
   try {
-    console.log(`Obteniendo contenido con ID: ${contentId}`);
     const response = await api.get(`${CONTENT}/${contentId}/quiz`);
     return response.data.data;
   } catch (error: any) {

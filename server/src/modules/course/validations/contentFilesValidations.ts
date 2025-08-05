@@ -1,4 +1,5 @@
 import { body, param } from 'express-validator';
+import { allowedFileTypes, fileLimits, getAllowedMimeTypes, isMimeTypeAllowed } from '../../drive/config/driveConfig';
 
 /**
  * Validaciones para el controlador de ContentFiles
@@ -15,67 +16,73 @@ export const validateContentId = [
 // Validación para parámetro fileId
 export const validateFileId = [
   param('fileId')
-    .isInt({ min: 1 })
-    .withMessage('El ID del archivo debe ser un número entero positivo')
-    .toInt()
+    .isUUID(4)
+    .withMessage('El ID del archivo debe ser un UUID v4 válido')
 ];
 
-// Validaciones para actualización de archivo
-export const validateUpdateFile = [
-  body('originalName')
-    .optional()
-    .isString()
-    .withMessage('El nombre original debe ser una cadena de texto')
-    .isLength({ min: 1, max: 255 })
-    .withMessage('El nombre original debe tener entre 1 y 255 caracteres')
-    .trim(),
-  
-  body('description')
-    .optional()
-    .isString()
-    .withMessage('La descripción debe ser una cadena de texto')
-    .isLength({ max: 1000 })
-    .withMessage('La descripción no puede exceder 1000 caracteres')
-    .trim(),
-  
-  body('isPublic')
-    .optional()
-    .isBoolean()
-    .withMessage('isPublic debe ser un valor booleano'),
-  
-  body('position')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('La posición debe ser un número entero positivo')
-    .toInt()
-];
+/**
+ * Validador personalizado para archivos subidos en contenido de curso
+ */
+export const validateUploadedFile = (file: Express.Multer.File) => {
+  const errors: string[] = [];
 
-// Validaciones para cambio de visibilidad
-export const validateToggleVisibility = [
-  body('isPublic')
-    .isBoolean()
-    .withMessage('isPublic debe ser un valor booleano')
-];
+  // Determinar si es un archivo de video para aplicar límite de tamaño diferente
+  const isVideo = allowedFileTypes.videos.includes(file.mimetype);
+  const maxSize = isVideo ? 400 * 1024 * 1024 * 1024 : 20 * 1024 * 1024; // 400GB para videos, 20MB para otros
 
-// Validaciones para subida de archivos
-export const validateFileUpload = [
-  body('descriptions')
-    .optional()
-    .custom((value) => {
-      if (value === undefined || value === null) return true;
-      
-      if (typeof value === 'string') return true;
-      
-      if (Array.isArray(value)) {
-        return value.every(desc => typeof desc === 'string' && desc.length <= 1000);
-      }
-      
-      return false;
-    })
-    .withMessage('Las descripciones deben ser strings de máximo 1000 caracteres'),
-  
-  body('isPublic')
-    .optional()
-    .isBoolean()
-    .withMessage('isPublic debe ser un valor booleano')
-];
+  // Validar tamaño según el tipo de archivo
+  if (file.size > maxSize) {
+    const sizeLimit = isVideo ? '400GB' : '20MB';
+    errors.push(`El archivo excede el tamaño máximo permitido de ${sizeLimit}`);
+  }
+
+  // Validar tipo MIME
+  if (!isMimeTypeAllowed(file.mimetype)) {
+    errors.push(`Tipo de archivo no permitido: ${file.mimetype}`);
+  }
+
+  // Validar extensión
+  const fileExtension = file.originalname.toLowerCase().split('.').pop();
+  if (fileExtension && !fileLimits.allowedExtensions.includes(`.${fileExtension}`)) {
+    errors.push(`Extensión de archivo no permitida: .${fileExtension}`);
+  }
+
+  // Validar nombre de archivo
+  if (!file.originalname || file.originalname.length > 255) {
+    errors.push('El nombre del archivo debe tener entre 1 y 255 caracteres');
+  }
+
+  if (!/^[^<>:"/\\|?*]+$/.test(file.originalname)) {
+    errors.push('El nombre del archivo contiene caracteres no válidos');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
+
+/**
+ * Validador para múltiples archivos en contenido de curso
+ */
+export const validateMultipleFiles = (files: Express.Multer.File[]) => {
+  const errors: string[] = [];
+
+  // Validar número de archivos
+  if (files.length > fileLimits.maxFilesPerUpload) {
+    errors.push(`No se pueden subir más de ${fileLimits.maxFilesPerUpload} archivos a la vez`);
+  }
+
+  // Validar cada archivo individualmente
+  files.forEach((file, index) => {
+    const fileValidation = validateUploadedFile(file);
+    if (!fileValidation.isValid) {
+      errors.push(`Archivo ${index + 1} (${file.originalname}): ${fileValidation.errors.join(', ')}`);
+    }
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};

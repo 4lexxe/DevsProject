@@ -21,16 +21,12 @@ export class ContentFileService {
    */
   async getContentFileById(contentFileId: string): Promise<ContentFileInfo | null> {
     try {
-      console.log(`🔍 Buscando archivo de contenido: ${contentFileId}`);
-      
       const contentFile = await ContentFiles.findByPk(contentFileId);
       
       if (!contentFile) {
         console.log(`❌ Archivo de contenido no encontrado: ${contentFileId}`);
         return null;
       }
-
-      console.log(`✅ Archivo encontrado: ${contentFile.fileName} (${contentFile.mimeType})`);
       
       return {
         id: contentFile.id,

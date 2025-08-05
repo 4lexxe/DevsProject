@@ -19,7 +19,6 @@ function ContentLoading({
       if (!contentId) return;
       try {
         const data = await getContentById(contentId);
-        console.log("Contenido obtenido:", data);
         if (isMounted) {
           setContent(data);
         }

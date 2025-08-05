@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
-import { fileLimits, isMimeTypeAllowed, createDriveClient, driveConfig } from '../config/driveConfig';
+import { fileLimits, isMimeTypeAllowed, createDriveClient, driveConfig, allowedFileTypes } from '../config/driveConfig';
 import { validateUploadedFile, validateMultipleFiles, sanitizeFileName } from '../validations/driveValidations';
 
 
@@ -176,7 +176,7 @@ const tempStorage = multer.diskStorage({
 });
 
 /**
- * Filtro de archivos para validar tipos permitidos
+ * Filtro de archivos para validar tipos permitidos y tamaños específicos
  */
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Validar tipo MIME
@@ -194,13 +194,68 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
 };
 
 /**
+ * Middleware personalizado para validar tamaño de archivo después de multer
+ */
+const validateFileSize = (req: Request, res: Response, next: NextFunction): void => {
+  if (req.file) {
+    // Validar archivo único
+    const isVideo = allowedFileTypes.videos.includes(req.file.mimetype);
+    const maxSize = isVideo ? fileLimits.maxVideoFileSize : fileLimits.maxFileSize;
+    
+    if (req.file.size > maxSize) {
+      const sizeLimit = isVideo ? '400GB' : '20MB';
+      // Eliminar archivo temporal si existe
+      if (req.file.path && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      res.status(400).json({
+        success: false,
+        message: `El archivo excede el tamaño máximo permitido de ${sizeLimit}`,
+        fileSize: req.file.size,
+        maxSize,
+        fileName: req.file.originalname
+      });
+      return;
+    }
+  }
+  
+  if (req.files && Array.isArray(req.files)) {
+    // Validar múltiples archivos
+    for (const file of req.files) {
+      const isVideo = allowedFileTypes.videos.includes(file.mimetype);
+      const maxSize = isVideo ? fileLimits.maxVideoFileSize : fileLimits.maxFileSize;
+      
+      if (file.size > maxSize) {
+        const sizeLimit = isVideo ? '400GB' : '20MB';
+        // Eliminar archivos temporales
+        req.files.forEach(f => {
+          if (f.path && fs.existsSync(f.path)) {
+            fs.unlinkSync(f.path);
+          }
+        });
+        res.status(400).json({
+          success: false,
+          message: `El archivo "${file.originalname}" excede el tamaño máximo permitido de ${sizeLimit}`,
+          fileSize: file.size,
+          maxSize,
+          fileName: file.originalname
+        });
+        return;
+      }
+    }
+  }
+  
+  next();
+};
+
+/**
  * Configuración base de Multer usando archivos temporales
  */
 const multerConfig = {
   storage: tempStorage,
   fileFilter,
   limits: {
-    fileSize: fileLimits.maxFileSize,
+    fileSize: 400 * 1024 * 1024 * 1024, // 400GB máximo (para permitir todos los tipos)
     files: fileLimits.maxFilesPerUpload,
   },
 };
@@ -214,6 +269,11 @@ export const uploadSingleFile = multer(multerConfig).single('file');
  * Middleware para subir múltiples archivos
  */
 export const uploadMultipleFiles = multer(multerConfig).array('files', fileLimits.maxFilesPerUpload);
+
+/**
+ * Middleware para validar tamaño de archivos (exportado)
+ */
+export { validateFileSize };
 
 /**
  * Middleware para procesar y subir archivo único directamente a Google Drive

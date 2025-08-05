@@ -32,29 +32,6 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
 
   // Función para renderizar la vista previa según el tipo
   const renderFilePreview = (file: IContentFile) => {
-    // Generar URL de preview público
-    const getPublicPreviewUrl = (fileId: string, fileType: string) => {
-      if (file.drivePreviewLink) {
-        return file.drivePreviewLink;
-      }
-      
-      // Extraer ID del archivo de diferentes tipos de URLs
-      let driveId = fileId;
-      if (file.driveWebViewLink) {
-        const match = file.driveWebViewLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
-        if (match) driveId = match[1];
-      }
-      
-      // Generar URL público de preview según el tipo
-      switch (fileType) {
-        case 'pdf':
-          return `https://drive.google.com/file/d/${driveId}/preview`;
-        case 'presentation':
-          return `https://docs.google.com/presentation/d/${driveId}/embed?start=false&loop=false&delayms=3000&usp=sharing`;
-        default:
-          return `https://drive.google.com/file/d/${driveId}/preview?usp=sharing`;
-      }
-    };
 
     switch (file.fileType) {
       case 'video':
@@ -75,7 +52,7 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
         return (
           <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
             <iframe
-              src={getPublicPreviewUrl(file.driveFileId, file.fileType)}
+              src={file.drivePreviewLink}
               className="w-full h-full border-0"
               title={file.originalName}
             />
@@ -86,7 +63,7 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
         return (
           <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
             <iframe
-              src={getPublicPreviewUrl(file.driveFileId, file.fileType)}
+              src={file.drivePreviewLink}
               className="w-full h-full border-0"
               title={file.originalName}
               allowFullScreen
@@ -169,7 +146,7 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
                       <div>
                         <h4 className="font-semibold text-slate-800">{file.originalName}</h4>
                         <p className="text-sm text-slate-600">
-                          {formatFileSize(file.fileSize)} • {file.fileType.toUpperCase()}
+                          {file.fileType.toUpperCase()}
                         </p>
                       </div>
                     </div>

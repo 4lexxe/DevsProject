@@ -24,7 +24,6 @@ export const NavLinks: FC<NavLinksProps> = ({ onNavigate, isMobile = false }) =>
           key={href}
           href={href} 
           className={`${baseClasses} ${hoverClasses}`}
-          onClick={onNavigate}
         >
           <Icon className={`h-5 w-5 ${isMobile ? 'text-blue-500' : ''}`} />
           <span>{label}</span>

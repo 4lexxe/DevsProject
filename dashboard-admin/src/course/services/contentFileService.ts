@@ -213,7 +213,10 @@ export const getFileTypeInfo = (fileType: ContentFile['fileType']) => {
 
 // Helper function to validate file types (can be customized)
 export const validateFileType = (file: File): { isValid: boolean; message?: string } => {
-  const maxSize = 100 * 1024 * 1024; // 100MB
+  // Definir límites de tamaño
+  const maxVideoSize = 400 * 1024 * 1024 * 1024; // 400GB para videos
+  const maxOtherSize = 20 * 1024 * 1024; // 20MB para otros archivos
+  
   const allowedTypes = [
     // Images
     'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
@@ -226,28 +229,32 @@ export const validateFileType = (file: File): { isValid: boolean; message?: stri
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     // Videos
-    'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm',
-    // Audio
-    'audio/mp3', 'audio/wav', 'audio/m4a', 'audio/ogg',
+    'video/mp4', 'video/webm',
     // Archives
     'application/zip', 'application/x-rar-compressed', 'application/x-tar',
     // Code
     'text/plain', 'application/json', 'text/javascript', 'text/css', 'text/html'
   ];
-  
-  if (file.size > maxSize) {
-    return {
-      isValid: false,
-      message: `El archivo ${file.name} excede el tamaño máximo de 100MB`
-    };
-  }
-  
+
+  // Verificar tipo de archivo permitido
   if (!allowedTypes.includes(file.type)) {
     return {
       isValid: false,
       message: `El tipo de archivo ${file.type} no está permitido`
     };
   }
-  
+
+  // Verificar tamaño según el tipo de archivo
+  const isVideo = file.type.startsWith('video/');
+  const maxSize = isVideo ? maxVideoSize : maxOtherSize;
+  const maxSizeLabel = isVideo ? '400GB' : '20MB';
+
+  if (file.size > maxSize) {
+    return {
+      isValid: false,
+      message: `El archivo ${file.name} excede el tamaño máximo de ${maxSizeLabel}`
+    };
+  }
+
   return { isValid: true };
 };

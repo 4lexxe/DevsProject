@@ -22,8 +22,6 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    console.log(`🎯 Analizando estrategia óptima para contentFileId: ${contentFileId}`);
-
     // Obtener ContentFile
     const contentFile = await contentFileService.getContentFileById(contentFileId);
     if (!contentFile) {
@@ -62,12 +60,10 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
 
     // Delegar al controlador apropiado
     if (strategy.useCache) {
-      console.log('🚀 Delegando a controlador de cache...');
       // Crear una nueva request con fileId para el cache controller
       req.params.fileId = fileId;
       await videoCacheController.getVideoFromCache(req, res);
     } else {
-      console.log('🌊 Delegando a controlador de streaming...');
       await secureVideoController.getVideoStream(req, res);
     }
 

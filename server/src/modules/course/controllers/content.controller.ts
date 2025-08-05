@@ -69,6 +69,24 @@ export default class ContentController extends BaseController {
         return;
       }
 
+      // Filtrar campos de archivos de video por seguridad
+      const contentData = content.toJSON() as any;
+      if (contentData.files && contentData.files.length > 0) {
+        contentData.files = contentData.files.map((file: any) => {
+          if (file.fileType === 'video') {
+            // Para videos, solo retornar id, originalName, fileType y position por seguridad
+            return {
+              id: file.id,
+              originalName: file.originalName,
+              fileType: file.fileType,
+              position: file.position
+            };
+          }
+          // Para otros tipos de archivo, retornar todos los campos
+          return file;
+        });
+      }
+
       const sectionContents = await Content.findAll({
         where: { sectionId: content.sectionId },
         order: [["position", "ASC"]],
@@ -79,7 +97,7 @@ export default class ContentController extends BaseController {
       const nextContentId = currentIndex < sectionContents.length - 1 ? sectionContents[currentIndex + 1].id : null;
 
       const navigationData = {
-        content,
+        content: contentData,
         previousContentId,
         nextContentId,
       };

@@ -3,17 +3,39 @@ import { ContentFilesController } from '../controllers/contentFiles.controller';
 import { 
   validateContentId, 
   validateFileId, 
-  validateUpdateFile, 
-  validateToggleVisibility,
-  validateFileUpload 
+  validateMultipleFiles
 } from '../validations/contentFilesValidations';
 
 import { 
-  uploadMultipleFiles
+  uploadMultipleFiles,
+  validateFileSize
 } from '../../drive/middlewares/driveMiddleware';
 
 import { authMiddleware } from "../../../shared/middleware/authMiddleware";
 import { auth } from 'googleapis/build/src/apis/abusiveexperiencereport';
+
+// Middleware para validar archivos subidos
+const validateUploadedFilesMiddleware = (req: any, res: any, next: any) => {
+  if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'No se han proporcionado archivos para subir'
+    });
+  }
+
+  // Validar múltiples archivos
+  const validation = validateMultipleFiles(req.files);
+  
+  if (!validation.isValid) {
+    return res.status(400).json({
+      success: false,
+      message: 'Error en la validación de archivos',
+      errors: validation.errors
+    });
+  }
+
+  next();
+};
 
 const router = Router();
 
@@ -65,7 +87,8 @@ router.post(
   authMiddleware,
   validateContentId,
   uploadMultipleFiles,
-  validateFileUpload,
+  validateFileSize,
+  validateUploadedFilesMiddleware,
   ContentFilesController.uploadFiles
 );
 

@@ -25,6 +25,30 @@ export class VideoCacheService {
     this.drive = createDriveClient();
     this.cacheDir = path.join(process.cwd(), 'cache', 'videos');
     this.ensureCacheDir();
+    this.setupCleanupHandlers();
+  }
+
+  /**
+   * Configura los handlers para limpiar cache al cerrar el servidor
+   */
+  private setupCleanupHandlers(): void {
+    const cleanup = async () => {
+      console.log('🧹 Limpiando cache antes de cerrar el servidor...');
+      await this.clearAllCache();
+      process.exit(0);
+    };
+
+    // Limpiar cache al reiniciar/cerrar el servidor
+    process.on('SIGINT', cleanup);  // Ctrl+C
+    process.on('SIGTERM', cleanup); // Terminación del proceso
+    process.on('SIGUSR2', cleanup); // Reinicio con nodemon
+    
+    // Limpiar cache al iniciar el servidor
+    this.clearAllCache().then(() => {
+      console.log('🔄 Cache limpiado al iniciar el servidor');
+    }).catch((error) => {
+      console.error('❌ Error al limpiar cache inicial:', error);
+    });
   }
 
   /**
@@ -33,7 +57,6 @@ export class VideoCacheService {
   private ensureCacheDir(): void {
     if (!fs.existsSync(this.cacheDir)) {
       fs.mkdirSync(this.cacheDir, { recursive: true });
-      console.log(`📁 Directorio de cache creado: ${this.cacheDir}`);
     }
   }
 
@@ -55,7 +78,9 @@ export class VideoCacheService {
       'video/ogg': '.ogg',
       'video/avi': '.avi',
       'video/mov': '.mov',
-      'video/wmv': '.wmv'
+      'video/wmv': '.wmv',
+      'video/mkv': '.mkv',
+      'video/x-matroska': '.mkv'
     };
     return mimeToExt[mimeType] || '.mp4';
   }
@@ -116,7 +141,6 @@ export class VideoCacheService {
 
       // Marcar como descargando
       this.downloadingFiles.add(fileId);
-      console.log(`⬬ Iniciando descarga de video: ${fileId} (${(totalSize / 1024 / 1024).toFixed(2)} MB)`);
 
       // Crear stream de descarga desde Google Drive
       const response = await this.drive.files.get({
@@ -137,7 +161,6 @@ export class VideoCacheService {
         driveStream.on('data', (chunk) => {
           downloadedBytes += chunk.length;
           const progress = ((downloadedBytes / totalSize) * 100).toFixed(1);
-          console.log(`📥 Descarga ${fileId}: ${progress}% (${(downloadedBytes / 1024 / 1024).toFixed(2)} MB)`);
         });
 
         driveStream.on('error', (error) => {

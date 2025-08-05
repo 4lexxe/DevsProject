@@ -9,6 +9,7 @@ import { loginSchema } from "../../validations/loginValidator";
 import AuthService from "../../services/auth.service";
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import PasswordInput from "@/shared/components/inputs/PasswordInput";
+import { Link } from "react-router-dom";
 
 type Inputs = {
   email: string;

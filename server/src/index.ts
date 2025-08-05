@@ -48,8 +48,10 @@ import invoiceRoutes from './modules/subscription/routes/invoice.route';
 import purchaseRoutes from './modules/purchase/routes';
 
 // Rutas para proxy de videos
-import videoProxyRoutes from './modules/drive/routes/videoProxyRoutes';
 import hybridVideoRoutes from './modules/drive/routes/hybridVideoRoutes';
+
+// Inicializar servicios de video (incluyendo limpieza automática de cache)
+import './modules/drive/services/videoCacheService';
 
 import webhookRoute from './modules/webhook/webhook.route';
 // ==================================================
@@ -277,9 +279,6 @@ app.use('/api', courseRoutes);
 
 // Rutas de Roadmap
 app.use('/api', roadMapRoutes);
-
-// Rutas de proxy de videos (seguras)
-app.use('/api/video', videoProxyRoutes);
 
 // Rutas del sistema híbrido de video (cache + streaming)
 app.use('/api/video', hybridVideoRoutes);

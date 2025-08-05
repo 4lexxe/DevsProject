@@ -83,21 +83,7 @@ export const allowedFileTypes = {
   ],
   videos: [
     'video/mp4',
-    'video/avi',
-    'video/mov',
-    'video/wmv',
-    'video/flv',
-    'video/webm',
-    'video/mkv'
-  ],
-  audio: [
-    'audio/mp3',
-    'audio/mpeg',
-    'audio/wav',
-    'audio/ogg',
-    'audio/aac',
-    'audio/flac',
-    'audio/m4a'
+    'video/webm'
   ],
   documents: [
     'application/pdf',
@@ -106,24 +92,19 @@ export const allowedFileTypes = {
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/plain',
-    'text/csv'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   ],
   archives: [
     'application/zip',
     'application/x-rar-compressed',
-    'application/x-tar',
-    'application/gzip',
-    'application/x-7z-compressed'
+    'application/x-tar'
   ],
   code: [
-    'text/javascript',
-    'text/html',
-    'text/css',
+    'text/plain',
     'application/json',
-    'application/xml',
-    'text/xml'
+    'text/javascript',
+    'text/css',
+    'text/html'
   ]
 };
 
@@ -131,7 +112,8 @@ export const allowedFileTypes = {
  * Configuración de límites de archivo
  */
 export const fileLimits = {
-  maxFileSize: 100 * 1024 * 1024, // 100MB en bytes
+  maxFileSize: 20 * 1024 * 1024, // 20MB en bytes para archivos normales
+  maxVideoFileSize: 400 * 1024 * 1024 * 1024, // 400GB en bytes para videos
   maxFilesPerUpload: 10,
   allowedExtensions: [
     '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
@@ -150,7 +132,6 @@ export function getAllowedMimeTypes(): string[] {
   return [
     ...allowedFileTypes.images,
     ...allowedFileTypes.videos,
-    ...allowedFileTypes.audio,
     ...allowedFileTypes.documents,
     ...allowedFileTypes.archives,
     ...allowedFileTypes.code,
@@ -170,7 +151,6 @@ export function isMimeTypeAllowed(mimeType: string): boolean {
 export function getFileTypeFromMime(mimeType: string): string {
   if (allowedFileTypes.images.includes(mimeType)) return 'image';
   if (allowedFileTypes.videos.includes(mimeType)) return 'video';
-  if (allowedFileTypes.audio.includes(mimeType)) return 'audio';
   if (allowedFileTypes.archives.includes(mimeType)) return 'archive';
   if (allowedFileTypes.code.includes(mimeType)) return 'code';
   if (allowedFileTypes.documents.includes(mimeType)) return 'document';

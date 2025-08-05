@@ -26,13 +26,23 @@ export class HybridVideoService {
   private config: HybridVideoConfig;
   
   constructor(config?: Partial<HybridVideoConfig>) {
+    // Leer configuraciones desde variables de entorno
+    const maxCacheSizeMB = parseInt(process.env.VIDEO_CACHE_MAX_SIZE_MB || '2048');
+    const maxVideoSizeMB = parseInt(process.env.VIDEO_CACHE_MAX_FILE_SIZE_MB || '500');
+    
     this.config = {
-      maxCacheSize: 8 * 1024 * 1024 * 1024, // 8GB por defecto
-      maxVideoSizeForCache: 500 * 1024 * 1024, // 500MB por defecto
-      preloadPopularVideos: true,
-      cleanupThreshold: 0.9, // 90%
+      maxCacheSize: maxCacheSizeMB * 1024 * 1024, // Convertir MB a bytes
+      maxVideoSizeForCache: maxVideoSizeMB * 1024 * 1024, // Convertir MB a bytes
+      preloadPopularVideos: process.env.VIDEO_CACHE_PRELOAD_POPULAR === 'true',
+      cleanupThreshold: parseFloat(process.env.VIDEO_CACHE_CLEANUP_THRESHOLD || '0.9'), // 90%
       ...config
     };
+
+    console.log(`⚙️ Configuración de Video Cache:`);
+    console.log(`   - Cache máximo: ${maxCacheSizeMB} MB (${(this.config.maxCacheSize / 1024 / 1024).toFixed(1)} MB)`);
+    console.log(`   - Archivo máximo: ${maxVideoSizeMB} MB (${(this.config.maxVideoSizeForCache / 1024 / 1024).toFixed(1)} MB)`);
+    console.log(`   - Pre-carga activa: ${this.config.preloadPopularVideos}`);
+    console.log(`   - Umbral de limpieza: ${(this.config.cleanupThreshold * 100).toFixed(1)}%`);
   }
 
   /**
@@ -252,8 +262,6 @@ export class HybridVideoService {
     if (!this.config.preloadPopularVideos) {
       return;
     }
-
-    console.log('🔄 Iniciando pre-carga inteligente de videos populares...');
 
     // Ordenar por prioridad
     const prioritizedVideos = videoList

@@ -27,8 +27,6 @@ class VideoService {
    */
   async getVideoMetadata(contentFileId: string): Promise<VideoMetadata | null> {
     try {
-      console.log(`📋 Obteniendo metadatos de video: ${contentFileId}`);
-      
       const response = await api.get(`/video/metadata/${contentFileId}`);
       
       if (response.data.success) {
@@ -48,9 +46,7 @@ class VideoService {
    */
   async testConnection(): Promise<boolean> {
     try {
-      console.log('🔍 Probando conexión con el servidor de proxy...');
       const response = await api.get('/video/test');
-      console.log('✅ Conexión exitosa:', response.data);
       return response.data.success;
     } catch (error: any) {
       console.error('❌ Error de conexión con el proxy:', error);
@@ -67,12 +63,7 @@ class VideoService {
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const queryParams = userCount ? `?userCount=${userCount}` : '';
     const fullUrl = `${baseUrl}/video/hybrid/${contentFileId}${queryParams}`;
-    console.log('🎯 Generando URL híbrida:', {
-      baseUrl,
-      contentFileId,
-      userCount,
-      fullUrl
-    });
+    
     return fullUrl;
   }
 
@@ -84,11 +75,7 @@ class VideoService {
     // Usar la URL base de la configuración de axios sin duplicar /api
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const fullUrl = `${baseUrl}/video/stream/${contentFileId}`;
-    console.log('🔗 Generando URL de stream:', {
-      baseUrl,
-      contentFileId,
-      fullUrl
-    });
+    
     return fullUrl;
   }
 
@@ -99,11 +86,7 @@ class VideoService {
   getCacheStreamUrl(contentFileId: string): string {
     const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const fullUrl = `${baseUrl}/video/cache/${contentFileId}`;
-    console.log('💾 Generando URL de cache:', {
-      baseUrl,
-      contentFileId,
-      fullUrl
-    });
+    
     return fullUrl;
   }
 
@@ -214,19 +197,6 @@ class VideoService {
     const seconds = totalSeconds % 60;
     
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  }
-
-  /**
-   * Formatea el tamaño del archivo
-   */
-  formatFileSize(bytes?: string): string {
-    if (!bytes) return 'Tamaño desconocido';
-    
-    const size = parseInt(bytes);
-    if (size < 1024) return `${size} B`;
-    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-    if (size < 1024 * 1024 * 1024) return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-    return `${(size / (1024 * 1024 * 1024)).toFixed(1)} GB`;
   }
 }
 

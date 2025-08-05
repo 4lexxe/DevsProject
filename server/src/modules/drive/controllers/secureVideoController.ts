@@ -19,13 +19,6 @@ export class SecureVideoController {
         return;
       }
 
-      console.log(`🎥 Solicitando stream de video por ContentFile: ${contentFileId}`);
-      console.log(`📊 Headers recibidos:`, {
-        range: range,
-        userAgent: req.headers['user-agent'],
-        origin: req.headers.origin
-      });
-
       // Obtener stream del video
       const streamResult = await contentFileService.getVideoStreamByContentFileId(
         contentFileId, 
@@ -38,8 +31,13 @@ export class SecureVideoController {
       }
 
       // Configurar headers para streaming de video con CORS
+      const contentType = streamResult.contentType || 'video/mp4';
+      
+      // Para archivos MKV, asegurar el tipo MIME correcto
+      const finalContentType = contentType === 'video/mkv' ? 'video/x-matroska' : contentType;
+      
       res.set({
-        'Content-Type': streamResult.contentType || 'video/mp4',
+        'Content-Type': finalContentType,
         'Accept-Ranges': 'bytes',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
@@ -53,7 +51,8 @@ export class SecureVideoController {
         'Cross-Origin-Resource-Policy': 'cross-origin',
         'Cross-Origin-Embedder-Policy': 'unsafe-none',
         // Headers informativos
-        'X-Content-File-ID': contentFileId
+        'X-Content-File-ID': contentFileId,
+        'X-Original-Content-Type': contentType
       });
 
       if (streamResult.contentRange) {

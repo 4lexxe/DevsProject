@@ -36,7 +36,6 @@ function SecureVideoPlayer({
         onLoadStart?.();
 
         // Primero probar la conexión con el servidor
-        console.log('🔍 Verificando conexión con el servidor...');
         const connectionOk = await videoService.testConnection();
         if (!connectionOk) {
           setError('No se puede conectar con el servidor de videos');
@@ -46,7 +45,6 @@ function SecureVideoPlayer({
 
 
         // Obtener metadatos del video
-        console.log('📋 Obteniendo metadatos del video...');
         const videoMetadata = await videoService.getVideoMetadata(contentFileId);
         if (!videoMetadata) {
           setError('No se pudieron cargar los metadatos del video');
@@ -59,7 +57,6 @@ function SecureVideoPlayer({
         // Generar URL híbrida para React Player (decide automáticamente)
         const hybridUrl = videoService.getHybridStreamUrl(contentFileId);
         setStreamUrl(hybridUrl);
-        console.log('� URL híbrida generada:', hybridUrl);
 
         // Debug: Analizar estrategia que se usará
         const analysis = await videoService.analyzeStrategy(contentFileId);
@@ -87,33 +84,50 @@ function SecureVideoPlayer({
     }
   }, [contentFileId, onLoadStart, onLoadEnd, onError]);
 
-  // Handlers para React Player
-  const handleReady = () => {
-    console.log('🎥 Video listo para reproducir');
-  };
-
-  const handleStart = () => {
-    console.log('▶️ Video iniciado');
-  };
-
-  const handlePlay = () => {
-    console.log('▶️ Video reproduciendo');
-  };
-
-  const handlePause = () => {
-    console.log('⏸️ Video pausado');
-  };
-
-  const handleProgress = (state: { played: number; playedSeconds: number; loaded: number; loadedSeconds: number }) => {
-    console.log(`⏱️ Progreso: ${(state.played * 100).toFixed(1)}%`);
-  };
-
-  const handleEnded = () => {
-    console.log('🏁 Video terminado');
-  };
-
   const handlePlayerError = (error: any) => {
     console.error('❌ Error en React Player:', error);
+    
+    // Obtener más detalles del error del elemento video
+    if (error?.target) {
+      const videoElement = error.target;
+      console.error('📊 Estado del video:', {
+        networkState: videoElement.networkState,
+        readyState: videoElement.readyState,
+        error: videoElement.error,
+        src: videoElement.src,
+        currentSrc: videoElement.currentSrc
+      });
+      
+      // Analizar el tipo de error específico
+      if (videoElement.error) {
+        const errorCode = videoElement.error.code;
+        const errorMessage = videoElement.error.message;
+        console.error(`📍 Error específico: Código ${errorCode} - ${errorMessage}`);
+        
+        let userFriendlyError = 'Error al reproducir el video';
+        switch (errorCode) {
+          case 1: // MEDIA_ERR_ABORTED
+            userFriendlyError = 'Reproducción abortada por el usuario';
+            break;
+          case 2: // MEDIA_ERR_NETWORK
+            userFriendlyError = 'Error de red al cargar el video';
+            break;
+          case 3: // MEDIA_ERR_DECODE
+            userFriendlyError = 'Error al decodificar el video (formato no compatible)';
+            break;
+          case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
+            userFriendlyError = 'Formato de video no soportado';
+            break;
+          default:
+            userFriendlyError = `Error desconocido (${errorCode}): ${errorMessage}`;
+        }
+        
+        setError(userFriendlyError);
+        onError?.(userFriendlyError);
+        return;
+      }
+    }
+    
     setError('Error al reproducir el video');
     onError?.('Error al reproducir el video');
   };
@@ -154,27 +168,6 @@ function SecureVideoPlayer({
 
   return (
     <div className={`relative bg-black rounded-lg overflow-hidden ${className}`}>
-      {/* Información del video */}
-      <div className="absolute top-4 left-4 right-4 z-10">
-        <div className="bg-black bg-opacity-50 text-white px-3 py-2 rounded-lg">
-          <h3 className="text-sm font-medium truncate">{title}</h3>
-          <p className="text-xs text-gray-300">{metadata.name}</p>
-          <div className="flex items-center justify-between mt-1">
-            <p className="text-xs text-gray-400">{videoService.formatFileSize(metadata.size)}</p>
-            {strategy && (
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs px-2 py-1 rounded ${
-                  strategy.type === 'cache' 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-blue-600 text-white'
-                }`}>
-                  {strategy.type === 'cache' ? '💾 Cache' : '🌊 Stream'}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* React Player */}
       <ReactPlayer
@@ -184,12 +177,6 @@ function SecureVideoPlayer({
         width="100%"
         height="100%"
         style={{ aspectRatio: '16/9' }}
-        onReady={handleReady}
-        onStart={handleStart}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onEnded={handleEnded}
-        onProgress={handleProgress}
         onError={handlePlayerError}
         config={{
           file: {
@@ -197,6 +184,10 @@ function SecureVideoPlayer({
               crossOrigin: 'use-credentials',
               preload: 'metadata',
             },
+            forceVideo: true,
+            forceAudio: false,
+            forceHLS: false,
+            forceDASH: false
           },
         }}
       />
