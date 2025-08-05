@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { BaseController } from "./BaseController";
 import CourseAccess from "../models/CourseAccess";
 import Course from "../../course/models/Course";
+import Progress from "../../course/models/Progress";
+import Content from "../../course/models/Content";
+import Section from "../../course/models/Section";
 import { Op } from "sequelize";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
@@ -43,18 +46,20 @@ export class CourseAccessController extends BaseController {
     });
 
     // Transformar datos para el frontend
-    const coursesData = userCourses.map((access: any) => ({
-      id: access.course.id,
-      title: access.course.title,
-      description: access.course.summary,
-      imageUrl: access.course.image,
-      price: access.course.price,
-      progress: 0, // TODO: Implementar progreso real desde el sistema de lecciones
-      accessToken: access.accessToken,
-      grantedAt: access.grantedAt,
-      isActive: access.revokedAt === null,
-      courseId: access.courseId
-    }));
+    const coursesData = await Promise.all(
+      userCourses.map(async (access: any) => ({
+        id: access.course.id,
+        title: access.course.title,
+        description: access.course.summary,
+        imageUrl: access.course.image,
+        price: access.course.price,
+        progress: await this.calculateCourseProgress(parseInt(userId), access.course.id),
+        accessToken: access.accessToken,
+        grantedAt: access.grantedAt,
+        isActive: access.revokedAt === null,
+        courseId: access.courseId
+      }))
+    );
 
     this.sendSuccess(res, req, coursesData, "Cursos del usuario obtenidos exitosamente");
   });
@@ -100,7 +105,7 @@ export class CourseAccessController extends BaseController {
       price: (courseAccess as any).course.price,
       learningOutcomes: (courseAccess as any).course.learningOutcomes,
       prerequisites: (courseAccess as any).course.prerequisites,
-      progress: 0, // TODO: Implementar progreso real
+      progress: await this.calculateCourseProgress(parseInt(userId), (courseAccess as any).course.id),
       accessToken: courseAccess.accessToken,
       grantedAt: courseAccess.grantedAt,
       isActive: courseAccess.revokedAt === null
@@ -288,4 +293,39 @@ export class CourseAccessController extends BaseController {
 
     this.sendPaginated(res, req, accessHistory, count, currentPage, pageLimit, "Historial de accesos obtenido exitosamente");
   });
+
+  /**
+   * Calcula el porcentaje de progreso de un usuario en un curso
+   */
+  private static async calculateCourseProgress(userId: number, courseId: number): Promise<number> {
+    try {
+      // Obtener total de contenidos del curso
+      const totalContent = await Content.count({
+        include: [{
+          model: Section,
+          as: 'section',
+          where: { courseId }
+        }]
+      });
+
+      if (totalContent === 0) {
+        return 0;
+      }
+
+      // Obtener contenidos completados por el usuario
+      const completedContent = await Progress.count({
+        where: {
+          userId,
+          courseId,
+          isCompleted: true
+        }
+      });
+
+      // Calcular porcentaje
+      return Math.round((completedContent / totalContent) * 100);
+    } catch (error) {
+      console.error('Error calculating course progress:', error);
+      return 0;
+    }
+  }
 }

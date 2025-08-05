@@ -126,64 +126,82 @@ export default function LearningPath() {
           <p className="mt-4 text-gray-600">Goal: {currentLevel.goal}</p>
         </div>
 
-        <div className="space-y-4">
-          {currentLevel.topics.map((topic) => {
-            const isExpanded = expandedTopics.includes(topic.id)
-            const isCompleted = completedTopics.includes(topic.id)
+        <div className="space-y-6">
+          {courseProgress.sections.map((section) => {
+            const isExpanded = expandedTopics.includes(section.id.toString())
+            const sectionCompleted = section.progress === 100
 
             return (
               <div
-                key={topic.id}
+                key={section.id}
                 className={`border rounded-lg transition-colors ${
-                  isCompleted ? "bg-green-50/50 border-green-100" : "bg-white"
+                  sectionCompleted ? "bg-green-50/50 border-green-100" : "bg-white"
                 }`}
               >
-                <div className="flex items-center p-4 cursor-pointer" onClick={() => toggleTopic(topic.id)}>
-                  <Button
-                    variant="primary"
-                    size="icon"
-                    className="h-6 w-6 mr-2"
-
-                  >
-                    {isCompleted ? (
-                      <CheckSquare className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <Square className="h-5 w-5 text-gray-400" />
-                    )}
-                  </Button>
+                <div className="flex items-center p-4 cursor-pointer" onClick={() => toggleTopic(section.id.toString())}>
                   <div className="flex-1">
-                    <h3 className="font-medium">{topic.title}</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium text-lg">{section.title}</h3>
+                      <span className="text-sm text-gray-500">
+                        {section.completedContent}/{section.totalContent} completados
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{section.description}</p>
+                    <div className="flex items-center gap-4">
+                      <Badge variant="secondary" className="text-xs">
+                        {section.moduleType}
+                      </Badge>
+                      <Progress progress={section.progress} className="h-2 flex-1" />
+                      <span className="text-sm font-medium text-gray-700">{section.progress}%</span>
+                    </div>
                   </div>
-                  <Button variant="primary" size="icon" className="ml-2" onClick={() => toggleTopic(topic.id)}>
+                  <Button variant="primary" size="icon" className="ml-4">
                     {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                   </Button>
                 </div>
                 {isExpanded && (
                   <div className="px-4 pb-4 pt-0">
-                    <div className="pl-8 space-y-3">
-                      {topic.resources.map((resource, index) => {
-                        const Icon = ResourceIcon[resource.type]
+                    <div className="pl-4 space-y-3">
+                      {section.contents.map((content) => {
                         return (
-                          <a
-                            key={index}
-                            href={resource.url}
-                            className="flex items-center space-x-3 text-sm hover:text-blue-600 transition-colors"
+                          <div
+                            key={content.id}
+                            className={`flex items-center p-3 rounded-lg border transition-colors ${
+                              content.isCompleted ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                            }`}
                           >
-                            <Badge
-                              variant={
-                                resource.type === "Test"
-                                  ? "destructive"
-                                  : resource.type === "Video"
-                                    ? "secondary"
-                                    : "default"
-                              }
-                              className="w-16 justify-center"
+                            <Button
+                              variant="primary"
+                              size="icon"
+                              className="h-6 w-6 mr-3"
+                              onClick={() => toggleCompletion(content.id, content.isCompleted)}
                             >
-                              <Icon className="h-3 w-3 mr-1" />
-                              {resource.type}
-                            </Badge>
-                            <span>{resource.title}</span>
-                          </a>
+                              {content.isCompleted ? (
+                                <CheckSquare className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <Square className="h-4 w-4 text-gray-400" />
+                              )}
+                            </Button>
+                            <div 
+                              className="flex-1 cursor-pointer" 
+                              onClick={() => handleContentClick(content.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium text-sm">{content.title}</h4>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>{content.duration} min</span>
+                                  {content.timeSpent > 0 && (
+                                    <span>• {content.timeSpent} min gastados</span>
+                                  )}
+                                </div>
+                              </div>
+                              {content.completedAt && (
+                                <p className="text-xs text-green-600 mt-1">
+                                  Completado el {new Date(content.completedAt).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         )
                       })}
                     </div>

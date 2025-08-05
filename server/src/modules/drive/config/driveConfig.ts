@@ -97,6 +97,14 @@ export const allowedFileTypes = {
     'video/webm',
     'video/mkv'
   ],
+  audio: [
+    'audio/mp3',
+    'audio/wav',
+    'audio/ogg',
+    'audio/aac',
+    'audio/flac',
+    'audio/m4a'
+  ],
   documents: [
     'application/pdf',
     'application/msword',
@@ -108,6 +116,20 @@ export const allowedFileTypes = {
     'text/plain',
     'text/csv'
   ],
+  archives: [
+    'application/zip',
+    'application/x-rar-compressed',
+    'application/x-tar',
+    'application/gzip'
+  ],
+  code: [
+    'text/javascript',
+    'text/html',
+    'text/css',
+    'application/json',
+    'application/xml',
+    'text/xml'
+  ]
 };
 
 /**

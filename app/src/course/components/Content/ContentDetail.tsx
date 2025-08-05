@@ -4,7 +4,13 @@ import { Clock, ArrowLeft, BookOpen } from "lucide-react";
 import MarkdownPreview from "./MarkdownPreview";
 import { Link } from "react-router-dom";
 
-function ContentDetail({ content, courseId }: { content: IContentApi, courseId: string }) {
+function ContentDetail({ 
+  content, 
+  courseId 
+}: { 
+  content: IContentApi, 
+  courseId: string 
+}) {
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6 text-white">
@@ -65,6 +71,8 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
             </Link>
           </div>
         )}
+
+
       </div>
 
       <div className="bg-gradient-to-r from-slate-50 to-slate-100 px-6 py-4 flex justify-between items-center">

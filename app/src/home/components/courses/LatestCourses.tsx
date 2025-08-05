@@ -13,9 +13,9 @@ interface Course {
   image: string;
   createdAt: string;
   category: string;
-  careerType: {
+  careerType?: {
     name: string;
-  };
+  } | null;
   pricing?: {
     originalPrice: number;
     finalPrice: number;
@@ -150,7 +150,7 @@ export default function LatestCourses() {
                       summary={course.summary}
                       courseName={course.category}
                       image={course.image}
-                      careerType={course.careerType.name}
+                      careerType={course.careerType?.name || 'Sin categoría'}
                       pricing={course.pricing}
                     />          
                   </div>

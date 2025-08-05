@@ -88,7 +88,7 @@ const CourseDetails: React.FC = () => {
           <div className="lg:col-span-2 lg:order-1">
             <CourseOverview
               about={course.about}
-              careerType={course.careerType.name}
+              careerType={course.careerType?.name || 'Sin categoría'}
               numberOfModules={moduleCount}
               createdAt={course.createdAt}
             />

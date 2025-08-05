@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import ContentDetail from "./ContentDetail";
 import { getContentById } from "@/course/services/contentServices";
+import { accessContent, markContentCompleted } from "@/course/services/progressService";
+import { toast } from 'react-hot-toast';
 
 function ContentLoading({
   contentId,
@@ -24,6 +26,8 @@ function ContentLoading({
           setTimeout(() => {
             if (isMounted) {
               setContent(data);
+              // Registrar acceso al contenido
+              registerContentAccess();
             }
           }, 500);
         }
@@ -34,13 +38,28 @@ function ContentLoading({
       }
     };
 
+    const registerContentAccess = async () => {
+      try {
+        // Registrar acceso al contenido
+        await accessContent(parseInt(courseId), parseInt(contentId));
+        console.log('Acceso al contenido registrado');
+        
+        // Marcar automáticamente como completado
+        await markContentCompleted(parseInt(courseId), parseInt(contentId));
+        console.log('Contenido marcado como completado automáticamente');
+        toast.success('¡Contenido completado!');
+      } catch (error) {
+        console.error('Error al procesar contenido:', error);
+      }
+    };
+
     setContent(null);
     fetchContent();
 
     return () => {
       isMounted = false;
     };
-  }, [contentId]);
+  }, [contentId, courseId]);
 
   if (!content) {
     return (
@@ -106,6 +125,8 @@ function ContentLoading({
     );
   }
 
+
+
   return (
     <div className={`flex-1 transition-all duration-500 ease-in-out`}>
       <div className="mb-8">
@@ -117,7 +138,10 @@ function ContentLoading({
         />
       </div>
 
-      <ContentDetail courseId={courseId} content={content.content} />
+      <ContentDetail 
+        courseId={courseId} 
+        content={content.content} 
+      />
     </div>
   );
 }

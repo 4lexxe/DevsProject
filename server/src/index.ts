@@ -319,8 +319,8 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
 // ==================================================
 // 9. Configuración del servidor web
 // ==================================================
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
+const server = app.listen(3000, () => {
+  console.log(`🚀 Servidor ejecutándose en puerto 3000`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Estado geolocalización:', GeoUtils.checkServiceStatus());
 });

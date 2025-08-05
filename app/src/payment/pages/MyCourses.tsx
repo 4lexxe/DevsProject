@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Link, Navigate } from "react-router-dom"
-import { Play, CheckCircle, Download, Clock, Award, GraduationCap, ArrowLeft } from "lucide-react"
+import { Play, CheckCircle, Clock, Award, GraduationCap, ArrowLeft } from "lucide-react"
 import { courseService } from "../services"
 import type { UserCourse } from "../services/courseService"
 import { useAuth } from "@/user/contexts/AuthContext";
@@ -72,23 +72,7 @@ export default function MyCoursesPage() {
     }
   }
 
-  const downloadCertificate = async (courseId: number) => {
-    try {
-      // Simular descarga de certificado (implementar según necesidades)
-      const response = await fetch(`/api/courses/${courseId}/certificate`)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `certificado-curso-${courseId}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      console.error('Error downloading certificate:', error)
-    }
-  }
+
 
   // Verificaciones condicionales después de todos los hooks
   if (authLoading) {
@@ -233,14 +217,10 @@ export default function MyCoursesPage() {
                   </div>
 
                   {/* Información adicional */}
-                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{course.duration || 'N/A'}</span>
-                    </div>
+                  <div className="grid grid-cols-1 gap-4 mb-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <Play className="h-4 w-4" />
-                      <span>Lecciones</span>
+                      <span>Módulos</span>
                     </div>
                   </div>
 
@@ -256,26 +236,6 @@ export default function MyCoursesPage() {
                       <Play className="h-4 w-4" />
                       {course.progress > 0 ? 'Continuar' : 'Comenzar'}
                     </Link>
-
-                    {course.progress >= 100 && (
-                      <button
-                        onClick={() => downloadCertificate(course.id)}
-                        className="flex items-center justify-center p-2 rounded-md border transition-colors"
-                        style={{ 
-                          borderColor: "#d1d5db",
-                          color: "#374151"
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.backgroundColor = "#f3f4f6"
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent"
-                        }}
-                        title="Descargar certificado"
-                      >
-                        <Download className="h-4 w-4" />
-                      </button>
-                    )}
                   </div>
 
                   {/* Fecha de acceso */}

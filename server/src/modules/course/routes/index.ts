@@ -9,6 +9,7 @@ import contentRoutes from './content.route';
 import courseRoutes from './course.route';
 import sectionRoutes from './section.route';
 import searchRoutes from './search.route';
+import progressRoutes from './progress.routes';
 
 const courseRouter = Router();
 
@@ -19,5 +20,6 @@ courseRouter.use(contentRoutes);
 courseRouter.use(courseRoutes);
 courseRouter.use(sectionRoutes);
 courseRouter.use(searchRoutes);
+courseRouter.use(progressRoutes);
 
 export default courseRouter;

@@ -39,7 +39,7 @@ export interface Course {
   summary: string;
   categories: Category[];
   about: string;
-  careerType: CareerType;
+  careerType?: CareerType | null;
   prerequisites: string[];
   learningOutcomes: string[];
   isActive: boolean;
