@@ -20,6 +20,7 @@ import Course from "./modules/course/models/Course";
 import { CourseCategory } from "./modules/course/models/Course";
 import Section from "./modules/course/models/Section";
 import Content from "./modules/course/models/Content";
+import ContentFiles from "./modules/course/models/ContentFiles";
 
 /* Modelos relacionas con la pasarela de pagos membresia/suscripcion */
 import PlanDiscountEvent from "./modules/subscription/models/PlanDiscountEvent";
@@ -75,6 +76,7 @@ async function syncDatabase() {
     await CourseCategory.sync({ force: true });
     await Section.sync({ force: true });
     await Content.sync({ force: true });
+    await ContentFiles.sync({ force: true });
 
     // Area de pagos
     await MPWebhookEvent.sync({ force: true });

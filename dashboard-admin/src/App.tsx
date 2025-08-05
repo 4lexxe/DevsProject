@@ -18,8 +18,11 @@ import {
   SectionPage,
   CourseDiscountEvent,
   DiscountEventsList,
-  QuizFormPage
+  QuizFormPage,
+  FileUploadPage,
+  FileManagementPage
 } from "@/course/index";
+
 
 import HeaderSectionAdminPage from "./header-section/page/HeaderSectionAdminPage";
 import "@/shared/styles/main.css"; // Importa tus estilos globales
@@ -90,6 +93,16 @@ function App() {
               <Route
                 path="courses/:courseId/section/:sectionId/quiz"
                 element={<QuizFormPage />}
+              />
+
+              {/* Rutas para Gestión de Archivos */}
+              <Route
+                path="/contents/:contentId/files"
+                element={<FileManagementPage />}
+              />
+              <Route
+                path="/contents/:contentId/files/upload"
+                element={<FileUploadPage />}
               />
 
               <Route

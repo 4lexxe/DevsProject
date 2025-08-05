@@ -1,495 +1,397 @@
-import { drive_v3, google } from 'googleapis';
-import { Readable } from 'stream';
-import { createDriveClient, driveConfig, validateDriveConfig } from '../config/driveConfig';
-
-export interface DriveFile {
-  id: string;
-  name: string;
-  mimeType: string;
-  size: string;
-  webViewLink: string;
-  webContentLink: string;
-  thumbnailLink?: string;
-  createdTime: string;
-  modifiedTime: string;
-  parents?: string[];
-  description?: string;
-}
+import { drive_v3, google } from "googleapis";
+import { Readable } from "stream";
+import { createDriveClient, driveConfig } from "../config/driveConfig";
+import fs from 'fs';
 
 export interface UploadFileOptions {
   name: string;
   description?: string;
-  folderId?: string;
-  makePublic?: boolean;
+  parents?: string[];
 }
 
-export interface UpdateFileOptions {
-  name?: string;
-  description?: string;
-  folderId?: string;
+export interface DriveFileResult {
+  id: string;
+  name: string;
+  mimeType: string;
+  size?: string;
+  webViewLink?: string;
+  webContentLink?: string;
+  thumbnailLink?: string;
 }
 
-export interface FileUploadResult {
+export interface UploadResult {
   success: boolean;
-  file?: DriveFile;
+  file?: DriveFileResult;
   error?: string;
-  shareableLink?: string;
 }
 
 /**
- * Servicio para manejar operaciones con Google Drive API
+ * Servicio para interactuar con Google Drive API
  */
-export class DriveService {
+export default class DriveService {
   private drive: drive_v3.Drive;
 
   constructor() {
-    // Validar configuración al crear instancia
-    const validation = validateDriveConfig();
-    if (!validation.isValid) {
-      throw new Error(
-        `Google Drive no está configurado correctamente. Variables faltantes: ${validation.missingVars.join(', ')}`
-      );
-    }
-
     this.drive = createDriveClient();
   }
 
   /**
-   * Sube un archivo a Google Drive
-   * @param fileBuffer - Buffer del archivo
-   * @param mimeType - Tipo MIME del archivo
-   * @param options - Opciones de subida
-   * @returns Resultado de la subida
+   * Sube un archivo desde una ruta temporal usando fs.createReadStream
    */
-  async uploadFile(
-    fileBuffer: Buffer,
-    mimeType: string,
-    options: UploadFileOptions
-  ): Promise<FileUploadResult> {
+  async uploadFileFromPath(filePath: string, mimeType: string, options: UploadFileOptions): Promise<UploadResult> {
     try {
-      const fileStream = new Readable();
-      fileStream.push(fileBuffer);
-      fileStream.push(null);
+      console.log(`📤 Subiendo archivo desde: ${filePath}`);
+      
+      // Verificar que el archivo existe
+      if (!fs.existsSync(filePath)) {
+        throw new Error(`Archivo no encontrado: ${filePath}`);
+      }
 
-      const fileMetadata: any = {
+      // Obtener información del archivo para debug
+      const fileStats = fs.statSync(filePath);
+      console.log(`📋 Info del archivo: Tamaño: ${fileStats.size} bytes, Modificado: ${fileStats.mtime}`);
+
+      // Preparar metadata del archivo
+      const fileMetadata: drive_v3.Schema$File = {
         name: options.name,
         description: options.description,
+        parents: options.parents || (driveConfig.folderId ? [driveConfig.folderId] : undefined)
       };
 
-      // Si se especifica una carpeta, mover el archivo ahí
-      if (options.folderId || driveConfig.folderId) {
-        fileMetadata.parents = [options.folderId || driveConfig.folderId];
-      }
+      // Verificar configuración de Drive
+      console.log(`🔧 Drive Config: folderId=${driveConfig.folderId}, hasParents=${!!fileMetadata.parents}`);
 
+      // Preparar el media con stream del archivo
       const media = {
-        mimeType,
-        body: fileStream,
+        mimeType: mimeType,
+        body: fs.createReadStream(filePath)
       };
 
-      const response = await this.drive.files.create({
+      console.log(`📊 Subiendo a Drive: ${options.name} (${mimeType})`);
+
+      // Agregar timeout y verificación adicional
+      const uploadPromise = this.drive.files.create({
         requestBody: fileMetadata,
-        media,
-        fields: 'id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime,modifiedTime,parents,description',
+        media: media,
+        fields: 'id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink'
       });
 
-      if (!response.data.id) {
-        return {
-          success: false,
-          error: 'No se pudo obtener el ID del archivo subido'
-        };
+      const response = await uploadPromise;
+
+      const driveFile = response.data;
+      
+      if (!driveFile.id) {
+        throw new Error('No se pudo obtener el ID del archivo subido');
       }
 
-      let shareableLink: string | undefined;
-
-      // Hacer público si se solicita
-      if (options.makePublic) {
-        const publicLink = await this.makeFilePublic(response.data.id);
-        shareableLink = publicLink || undefined;
+      console.log(`✅ Archivo subido exitosamente: ${driveFile.name} (ID: ${driveFile.id})`);
+      let permission;
+      try {
+        const publicResult = await this.makeFilePublic(driveFile.id);
+        permission = publicResult?.permission || 'reader'; // Asignar permiso por defecto si no se pudo hacer público
+        
+      } catch (publicError: any) {
+        console.warn(`⚠️ No se pudo hacer público el archivo ${driveFile.id}:`, publicError.message);
+        // Continuar sin hacer público
       }
-
-      const driveFile: DriveFile = {
-        id: response.data.id,
-        name: response.data.name || options.name,
-        mimeType: response.data.mimeType || mimeType,
-        size: response.data.size || '0',
-        webViewLink: response.data.webViewLink || '',
-        webContentLink: response.data.webContentLink || '',
-        thumbnailLink: response.data.thumbnailLink || undefined,
-        createdTime: response.data.createdTime || new Date().toISOString(),
-        modifiedTime: response.data.modifiedTime || new Date().toISOString(),
-        parents: response.data.parents || undefined,
-        description: response.data.description || undefined,
-      };
 
       return {
         success: true,
-        file: driveFile,
-        shareableLink: shareableLink || driveFile.webViewLink
-      };
-
-    } catch (error: any) {
-      console.error('Error al subir archivo a Drive:', error);
-      return {
-        success: false,
-        error: error.message || 'Error desconocido al subir archivo'
-      };
-    }
-  }
-
-  /**
-   * Obtiene información de un archivo por su ID
-   * @param fileId - ID del archivo en Drive
-   * @returns Información del archivo
-   */
-  async getFile(fileId: string): Promise<DriveFile | null> {
-    try {
-      const response = await this.drive.files.get({
-        fileId,
-        fields: 'id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime,modifiedTime,parents,description',
-      });
-
-      if (!response.data.id) {
-        return null;
-      }
-
-      return {
-        id: response.data.id,
-        name: response.data.name || 'Sin nombre',
-        mimeType: response.data.mimeType || 'application/octet-stream',
-        size: response.data.size || '0',
-        webViewLink: response.data.webViewLink || '',
-        webContentLink: response.data.webContentLink || '',
-        thumbnailLink: response.data.thumbnailLink || undefined,
-        createdTime: response.data.createdTime || new Date().toISOString(),
-        modifiedTime: response.data.modifiedTime || new Date().toISOString(),
-        parents: response.data.parents || undefined,
-        description: response.data.description || undefined,
-      };
-
-    } catch (error: any) {
-      console.error('Error al obtener archivo de Drive:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Actualiza metadatos de un archivo
-   * @param fileId - ID del archivo
-   * @param options - Nuevos metadatos
-   * @returns Archivo actualizado
-   */
-  async updateFile(fileId: string, options: UpdateFileOptions): Promise<DriveFile | null> {
-    try {
-      const updateData: any = {};
-
-      if (options.name) updateData.name = options.name;
-      if (options.description !== undefined) updateData.description = options.description;
-      if (options.folderId) updateData.parents = [options.folderId];
-
-      const response = await this.drive.files.update({
-        fileId,
-        requestBody: updateData,
-        fields: 'id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime,modifiedTime,parents,description',
-      });
-
-      if (!response.data.id) {
-        return null;
-      }
-
-      return {
-        id: response.data.id,
-        name: response.data.name || 'Sin nombre',
-        mimeType: response.data.mimeType || 'application/octet-stream',
-        size: response.data.size || '0',
-        webViewLink: response.data.webViewLink || '',
-        webContentLink: response.data.webContentLink || '',
-        thumbnailLink: response.data.thumbnailLink || undefined,
-        createdTime: response.data.createdTime || new Date().toISOString(),
-        modifiedTime: response.data.modifiedTime || new Date().toISOString(),
-        parents: response.data.parents || undefined,
-        description: response.data.description || undefined,
-      };
-
-    } catch (error: any) {
-      console.error('Error al actualizar archivo de Drive:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Elimina un archivo de Google Drive
-   * @param fileId - ID del archivo a eliminar
-   * @returns true si se eliminó correctamente
-   */
-  async deleteFile(fileId: string): Promise<boolean> {
-    try {
-      await this.drive.files.delete({
-        fileId,
-      });
-      return true;
-    } catch (error: any) {
-      console.error('Error al eliminar archivo de Drive:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Hace un archivo público y devuelve el enlace compartible
-   * @param fileId - ID del archivo
-   * @returns Enlace público del archivo
-   */
-  async makeFilePublic(fileId: string): Promise<string | null> {
-    try {
-      // Crear permiso público de lectura
-      await this.drive.permissions.create({
-        fileId,
-        requestBody: {
-          role: 'reader',
-          type: 'anyone',
+        file: {
+          id: driveFile.id,
+          name: driveFile.name || options.name,
+          mimeType: driveFile.mimeType || mimeType,
+          size: driveFile.size || undefined,
+          webViewLink: driveFile.webViewLink || undefined,
+          webContentLink: undefined, // Nunca permitir descarga directa con restricciones máximas
+          thumbnailLink: driveFile.thumbnailLink || undefined
         },
-      });
-
-      // Obtener el enlace compartible
-      const file = await this.drive.files.get({
-        fileId,
-        fields: 'webViewLink,webContentLink',
-      });
-
-      return file.data.webViewLink || file.data.webContentLink || null;
+      };
 
     } catch (error: any) {
-      console.error('Error al hacer archivo público:', error);
-      return null;
-    }
-  }
+      console.log("⚠️ Error durante la subida, verificando si el archivo se subió:", error.message);
+      
+      // Si el error es 500 pero el archivo podría haberse subido, intentar recuperarlo
+      if (error.status === 500 || error.code === 500) {
+        console.log("🔍 Error 500 detectado, intentando recuperar archivo subido...");
+        
+        try {
+          // Buscar archivos recientes con el mismo nombre en la carpeta específica
+          const parentFolder = options?.parents?.[0] || driveConfig.folderId;
+          const searchQuery = parentFolder 
+            ? `name='${options.name}' and '${parentFolder}' in parents`
+            : `name='${options.name}'`;
+            
+          const searchResult = await this.drive.files.list({
+            q: searchQuery,
+            orderBy: 'createdTime desc',
+            pageSize: 1,
+            fields: 'files(id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime)'
+          });
 
-  /**
-   * Revoca el acceso público de un archivo
-   * @param fileId - ID del archivo
-   * @returns true si se revocó correctamente
-   */
-  async makeFilePrivate(fileId: string): Promise<boolean> {
-    try {
-      // Obtener permisos actuales
-      const permissions = await this.drive.permissions.list({
-        fileId,
-      });
+          if (searchResult.data.files && searchResult.data.files.length > 0) {
+            const recoveredFile = searchResult.data.files[0];
+            console.log("✅ Archivo recuperado exitosamente:", recoveredFile);
+            
+            // Verificar que es un archivo reciente (último minuto)
+            const fileTime = new Date(recoveredFile.createdTime || '');
+            const now = new Date();
+            const timeDiff = now.getTime() - fileTime.getTime();
+            
+            if (timeDiff < 60000) { // Menos de 1 minuto
+              console.log("✅ Archivo confirmado como recién subido");
+              const makePublicResult = await this.makeFilePublic(recoveredFile.id!); // Hacerlo público automáticamente
 
-      // Eliminar permisos públicos
-      const publicPermissions = permissions.data.permissions?.filter(
-        permission => permission.type === 'anyone'
-      );
-
-      if (publicPermissions) {
-        for (const permission of publicPermissions) {
-          if (permission.id) {
-            await this.drive.permissions.delete({
-              fileId,
-              permissionId: permission.id,
-            });
+              return {
+                success: true,
+                file: {
+                  id: recoveredFile.id!,
+                  name: recoveredFile.name || options.name,
+                  mimeType: recoveredFile.mimeType || mimeType,
+                  size: recoveredFile.size || undefined,
+                  webViewLink: recoveredFile.webViewLink || undefined,
+                  webContentLink: recoveredFile.webContentLink || undefined,
+                  thumbnailLink: recoveredFile.thumbnailLink || undefined
+                },
+              };
+            } else {
+              console.log("⚠️ El archivo encontrado es muy antiguo, no es el que acabamos de subir");
+            }
+          } else {
+            console.log("❌ No se encontró el archivo en Drive después del error 500");
           }
+        } catch (recoveryError: any) {
+          console.log("❌ Error al intentar recuperar archivo:", recoveryError.message);
         }
       }
 
-      return true;
-    } catch (error: any) {
-      console.error('Error al hacer archivo privado:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Lista archivos en una carpeta específica
-   * @param folderId - ID de la carpeta (opcional)
-   * @param pageSize - Número de archivos por página
-   * @param pageToken - Token de página para paginación
-   * @returns Lista de archivos
-   */
-  async listFiles(
-    folderId?: string,
-    pageSize: number = 10,
-    pageToken?: string
-  ): Promise<{
-    files: DriveFile[];
-    nextPageToken?: string;
-    totalCount?: number;
-  }> {
-    try {
-      let query = "trashed=false";
+      console.error(`❌ Error al subir archivo desde ${filePath}:`, {
+        message: error.message,
+        code: error.code,
+        status: error.status,
+        statusText: error.statusText,
+        response: error.response?.data,
+        stack: error.stack,
+        fullError: error
+      });
       
-      if (folderId) {
-        query += ` and '${folderId}' in parents`;
-      } else if (driveConfig.folderId) {
-        query += ` and '${driveConfig.folderId}' in parents`;
-      }
-
-      const response = await this.drive.files.list({
-        q: query,
-        pageSize,
-        pageToken,
-        fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime,modifiedTime,parents,description)',
-        orderBy: 'modifiedTime desc',
-      });
-
-      const files: DriveFile[] = response.data.files?.map(file => ({
-        id: file.id || '',
-        name: file.name || 'Sin nombre',
-        mimeType: file.mimeType || 'application/octet-stream',
-        size: file.size || '0',
-        webViewLink: file.webViewLink || '',
-        webContentLink: file.webContentLink || '',
-        thumbnailLink: file.thumbnailLink || undefined,
-        createdTime: file.createdTime || new Date().toISOString(),
-        modifiedTime: file.modifiedTime || new Date().toISOString(),
-        parents: file.parents || undefined,
-        description: file.description || undefined,
-      })) || [];
-
-      return {
-        files,
-        nextPageToken: response.data.nextPageToken || undefined,
-      };
-
-    } catch (error: any) {
-      console.error('Error al listar archivos de Drive:', error);
-      return {
-        files: [],
-      };
-    }
-  }
-
-  /**
-   * Busca archivos por nombre
-   * @param searchTerm - Término de búsqueda
-   * @param pageSize - Número de resultados por página
-   * @returns Lista de archivos encontrados
-   */
-  async searchFiles(
-    searchTerm: string,
-    pageSize: number = 10
-  ): Promise<DriveFile[]> {
-    try {
-      let query = `name contains '${searchTerm}' and trashed=false`;
+      // Determinar mensaje de error más específico
+      let errorMessage = 'Error desconocido al subir archivo';
       
-      if (driveConfig.folderId) {
-        query += ` and '${driveConfig.folderId}' in parents`;
+      if (error.code) {
+        errorMessage = `Error ${error.code}: ${error.message}`;
+      } else if (error.status) {
+        errorMessage = `HTTP ${error.status}: ${error.statusText || error.message}`;
+      } else if (error.response?.data) {
+        errorMessage = `API Error: ${JSON.stringify(error.response.data)}`;
+      } else if (error.message && error.message !== 'Unknown Error') {
+        errorMessage = error.message;
       }
-
-      const response = await this.drive.files.list({
-        q: query,
-        pageSize,
-        fields: 'files(id,name,mimeType,size,webViewLink,webContentLink,thumbnailLink,createdTime,modifiedTime,parents,description)',
-        orderBy: 'relevance,modifiedTime desc',
-      });
-
-      return response.data.files?.map(file => ({
-        id: file.id || '',
-        name: file.name || 'Sin nombre',
-        mimeType: file.mimeType || 'application/octet-stream',
-        size: file.size || '0',
-        webViewLink: file.webViewLink || '',
-        webContentLink: file.webContentLink || '',
-        thumbnailLink: file.thumbnailLink || undefined,
-        createdTime: file.createdTime || new Date().toISOString(),
-        modifiedTime: file.modifiedTime || new Date().toISOString(),
-        parents: file.parents || undefined,
-        description: file.description || undefined,
-      })) || [];
-
-    } catch (error: any) {
-      console.error('Error al buscar archivos en Drive:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Crea una carpeta en Google Drive
-   * @param name - Nombre de la carpeta
-   * @param parentFolderId - ID de la carpeta padre
-   * @returns ID de la carpeta creada
-   */
-  async createFolder(name: string, parentFolderId?: string): Promise<string | null> {
-    try {
-      const fileMetadata: any = {
-        name,
-        mimeType: 'application/vnd.google-apps.folder',
+      
+      return {
+        success: false,
+        error: errorMessage
       };
-
-      if (parentFolderId || driveConfig.folderId) {
-        fileMetadata.parents = [parentFolderId || driveConfig.folderId];
-      }
-
-      const response = await this.drive.files.create({
-        requestBody: fileMetadata,
-        fields: 'id',
-      });
-
-      return response.data.id || null;
-
-    } catch (error: any) {
-      console.error('Error al crear carpeta en Drive:', error);
-      return null;
     }
   }
 
   /**
-   * Mueve un archivo a otra carpeta
-   * @param fileId - ID del archivo
-   * @param newFolderId - ID de la nueva carpeta
-   * @returns true si se movió correctamente
+   * Hace un archivo público solo para visualización (sin descarga, copia ni impresión)
    */
-  async moveFile(fileId: string, newFolderId: string): Promise<boolean> {
+  async makeFilePublic(fileId: string): Promise<{ success: boolean; permission?: string; error?: string }> {
     try {
-      // Obtener padres actuales
-      const file = await this.drive.files.get({
-        fileId,
-        fields: 'parents',
+      console.log(`🌐 Haciendo público el archivo: ${fileId}`);
+
+      // Verificar si ya tiene permiso público
+      const existingPermissions = await this.drive.permissions.list({
+        fileId: fileId,
+        fields: 'permissions(id,type,role)'
       });
 
-      const previousParents = file.data.parents?.join(',') || '';
+      // Buscar si ya existe un permiso público
+      const publicPermission = existingPermissions.data.permissions?.find(
+        permission => permission.type === 'anyone' && permission.role === 'reader'
+      );
 
-      // Mover archivo
+      if (!publicPermission) {
+        // Crear permiso público de solo lectura
+        await this.drive.permissions.create({
+          fileId: fileId,
+          requestBody: {
+            role: 'reader',
+            type: 'anyone',
+            allowFileDiscovery: false // No aparece en búsquedas
+          },
+          fields: 'id'
+        });
+        console.log(`✅ Permiso público creado para archivo: ${fileId}`);
+      } else {
+        console.log(`ℹ️ El archivo ${fileId} ya es público`);
+      }
+
+      // Aplicar restricciones específicas para ocultar botón de descarga
       await this.drive.files.update({
-        fileId,
-        addParents: newFolderId,
-        removeParents: previousParents,
+        fileId: fileId,
+        requestBody: {
+          copyRequiresWriterPermission: true,  // Bloquea copia
+          viewersCanCopyContent: false,        // No permite copiar contenido
+          writersCanShare: false,              // No permite compartir
+          // Restricciones de descarga específicas
+          downloadRestrictions: {
+            itemDownloadRestriction: {
+              restrictedForReaders: true,      // Bloquea descarga para lectores
+              restrictedForWriters: true       // Bloquea descarga para escritores
+            }
+          }
+        }
       });
+      
+      return {
+        success: true,
+      };
 
-      return true;
     } catch (error: any) {
-      console.error('Error al mover archivo en Drive:', error);
+      console.error(`❌ Error al hacer público el archivo ${fileId}:`, error.message);
+      
+      // Manejo específico de errores comunes
+      let errorMessage = error.message;
+      
+      if (error.code === 403) {
+        errorMessage = 'No tienes permisos para hacer público este archivo';
+      } else if (error.code === 404) {
+        errorMessage = 'Archivo no encontrado en Google Drive';
+      } else if (error.code === 400) {
+        errorMessage = 'Solicitud inválida para hacer público el archivo';
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        permission: "reader"
+      };
+    }
+  }
+
+
+  /**
+   * Elimina un archivo de Google Drive
+   */
+  async deleteFile(fileId: string): Promise<boolean> {
+    try {
+      console.log(`🗑️ Eliminando archivo de Drive: ${fileId}`);
+      
+      await this.drive.files.delete({
+        fileId: fileId
+      });
+      
+      console.log(`✅ Archivo eliminado exitosamente: ${fileId}`);
+      return true;
+
+    } catch (error: any) {
+      console.error(`❌ Error al eliminar archivo ${fileId}:`, error.message);
+      
+      // Si el archivo no existe, considerarlo como "eliminado exitosamente"
+      if (error.code === 404) {
+        console.log(`ℹ️ Archivo ${fileId} no encontrado en Drive, considerado como eliminado`);
+        return true;
+      }
+      
       return false;
     }
   }
 
   /**
-   * Obtiene información de uso del espacio de Drive
-   * @returns Información del espacio usado
+   * Crea una carpeta en Google Drive y devuelve su ID
    */
-  async getStorageInfo(): Promise<{
-    limit: string;
-    usage: string;
-    usageInDrive: string;
-  } | null> {
+  async createFolder(name: string, parentFolderId?: string): Promise<{ success: boolean; folderId?: string; error?: string }> {
     try {
-      const response = await this.drive.about.get({
-        fields: 'storageQuota',
+      console.log(`📁 Creando carpeta: ${name}${parentFolderId ? ` en carpeta: ${parentFolderId}` : ''}`);
+      
+      // Preparar metadata de la carpeta
+      const folderMetadata: drive_v3.Schema$File = {
+        name: name,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: parentFolderId ? [parentFolderId] : (driveConfig.folderId ? [driveConfig.folderId] : undefined)
+      };
+
+      // Crear la carpeta
+      const response = await this.drive.files.create({
+        requestBody: folderMetadata,
+        fields: 'id,name,parents'
       });
 
-      const quota = response.data.storageQuota;
-      if (!quota) return null;
+      const folder = response.data;
+      
+      if (!folder.id) {
+        throw new Error('No se pudo obtener el ID de la carpeta creada');
+      }
 
+      console.log(`✅ Carpeta creada exitosamente: ${folder.name} (ID: ${folder.id})`);
+      
       return {
-        limit: quota.limit || '0',
-        usage: quota.usage || '0',
-        usageInDrive: quota.usageInDrive || '0',
+        success: true,
+        folderId: folder.id
       };
 
     } catch (error: any) {
-      console.error('Error al obtener información de almacenamiento:', error);
-      return null;
+      console.error(`❌ Error al crear carpeta ${name}:`, error.message);
+      
+      return {
+        success: false,
+        error: error.message || 'Error desconocido al crear carpeta'
+      };
+    }
+  }
+
+  /**
+   * Elimina una carpeta de Google Drive incluyendo todos sus archivos y subcarpetas
+   */
+  async deleteFolder(folderId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      console.log(`🗑️ Eliminando carpeta de Drive: ${folderId}`);
+      
+      // Verificar que la carpeta existe y obtener su información
+      try {
+        const folderInfo = await this.drive.files.get({
+          fileId: folderId,
+          fields: 'id,name,mimeType'
+        });
+        
+        if (folderInfo.data.mimeType !== 'application/vnd.google-apps.folder') {
+          throw new Error('El ID proporcionado no corresponde a una carpeta');
+        }
+        
+        console.log(`📋 Eliminando carpeta: ${folderInfo.data.name} (ID: ${folderId})`);
+      } catch (getError: any) {
+        if (getError.code === 404) {
+          console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+          return { success: true };
+        }
+        throw getError;
+      }
+      
+      // Eliminar la carpeta (Google Drive elimina automáticamente todo el contenido)
+      await this.drive.files.delete({
+        fileId: folderId
+      });
+      
+      console.log(`✅ Carpeta eliminada exitosamente: ${folderId}`);
+      return { success: true };
+
+    } catch (error: any) {
+      console.error(`❌ Error al eliminar carpeta ${folderId}:`, error.message);
+      
+      // Si la carpeta no existe, considerarlo como "eliminado exitosamente"
+      if (error.code === 404) {
+        console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+        return { success: true };
+      }
+      
+      return {
+        success: false,
+        error: error.message || 'Error desconocido al eliminar carpeta'
+      };
     }
   }
 }
 
-export default DriveService;

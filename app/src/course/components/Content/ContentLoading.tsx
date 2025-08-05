@@ -19,13 +19,8 @@ function ContentLoading({
       if (!contentId) return;
       try {
         const data = await getContentById(contentId);
-
         if (isMounted) {
-          setTimeout(() => {
-            if (isMounted) {
-              setContent(data);
-            }
-          }, 500);
+          setContent(data);
         }
       } catch (err) {
         if (isMounted) {

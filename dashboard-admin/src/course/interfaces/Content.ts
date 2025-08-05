@@ -50,7 +50,8 @@ export interface IContentInput {
 }
 
 export interface IContent {
-  id: string;
+  id?: string;
+  contentId: string; // ID temporal para manejo del frontend
   title: string;
   text: string;
   markdown?: string;

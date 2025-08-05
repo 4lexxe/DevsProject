@@ -17,7 +17,7 @@ export default function DraggableItem({
   isDragging?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item.id });
+    useSortable({ id: item.contentId });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -74,7 +74,7 @@ export default function DraggableItem({
           </button>
           <button
             data-dndkit-disable-drag
-            onClick={() => onDelete(item.id)}
+            onClick={() => onDelete(item.contentId)}
             className="flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-red-100 hover:text-red-700 transition-colors duration-200"
           >
             <Trash2 className="w-3.5 h-3.5 mr-1.5" />

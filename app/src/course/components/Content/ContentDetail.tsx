@@ -1,10 +1,97 @@
 import React from "react";
-import { IContentApi } from "@/course/interfaces/Content";
-import { Clock, ArrowLeft, BookOpen } from "lucide-react";
+import { IContentApi, IContentFile } from "@/course/interfaces/Content";
+import { Clock, ArrowLeft, BookOpen, FileText, Video, Image, Download } from "lucide-react";
 import MarkdownPreview from "./MarkdownPreview";
+import SecureVideoPlayer from "./SecureVideoPlayer";
 import { Link } from "react-router-dom";
 
 function ContentDetail({ content, courseId }: { content: IContentApi, courseId: string }) {
+  // Función para obtener el icono según el tipo de archivo
+  const getFileIcon = (fileType: string) => {
+    switch (fileType) {
+      case 'video':
+        return <Video className="w-5 h-5 text-red-600" />;
+      case 'pdf':
+        return <FileText className="w-5 h-5 text-red-600" />;
+      case 'presentation':
+        return <FileText className="w-5 h-5 text-orange-600" />;
+      case 'image':
+        return <Image className="w-5 h-5 text-green-600" />;
+      default:
+        return <FileText className="w-5 h-5 text-gray-600" />;
+    }
+  };
+
+  // Función para formatear el tamaño del archivo
+  const formatFileSize = (bytes: string) => {
+    const size = parseInt(bytes);
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  // Función para renderizar la vista previa según el tipo
+  const renderFilePreview = (file: IContentFile) => {
+
+    switch (file.fileType) {
+      case 'video':
+        return (
+          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+            <SecureVideoPlayer
+              contentFileId={file.id}
+              title={file.originalName}
+              className="w-full h-full"
+              onError={(error) => {
+                console.error('Error en reproductor de video:', error);
+              }}
+            />
+          </div>
+        );
+      
+      case 'pdf':
+        return (
+          <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
+            <iframe
+              src={file.drivePreviewLink}
+              className="w-full h-full border-0"
+              title={file.originalName}
+            />
+          </div>
+        );
+      
+      case 'presentation':
+        return (
+          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+            <iframe
+              src={file.drivePreviewLink}
+              className="w-full h-full border-0"
+              title={file.originalName}
+              allowFullScreen
+            />
+          </div>
+        );
+      
+      case 'image':
+        return (
+          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+            {file.thumbnailLink ? (
+              <img
+                src={file.thumbnailLink}
+                alt={file.originalName}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <Image className="w-16 h-16 text-gray-400" />
+              </div>
+            )}
+          </div>
+        );
+      
+      default:
+        return null;
+    }
+  };
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <div className="bg-gradient-to-r from-cyan-600 to-blue-900 p-6 text-white">
@@ -38,6 +125,56 @@ function ContentDetail({ content, courseId }: { content: IContentApi, courseId: 
                     {resource.title}
                   </span>
                 </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Archivos del contenido */}
+        {content.files && content.files.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-cyan-600 to-blue-900 bg-clip-text text-transparent">
+              Archivos del contenido
+            </h3>
+            <div className="grid gap-6">
+              {content.files.map((file) => (
+                <div key={file.id} className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-6">
+                  {/* Header del archivo */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      {getFileIcon(file.fileType)}
+                      <div>
+                        <h4 className="font-semibold text-slate-800">{file.originalName}</h4>
+                        <p className="text-sm text-slate-600">
+                          {file.fileType.toUpperCase()}
+                        </p>
+                      </div>
+                    </div>
+                    {file.allowDownload && file.driveWebContentLink && (
+                      <a
+                        href={file.driveWebContentLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-2 bg-gradient-to-r from-cyan-600 to-blue-900 text-white px-4 py-2 rounded-lg hover:from-cyan-700 hover:to-blue-950 transition-all duration-300"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Descargar</span>
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Vista previa del archivo */}
+                  {['video', 'pdf', 'presentation', 'image'].includes(file.fileType) && (
+                    <div className="mt-4">
+                      {renderFilePreview(file)}
+                    </div>
+                  )}
+
+                  {/* Descripción si existe */}
+                  {file.description && (
+                    <p className="mt-4 text-slate-700 text-sm">{file.description}</p>
+                  )}
+                </div>
               ))}
             </div>
           </div>
