@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash2 } from "lucide-react";
 
 interface SectionHeaderProps {
   section: {
@@ -13,9 +13,10 @@ interface SectionHeaderProps {
     duration: number;
   };
   onBack: () => void;
+  onDeleteSection?: (sectionId: number) => void;
 }
 
-export default function SectionHeader({ section, onBack }: SectionHeaderProps) {
+export default function SectionHeader({ section, onBack, onDeleteSection }: SectionHeaderProps) {
   const getModuleTypeBg = (type: string) => {
     switch (type.toLowerCase()) {
       case "introductorio":
@@ -33,13 +34,26 @@ export default function SectionHeader({ section, onBack }: SectionHeaderProps) {
 
   return (
     <div className="space-y-6">
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 text-blue-700 hover:text-blue-900 font-semibold mb-6"
-      >
-        <ArrowLeft className="h-5 w-5" />
-        Volver al Dashboard
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-blue-700 hover:text-blue-900 font-semibold"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Volver al Dashboard
+        </button>
+        
+        {onDeleteSection && (
+          <button
+            onClick={() => onDeleteSection(section.id)}
+            className="flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200 font-semibold"
+            title="Eliminar sección completa"
+          >
+            <Trash2 className="h-5 w-5" />
+            Eliminar Sección
+          </button>
+        )}
+      </div>
 
       {/* Header de la sección */}
       <div className="rounded-lg border shadow-sm overflow-hidden">

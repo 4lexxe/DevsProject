@@ -17,8 +17,12 @@ class Course extends Model {
   public isInDevelopment!: boolean;
   public price!: number; // Precio del curso
   public adminId!: bigint;
+  public driveFolderId?: string; // ID de la carpeta en Google Drive para el curso
   public readonly createdAt!: Date; 
   public readonly updatedAt!: Date; 
+
+  // Asociaciones
+  public sections?: any[]; // Relación con secciones
 }
 
 Course.init(
@@ -76,12 +80,18 @@ Course.init(
       allowNull: false,
       defaultValue: 100, // Precio por defecto
     },
+    driveFolderId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "ID de la carpeta en Google Drive para el curso",
+    },
   },
   {
     sequelize,
     modelName: "Course",
     tableName: "Courses", // 🔹 Corrección del espacio extra
     timestamps: true,
+    paranoid: true,
   }
 );
 
@@ -98,12 +108,16 @@ CourseCategory.init(
       references: { model: Course, key: "id" },
       allowNull: false,
       primaryKey: true,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     categoryId: {
       type: DataTypes.BIGINT,
       references: { model: Category, key: "id" },
       allowNull: false,
       primaryKey: true,
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
   },
   { 
@@ -117,8 +131,20 @@ CourseCategory.init(
 // 📌 **Relaciones**
 
 // 🔹 Muchos a Muchos (Course ↔ Category)
-Course.belongsToMany(Category, { through: CourseCategory, as: "categories", foreignKey: "courseId" });
-Category.belongsToMany(Course, { through: CourseCategory, as: "courses", foreignKey: "categoryId" });
+Course.belongsToMany(Category, { 
+  through: CourseCategory, 
+  as: "categories", 
+  foreignKey: "courseId",
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
+Category.belongsToMany(Course, { 
+  through: CourseCategory, 
+  as: "courses", 
+  foreignKey: "categoryId",
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 
 // 🔹 Uno a Muchos (Course → CareerType)

@@ -50,6 +50,30 @@ export interface IContentState {
   currentSectionId: string | null;
 }
 
+export interface IContentFile {
+  id: string;
+  contentId: string;
+  fileName: string;
+  originalName: string;
+  fileType: string;
+  fileSize: string;
+  mimeType: string;
+  driveFileId: string;
+  driveUrl: string;
+  thumbnailLink?: string;
+  driveWebViewLink: string;
+  driveWebContentLink?: string;
+  drivePreviewLink?: string;
+  description?: string;
+  isPublic: boolean;
+  allowDownload: boolean;
+  uploadedBy: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string;
+}
+
 export interface IContentApi {
   id: string;
   sectionId: string;
@@ -61,6 +85,7 @@ export interface IContentApi {
   duration: number;
   position: number;
   section: any;
+  files?: IContentFile[];
   createdAt: Date;
   updatedAt: Date;
 }

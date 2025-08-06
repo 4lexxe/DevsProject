@@ -25,8 +25,8 @@ export const validateQuiz = [
   body("quiz.*.description")
     .notEmpty()
     .withMessage("Cada pregunta del quiz debe tener una descripción")
-    .isLength({ min: 10, max: 1000 })
-    .withMessage("La descripción debe tener entre 10 y 1000 caracteres"),
+    .isLength({ min: 5, max: 1000 })
+    .withMessage("La descripción debe tener entre 5 y 1000 caracteres"),
 
   // Validar orden de la pregunta
   body("quiz.*.order")
@@ -122,10 +122,15 @@ export const validateQuiz = [
     })
     .withMessage("Cada tag debe ser una cadena de texto de máximo 50 caracteres"),
 
-  // Validación personalizada para verificar que haya al menos una respuesta correcta
+  // Validación personalizada para verificar que haya al menos una respuesta correcta (excepto TrueOrFalse)
   body("quiz.*")
     .custom((question) => {
       if (question.answers && Array.isArray(question.answers)) {
+        // Para TrueOrFalse no validamos respuestas correctas ya que cada afirmación puede ser V o F
+        if (question.type === "TrueOrFalse") {
+          return true;
+        }
+        
         const hasCorrectAnswer = question.answers.some((answer: any) => answer.isCorrect === true);
         if (!hasCorrectAnswer) {
           throw new Error("Cada pregunta debe tener al menos una respuesta correcta");
@@ -142,11 +147,10 @@ export const validateQuiz = [
         
         switch (question.type) {
           case "TrueOrFalse":
-            if (question.answers.length !== 2) {
-              throw new Error("Las preguntas de Verdadero/Falso deben tener exactamente 2 respuestas");
-            }
-            if (correctAnswers.length !== 1) {
-              throw new Error("Las preguntas de Verdadero/Falso deben tener exactamente 1 respuesta correcta");
+            // Para TrueOrFalse, cada respuesta puede ser verdadera o falsa independientemente
+            // No necesitamos validar cantidad específica de respuestas o respuestas correctas
+            if (question.answers.length < 1) {
+              throw new Error("Las preguntas de Verdadero/Falso deben tener al menos 1 afirmación");
             }
             break;
           case "Single":

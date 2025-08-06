@@ -60,14 +60,14 @@ export const saveContentQuiz = async (contentId: string, quiz: any) => {
   }
 }
 
-export const deleteContentQuiz = async (contentId: string, quizId: string) => {
+export const deleteContentQuiz = async (contentId: string) => {
   try {
-    console.log(`Eliminando quiz ID: ${quizId} del contenido ID: ${contentId}`);
+    console.log(`Eliminando quiz del contenido ID: ${contentId}`);
     const response = await api.delete(`${CONTENT}/${contentId}/quiz`);
     return response.data.data;
   } catch (error: any) {
     console.error(
-      `Error al eliminar el quiz (ID: ${quizId}) del contenido (ID: ${contentId}):`,
+      `Error al eliminar el quiz del contenido (ID: ${contentId}):`,
       error.response?.data || error.message
     );
     throw error;

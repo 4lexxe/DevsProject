@@ -5,7 +5,7 @@ import Content from "./Content";
 type fileType = "video" | "audio" | "document" | "image" | "pdf" | "presentation" | "spreadsheet" | "code" | "archive" | "other";
 
 interface ContentFilesAttributes {
-  id: bigint;
+  id: string; // Cambiado a string para UUID
   contentId: bigint;
   fileName: string;
   originalName: string;
@@ -13,21 +13,22 @@ interface ContentFilesAttributes {
   fileSize: number; // Tamaño en bytes
   mimeType: string;
   driveFileId: string; // ID del archivo en Google Drive
-  driveUrl: string; // URL de visualización/descarga de Google Drive
+  thumbnailLink?: string; // URL de la miniatura del archivo (si aplica)
   driveWebViewLink?: string; // URL para vista web del archivo
   driveWebContentLink?: string; // URL de descarga directa
+  drivePreviewLink?: string; // URL de preview embebido del archivo
   description?: string;
-  isPublic: boolean; // Si el archivo es público o privado
+  allowDownload: boolean; // Si se permite descargar el archivo desde la preview
   uploadedBy: bigint; // ID del admin que subió el archivo
   position: number; // Orden de los archivos en el contenido
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface ContentFilesCreationAttributes extends Optional<ContentFilesAttributes, 'id' | 'driveWebViewLink' | 'driveWebContentLink' | 'description' | 'createdAt' | 'updatedAt'> {}
+interface ContentFilesCreationAttributes extends Optional<ContentFilesAttributes, 'id' | 'driveWebViewLink' | 'driveWebContentLink' | 'drivePreviewLink' | 'description' | 'createdAt' | 'updatedAt'> {}
 
 class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAttributes> implements ContentFilesAttributes {
-  public id!: bigint;
+  public id!: string; // Cambiado a string para UUID
   public contentId!: bigint;
   public fileName!: string;
   public originalName!: string;
@@ -35,62 +36,22 @@ class ContentFiles extends Model<ContentFilesAttributes, ContentFilesCreationAtt
   public fileSize!: number;
   public mimeType!: string;
   public driveFileId!: string;
-  public driveUrl!: string;
   public driveWebViewLink?: string;
   public driveWebContentLink?: string;
+  public drivePreviewLink?: string;
   public description?: string;
-  public isPublic!: boolean;
+  public allowDownload!: boolean;
   public uploadedBy!: bigint;
   public position!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-
-  // Métodos de instancia para manejo de Drive
-  public getDriveShareableLink(): string {
-    return `https://drive.google.com/file/d/${this.driveFileId}/view?usp=sharing`;
-  }
-
-  public getDriveDirectDownloadLink(): string {
-    return `https://drive.google.com/uc?id=${this.driveFileId}&export=download`;
-  }
-
-  public getDriveEmbedLink(): string {
-    return `https://drive.google.com/file/d/${this.driveFileId}/preview`;
-  }
-
-  public getFormattedFileSize(): string {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (this.fileSize === 0) return '0 Bytes';
-    const i = Math.floor(Math.log(this.fileSize) / Math.log(1024));
-    return Math.round(this.fileSize / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-  }
-
-  public isImageFile(): boolean {
-    return ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'].includes(this.mimeType);
-  }
-
-  public isVideoFile(): boolean {
-    return this.mimeType.startsWith('video/');
-  }
-
-  public isDocumentFile(): boolean {
-    return [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ].includes(this.mimeType);
-  }
 }
 
 ContentFiles.init(
   {
     id: {
-      type: DataTypes.BIGINT,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     contentId: {
@@ -134,10 +95,10 @@ ContentFiles.init(
       unique: true,
       comment: 'ID único del archivo en Google Drive',
     },
-    driveUrl: {
+    thumbnailLink: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      comment: 'URL principal del archivo en Google Drive',
+      allowNull: true,
+      comment: 'URL de la miniatura del archivo (si aplica)',
     },
     driveWebViewLink: {
       type: DataTypes.TEXT,
@@ -149,16 +110,21 @@ ContentFiles.init(
       allowNull: true,
       comment: 'URL de descarga directa del archivo desde Google Drive',
     },
+    drivePreviewLink: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: 'URL de preview embebido del archivo desde Google Drive',
+    },
     description: {
       type: DataTypes.TEXT,
       allowNull: true,
       comment: 'Descripción opcional del archivo',
     },
-    isPublic: {
+    allowDownload: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
-      comment: 'Indica si el archivo es público o privado',
+      comment: 'Indica si se permite descargar el archivo',
     },
     uploadedBy: {
       type: DataTypes.BIGINT,
@@ -185,6 +151,7 @@ ContentFiles.init(
     modelName: "ContentFiles",
     tableName: "ContentFiles",
     timestamps: true,
+    paranoid: true,
     indexes: [
       {
         fields: ['contentId'],
@@ -197,9 +164,6 @@ ContentFiles.init(
         fields: ['fileType'],
       },
       {
-        fields: ['isPublic'],
-      },
-      {
         fields: ['position'],
       },
       {
@@ -207,32 +171,6 @@ ContentFiles.init(
         name: 'content_files_order',
       },
     ],
-    hooks: {
-      beforeValidate: (contentFile: ContentFiles) => {
-        // Determinar el tipo de archivo basado en el mimeType si no se especifica
-        if (!contentFile.fileType && contentFile.mimeType) {
-          if (contentFile.mimeType.startsWith('video/')) {
-            contentFile.fileType = 'video';
-          } else if (contentFile.mimeType.startsWith('audio/')) {
-            contentFile.fileType = 'audio';
-          } else if (contentFile.mimeType.startsWith('image/')) {
-            contentFile.fileType = 'image';
-          } else if (contentFile.mimeType === 'application/pdf') {
-            contentFile.fileType = 'pdf';
-          } else if (['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'document';
-          } else if (['application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'presentation';
-          } else if (['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].includes(contentFile.mimeType)) {
-            contentFile.fileType = 'spreadsheet';
-          } else if (contentFile.mimeType.includes('zip') || contentFile.mimeType.includes('rar') || contentFile.mimeType.includes('tar')) {
-            contentFile.fileType = 'archive';
-          } else {
-            contentFile.fileType = 'other';
-          }
-        }
-      },
-    },
   }
 );
 

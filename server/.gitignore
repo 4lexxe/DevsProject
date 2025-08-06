@@ -1,1 +1,22 @@
 node_modules
+
+# Archivos temporales
+temp/
+*.tmp
+
+# Cache
+cache/
+
+# Variables de entorno
+.env
+.env.local
+.env.development
+.env.production
+
+# Logs
+logs
+*.log
+
+# Build outputs
+dist/
+build/

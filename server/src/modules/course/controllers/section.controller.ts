@@ -6,8 +6,11 @@ import Content from "../models/Content";
 import User from "../../user/User";
 import { Sequelize, Op } from "sequelize";
 import { BaseController } from "./BaseController";
+import DriveService from "../../drive/services/driveService";
+import { drive } from "googleapis/build/src/apis/drive";
 
 export default class SectionController extends BaseController {
+  static driveService = new DriveService();
   // Crear una nueva sección
   static create: RequestHandler = async (req, res) => {
     try {
@@ -28,6 +31,8 @@ export default class SectionController extends BaseController {
         return;
       }
 
+      const response = await SectionController.driveService.createFolder(title, course.driveFolderId);
+
       const newSection = await Section.create({
         title,
         description,
@@ -35,6 +40,7 @@ export default class SectionController extends BaseController {
         coverImage,
         moduleType,
         colorGradient,
+        driveFolderId: response.folderId, // Guardar el ID de la carpeta creada
       });
 
       SectionController.created(res, req, newSection, "Sección creada correctamente");
@@ -51,6 +57,15 @@ export default class SectionController extends BaseController {
     try {
       const { section, courseId } = req.body;
 
+      const course = await Course.findByPk(courseId);
+      if (!course) {
+        await transaction.rollback();
+        SectionController.sendError(res, req, "Curso no encontrado", 400);
+        return;
+      }
+
+      const response = await SectionController.driveService.createFolder(section.title, course.driveFolderId);
+      const sectionFolderId = response.folderId;
       const newSection = await Section.create(
         {
           title: section.title,
@@ -59,14 +74,16 @@ export default class SectionController extends BaseController {
           moduleType: section.moduleType,
           coverImage: section.coverImage,
           colorGradient: section.colorGradient,
+          driveFolderId: sectionFolderId,
         },
         { transaction }
       );
 
       if (Array.isArray(section.contents) && section.contents.length > 0) {
         await Promise.all(
-          section.contents.map((contentData: any) =>
-            Content.create(
+          section.contents.map(async (contentData: any) => {
+            const response = await SectionController.driveService.createFolder(contentData.title, sectionFolderId);
+            return await Content.create(
               {
                 sectionId: newSection.id,
                 title: contentData.title,
@@ -76,10 +93,11 @@ export default class SectionController extends BaseController {
                 resources: contentData.resources,
                 duration: contentData.duration,
                 position: contentData.position,
+                driveFolderId: response.folderId, // Guardar el ID de la carpeta del contenido
               },
               { transaction }
-            )
-          )
+            );
+          })
         );
       }
 
@@ -94,6 +112,8 @@ export default class SectionController extends BaseController {
   // Actualizar una sección y sus contenidos
   static updateSectionAndContents: RequestHandler = async (req, res) => {
     if (!SectionController.handleValidationErrors(req, res)) return;
+    const { section } = req.body;
+      const { id } = req.params;
 
     const transaction = await sequelize.transaction();
     try {
@@ -122,6 +142,27 @@ export default class SectionController extends BaseController {
         .map((c: any) => c.id)
         .filter(Boolean);
 
+      // Obtener contenidos que van a ser eliminados para eliminar sus carpetas de Drive
+      const contentsToDelete = await Content.findAll({
+        where: {
+          sectionId: id,
+          id: { [Op.notIn]: incomingContentIds },
+        },
+        transaction,
+      });
+
+      // Eliminar carpetas de Drive de contenidos que van a ser eliminados
+      for (const contentToDelete of contentsToDelete) {
+        if (contentToDelete.driveFolderId) {
+          try {
+            await SectionController.driveService.deleteFolder(contentToDelete.driveFolderId);
+            console.log(`🗑️ Carpeta de Drive eliminada para contenido: ${contentToDelete.title}`);
+          } catch (error) {
+            console.warn(`⚠️ Error al eliminar carpeta de Drive para contenido ${contentToDelete.title}:`, error);
+          }
+        }
+      }
+
       await Content.destroy({
         where: {
           sectionId: id,
@@ -132,6 +173,7 @@ export default class SectionController extends BaseController {
 
       const contentUpdates = section.contents.map(async (contentData: any) => {
         if (contentData.id) {
+          // Actualizar contenido existente
           await Content.update(
             {
               title: contentData.title,
@@ -148,6 +190,24 @@ export default class SectionController extends BaseController {
             }
           );
         } else {
+          // Crear nuevo contenido con su carpeta de Drive
+          let contentFolderId: string | undefined;
+          
+          try {
+            const folderResponse = await this.driveService.createFolder(
+              contentData.title, 
+              existingSection.driveFolderId
+            );
+            if (folderResponse.success && folderResponse.folderId) {
+              contentFolderId = folderResponse.folderId;
+              console.log(`📁 Carpeta de Drive creada para contenido: ${contentData.title} (ID: ${contentFolderId})`);
+            } else {
+              console.warn(`⚠️ No se pudo crear carpeta de Drive para contenido: ${contentData.title}`);
+            }
+          } catch (error) {
+            console.warn(`⚠️ Error al crear carpeta de Drive para contenido ${contentData.title}:`, error);
+          }
+
           await Content.create(
             {
               sectionId: id,
@@ -158,6 +218,7 @@ export default class SectionController extends BaseController {
               resources: contentData.resources,
               duration: contentData.duration,
               position: contentData.position,
+              driveFolderId: contentFolderId, // Asignar el ID de la carpeta creada
             },
             { transaction }
           );
@@ -227,6 +288,9 @@ export default class SectionController extends BaseController {
         return;
       }
 
+      if(section.driveFolderId) {
+        await this.driveService.deleteFolder(section.driveFolderId);
+      }
       await section.destroy();
       
       SectionController.deleted(res, req, "Sección eliminada correctamente");

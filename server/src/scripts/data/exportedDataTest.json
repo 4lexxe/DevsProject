@@ -107,7 +107,7 @@
       "summary": "Aprende Node.js desde cero.",
       "about": "Este curso cubre los fundamentos y conceptos avanzados de Node.js.",
       "careerTypeId": 1,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos fundamentales sobre el lenguaje de javascript"
       ],
       "learningOutcomes": ["Manejo de Express", "Uso de Sequelize"],
@@ -116,6 +116,7 @@
       "adminId": 1,
       "categoryIds": [1, 2],
       "price": 100,
+      "driveFolderId": "11H0M5vwSKDrBH-2tQgShKnTeqcjjzyjY",
       "sections": [
         {
           "title": "Introducción al Curso",
@@ -123,6 +124,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover1.jpg",
           "moduleType": "Introductorio",
+          "driveFolderId": "1kVws1bHk3om3acnSzwH57mdBKJsxCOj-",
           "contents": [
             {
               "title": "Introducción al curso",
@@ -132,7 +134,8 @@
               "quiz": [],
               "duration": 30,
               "position": 1,
-              "sectionId": 1
+              "sectionId": 1,
+              "driveFolderId": "1Hd0Z1wQDbpkol-r8VjktTpiuoC_9er4P"
             }
           ]
         },
@@ -142,6 +145,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover2.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1Xe4RQssFAnZUt-CDQLKPb_KFohisEFeF",
           "contents": [
             {
               "title": "Módulos en Node.js",
@@ -151,7 +155,8 @@
               "quiz": [],
               "duration": 25,
               "position": 1,
-              "sectionId": 2
+              "sectionId": 2,
+              "driveFolderId": "1lMYavdBZx4t0xDIuI_EwKr2d9RlKofzr"
             },
             {
               "title": "Event Loop en Node.js",
@@ -161,7 +166,8 @@
               "quiz": [],
               "duration": 30,
               "position": 2,
-              "sectionId": 2
+              "sectionId": 2,
+              "driveFolderId": "1r8jIpYlogzI89suWJAelImrYuUeOZvhy"
             }
           ]
         },
@@ -171,6 +177,7 @@
           "courseId": 1,
           "coverImage": "https://example.com/cover3.jpg",
           "moduleType": "Intermedio",
+          "driveFolderId": "1jGNOH5sJYxQTEvGJ9d4WSuSCKwt6qgjn",
           "contents": [
             {
               "title": "Uso de Express.js",
@@ -180,7 +187,8 @@
               "quiz": [],
               "duration": 35,
               "position": 1,
-              "sectionId": 3
+              "sectionId": 3,
+              "driveFolderId": "1zz61tdi2FBjLMCqMbLYC0mecNgvICJVe"
             },
             {
               "title": "Middleware en Express.js",
@@ -190,12 +198,14 @@
               "quiz": [],
               "duration": 25,
               "position": 2,
-              "sectionId": 3
+              "sectionId": 3,
+              "driveFolderId": "1HEgpddPe99iBnj7T7kp8VbI_2kIHhHRX"
             },
             {
               "title": "Prueba de conceptos intermedios",
               "text": "Este cuestionario evalúa tus conocimientos sobre conceptos intermedios de Node.js.",
               "markdown": "## Prueba de conceptos intermedios\nResponde las siguientes preguntas para evaluar tus conocimientos.",
+              "driveFolderId": "1sRPZfs740xVBF2eiXgOPzQq0bRREU80_",
               "quiz": [
                 {
                   "id": 1,
@@ -369,7 +379,7 @@
       "summary": "Domina React.js desde los conceptos básicos hasta técnicas avanzadas.",
       "about": "Este curso completo te enseñará React.js, la biblioteca más popular para crear interfaces de usuario modernas y dinámicas.",
       "careerTypeId": 1,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos sólidos de JavaScript ES6+",
         "Familiaridad con HTML y CSS",
         "Conceptos básicos de programación web"
@@ -380,6 +390,7 @@
       "adminId": 1,
       "categoryIds": [1, 3],
       "price": 150,
+      "driveFolderId": "1m3WcBtOUQefsQO0Ygd54Esdpo0Q6p0IP",
       "sections": [
         {
           "title": "Fundamentos de React",
@@ -387,6 +398,7 @@
           "courseId": 2,
           "coverImage": "https://example.com/react-cover1.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1P-sRH1_HvbydZsFoY3iyhVraC73q52bt",
           "contents": [
             {
               "title": "¿Qué es React?",
@@ -455,6 +467,7 @@
           "courseId": 2,
           "coverImage": "https://example.com/react-cover2.jpg",
           "moduleType": "Intermedio",
+          "driveFolderId": "1EDRj4Cmfs3XcT6KpHqoUcWQISUulme6N",
           "contents": [
             {
               "title": "useState Hook",
@@ -514,7 +527,7 @@
       "summary": "Aprende Python desde cero con ejemplos prácticos.",
       "about": "Un curso completo de Python que cubre desde la sintaxis básica hasta conceptos avanzados como programación orientada a objetos.",
       "careerTypeId": 2,
-      "prerequesites": [
+      "prerequisites": [
         "Conocimientos básicos de lógica de programación",
         "Familiaridad con el uso de computadoras"
       ],
@@ -524,6 +537,7 @@
       "adminId": 1,
       "categoryIds": [2, 4],
       "price": 120,
+      "driveFolderId": "1TWDmgBADWiQEFEQlwXc5Ven973fLXEHA",
       "sections": [
         {
           "title": "Introducción a Python",
@@ -531,6 +545,7 @@
           "courseId": 3,
           "coverImage": "https://example.com/python-cover1.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "1EDRj4Cmfs3XcT6KpHqoUcWQISUulme6N",
           "contents": [
             {
               "title": "Instalación y primer programa",
@@ -604,6 +619,7 @@
           "courseId": 3,
           "coverImage": "https://example.com/python-cover2.jpg",
           "moduleType": "Principiante",
+          "driveFolderId": "11S-BKtyemk31gggOBn5nI0uvc_OW0lfE",
           "contents": [
             {
               "title": "Condicionales y bucles",

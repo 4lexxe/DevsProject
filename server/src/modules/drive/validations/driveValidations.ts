@@ -9,7 +9,7 @@ import { allowedFileTypes, fileLimits, getAllowedMimeTypes, isMimeTypeAllowed } 
  * Validación para subida de archivos
  */
 export const uploadFileValidations = [
-  body('name')
+  /* body('name')
     .notEmpty()
     .withMessage('El nombre del archivo es requerido')
     .isLength({ min: 1, max: 255 })
@@ -32,7 +32,7 @@ export const uploadFileValidations = [
   body('makePublic')
     .optional()
     .isBoolean()
-    .withMessage('makePublic debe ser un valor booleano'),
+    .withMessage('makePublic debe ser un valor booleano'), */
 ];
 
 /**
@@ -260,8 +260,6 @@ export const getFileTypesByCategory = (category: string): string[] => {
     case 'videos':
     case 'video':
       return allowedFileTypes.videos;
-    case 'audio':
-      return allowedFileTypes.audio;
     case 'documents':
     case 'document':
       return allowedFileTypes.documents;

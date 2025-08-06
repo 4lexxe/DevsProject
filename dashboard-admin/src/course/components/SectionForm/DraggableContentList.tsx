@@ -30,6 +30,7 @@ export default function DraggableContentList() {
   } = useSectionContext();
   
   const [items, setItems] = useState<IContent[]>([]);
+  const [pendingUpdates, setPendingUpdates] = useState<{ contentId: string; position: number }[]>([]);
   
   // 🔹 Sincronizar `items` cuando cambie la sección
   useEffect(() => {
@@ -37,6 +38,20 @@ export default function DraggableContentList() {
       setItems([...courseState.section.contents].sort((a, b) => a.position - b.position)); // 🔥 Siempre ordenado
     }
   }, [courseState.section]);
+
+  // 🔹 Ejecutar actualizaciones de posición de forma asíncrona
+  useEffect(() => {
+    if (pendingUpdates.length > 0) {
+      const timer = setTimeout(() => {
+        pendingUpdates.forEach((update) => {
+          updateContentPosition(update.contentId, update.position);
+        });
+        setPendingUpdates([]);
+      }, 0);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [pendingUpdates, updateContentPosition]);
   
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -47,8 +62,8 @@ export default function DraggableContentList() {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
   
-    const oldIndex = items.findIndex((item) => item.id === active.id);
-    const newIndex = items.findIndex((item) => item.id === over.id);
+    const oldIndex = items.findIndex((item) => item.contentId === active.id);
+    const newIndex = items.findIndex((item) => item.contentId === over.id);
   
     const updatedItems = arrayMove(items, oldIndex, newIndex).map((item, index) => ({
       ...item,
@@ -57,14 +72,31 @@ export default function DraggableContentList() {
   
     setItems(updatedItems);
     
-    updatedItems.forEach((item) => {
-      updateContentPosition(item.id, item.position);
-    });
+    // 🔹 Programa las actualizaciones para ejecutarse de forma asíncrona
+    const updates = updatedItems.map(item => ({ contentId: item.contentId, position: item.position }));
+    setPendingUpdates(updates);
   };
   
-  const handleDelete = (id: string) => {
-    deleteContent(id);
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  const handleDelete = (contentId: string) => {
+    // Eliminar el contenido del contexto
+    deleteContent(contentId);
+    
+    // Actualizar el estado local eliminando el item y reestructurando posiciones
+    setItems((prevItems) => {
+      const filteredItems = prevItems.filter((item) => item.contentId !== contentId);
+      
+      // Reestructurar las posiciones de los elementos restantes
+      const reorderedItems = filteredItems.map((item, index) => ({
+        ...item,
+        position: index + 1, // Nueva posición basada en el índice
+      }));
+      
+      // 🔹 Programa las actualizaciones para ejecutarse de forma asíncrona
+      const updates = reorderedItems.map(item => ({ contentId: item.contentId, position: item.position }));
+      setPendingUpdates(updates);
+      
+      return reorderedItems;
+    });
   };
 
   return (
@@ -93,17 +125,17 @@ export default function DraggableContentList() {
             onDragEnd={handleDragEnd}
           >
             <SortableContext
-              items={items}
+              items={items.map(item => item.contentId)}
               strategy={verticalListSortingStrategy}
             >
               <div className="space-y-4">
                 {items.map((item, index) => (
                   <DraggableItem
-                    key={item.id}
+                    key={item.contentId}
                     index={index}
                     item={item}
                     onEdit={() => editContent(item)}
-                    onDelete={() => handleDelete(item.id)}
+                    onDelete={() => handleDelete(item.contentId)}
                   />
                 ))}
               </div>

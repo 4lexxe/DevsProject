@@ -1,6 +1,7 @@
 import type React from "react";
 import LoginForm from "../components/login/LoginForm";
 import withAuthCheck from "../hoc/WithAuthCheck";
+import { Link } from "react-router-dom";
 
 function LoginPage() {
   return (
@@ -16,7 +17,11 @@ function LoginPage() {
             ¿Olvidaste tu contraseña?
           </a>
         </div>
+      <Link to="/register" className="text-blue-600 hover:underline">
+          No tienes cuenta? Regístrate
+      </Link>
       </div>
+
     </div>
   );
 }
