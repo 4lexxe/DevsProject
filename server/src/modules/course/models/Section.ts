@@ -11,6 +11,9 @@ class Section extends Model {
   public moduleType!: 'Introductorio' | 'Principiante' | 'Intermedio' | 'Avanzado' | 'Experto' | 'Insano Hardcore';
   public colorGradient!: string[];
   
+  // Asociaciones
+  public course?: Course;
+  
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }

@@ -5,6 +5,7 @@ import CourseGetController from '../controllers/courseGet.controller';
 import { validateCourse } from '../validators/courseValidation';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
 import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
+import { validateAdminCourseAccess } from '../../../shared/middleware/courseAccessMiddleware';
 
 const router = Router();
 
@@ -38,26 +39,26 @@ router.get('/courses/:id/price', CourseGetController.getByIdWithPrices);
 // Ruta para obtener un curso por ID y la navegacion entre sus secciones y contenidos de cada una
 router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
 
-// Ruta para crear un curso (requiere autenticación y permisos)
+// Ruta para crear un curso (requiere autenticación y permisos administrativos)
 router.post('/courses', 
   authMiddleware, 
-  permissionsMiddleware(['manage:courses']), 
+  validateAdminCourseAccess, 
   validateCourse, 
   CourseController.create
 );
 
-// Ruta para actualizar un curso (requiere autenticación y permisos)
+// Ruta para actualizar un curso (requiere autenticación y permisos administrativos)
 router.put('/courses/:id', 
   authMiddleware, 
-  permissionsMiddleware(['manage:courses']), 
+  validateAdminCourseAccess, 
   validateCourse, 
   CourseController.update
 );
 
-// Ruta para eliminar un curso (requiere autenticación y permisos)
+// Ruta para eliminar un curso (requiere autenticación y permisos administrativos)
 router.delete('/courses/:id', 
   authMiddleware, 
-  permissionsMiddleware(['delete:courses']), 
+  validateAdminCourseAccess, 
   CourseController.delete
 );
 

@@ -56,7 +56,7 @@ export interface UserCourseProgress {
 /**
  * Registra el acceso a un contenido específico
  */
-export const accessContent = async (courseId: number, contentId: number, timeSpent?: number) => {
+export const accessContent = async (courseId: string, contentId: string, timeSpent?: number) => {
   try {
     const response = await api.post(`${PROGRESS_ENDPOINT}/${courseId}/content/${contentId}/access`, {
       timeSpent
@@ -71,7 +71,7 @@ export const accessContent = async (courseId: number, contentId: number, timeSpe
 /**
  * Marca un contenido como completado
  */
-export const markContentCompleted = async (courseId: number, contentId: number, timeSpent?: number) => {
+export const markContentCompleted = async (courseId: string, contentId: string, timeSpent?: number) => {
   try {
     const response = await api.post(`${PROGRESS_ENDPOINT}/${courseId}/content/${contentId}/complete`, {
       timeSpent
@@ -86,7 +86,7 @@ export const markContentCompleted = async (courseId: number, contentId: number, 
 /**
  * Obtiene el progreso completo de un usuario en un curso
  */
-export const getCourseProgress = async (courseId: number): Promise<CourseProgressDetails> => {
+export const getCourseProgress = async (courseId: string): Promise<CourseProgressDetails> => {
   try {
     const response = await api.get(`${PROGRESS_ENDPOINT}/${courseId}/progress`);
     return response.data.data;

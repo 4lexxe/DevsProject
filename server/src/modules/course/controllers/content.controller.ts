@@ -4,6 +4,8 @@ import Content from "../models/Content";
 import Section from "../models/Section";
 import User from "../../user/User";
 import { BaseController } from "./BaseController";
+import { EncryptionUtils } from "../../../shared/utils/encryption.utils";
+import { validateCourseAccess } from "../../../shared/middleware/courseAccessMiddleware";
 
 export default class ContentController extends BaseController {
   // Obtener todos los contenidos
@@ -19,27 +21,48 @@ export default class ContentController extends BaseController {
     }
   };
 
-  // Obtener un contenido por ID
+  // Obtener un contenido por ID (REQUIERE AUTENTICACIÓN Y ACCESO AL CURSO)
   static getById: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const content = await Content.findByPk(id, {
+      
+      // Desencriptar ID si es necesario
+      let contentId: number;
+      if (EncryptionUtils.isValidEncryptedId(id)) {
+        contentId = EncryptionUtils.decryptId(id);
+      } else {
+        contentId = parseInt(id, 10);
+      }
+      
+      const content = await Content.findByPk(contentId, {
         include: [{ model: Section, as: "section" }],
       });
       if (!content) {
         ContentController.notFound(res, req, "Contenido");
         return;
       }
+      
+      // El contenido se devuelve con IDs originales ya que el usuario tiene acceso
       ContentController.sendSuccess(res, req, content, "Contenido obtenido correctamente");
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al obtener el contenido");
     }
   };
 
+  // Obtener quiz por ID de contenido (REQUIERE AUTENTICACIÓN Y ACCESO AL CURSO)
   static getQuizById: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const content = await Content.findByPk(id, {
+      
+      // Desencriptar ID si es necesario
+      let contentId: number;
+      if (EncryptionUtils.isValidEncryptedId(id)) {
+        contentId = EncryptionUtils.decryptId(id);
+      } else {
+        contentId = parseInt(id, 10);
+      }
+      
+      const content = await Content.findByPk(contentId, {
           attributes: ['quiz', "id"], // Solo traer el campo 'quiz'
       });
 
@@ -59,7 +82,16 @@ export default class ContentController extends BaseController {
   static getByIdWithNavigation: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const content = await Content.findByPk(id, {
+      
+      // Desencriptar ID si es necesario
+      let contentId: number;
+      if (EncryptionUtils.isValidEncryptedId(id)) {
+        contentId = EncryptionUtils.decryptId(id);
+      } else {
+        contentId = parseInt(id, 10);
+      }
+      
+      const content = await Content.findByPk(contentId, {
         include: [{ model: Section, as: "section" }],
       });
 
@@ -89,11 +121,23 @@ export default class ContentController extends BaseController {
     }
   };
 
-  // Obtener contenidos por sectionId
+  // Obtener contenidos por sectionId (REQUIERE AUTENTICACIÓN Y ACCESO AL CURSO)
   static getBySectionId: RequestHandler = async (req, res) => {
     try {
       const { sectionId } = req.params;
-      const contents = await Content.findAll({ where: { sectionId } });
+      
+      // Desencriptar ID si es necesario
+      let numericSectionId: number;
+      if (EncryptionUtils.isValidEncryptedId(sectionId)) {
+        numericSectionId = EncryptionUtils.decryptId(sectionId);
+      } else {
+        numericSectionId = parseInt(sectionId, 10);
+      }
+      
+      const contents = await Content.findAll({ 
+        where: { sectionId: numericSectionId },
+        order: [['position', 'ASC']]
+      });
       ContentController.sendSuccess(res, req, contents, "Contenidos obtenidos correctamente para la sección especificada");
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al obtener los contenidos de la sección");

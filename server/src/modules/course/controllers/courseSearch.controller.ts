@@ -1,6 +1,7 @@
 import { Request, Response, RequestHandler } from "express";
 import { BaseController } from "./BaseController";
 import { CourseSearchService } from "../services/searchService";
+import { EncryptionUtils } from "../../../shared/utils/encryption.utils";
 
 export default class CourseSearchController extends BaseController {
   
@@ -27,11 +28,25 @@ export default class CourseSearchController extends BaseController {
       // Realizar búsqueda usando el servicio
       const searchResults = await CourseSearchService.basicSearch(searchTerm.trim(), pageNumber, limitNumber);
 
+      // Encriptar IDs en los resultados para seguridad
+      const encryptedResults = {
+        ...searchResults,
+        courses: searchResults.courses.map((course: any) => ({
+          ...course,
+          id: EncryptionUtils.encryptId(course.id),
+          sections: course.sections?.map((section: any) => ({
+            ...section,
+            id: EncryptionUtils.encryptId(section.id),
+            courseId: EncryptionUtils.encryptId(section.courseId)
+          })) || []
+        }))
+      };
+
       CourseSearchController.sendSuccess(
         res, 
         req, 
-        searchResults, 
-        `Página ${searchResults.pagination.currentPage} de ${searchResults.pagination.totalPages} - ${searchResults.totalResults} cursos encontrados para: "${searchResults.searchTerm}"`
+        encryptedResults, 
+        `Página ${encryptedResults.pagination.currentPage} de ${encryptedResults.pagination.totalPages} - ${encryptedResults.totalResults} cursos encontrados para: "${encryptedResults.searchTerm}"`
       );
       
     } catch (error) {
@@ -86,14 +101,28 @@ export default class CourseSearchController extends BaseController {
       // Realizar búsqueda avanzada usando el servicio
       const searchResults = await CourseSearchService.advancedSearch(searchOptions);
 
+      // Encriptar IDs en los resultados para seguridad
+      const encryptedResults = {
+        ...searchResults,
+        courses: searchResults.courses.map((course: any) => ({
+          ...course,
+          id: EncryptionUtils.encryptId(course.id),
+          sections: course.sections?.map((section: any) => ({
+            ...section,
+            id: EncryptionUtils.encryptId(section.id),
+            courseId: EncryptionUtils.encryptId(section.courseId)
+          })) || []
+        }))
+      };
+
       // Mensaje simplificado
-      const searchTime = searchResults.searchMetadata?.searchTime || 0;
+      const searchTime = encryptedResults.searchMetadata?.searchTime || 0;
       
       CourseSearchController.sendSuccess(
         res,
         req,
-        searchResults,
-        `Se encontraron ${searchResults.totalResults} cursos. Tiempo de búsqueda: ${searchTime}ms.`
+        encryptedResults,
+        `Se encontraron ${encryptedResults.totalResults} cursos. Tiempo de búsqueda: ${searchTime}ms.`
       );
       
     } catch (error) {

@@ -10,6 +10,9 @@ class Content extends Model {
   public title!: string;
   public text!: string;
   public markdown?: string;
+  
+  // Asociaciones
+  public section?: Section;
   public quiz?: Array<{
     id: string;
     question: string; // Pregunta

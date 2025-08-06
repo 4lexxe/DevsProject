@@ -6,6 +6,7 @@ import Progress from "../../course/models/Progress";
 import Content from "../../course/models/Content";
 import Section from "../../course/models/Section";
 import { Op } from "sequelize";
+import { EncryptionUtils } from "../../../shared/utils/encryption.utils";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
 
@@ -73,11 +74,23 @@ export class CourseAccessController extends BaseController {
 
     const { userId, courseId } = req.params;
 
+    // Intentar desencriptar el courseId si está encriptado
+    let numericCourseId: number;
+    try {
+      if (EncryptionUtils.isValidEncryptedId(courseId)) {
+        numericCourseId = EncryptionUtils.decryptId(courseId);
+      } else {
+        numericCourseId = parseInt(courseId);
+      }
+    } catch (error) {
+      return this.sendError(res, req, "ID de curso inválido", 400);
+    }
+
     // Verificar que el usuario tiene acceso al curso
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: parseInt(userId),
-        courseId: parseInt(courseId),
+        courseId: numericCourseId,
         revokedAt: null
       },
       include: [
@@ -123,10 +136,22 @@ export class CourseAccessController extends BaseController {
 
     const { userId, courseId } = req.params;
 
+    // Intentar desencriptar el courseId si está encriptado
+    let numericCourseId: number;
+    try {
+      if (EncryptionUtils.isValidEncryptedId(courseId)) {
+        numericCourseId = EncryptionUtils.decryptId(courseId);
+      } else {
+        numericCourseId = parseInt(courseId);
+      }
+    } catch (error) {
+      return this.sendError(res, req, "ID de curso inválido", 400);
+    }
+
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: parseInt(userId),
-        courseId: parseInt(courseId),
+        courseId: numericCourseId,
         revokedAt: null
       }
     });

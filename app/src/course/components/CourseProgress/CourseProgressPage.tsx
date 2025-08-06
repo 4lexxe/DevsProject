@@ -17,7 +17,7 @@ const CourseProgressPage: React.FC = () => {
       
       try {
         setLoading(true);
-        const progressData = await getCourseProgress(parseInt(courseId));
+        const progressData = await getCourseProgress(courseId);
         setCourseProgress(progressData);
       } catch (err) {
         setError('Error al cargar el progreso del curso');

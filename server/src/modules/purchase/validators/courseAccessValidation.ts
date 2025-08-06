@@ -1,4 +1,5 @@
 import { body, param } from 'express-validator';
+import { EncryptionUtils } from '../../../shared/utils/encryption.utils';
 
 /**
  * Validaciones para las rutas de acceso a cursos
@@ -15,9 +16,19 @@ export const validateUserId = [
 // Validación para el parámetro courseId
 export const validateCourseId = [
   param('courseId')
-    .isInt({ min: 1 })
-    .withMessage('El ID del curso debe ser un número entero positivo')
-    .toInt()
+    .custom((value) => {
+      // Verificar si es un ID encriptado válido
+      if (EncryptionUtils.isValidEncryptedId(value)) {
+        return true;
+      }
+      // Si no es encriptado, verificar que sea un entero positivo
+      const numericValue = parseInt(value, 10);
+      if (isNaN(numericValue) || numericValue < 1) {
+        throw new Error('El ID del curso debe ser un número entero positivo o un ID encriptado válido');
+      }
+      return true;
+    })
+    .withMessage('El ID del curso debe ser un número entero positivo o un ID encriptado válido')
 ];
 
 // Validación para otorgar acceso a curso

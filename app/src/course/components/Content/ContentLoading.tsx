@@ -41,11 +41,11 @@ function ContentLoading({
     const registerContentAccess = async () => {
       try {
         // Registrar acceso al contenido
-        await accessContent(parseInt(courseId), parseInt(contentId));
+        await accessContent(courseId, contentId);
         console.log('Acceso al contenido registrado');
         
         // Marcar automáticamente como completado
-        await markContentCompleted(parseInt(courseId), parseInt(contentId));
+        await markContentCompleted(courseId, contentId);
         console.log('Contenido marcado como completado automáticamente');
         toast.success('¡Contenido completado!');
       } catch (error) {

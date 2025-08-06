@@ -1,4 +1,5 @@
 import api from '../../shared/api/axios';
+import { cacheService } from '../../shared/services/cacheService';
 
 interface Course {
   id: number;
@@ -10,8 +11,22 @@ const COURSES_ENDPOINT = '/courses';
 //Obtener todos los cursos activos
 export const getCourses = async () => {
   try {
+    // Intentar obtener del caché primero
+    const cachedCourses = cacheService.getCourses();
+    if (cachedCourses) {
+      console.log('Cursos obtenidos del caché');
+      return cachedCourses;
+    }
+
+    // Si no hay caché, hacer la petición a la API
     const response = await api.get(COURSES_ENDPOINT + "/actives");
-    return response.data.data;
+    const courses = response.data.data;
+    
+    // Guardar en caché
+    cacheService.setCourses(courses);
+    console.log('Cursos guardados en caché');
+    
+    return courses;
   } catch (error) {
     console.error('Error al obtener los cursos:', error);
     throw error;
@@ -22,8 +37,22 @@ export const getCourses = async () => {
 export const getById = async(id: string) => {
   if(id){
     try {
+      // Intentar obtener del caché primero
+      const cachedCourse = cacheService.getCourseDetail(id);
+      if (cachedCourse) {
+        console.log(`Curso ${id} obtenido del caché`);
+        return cachedCourse;
+      }
+
+      // Si no hay caché, hacer la petición a la API
       const response = await api.get(COURSES_ENDPOINT + `/${id}/price`);
-      return response.data.data;
+      const course = response.data.data;
+      
+      // Guardar en caché
+      cacheService.setCourseDetail(id, course);
+      console.log(`Curso ${id} guardado en caché`);
+      
+      return course;
     } catch (error) {
       console.error('Error al obtener los cursos:', error);
       throw error;

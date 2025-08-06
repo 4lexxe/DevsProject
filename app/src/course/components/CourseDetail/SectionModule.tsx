@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   BookCopy,
   ChevronDown,
@@ -11,14 +11,19 @@ interface SectionModuleProps {
   section: Section;
 }
 
-const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
+const SectionModule: React.FC<SectionModuleProps> = React.memo(({ section }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Memoizar la función de toggle para evitar recreaciones
+  const toggleExpanded = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
 
   return (
     <div className="bg-slate-50 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg border border-gray-300">
       <div
         className="cursor-pointer relative"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={toggleExpanded}
       >
         <div className="relative">
           {/* Background image with gradient overlay */}
@@ -86,6 +91,6 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
       )}
     </div>
   );
-};
+});
 
 export default SectionModule;

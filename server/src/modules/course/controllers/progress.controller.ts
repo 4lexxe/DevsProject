@@ -9,6 +9,7 @@ import Role from '../../role/Role';
 import CourseAccess from '../../purchase/models/CourseAccess';
 import { Op } from 'sequelize';
 import sequelize from '../../../infrastructure/database/db';
+import { EncryptionUtils } from '../../../shared/utils/encryption.utils';
 
 /**
  * Controlador para gestionar el progreso del usuario en los cursos
@@ -27,11 +28,27 @@ export class ProgressController extends BaseController {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
+    // Desencriptar IDs si es necesario
+    let decryptedCourseId: number;
+    let decryptedContentId: number;
+    
+    if (EncryptionUtils.isValidEncryptedId(courseId)) {
+      decryptedCourseId = EncryptionUtils.decryptId(courseId);
+    } else {
+      decryptedCourseId = parseInt(courseId, 10);
+    }
+    
+    if (EncryptionUtils.isValidEncryptedId(contentId)) {
+      decryptedContentId = EncryptionUtils.decryptId(contentId);
+    } else {
+      decryptedContentId = parseInt(contentId, 10);
+    }
+
     // Verificar que el usuario tiene acceso al curso
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: userId,
-        courseId: parseInt(courseId),
+        courseId: decryptedCourseId,
         revokedAt: null
       }
     });
@@ -42,11 +59,11 @@ export class ProgressController extends BaseController {
 
     // Verificar que el contenido existe y pertenece al curso
     const content = await Content.findOne({
-      where: { id: parseInt(contentId) },
+      where: { id: decryptedContentId },
       include: [{
         model: Section,
         as: 'section',
-        where: { courseId: parseInt(courseId) }
+        where: { courseId: decryptedCourseId }
       }]
     });
 
@@ -58,13 +75,13 @@ export class ProgressController extends BaseController {
     const [progress] = await Progress.findOrCreate({
       where: {
         userId: userId,
-        courseId: parseInt(courseId),
-        contentId: parseInt(contentId)
+        courseId: decryptedCourseId,
+        contentId: decryptedContentId
       },
       defaults: {
         userId: userId,
-        courseId: parseInt(courseId),
-        contentId: parseInt(contentId),
+        courseId: decryptedCourseId,
+        contentId: decryptedContentId,
         isCompleted: false,
         timeSpent: timeSpent || 0,
         lastAccessedAt: new Date()
@@ -97,11 +114,27 @@ export class ProgressController extends BaseController {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
+    // Desencriptar IDs si es necesario
+    let decryptedCourseId: number;
+    let decryptedContentId: number;
+    
+    if (EncryptionUtils.isValidEncryptedId(courseId)) {
+      decryptedCourseId = EncryptionUtils.decryptId(courseId);
+    } else {
+      decryptedCourseId = parseInt(courseId, 10);
+    }
+    
+    if (EncryptionUtils.isValidEncryptedId(contentId)) {
+      decryptedContentId = EncryptionUtils.decryptId(contentId);
+    } else {
+      decryptedContentId = parseInt(contentId, 10);
+    }
+
     // Verificar que el usuario tiene acceso al curso
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: userId,
-        courseId: parseInt(courseId),
+        courseId: decryptedCourseId,
         revokedAt: null
       }
     });
@@ -112,11 +145,11 @@ export class ProgressController extends BaseController {
 
     // Verificar que el contenido existe y pertenece al curso
     const content = await Content.findOne({
-      where: { id: parseInt(contentId) },
+      where: { id: decryptedContentId },
       include: [{
         model: Section,
         as: 'section',
-        where: { courseId: parseInt(courseId) }
+        where: { courseId: decryptedCourseId }
       }]
     });
 
@@ -128,13 +161,13 @@ export class ProgressController extends BaseController {
     const [progress] = await Progress.findOrCreate({
       where: {
         userId: userId,
-        courseId: parseInt(courseId),
-        contentId: parseInt(contentId)
+        courseId: decryptedCourseId,
+        contentId: decryptedContentId
       },
       defaults: {
         userId: userId,
-        courseId: parseInt(courseId),
-        contentId: parseInt(contentId),
+        courseId: decryptedCourseId,
+        contentId: decryptedContentId,
         isCompleted: true,
         completedAt: new Date(),
         timeSpent: 0,
@@ -152,7 +185,7 @@ export class ProgressController extends BaseController {
     }
 
     // Calcular progreso del curso
-    const courseProgress = await this.calculateCourseProgress(userId, parseInt(courseId));
+    const courseProgress = await this.calculateCourseProgress(userId, decryptedCourseId);
 
     this.sendSuccess(res, req, {
       contentId: progress.contentId,
@@ -173,11 +206,20 @@ export class ProgressController extends BaseController {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
+    // Desencriptar courseId si es necesario
+    let decryptedCourseId: number;
+    
+    if (EncryptionUtils.isValidEncryptedId(courseId)) {
+      decryptedCourseId = EncryptionUtils.decryptId(courseId);
+    } else {
+      decryptedCourseId = parseInt(courseId, 10);
+    }
+
     // Verificar acceso al curso
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: userId,
-        courseId: parseInt(courseId),
+        courseId: decryptedCourseId,
         revokedAt: null
       }
     });
@@ -186,7 +228,7 @@ export class ProgressController extends BaseController {
       return this.forbidden(res, req, 'No tienes acceso a este curso');
     }
 
-    const progressData = await this.getCourseProgressDetails(userId, parseInt(courseId));
+    const progressData = await this.getCourseProgressDetails(userId, decryptedCourseId);
 
     this.sendSuccess(res, req, progressData, 'Progreso del curso obtenido exitosamente');
   });
@@ -364,6 +406,15 @@ export class ProgressController extends BaseController {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
+    // Desencriptar courseId si es necesario
+    let decryptedCourseId: number;
+    
+    if (EncryptionUtils.isValidEncryptedId(courseId)) {
+      decryptedCourseId = EncryptionUtils.decryptId(courseId);
+    } else {
+      decryptedCourseId = parseInt(courseId, 10);
+    }
+
     // Solo permitir a administradores o al propio usuario
     const user = await User.findByPk(userId, {
       include: [{
@@ -381,12 +432,12 @@ export class ProgressController extends BaseController {
     await Progress.destroy({
       where: {
         userId: targetUser,
-        courseId: parseInt(courseId)
+        courseId: decryptedCourseId
       }
     });
 
     this.sendSuccess(res, req, {
-      courseId: parseInt(courseId),
+      courseId: decryptedCourseId,
       userId: userId
     }, 'Progreso del curso reiniciado exitosamente');
   });

@@ -7,6 +7,7 @@ import Course from "../../course/models/Course";
 import User from "../../user/User";
 import { Preference } from "mercadopago";
 import { Op } from "sequelize";
+import { EncryptionUtils } from "../../../shared/utils/encryption.utils";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
@@ -82,8 +83,20 @@ class CartController extends BaseController {
         return this.unauthorized(res, req, "Usuario no autenticado");
       }
 
+      // Intentar desencriptar el courseId si está encriptado
+      let numericCourseId: number;
+      try {
+        if (typeof courseId === 'string' && EncryptionUtils.isValidEncryptedId(courseId)) {
+          numericCourseId = EncryptionUtils.decryptId(courseId);
+        } else {
+          numericCourseId = parseInt(courseId);
+        }
+      } catch (error) {
+        return this.sendError(res, req, "ID de curso inválido", 400);
+      }
+
       // Verificar que el curso existe
-      const course = await Course.findByPk(courseId);
+      const course = await Course.findByPk(numericCourseId);
       if (!course) {
         return this.notFound(res, req, "Curso");
       }
@@ -113,27 +126,27 @@ class CartController extends BaseController {
 
       // Verificar si el curso ya está en el carrito
       const existingCartCourse = await CartCourse.findOne({
-        where: { cartId: cart.id, courseId },
+        where: { cartId: cart.id, courseId: numericCourseId },
       });
 
       if (existingCartCourse) {
         return this.validationFailed(
           res,
           req,
-          { courseId },
+          { courseId: numericCourseId },
           "El curso ya está en el carrito"
         );
       }
 
       const coursesAccess = await CourseAccess.findOne({
-        where: { userId, courseId },
+        where: { userId, courseId: numericCourseId },
       });
 
       if (coursesAccess) {
         return this.validationFailed(
           res,
           req,
-          { courseId },
+          { courseId: numericCourseId },
           "Ya tienes acceso a este curso"
         );
       }
@@ -141,7 +154,7 @@ class CartController extends BaseController {
       // Agregar curso al carrito
       const cartCourse = await CartCourse.create({
         cartId: cart.id,
-        courseId,
+        courseId: numericCourseId,
       });
 
       // Recalcular totales del carrito
@@ -656,6 +669,18 @@ class CartController extends BaseController {
         return this.unauthorized(res, req, "Usuario no autenticado");
       }
 
+      // Intentar desencriptar el courseId si está encriptado
+      let numericCourseId: number;
+      try {
+        if (EncryptionUtils.isValidEncryptedId(courseId)) {
+          numericCourseId = EncryptionUtils.decryptId(courseId);
+        } else {
+          numericCourseId = parseInt(courseId);
+        }
+      } catch (error) {
+        return this.sendError(res, req, "ID de curso inválido", 400);
+      }
+
       const cart = await Cart.findOne({
         where: { userId, status: "active" },
       });
@@ -670,7 +695,7 @@ class CartController extends BaseController {
       }
 
       const cartCourse = await CartCourse.findOne({
-        where: { cartId: cart.id, courseId: parseInt(courseId) },
+        where: { cartId: cart.id, courseId: numericCourseId },
       });
 
       this.sendSuccess(

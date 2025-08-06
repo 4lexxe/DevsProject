@@ -38,6 +38,7 @@ import MyCoursesPage from "./payment/pages/MyCourses";
 import CourseDiscountEvent from "./payment/pages/CourseDiscountEvent";
 import DiscountEventsList from "./payment/pages/DiscountEventsList";
 import MyCourse from "./payment/pages/MyCourse";
+import Settings from "./pages/settings/Settings";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,7 @@ function App() {
               <Route path="/discount-events/create" element={<CourseDiscountEvent />} />
               <Route path="/discount-events/edit" element={<CourseDiscountEvent />} />
               <Route path="/my-course/:id" element={<MyCourse />} />
+              <Route path="/settings" element={<Settings />} />
               {/* Rutas públicas */}
 
               {/* Rutas protegidas */}

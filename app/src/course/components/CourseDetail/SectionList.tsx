@@ -1,5 +1,5 @@
 // components/courses/SectionList.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { getSectionsByCourse } from "../../services/sectionServices";
 import SectionModule from "./SectionModule";
 import { Section } from "@/course/interfaces/ViewnerCourse";
@@ -8,26 +8,37 @@ interface SectionListProps {
   courseId: string;
 }
 
-const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
+const SectionList: React.FC<SectionListProps> = React.memo(({ courseId }) => {
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchSections = async () => {
-      try {
-        setLoading(true);
-        const response = await getSectionsByCourse(courseId);
-        setSections(response);
-      } catch (err) {
-        console.error("Error fetching sections:", err);
-        setError("No se pudieron cargar las secciones del curso");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSections();
+  // Memoizar la función de fetch para evitar recreaciones innecesarias
+  const fetchSections = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getSectionsByCourse(courseId);
+      setSections(response);
+    } catch (err) {
+      console.error("Error fetching sections:", err);
+      setError("No se pudieron cargar las secciones del curso");
+    } finally {
+      setLoading(false);
+    }
   }, [courseId]);
+
+  // Memoizar el renderizado de las secciones ANTES de cualquier return condicional
+  const renderedSections = useMemo(() => {
+    return sections.map((section) => (
+      <div key={section.id}>
+        <SectionModule section={section} />
+      </div>
+    ));
+  }, [sections]);
+
+  useEffect(() => {
+    fetchSections();
+  }, [fetchSections]);
 
   if (loading) {
     return (
@@ -69,14 +80,10 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
     <div>
       {/* Lista de secciones */}
       <div className="grid grid-cols-1 gap-4">
-        {sections.map((section) => (
-          <div key={section.id}>
-            <SectionModule section={section} />
-          </div>
-        ))}
+        {renderedSections}
       </div>
     </div>
   );
-};
+});
 
 export default SectionList;
