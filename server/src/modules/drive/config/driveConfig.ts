@@ -1,5 +1,4 @@
 import { google } from 'googleapis';
-import path from 'path';
 
 export interface DriveConfig {
   clientId: string;
@@ -15,8 +14,23 @@ const clientSecret = process.env.GOOGLE_DRIVE_CLIENT_SECRET || '';
 const refreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
 const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || '';  
 
+// Logging de configuración (sin mostrar valores sensibles)
+console.log('🔧 Configuración de Google Drive:', {
+  clientIdConfigured: !!clientId,
+  clientSecretConfigured: !!clientSecret,
+  refreshTokenConfigured: !!refreshToken,
+  folderIdConfigured: !!folderId,
+  clientIdLength: clientId.length,
+  refreshTokenLength: refreshToken.length
+});
+
 if(!clientId || !clientSecret || !refreshToken) {
-  throw new Error('Faltan variables de entorno necesarias para la configuración de Google Drive');
+  const missingVars = [];
+  if (!clientId) missingVars.push('GOOGLE_DRIVE_CLIENT_ID');
+  if (!clientSecret) missingVars.push('GOOGLE_DRIVE_CLIENT_SECRET');
+  if (!refreshToken) missingVars.push('GOOGLE_DRIVE_REFRESH_TOKEN');
+  
+  throw new Error(`Faltan variables de entorno necesarias para la configuración de Google Drive: ${missingVars.join(', ')}`);
 }
 
 
@@ -57,27 +71,6 @@ export function createDriveClient() {
 }
 
 /**
- * Valida que todas las variables de entorno necesarias estén configuradas
- */
-export function validateDriveConfig(): { isValid: boolean; missingVars: string[] } {
-  const requiredVars = [
-    clientId,
-    clientSecret,
-    refreshToken
-  ];
-
-  const missingVars = requiredVars.filter(varName => {
-    const value = process.env[varName];
-    return !value || value.trim() === '';
-  });
-
-  return {
-    isValid: missingVars.length === 0,
-    missingVars
-  };
-}
-
-/**
  * Configuración de tipos de archivo permitidos
  */
 export const allowedFileTypes = {
@@ -90,12 +83,7 @@ export const allowedFileTypes = {
   ],
   videos: [
     'video/mp4',
-    'video/avi',
-    'video/mov',
-    'video/wmv',
-    'video/flv',
-    'video/webm',
-    'video/mkv'
+    'video/webm'
   ],
   audio: [
     'audio/mp3',
@@ -112,23 +100,19 @@ export const allowedFileTypes = {
     'application/vnd.ms-powerpoint',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'text/plain',
-    'text/csv'
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   ],
   archives: [
     'application/zip',
     'application/x-rar-compressed',
-    'application/x-tar',
-    'application/gzip'
+    'application/x-tar'
   ],
   code: [
-    'text/javascript',
-    'text/html',
-    'text/css',
+    'text/plain',
     'application/json',
-    'application/xml',
-    'text/xml'
+    'text/javascript',
+    'text/css',
+    'text/html'
   ]
 };
 
@@ -136,7 +120,8 @@ export const allowedFileTypes = {
  * Configuración de límites de archivo
  */
 export const fileLimits = {
-  maxFileSize: 100 * 1024 * 1024, // 100MB en bytes
+  maxFileSize: 20 * 1024 * 1024, // 20MB en bytes para archivos normales
+  maxVideoFileSize: 400 * 1024 * 1024 * 1024, // 400GB en bytes para videos
   maxFilesPerUpload: 10,
   allowedExtensions: [
     '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg',
@@ -156,6 +141,8 @@ export function getAllowedMimeTypes(): string[] {
     ...allowedFileTypes.images,
     ...allowedFileTypes.videos,
     ...allowedFileTypes.documents,
+    ...allowedFileTypes.archives,
+    ...allowedFileTypes.code,
   ];
 }
 
@@ -172,6 +159,8 @@ export function isMimeTypeAllowed(mimeType: string): boolean {
 export function getFileTypeFromMime(mimeType: string): string {
   if (allowedFileTypes.images.includes(mimeType)) return 'image';
   if (allowedFileTypes.videos.includes(mimeType)) return 'video';
+  if (allowedFileTypes.archives.includes(mimeType)) return 'archive';
+  if (allowedFileTypes.code.includes(mimeType)) return 'code';
   if (allowedFileTypes.documents.includes(mimeType)) return 'document';
   if (mimeType === 'application/pdf') return 'pdf';
   if (mimeType.includes('presentation')) return 'presentation';
@@ -183,7 +172,7 @@ export default {
   driveConfig,
   createDriveAuth,
   createDriveClient,
-  validateDriveConfig,
+  /* validateDriveConfig, */
   allowedFileTypes,
   fileLimits,
   getAllowedMimeTypes,

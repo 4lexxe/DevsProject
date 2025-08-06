@@ -10,12 +10,15 @@ class Section extends Model {
   public coverImage!: string;
   public moduleType!: 'Introductorio' | 'Principiante' | 'Intermedio' | 'Avanzado' | 'Experto' | 'Insano Hardcore';
   public colorGradient!: string[];
+  public driveFolderId?: string;
   
   // Asociaciones
   public course?: Course;
-  
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // Asociaciones
+  public contents?: any[]; // Relación con contenidos
 }
 
 Section.init(
@@ -36,6 +39,8 @@ Section.init(
     courseId: {
       type: DataTypes.BIGINT,
       references: { model: Course, key: "id" },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
     },
     coverImage: {
       type: DataTypes.TEXT,
@@ -51,16 +56,27 @@ Section.init(
       allowNull: false,
       defaultValue: ['#000000', '#FFFFFF'],
     },
+    driveFolderId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'ID de la carpeta en Google Drive asociada a esta sección',  
+    },
   },
   {
     sequelize,
     modelName: "Section",
     tableName: "Sections",
     timestamps: true,
+    paranoid: true,
   }
 );
 
 Section.belongsTo(Course, { foreignKey: "courseId", as: "course" });
-Course.hasMany(Section, { foreignKey: "courseId", as: "sections" });
+Course.hasMany(Section, { 
+  foreignKey: "courseId", 
+  as: "sections",
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 export default Section;

@@ -1,4 +1,4 @@
-import { Clock, Plus, Settings } from "lucide-react";
+import { Clock, Plus, Settings, Trash2 } from "lucide-react";
 import { Section } from "../../interfaces/CourseDetail";
 
 interface SectionsGridProps {
@@ -6,6 +6,7 @@ interface SectionsGridProps {
   onCreateSection: () => void;
   onSectionClick: (sectionId: string) => void;
   onEditSection: (e: React.MouseEvent, sectionId: string) => void;
+  onDeleteSection?: (e: React.MouseEvent, sectionId: string) => void;
   formatDate: (dateString: string) => string;
   getModuleTypeBg: (type: string) => string;
 }
@@ -15,6 +16,7 @@ export default function SectionsGrid({
   onCreateSection, 
   onSectionClick, 
   onEditSection, 
+  onDeleteSection,
   formatDate, 
   getModuleTypeBg 
 }: SectionsGridProps) {
@@ -77,6 +79,16 @@ export default function SectionsGrid({
                         <Settings className="w-3 h-3" />
                         Editar
                       </button>
+                      {onDeleteSection && (
+                        <button 
+                          onClick={(e) => onDeleteSection(e, section.id)}
+                          className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 transition-colors"
+                          title="Eliminar sección completa"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   </div>
 

@@ -22,10 +22,7 @@ function SideNavigationLoading({
       if (!courseId) return; // Evita hacer la petición si no hay un ID válido
       try {
         const data = await getNavegationById(courseId);
-        console.log(data);
-        setTimeout(() => {
-          setNavigate(data);
-        }, 500);
+        setNavigate(data);
       } catch (err) {
         console.error("Error al obtener la navegacion:", err);
       }

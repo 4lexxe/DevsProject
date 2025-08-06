@@ -5,9 +5,11 @@ import CareerType from "../models/CareerType";
 import User from "../../user/User";
 import { BaseController } from "./BaseController";
 import { Op } from "sequelize";
+import DriveService from "../../drive/services/driveService";
+import { formField } from "pdfkit";
 
 export default class CourseController extends BaseController {
-  
+  static driveService = new DriveService();
   // Crear un nuevo curso con categorías
   static create: RequestHandler = async (req, res) => {
     if (!CourseController.handleValidationErrors(req, res)) return;
@@ -28,6 +30,12 @@ export default class CourseController extends BaseController {
         categoryIds,
       } = req.body;
 
+      
+      // Crear carpeta en Google Drive para el curso
+      
+      const response = await this.driveService.createFolder(title);
+
+
       const newCourse = await Course.create({
         title,
         image,
@@ -40,6 +48,7 @@ export default class CourseController extends BaseController {
         isActive,
         isInDevelopment,
         adminId,
+        driveFolderId: response.folderId,
       });
 
       if (categoryIds && categoryIds.length > 0) {
@@ -145,8 +154,24 @@ export default class CourseController extends BaseController {
         return;
       }
 
+      console.log('🗑️ Iniciando eliminación del curso:', course.title);
+
+      // Solo eliminar la carpeta principal del curso en Drive
+      // Esto eliminará automáticamente todas las subcarpetas y archivos
+      console.log(`🗑️ Eliminando carpeta principal del curso: ${course.title} de id ${course.driveFolderId}`);
+      if (course.driveFolderId) {
+        try {
+          await CourseController.driveService.deleteFolder(course.driveFolderId);
+          console.log(`✅ Carpeta principal del curso eliminada (incluyendo subcarpetas): ${course.title}`);
+        } catch (error) {
+          console.error(`❌ Error eliminando carpeta principal del curso ${course.title}:`, error);
+        }
+      }
+
+      // Eliminar el curso (la cascada en Sequelize se encarga del resto)
       await course.destroy();
       
+      console.log('✅ Curso eliminado completamente:', course.title);
       CourseController.deleted(res, req, "Curso eliminado correctamente");
     } catch (error) {
       CourseController.handleServerError(res, req, error, "Error al eliminar el curso");

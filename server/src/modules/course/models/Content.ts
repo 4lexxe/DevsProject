@@ -11,8 +11,6 @@ class Content extends Model {
   public text!: string;
   public markdown?: string;
   
-  // Asociaciones
-  public section?: Section;
   public quiz?: Array<{
     id: string;
     question: string; // Pregunta
@@ -40,8 +38,14 @@ class Content extends Model {
   }>;
   public duration!: number;
   public position!: number;
+  public driveFolderId?: string; // ID de la carpeta en Google Drive asociada al contenido
+  public section!: Section; // Relación con la sección
+
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  // Asociaciones
+  public files?: any[]; // Relación con archivos de contenido
 }
 
 Content.init(
@@ -82,17 +86,30 @@ Content.init(
     sectionId: {
       type: DataTypes.BIGINT,
       references: { model: Section, key: "id" },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    driveFolderId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: 'ID de la carpeta en Google Drive asociada al contenido',
     },
   },
   {
     sequelize,
     modelName: "Content",
     tableName: "Contents",
+    paranoid: true,
     timestamps: true,
   }
 );
 
 Content.belongsTo(Section, { foreignKey: "sectionId", as: "section" });
-Section.hasMany(Content, { foreignKey: "sectionId", as: "contents" });
+Section.hasMany(Content, { 
+  foreignKey: "sectionId", 
+  as: "contents",
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE',
+});
 
 export default Content;

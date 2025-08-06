@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, Edit, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import MarkdownPreview from "../SectionForm/MarkdownPreview";
 
 interface Quiz {
@@ -27,16 +27,11 @@ interface QuizDisplayProps {
   quiz: Quiz;
   quizIndex: number;
   contentId: string;
-  onEditQuiz: (contentId: string) => void;
-  onDeleteQuiz: (contentId: string, quizId: string) => void;
 }
 
 export default function QuizDisplay({ 
   quiz, 
   quizIndex, 
-  contentId, 
-  onEditQuiz, 
-  onDeleteQuiz 
 }: QuizDisplayProps) {
   return (
     <div className="border rounded-lg p-4" style={{ borderColor: "#02ffff" }}>
@@ -59,25 +54,7 @@ export default function QuizDisplay({
             >
               {quiz.points} pts
             </span>
-            {/* Quiz Action Buttons */}
-            <div className="flex items-center gap-1 ml-2">
-              <button
-                onClick={() => onEditQuiz(contentId)}
-                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 rounded hover:bg-blue-100 transition-colors duration-200"
-                title="Editar quiz"
-              >
-                <Edit className="w-3 h-3" />
-                Editar
-              </button>
-              <button
-                onClick={() => onDeleteQuiz(contentId, quiz.id)}
-                className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded hover:bg-red-100 transition-colors duration-200"
-                title="Eliminar quiz"
-              >
-                <Trash2 className="w-3 h-3" />
-                Eliminar
-              </button>
-            </div>
+
           </div>
         </div>
         

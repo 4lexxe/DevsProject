@@ -36,10 +36,8 @@ export default function SectionList({
       setStatus(response.status);
       setMessage(response.message);
 
-      if (response.statusCode === (sectionId ? 200 : 201)) {
-        setTimeout(() => {
-          navigate(`/courses/${response.data.courseId}`);
-        }, 500);
+      if (response.statusCode === 200) {
+        navigate(-1);
       }
     } catch (err: any) {
       setMessage(err.response?.data?.message || "Error desconocido");
@@ -72,7 +70,7 @@ export default function SectionList({
 
     const sectionData = {
       ...sectionState.section,
-      contents: sectionState.section.contents.map(({ id, ...rest }) => rest),
+      contents: sectionState.section.contents,
     };
 
     const dataToSend = { section: sectionData, courseId };

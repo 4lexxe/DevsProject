@@ -6,8 +6,11 @@ import User from "../../user/User";
 import { BaseController } from "./BaseController";
 import { EncryptionUtils } from "../../../shared/utils/encryption.utils";
 import { validateCourseAccess } from "../../../shared/middleware/courseAccessMiddleware";
+import ContentFiles from "../models/ContentFiles";
+import DriveService from "../../drive/services/driveService";
 
 export default class ContentController extends BaseController {
+  static driveService = new DriveService();
   // Obtener todos los contenidos
   static getAll: RequestHandler = async (req, res) => {
     try {
@@ -76,7 +79,7 @@ export default class ContentController extends BaseController {
   } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al obtener el quiz");
   }
-};
+  };
 
   // Obtener un contenido por ID con IDs del siguiente y anterior contenido en la misma sección
   static getByIdWithNavigation: RequestHandler = async (req, res) => {
@@ -92,12 +95,30 @@ export default class ContentController extends BaseController {
       }
       
       const content = await Content.findByPk(contentId, {
-        include: [{ model: Section, as: "section" }],
+        include: [{ model: Section, as: "section" }, { model: ContentFiles, as: "files", separate: true, order: [["position", "ASC"]] }],
       });
 
       if (!content) {
         ContentController.notFound(res, req, "Contenido");
         return;
+      }
+
+      // Filtrar campos de archivos de video por seguridad
+      const contentData = content.toJSON() as any;
+      if (contentData.files && contentData.files.length > 0) {
+        contentData.files = contentData.files.map((file: any) => {
+          if (file.fileType === 'video') {
+            // Para videos, solo retornar id, originalName, fileType y position por seguridad
+            return {
+              id: file.id,
+              originalName: file.originalName,
+              fileType: file.fileType,
+              position: file.position
+            };
+          }
+          // Para otros tipos de archivo, retornar todos los campos
+          return file;
+        });
       }
 
       const sectionContents = await Content.findAll({
@@ -110,7 +131,7 @@ export default class ContentController extends BaseController {
       const nextContentId = currentIndex < sectionContents.length - 1 ? sectionContents[currentIndex + 1].id : null;
 
       const navigationData = {
-        content,
+        content: contentData,
         previousContentId,
         nextContentId,
       };
@@ -144,6 +165,7 @@ export default class ContentController extends BaseController {
     }
   };
 
+
   // Crear un contenido
   static create: RequestHandler = async (req, res) => {
     try {
@@ -157,6 +179,14 @@ export default class ContentController extends BaseController {
         return;
       }
 
+      const section = await Section.findByPk(sectionId);
+      if (!section) {
+        ContentController.notFound(res, req, "Sección");
+        return;
+      }
+
+      const response = await this.driveService.createFolder(title, section.driveFolderId);
+
       const content = await Content.create({
         title,
         text,
@@ -166,13 +196,14 @@ export default class ContentController extends BaseController {
         duration,
         position,
         sectionId,
+        driveFolderId: response.folderId,
       });
 
       ContentController.created(res, req, content, "Contenido creado correctamente");
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al crear el contenido");
     }
-  }
+  };
 
   // Actualizar un contenido por ID
   static update: RequestHandler = async (req, res) => {
@@ -241,7 +272,7 @@ export default class ContentController extends BaseController {
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al actualizar el quiz del contenido");
     }
-  }
+  };
 
   // Eliminar un quiz de un contenido por ID
   static deleteQuiz: RequestHandler = async (req, res) => {
@@ -262,7 +293,7 @@ export default class ContentController extends BaseController {
     } catch (error) {
       ContentController.handleServerError(res, req, error, "Error al eliminar el quiz del contenido");
     }
-  }
+  };
 
   // Eliminar un contenido por ID
   static delete: RequestHandler = async (req, res) => {
@@ -281,6 +312,10 @@ export default class ContentController extends BaseController {
       if (!content) {
         ContentController.notFound(res, req, "Contenido");
         return;
+      }
+
+      if(content.driveFolderId) {
+        await this.driveService.deleteFolder(content.driveFolderId);
       }
       
       await content.destroy();

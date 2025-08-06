@@ -8,3 +8,6 @@ export { default as SectionPage } from './pages/SectionPage'
 export { default as CourseDiscountEvent } from './pages/CourseDiscountEvent'
 export { default as DiscountEventsList } from './pages/DiscountEventsList'
 export { default as QuizFormPage } from './pages/QuizForm'
+
+export { default as FileManagementPage } from './pages/FileManagementPage'
+export { default as FileUploadPage } from './pages/FileUploadPage'

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getById } from "../services/courseServices";
-import { getSectionsByCourse } from "../services/sectionServices";
+import { getSectionsByCourse, deleteSection } from "../services/sectionServices";
 
 import { CourseData, Section } from "../interfaces/CourseDetail";
 
@@ -80,6 +80,41 @@ export default function CourseDetail() {
     navigate(`/courses/${id}/section/${sectionId}/edit`);
   };
 
+  const handleDeleteSection = async (e: React.MouseEvent, sectionId: string) => {
+    e.stopPropagation();
+    
+    // Encontrar la sección para mostrar información en la confirmación
+    const section = sections.find(s => s.id === sectionId);
+    const sectionTitle = section?.title || 'esta sección';
+    
+    const confirmMessage = `¿Estás seguro de que quieres eliminar "${sectionTitle}"?\n\n` +
+      `Esto eliminará:\n` +
+      `• La sección completa\n` +
+      `• Todos sus contenidos\n` +
+      `• Todos los archivos asociados\n` +
+      `• Todas las carpetas de Google Drive\n\n` +
+      `Esta acción NO SE PUEDE DESHACER.`;
+
+    if (window.confirm(confirmMessage)) {
+      try {
+        setLoading(true);
+        await deleteSection(sectionId);
+        
+        // Actualizar la lista de secciones después de eliminar
+        if (id) {
+          const updatedSections = await getSectionsByCourse(id);
+          setSections(updatedSections || []);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('Error deleting section:', err);
+        setError('Error al eliminar la sección');
+        setLoading(false);
+      }
+    }
+  };
+
   const handleCreateSection = () => {
     navigate(`/courses/${id}/section/form`);
   };
@@ -152,6 +187,7 @@ export default function CourseDetail() {
           onCreateSection={handleCreateSection}
           onSectionClick={handleSectionClick}
           onEditSection={handleEditSection}
+          onDeleteSection={handleDeleteSection}
           formatDate={formatDate}
           getModuleTypeBg={getModuleTypeBg}
         />
