@@ -47,7 +47,7 @@ const DebugNavigationInterceptor = () => {
         console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
         console.trace('Stack trace completo:');
       }
-      return originalPushState.apply(this, arguments);
+      return originalPushState.apply(this, arguments as any);
     };
     
     window.history.replaceState = function(state, title, url) {
@@ -56,7 +56,7 @@ const DebugNavigationInterceptor = () => {
         console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
         console.trace('Stack trace completo:');
       }
-      return originalReplaceState.apply(this, arguments);
+      return originalReplaceState.apply(this, arguments as any);
     };
     
     return () => {

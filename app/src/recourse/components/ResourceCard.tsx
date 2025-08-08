@@ -6,28 +6,31 @@ import ResourceUserInfo from '../userInfo/ResourceUserInfo';
 import RatingComponent from './Rating';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 
+interface ResourceUser {
+  id: number;
+  name: string;
+  avatar?: string;
+}
+
 interface Resource {
   id: number;
-  type: string;
   title: string;
   description?: string;
   url: string;
+  type: string;
+  isVisible: boolean;
   coverImage?: string;
   userId: number;
-  User?: {
-    id: number;
-    name: string;
-    username?: string;
-    displayName?: string;
-  };
+  userName?: string;
+  userAvatar?: string;
   createdAt: string;
+  updatedAt: string;
+  user: ResourceUser;
 }
 
 interface UserInfo {
   id: number;
   name: string;
-  username?: string;
-  displayName?: string;
   avatar?: string;
 }
 

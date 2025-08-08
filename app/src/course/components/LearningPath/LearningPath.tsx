@@ -45,7 +45,7 @@ const LearningPath: React.FC<LearningPathProps> = ({ courseId }) => {
 
   const toggleCompletion = async (contentId: number, isCompleted: boolean) => {
     if (isCompleted) {
-      toast.info('Este contenido ya está completado');
+      toast('Este contenido ya está completado');
       return;
     }
 

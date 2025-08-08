@@ -86,6 +86,49 @@ const currentLevel: Level = {
   ],
 }
 
+// Componente Progress simple
+const Progress = ({ progress, className }: { progress: number; className?: string }) => (
+  <div className={`bg-gray-200 rounded-full ${className}`}>
+    <div 
+      className="bg-blue-600 h-full rounded-full transition-all duration-300" 
+      style={{ width: `${progress}%` }}
+    />
+  </div>
+)
+
+// Datos de ejemplo para courseProgress
+const courseProgress = {
+  sections: [
+    {
+      id: 1,
+      title: "Introducción a React",
+      description: "Conceptos básicos de React",
+      moduleType: "Básico",
+      progress: 75,
+      completedContent: 3,
+      totalContent: 4,
+      contents: [
+        {
+          id: 1,
+          title: "¿Qué es React?",
+          duration: 15,
+          timeSpent: 15,
+          isCompleted: true,
+          completedAt: "2024-01-15"
+        },
+        {
+          id: 2,
+          title: "Componentes y JSX",
+          duration: 20,
+          timeSpent: 10,
+          isCompleted: false,
+          completedAt: null
+        }
+      ]
+    }
+  ]
+}
+
 export default function LearningPath() {
   const [expandedTopics, setExpandedTopics] = useState<string[]>([])
   const [completedTopics] = useState<string[]>([])
@@ -95,14 +138,16 @@ export default function LearningPath() {
       current.includes(topicId) ? current.filter((id) => id !== topicId) : [...current, topicId],
     )
   }
-  // Logica de seleccion a comppletar ;v
-  /*const toggleCompletion = (topicId: string) => {
-    setCompletedTopics((current) =>
-      current.includes(topicId) ? current.filter((id) => id !== topicId) : [...current, topicId],
-    )
-  }*/
 
-  //const progress = (completedTopics.length / currentLevel.topics.length) * 100*/
+  const toggleCompletion = (contentId: number, isCompleted: boolean) => {
+    console.log(`Toggle completion for content ${contentId}, currently ${isCompleted}`)
+    // Aquí iría la lógica para actualizar el estado de completado
+  }
+
+  const handleContentClick = (contentId: number) => {
+    console.log(`Content clicked: ${contentId}`)
+    // Aquí iría la lógica para navegar al contenido
+  }
 
   const ResourceIcon = {
     Docs: BookOpen,

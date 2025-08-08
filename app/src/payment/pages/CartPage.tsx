@@ -290,7 +290,7 @@ export default function CartPage() {
                         {/* Category badge - smaller */}
                         <div className="mb-2">
                           <span className="inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs">
-                            {item.course.category || "Curso"}
+                            {item.course.title || "Curso"}
                           </span>
                         </div>
 

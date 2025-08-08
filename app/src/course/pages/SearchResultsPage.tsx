@@ -96,6 +96,13 @@ export default function SearchResultsPage() {
     setSearchParams({ q: query, page: newPage.toString() });
   };
 
+  const handleFuzzySearch = (suggestion: string, metadata?: { id: string }) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('q', suggestion);
+    params.set('page', '1');
+    setSearchParams(params);
+  };
+
   useEffect(() => {
     if (query && query.trim().length > 0) {
       performSearch(query, currentPage);

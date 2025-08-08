@@ -111,7 +111,6 @@ const CourseDetails: React.FC = () => {
             <PricingCard pricing={course.pricing} />
             {id && (
               <div className="mt-6">
-                {console.log('📋 CourseDetail pasando a PurchaseButtons - course.id:', id, 'tipo:', typeof id, 'toString():', id.toString())}
                 <PurchaseButtons 
                   courseId={id} 
                   pricing={course.pricing}

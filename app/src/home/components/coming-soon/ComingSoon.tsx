@@ -9,7 +9,7 @@ interface Course {
   title: string
   image: string
   category: string
-  careerType: object[]
+  careerType: { id: number; name: string }[]
   isInDevelopment: boolean
   createdAt: string
 }
@@ -103,7 +103,7 @@ export function ComingSoon() {
                   aspectRatio="landscape"
                   title={course.title}
                   category={course.category}
-                  careerType={course.careerType.name}
+                  careerType={course.careerType[0]?.name || 'Sin categoría'}
                   imageUrl={course.image}
                   className="hover:shadow-2xl"
                 />
@@ -119,7 +119,7 @@ export function ComingSoon() {
                 aspectRatio="portrait"
                 title={course.title}
                 category={course.category}
-                careerType={course.careerType.name}
+                careerType={course.careerType[0]?.name || 'Sin categoría'}
                 imageUrl={course.image}
               />
             )
@@ -131,7 +131,7 @@ export function ComingSoon() {
               key={course.id}
               title={course.title}
               category={course.category}
-              careerType={course.careerType.name}
+              careerType={course.careerType[0]?.name || 'Sin categoría'}
               imageUrl={course.image}
             />
           )

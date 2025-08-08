@@ -6,9 +6,10 @@ import { IContentApi } from '@/course/interfaces/Content';
 
 interface SectionContentProps {
   sectionId: string;
+  courseId: string;
 }
 
-const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
+const SectionContent: React.FC<SectionContentProps> = ({ sectionId, courseId }) => {
   const [contents, setContents] = useState<IContentApi[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +58,7 @@ const SectionContent: React.FC<SectionContentProps> = ({ sectionId }) => {
   return (
     <div className="space-y-6">
       {contents.map((content) => (
-        <ContentViewer key={content.id} content={content} courseId={content.courseId} />
+        <ContentViewer key={content.id} content={content} courseId={courseId} />
       ))}
     </div>
   );

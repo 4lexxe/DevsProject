@@ -11,21 +11,19 @@ interface Resource {
   url: string;
   coverImage?: string;
   userId: number;
-  User?: {
+  user: {
     id: number;
     name: string;
-    username?: string;
-    displayName?: string;
     avatar?: string;
   };
   createdAt: string;
+  updatedAt: string;
+  isVisible: boolean;
 }
 
 interface UserInfo {
   id: number;
   name: string;
-  username?: string;
-  displayName?: string;
   avatar?: string;
 }
 
@@ -64,14 +62,12 @@ const ResourceListPage: React.FC = () => {
       // Extraer información del usuario directamente de los recursos (ya incluida por el backend)
       const userInfoMap: Record<number, UserInfo> = {};
       sortedResources.forEach(resource => {
-        if (resource.User) {
+        if (resource.user) {
           userInfoMap[resource.userId] = {
-            id: resource.User.id,
-            name: resource.User.name,
-            username: resource.User.username,
-            displayName: resource.User.displayName,
-            avatar: resource.User.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              resource.User.displayName || resource.User.name || resource.User.username || `Usuario ${resource.User.id}`
+            id: resource.user.id,
+            name: resource.user.name,
+            avatar: resource.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              resource.user.name || `Usuario ${resource.user.id}`
             )}&background=random`,
           };
         } else {
@@ -79,8 +75,6 @@ const ResourceListPage: React.FC = () => {
           userInfoMap[resource.userId] = {
             id: resource.userId,
             name: `Usuario ${resource.userId}`,
-            username: undefined,
-            displayName: undefined,
             avatar: `https://ui-avatars.com/api/?name=Usuario+${resource.userId}&background=random`,
           };
         }

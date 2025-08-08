@@ -1,4 +1,4 @@
-import CoursesList from "../components/Courses/CoursesList";
+import CoursesList from "../components/courses/CoursesList";
 import { getCourses } from "../services/courseServices";
 import { getCoursesByCategory } from "@/home/services/categoriesService";
 import { useParams } from "react-router-dom";

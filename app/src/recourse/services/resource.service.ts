@@ -5,9 +5,7 @@ import axios from 'axios';
 export interface ResourceUser {
   id: number;
   name: string;
-  username?: string;
-  displayName?: string;
-  avatar?: string; // Agregamos avatar
+  avatar?: string;
 }
 
 export interface Resource {
@@ -19,7 +17,7 @@ export interface Resource {
   isVisible: boolean;
   coverImage?: string;
   userId: number;
-  User: ResourceUser;
+  user: ResourceUser;
   createdAt: string;
   updatedAt: string;
 }
@@ -119,7 +117,7 @@ export const ResourceService = {
 
   // Helper para obtener el nombre de usuario que subió el recurso
   getResourceAuthor(resource: Resource): string {
-    return resource.User?.displayName || resource.User?.name || resource.User?.username || 'Usuario desconocido';
+    return resource.user?.name || 'Usuario desconocido';
   },
 
   // Helper para verificar si el usuario actual es el propietario del recurso

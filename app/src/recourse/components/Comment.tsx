@@ -1,22 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getCommentsByResource, createComment, updateComment, deleteComment } from '../services/comment.service';
+import { getCommentsByResource, createComment, updateComment, deleteComment, Comment } from '../services/comment.service';
 import { usePermissions } from '../../shared/hooks/usePermissions';
-
-interface Comment {
-  id: number;
-  userId: number;
-  resourceId: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  User?: {
-    id: number;
-    name: string;
-    username?: string;
-    displayName?: string;
-    avatar?: string;
-  };
-}
 
 interface CommentProps {
   resourceId: number;
@@ -107,8 +91,10 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
   };
 
   const startEdit = (comment: Comment) => {
-    setEditingId(comment.id);
-    setEditContent(comment.content);
+    if (comment.id) {
+      setEditingId(comment.id);
+      setEditContent(comment.content);
+    }
   };
 
   const cancelEdit = () => {
@@ -229,8 +215,8 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
                         {comment.User?.name || `Usuario ${comment.userId}`}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {formatDate(comment.createdAt)}
-                        {comment.updatedAt !== comment.createdAt && ' (editado)'}
+                        {comment.createdAt && formatDate(comment.createdAt)}
+                        {comment.updatedAt && comment.createdAt && comment.updatedAt !== comment.createdAt && ' (editado)'}
                       </p>
                     </div>
                   </div>
@@ -244,7 +230,7 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
                         Editar
                       </button>
                       <button
-                        onClick={() => handleDelete(comment.id)}
+                        onClick={() => comment.id && handleDelete(comment.id)}
                         className="text-red-600 hover:text-red-800 text-xs"
                       >
                         Eliminar
@@ -270,7 +256,7 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
                         Cancelar
                       </button>
                       <button
-                        onClick={() => handleEdit(comment.id)}
+                        onClick={() => comment.id && handleEdit(comment.id)}
                         className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700"
                       >
                         Guardar

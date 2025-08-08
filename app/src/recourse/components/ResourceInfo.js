@@ -1,0 +1,5 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+const ResourceInfo = ({ resource, user }) => {
+    return (_jsxs("div", { className: "p-6", children: [user && (_jsxs("div", { className: "flex items-center gap-4 p-4 bg-gray-50 rounded-lg", children: [_jsx("div", { className: "w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm", children: _jsx("img", { src: user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`, alt: user.name, className: "w-full h-full object-cover" }) }), _jsxs("div", { children: [_jsx("span", { className: "text-sm text-gray-500 block", children: "Publicado por" }), _jsx("span", { className: "font-medium text-gray-900", children: user.name })] })] })), resource.description && (_jsxs("div", { className: "mb-6", children: [_jsx("h2", { className: "text-lg font-semibold text-gray-900 mb-2", children: "Descripci\u00F3n" }), _jsx("p", { className: "text-gray-600 whitespace-pre-wrap", children: resource.description })] }))] }));
+};
+export default ResourceInfo;

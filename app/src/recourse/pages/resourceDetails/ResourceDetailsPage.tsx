@@ -73,13 +73,11 @@ const ResourceDetailsPage: React.FC = () => {
   }
 
   // Crear el objeto resourceUser a partir de la información que ya viene en el recurso
-  const resourceUser: UserInfo | null = resource.User ? {
-    id: resource.User.id,
-    name: resource.User.name,
-    username: resource.User.username,
-    displayName: resource.User.displayName,
-    avatar: resource.User.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      resource.User.displayName || resource.User.name || resource.User.username || `Usuario ${resource.User.id}`
+  const resourceUser: UserInfo | null = resource.user ? {
+    id: resource.user.id,
+    name: resource.user.name,
+    avatar: resource.user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      resource.user.name || `Usuario ${resource.user.id}`
     )}&background=random`
   } : null;
 
