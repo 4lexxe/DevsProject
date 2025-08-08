@@ -75,6 +75,10 @@ export default class CourseGetController extends BaseController {
           }
         }
 
+        // Determinar si el curso es gratuito
+        const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+        const priceDisplay = isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`;
+
         return {
           ...courseData,
           pricing: {
@@ -84,6 +88,8 @@ export default class CourseGetController extends BaseController {
             discountEvents: courseData.discountEvents || [],
             totalDiscountPercentage,
             savings: Math.round(totalDiscountAmount * 100) / 100, // Redondear a 2 decimales
+            isFree,
+            priceDisplay
           },
         };
       });
@@ -203,6 +209,10 @@ export default class CourseGetController extends BaseController {
         }
       }
 
+      // Determinar si el curso es gratuito
+      const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+      const priceDisplay = isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`;
+
       // Agregar información de precios al objeto de respuesta
       const responseData = {
         ...courseData,
@@ -213,6 +223,8 @@ export default class CourseGetController extends BaseController {
           discountEvents: courseData.discountEvents || [],
           totalDiscountPercentage,
           savings: Math.round(totalDiscountAmount * 100) / 100, // Redondear a 2 decimales
+          isFree,
+          priceDisplay
         },
       };
 

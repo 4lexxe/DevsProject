@@ -26,6 +26,8 @@ interface PricingCardProps {
     discountEvents: DiscountEvent[];
     totalDiscountPercentage: number;
     savings: number;
+    isFree?: boolean;
+    priceDisplay?: string;
   };
 }
 
@@ -51,7 +53,13 @@ export default function PricingCard({ pricing }: PricingCardProps) {
         
         {/* Precio principal */}
         <div className="mb-4">
-          {pricing.hasDiscount ? (
+          {pricing.isFree ? (
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-4xl font-bold text-green-600">
+                GRATIS
+              </span>
+            </div>
+          ) : pricing.hasDiscount ? (
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-2">
                 <span className="text-2xl line-through text-gray-400">
@@ -84,7 +92,7 @@ export default function PricingCard({ pricing }: PricingCardProps) {
         )}
 
         {/* Ahorro total */}
-        {pricing.savings > 0 && (
+        {!pricing.isFree && pricing.savings > 0 && (
           <p className="text-green-600 font-semibold text-lg">
             ¡Ahorras ${pricing.savings.toFixed(2)}!
           </p>

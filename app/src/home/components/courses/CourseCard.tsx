@@ -24,6 +24,8 @@ interface CourseCardProps {
       endDate: string;
     };
     savings: number;
+    isFree?: boolean;
+    priceDisplay?: string;
   };
 }
 
@@ -35,10 +37,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
   careerType,
   pricing,
 }) => {
+  console.log('🎯 CourseCard recibió props - id:', id, 'tipo:', typeof id, 'title:', title);
+  
   const navigate = useNavigate();
 
   const handleViewCourse = () => {
-    navigate(`/course/${id}`);
+    console.log('🔍 handleViewCourse - id:', id, 'tipo:', typeof id);
+    
+    if (id && id !== undefined) {
+      console.log('✅ Navegando a /course/' + id);
+      navigate(`/course/${id}`);
+    } else {
+      console.error('❌ ID del curso no válido:', id);
+    }
   };
 
   return (
@@ -85,7 +96,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-green-600" />
-              {pricing.hasDiscount ? (
+              {pricing.isFree ? (
+                <span className="text-lg font-bold text-green-600">
+                  GRATIS
+                </span>
+              ) : pricing.hasDiscount ? (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-green-600">
                     ${pricing.finalPrice.toFixed(2)}
@@ -100,9 +115,14 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 </span>
               )}
             </div>
-            {pricing.hasDiscount && pricing.savings > 0 && (
+            {pricing.hasDiscount && pricing.savings > 0 && !pricing.isFree && (
               <div className="text-xs text-green-600 font-medium">
                 Ahorras ${pricing.savings.toFixed(2)}
+              </div>
+            )}
+            {pricing.isFree && pricing.hasDiscount && (
+              <div className="text-xs text-green-600 font-medium">
+                ¡Curso completamente gratuito!
               </div>
             )}
           </div>

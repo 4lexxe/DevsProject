@@ -1,0 +1,374 @@
+import { Request, Response } from "express";
+import { BaseController } from "./BaseController";
+import Course from "../../course/models/Course";
+import CourseAccess from "../models/CourseAccess";
+import CourseDiscountEvent from "../models/CourseDiscountEvent";
+import User from "../../user/User";
+import { Op } from "sequelize";
+import { v4 as uuidv4 } from "uuid";
+import { Preference } from "mercadopago";
+import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
+import PreferenceModel from "../models/Preference";
+import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
+// Importar asociaciones para asegurar que están cargadas
+import "../models/Associations";
+
+/**
+ * Controlador para gestionar compras directas de cursos
+ * Maneja cursos gratuitos y compras directas sin pasar por el carrito
+ */
+export class DirectPurchaseController extends BaseController {
+
+  /**
+   * Verifica si un curso es gratuito (precio 0 o descuento 100%)
+   */
+  private static async isCourseFree(courseId: number): Promise<{ isFree: boolean; finalPrice: number; originalPrice: number }> {
+    const course = await Course.findByPk(courseId, {
+      include: [
+        {
+          model: CourseDiscountEvent,
+          as: "discountEvents",
+          where: {
+            isActive: true,
+            startDate: { [Op.lte]: new Date() },
+            endDate: { [Op.gte]: new Date() },
+          },
+          required: false, // LEFT JOIN para incluir cursos sin descuentos
+        },
+      ],
+    });
+
+    if (!course) {
+      throw new Error("Curso no encontrado");
+    }
+
+    const courseData = course.toJSON() as any;
+    const originalPrice = parseFloat(courseData.price.toString());
+    let finalPrice = originalPrice;
+    let totalDiscountPercentage = 0;
+
+    // Si hay descuentos activos, calcular el total acumulado
+    if (courseData.discountEvents && courseData.discountEvents.length > 0) {
+      // Sumar todos los porcentajes de descuento
+      totalDiscountPercentage = courseData.discountEvents.reduce((total: number, discount: any) => {
+        return total + discount.value;
+      }, 0);
+
+      // Calcular el precio final
+      const totalDiscountAmount = (originalPrice * totalDiscountPercentage) / 100;
+      finalPrice = originalPrice - totalDiscountAmount;
+
+      // Asegurar que el precio final no sea negativo
+      if (finalPrice < 0) {
+        finalPrice = 0;
+      }
+    }
+
+    // Un curso es gratuito si el precio original es 0 o si el descuento es 100% o más
+    const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+
+    return {
+      isFree,
+      finalPrice: Math.round(finalPrice * 100) / 100,
+      originalPrice
+    };
+  }
+
+  /**
+   * Otorga acceso automático a un curso gratuito
+   */
+  public static grantFreeCourseAccess = DirectPurchaseController.asyncHandler(async (req: Request, res: Response) => {
+    const { courseId } = req.params;
+    const userId = (req.user as User)?.id;
+
+    if (!userId) {
+      return DirectPurchaseController.unauthorized(res, req, "Usuario no autenticado");
+    }
+
+    // Verificar si el curso existe y está activo
+    const course = await Course.findOne({
+      where: {
+        id: parseInt(courseId),
+        isActive: true
+      }
+    });
+
+    if (!course) {
+      return DirectPurchaseController.notFound(res, req, "Curso no encontrado o no está activo");
+    }
+
+    // Verificar si el curso es gratuito
+    const { isFree, finalPrice, originalPrice } = await DirectPurchaseController.isCourseFree(parseInt(courseId));
+
+    if (!isFree) {
+      return DirectPurchaseController.sendError(res, req, "Este curso no es gratuito. Debe ser agregado al carrito para su compra.", 400);
+    }
+
+    // Verificar si el usuario ya tiene acceso al curso
+    const existingAccess = await CourseAccess.findOne({
+      where: {
+        userId,
+        courseId: parseInt(courseId),
+        revokedAt: null
+      }
+    });
+
+    if (existingAccess) {
+      return DirectPurchaseController.sendError(res, req, "Ya tienes acceso a este curso", 422);
+    }
+
+    // Generar token de acceso único
+    const accessToken = uuidv4();
+
+    // Crear el acceso al curso
+    const courseAccess = await CourseAccess.create({
+      userId,
+      courseId: parseInt(courseId),
+      accessToken,
+      grantedAt: new Date(),
+      revokedAt: null,
+      revokeReason: null
+    });
+
+    // Respuesta exitosa
+    DirectPurchaseController.sendSuccess(
+      res,
+      req,
+      {
+        courseAccess: {
+          id: courseAccess.id,
+          courseId: courseAccess.courseId,
+          accessToken: courseAccess.accessToken,
+          grantedAt: courseAccess.grantedAt
+        },
+        course: {
+          id: course.id,
+          title: course.title,
+          originalPrice,
+          finalPrice,
+          isFree: true
+        }
+      },
+      "Acceso al curso gratuito otorgado exitosamente"
+    );
+  });
+
+  /**
+   * Verifica si un curso es gratuito
+   */
+  public static checkIfCourseFree = DirectPurchaseController.asyncHandler(async (req: Request, res: Response) => {
+    const { courseId } = req.params;
+
+    try {
+      const { isFree, finalPrice, originalPrice } = await DirectPurchaseController.isCourseFree(parseInt(courseId));
+
+      DirectPurchaseController.sendSuccess(
+        res,
+        req,
+        {
+          courseId: parseInt(courseId),
+          isFree,
+          originalPrice,
+          finalPrice,
+          priceDisplay: isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`
+        },
+        "Información de precio del curso obtenida exitosamente"
+      );
+    } catch (error: any) {
+      if (error.message === "Curso no encontrado") {
+        return DirectPurchaseController.notFound(res, req, "Curso no encontrado");
+      }
+      throw error;
+    }
+  });
+
+  /**
+   * Compra directa de un curso (sin pasar por el carrito)
+   * Solo para cursos de pago - los gratuitos usan grantFreeCourseAccess
+   */
+  public static directPurchase = DirectPurchaseController.asyncHandler(async (req: Request, res: Response) => {
+    const { courseId } = req.params;
+    const userId = (req.user as User)?.id;
+
+    if (!userId) {
+      return DirectPurchaseController.unauthorized(res, req, "Usuario no autenticado");
+    }
+
+    // Verificar si el curso existe y está activo
+    const course = await Course.findOne({
+      where: {
+        id: parseInt(courseId),
+        isActive: true
+      }
+    });
+
+    if (!course) {
+      return DirectPurchaseController.notFound(res, req, "Curso no encontrado o no está activo");
+    }
+
+    // Verificar si el curso es gratuito
+    const { isFree, finalPrice, originalPrice } = await DirectPurchaseController.isCourseFree(parseInt(courseId));
+
+    if (isFree) {
+      return DirectPurchaseController.sendError(res, req, "Este curso es gratuito. Use el endpoint de acceso gratuito.", 400);
+    }
+
+    // Verificar si el usuario ya tiene acceso al curso
+    const existingAccess = await CourseAccess.findOne({
+      where: {
+        userId,
+        courseId: parseInt(courseId),
+        revokedAt: null
+      }
+    });
+
+    if (existingAccess) {
+      return DirectPurchaseController.sendError(res, req, "Ya tienes acceso a este curso", 422);
+    }
+
+    // Crear preferencia de MercadoPago para compra directa
+    try {
+      const preference = new Preference(MpConfig);
+      
+      // Validar precio
+      if (isNaN(finalPrice) || finalPrice <= 0) {
+        return DirectPurchaseController.validationFailed(
+          res,
+          req,
+          { price: finalPrice },
+          "Precio inválido para el curso"
+        );
+      }
+
+      const roundedPrice = Math.round(finalPrice * 100) / 100;
+
+      const item = {
+        id: course.id.toString(),
+        title: course.title,
+        description: course.summary || `Curso: ${course.title}`,
+        quantity: 1,
+        currency_id: "ARS",
+        unit_price: roundedPrice,
+      };
+
+      const result = await retryWithExponentialBackoff(() =>
+        preference.create({
+          body: {
+            items: [item],
+            back_urls: {
+              success: `${process.env.MP_BACK_URL}/payment/success`,
+              failure: `${process.env.MP_BACK_URL}/payment/failure`,
+              pending: `${process.env.MP_BACK_URL}/payment/pending`,
+            },
+            auto_return: "approved",
+            external_reference: `direct_${course.id}_${userId}_${Date.now()}`,
+            metadata: {
+              purchase_type: "direct",
+              course_id: course.id.toString(),
+              user_id: userId.toString(),
+              total_amount: roundedPrice,
+            },
+            payment_methods: {
+              excluded_payment_methods: [
+                { id: "ticket" },
+                { id: "atm" },
+              ],
+              installments: 1,
+              default_installments: 1,
+            },
+            notification_url: `${process.env.MP_BACK_URL}/api/webhook/mercadopago`,
+            expires: true,
+            expiration_date_from: new Date().toISOString(),
+            expiration_date_to: new Date(
+              Date.now() + 24 * 60 * 60 * 1000
+            ).toISOString(),
+          },
+        })
+      );
+
+      // Debug: Log de la respuesta de MercadoPago
+      console.log('🔍 Respuesta completa de MercadoPago:', JSON.stringify(result, null, 2));
+      console.log('🔍 init_point de MercadoPago:', result.init_point, 'tipo:', typeof result.init_point);
+
+      // Validar que el init_point sea válido
+      if (!result.init_point || result.init_point === 'undefined' || typeof result.init_point !== 'string') {
+        console.error('❌ init_point inválido de MercadoPago:', result.init_point);
+        return DirectPurchaseController.sendError(
+          res,
+          req,
+          "Error: MercadoPago no devolvió una URL de pago válida",
+          500
+        );
+      }
+
+      // Guardar preferencia en la base de datos
+      await PreferenceModel.create({
+        id: result.id,
+        userId: BigInt(userId),
+        externalReference: result.external_reference,
+        items: result.items,
+        initPoint: result.init_point,
+        expirationDateFrom: result.expiration_date_from,
+        expirationDateTo: result.expiration_date_to,
+      });
+
+      DirectPurchaseController.created(
+        res,
+        req,
+        {
+          initPoint: result.init_point,
+          course: {
+            id: course.id,
+            title: course.title,
+            originalPrice,
+            finalPrice: roundedPrice
+          }
+        },
+        "Preferencia de pago creada exitosamente"
+      );
+    } catch (error) {
+      console.error("Error creando preferencia de MercadoPago para compra directa:", error);
+      DirectPurchaseController.handleServerError(
+        res,
+        req,
+        error,
+        "Error al crear la preferencia de pago para compra directa"
+      );
+    }
+  });
+
+  /**
+   * Verifica si el usuario ya tiene acceso a un curso
+   */
+  public static checkCourseAccess = DirectPurchaseController.asyncHandler(async (req: Request, res: Response) => {
+    const { courseId } = req.params;
+    const userId = (req.user as User)?.id;
+
+    if (!userId) {
+      return DirectPurchaseController.unauthorized(res, req, "Usuario no autenticado");
+    }
+
+    const courseAccess = await CourseAccess.findOne({
+      where: {
+        userId,
+        courseId: parseInt(courseId),
+        revokedAt: null
+      }
+    });
+
+    DirectPurchaseController.sendSuccess(
+      res,
+      req,
+      {
+        hasAccess: !!courseAccess,
+        accessDetails: courseAccess ? {
+          grantedAt: courseAccess.grantedAt,
+          accessToken: courseAccess.accessToken
+        } : null
+      },
+      courseAccess ? "Usuario tiene acceso al curso" : "Usuario no tiene acceso al curso"
+    );
+  });
+}
+
+export default DirectPurchaseController;

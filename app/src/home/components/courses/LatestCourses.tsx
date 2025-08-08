@@ -44,6 +44,7 @@ export default function LatestCourses() {
       try {
         const data = await getCourses();
         const sortedCourses = data
+          .filter((course: Course) => course.id && course.id !== undefined)
           .sort((a: Course, b: Course) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, 10);
         setCourses(sortedCourses);

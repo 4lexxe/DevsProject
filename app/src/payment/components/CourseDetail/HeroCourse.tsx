@@ -164,7 +164,11 @@ export default function HeroCourse({
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center gap-2">
                   <DollarSign className="w-5 h-5 text-green-400" />
-                  {pricing.hasDiscount ? (
+                  {pricing.finalPrice === 0 ? (
+                    <span className="text-2xl font-bold text-green-400">
+                      Gratis
+                    </span>
+                  ) : pricing.hasDiscount ? (
                     <div className="flex items-center gap-3">
                       <span className="text-2xl font-bold text-green-400">
                         ${pricing.finalPrice.toFixed(2)}

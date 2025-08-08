@@ -21,7 +21,13 @@ const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, cat
   return (
     <div
       className="group w-full flex gap-4 p-4 border-b border-gray-200 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer"
-      onClick={() => (window.location.href = `/course/${id}`)}
+      onClick={() => {
+        if (id && id !== undefined) {
+          window.location.href = `/course/${id}`;
+        } else {
+          console.error('ID del curso no válido:', id);
+        }
+      }}
     >
       {/* Thumbnail con borde y formato 16:9 en PC y cuadrado en móvil */}
       <div className="relative w-24 sm:w-36 md:w-44 flex-shrink-0"> 
@@ -66,7 +72,11 @@ const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, cat
           {/* Pricing section - visible on mobile */}
           {pricing && (
             <div className="mt-2 flex items-center gap-2">
-              {pricing.hasDiscount ? (
+              {pricing.finalPrice === 0 ? (
+                <span className="text-lg font-bold text-green-600">
+                  Gratis
+                </span>
+              ) : pricing.hasDiscount ? (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-green-600">
                     ${pricing.finalPrice.toLocaleString()}

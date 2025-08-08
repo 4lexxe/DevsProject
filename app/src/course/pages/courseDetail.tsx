@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { Course } from "@/course/interfaces/ViewnerCourse";
 import HeroCourse from "@/course/components/CourseDetail/HeroCourse";
@@ -7,41 +7,67 @@ import CourseOverview from "@/course/components/CourseDetail/CourseOverview";
 import LearningOutcomes from "@/course/components/CourseDetail/LearningOutcomes";
 import Prerequisites from "@/course/components/CourseDetail/Prerequisites";
 import SectionList from "@/course/components/CourseDetail/SectionList";
-import AddToCartButton from "@/course/components/CourseDetail/AddToCartButton";
+import PurchaseButtons from "@/course/components/CourseDetail/PurchaseButtons";
 import PricingCard from "@/course/components/CourseDetail/PricingCard";
 
 import { getById } from "@/course/services/courseServices";
+import { checkCourseAccess } from "@/course/services/directPurchaseService";
 
 const CourseDetails: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
+  const { id } = params;
+  const navigate = useNavigate();
+  console.log('🔍 CourseDetails - Params completos:', params);
+  console.log('🔍 CourseDetails - ID de URL:', id, 'tipo:', typeof id);
+  console.log('🔍 CourseDetails - window.location.pathname:', window.location.pathname);
+  
   const [course, setCourse] = useState<Course | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
   const [moduleCount, setModuleCount] = useState<number>(0);
 
   useEffect(() => {
     const fetchCourseData = async () => {
-      if (id) {
+      if (!id) {
+        setError("ID del curso no válido.");
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        
+        // Verificar si el usuario ya tiene acceso al curso
         try {
-          setLoading(true);
-          const course = await getById(id);
-          if (course) {
-            setCourse(course);
-            const count = course.sections.length;
-            setModuleCount(count);
-          } else {
-            setError("Curso no encontrado.");
+          const accessResponse = await checkCourseAccess(id);
+          if (accessResponse.hasAccess) {
+            console.log('🔄 Usuario ya tiene acceso al curso, redirigiendo a my-course...');
+            navigate(`/my-course/${id}`);
+            return;
           }
-        } catch (err) {
-          console.error("Error al cargar el curso:", err);
-          setError("Hubo un error al cargar los datos del curso.");
-        } finally {
-          setLoading(false);
+        } catch (accessError) {
+          // Si hay error verificando acceso (ej: usuario no autenticado), continuar mostrando el curso
+          console.log('ℹ️ No se pudo verificar acceso (posiblemente usuario no autenticado), mostrando curso normal');
         }
+        
+        const course = await getById(id);
+        if (course) {
+          setCourse(course);
+          const count = course.sections.length;
+          setModuleCount(count);
+        } else {
+          setError("Curso no encontrado.");
+        }
+      } catch (err) {
+        console.error("Error al cargar el curso:", err);
+        setError("Hubo un error al cargar los datos del curso.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchCourseData();
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
     return <p className="p-6 text-blue-500">Cargando curso...</p>;
@@ -85,7 +111,12 @@ const CourseDetails: React.FC = () => {
             <PricingCard pricing={course.pricing} />
             {id && (
               <div className="mt-6">
-                <AddToCartButton courseId={id} className="shadow-lg" />
+                {console.log('📋 CourseDetail pasando a PurchaseButtons - course.id:', id, 'tipo:', typeof id, 'toString():', id.toString())}
+                <PurchaseButtons 
+                  courseId={id} 
+                  pricing={course.pricing}
+                  className="shadow-lg" 
+                />
               </div>
             )}
           </div>

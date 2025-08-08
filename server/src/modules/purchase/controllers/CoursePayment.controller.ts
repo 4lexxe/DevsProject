@@ -77,18 +77,88 @@ class CoursePaymentController extends BaseController {
 
   /**
    * Crea accesos a cursos cuando un pago es aprobado
+   * Maneja tanto pagos de carrito como compras directas
    * @param paymentData - Datos del pago desde MercadoPago
    */
   private static async createCourseAccessesForPayment(paymentData: any) {
     try {
-      // El external_reference contiene el ID del carrito
-      const cartId = paymentData.external_reference;
+      const externalReference = paymentData.external_reference;
       
-      if (!cartId) {
-        console.warn("No se encontró external_reference (cartId) en el pago:", paymentData.id);
+      if (!externalReference) {
+        console.warn("No se encontró external_reference en el pago:", paymentData.id);
         return;
       }
 
+      // Detectar si es compra directa o carrito basándose en el external_reference
+      if (externalReference.startsWith('direct_')) {
+        // Es una compra directa: formato "direct_{courseId}_{userId}_{timestamp}"
+        await this.handleDirectPurchaseAccess(paymentData, externalReference);
+      } else {
+        // Es un pago de carrito: external_reference es el cartId
+        await this.handleCartPurchaseAccess(paymentData, externalReference);
+      }
+
+    } catch (error) {
+      console.error('❌ Error creando accesos a cursos:', error);
+      // No relanzar el error para no fallar el pago principal
+    }
+  }
+
+  /**
+   * Maneja el acceso para compras directas
+   */
+  private static async handleDirectPurchaseAccess(paymentData: any, externalReference: string) {
+    try {
+      // Parsear el external_reference: "direct_{courseId}_{userId}_{timestamp}"
+      const parts = externalReference.split('_');
+      if (parts.length < 3) {
+        console.error('Formato inválido de external_reference para compra directa:', externalReference);
+        return;
+      }
+
+      const courseId = parseInt(parts[1]);
+      const userId = parseInt(parts[2]);
+
+      if (isNaN(courseId) || isNaN(userId)) {
+        console.error('IDs inválidos en external_reference:', externalReference);
+        return;
+      }
+
+      // Verificar si ya existe acceso para evitar duplicados
+      const existingAccess = await CourseAccess.findOne({
+        where: {
+          courseId,
+          userId
+        }
+      });
+
+      if (!existingAccess) {
+        await CourseAccess.create({
+          courseId,
+          userId,
+          accessToken: this.generateAccessToken(),
+          grantedAt: new Date(),
+          revokedAt: null,
+          revokeReason: null
+        });
+        
+        console.log(`✅ Acceso directo creado para usuario ${userId} al curso ${courseId}`);
+      } else {
+        console.log(`ℹ️ El usuario ${userId} ya tiene acceso al curso ${courseId}`);
+      }
+
+      console.log(`🎉 Compra directa completada para curso ${courseId}`);
+
+    } catch (error) {
+      console.error('❌ Error procesando compra directa:', error);
+    }
+  }
+
+  /**
+   * Maneja el acceso para pagos de carrito
+   */
+  private static async handleCartPurchaseAccess(paymentData: any, cartId: string) {
+    try {
       // Obtener el carrito y sus cursos
       const cart = await Cart.findByPk(cartId);
       if (!cart) {
@@ -135,8 +205,7 @@ class CoursePaymentController extends BaseController {
       console.log(`🎉 Proceso de creación de accesos completado para carrito ${cartId}`);
 
     } catch (error) {
-      console.error('❌ Error creando accesos a cursos:', error);
-      // No relanzar el error para no fallar el pago principal
+      console.error('❌ Error procesando pago de carrito:', error);
     }
   }
 

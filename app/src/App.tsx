@@ -1,3 +1,4 @@
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -33,6 +34,39 @@ import NotFound from "./shared/components/NotFound";
 import { PlansPage, SuccessPage, MySuscription, DetailsFormPage } from "./subscription/index";
 
 import CartPage from "./payment/pages/CartPage";
+
+// Componente de depuración temporal
+const DebugNavigationInterceptor = () => {
+  React.useEffect(() => {
+    const originalPushState = window.history.pushState;
+    const originalReplaceState = window.history.replaceState;
+    
+    window.history.pushState = function(state, title, url) {
+      console.log('🚨 NAVEGACIÓN DETECTADA - pushState:', url, 'Stack trace:', new Error().stack);
+      if (url && url.toString().includes('undefined')) {
+        console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
+        console.trace('Stack trace completo:');
+      }
+      return originalPushState.apply(this, arguments);
+    };
+    
+    window.history.replaceState = function(state, title, url) {
+      console.log('🚨 NAVEGACIÓN DETECTADA - replaceState:', url, 'Stack trace:', new Error().stack);
+      if (url && url.toString().includes('undefined')) {
+        console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
+        console.trace('Stack trace completo:');
+      }
+      return originalReplaceState.apply(this, arguments);
+    };
+    
+    return () => {
+      window.history.pushState = originalPushState;
+      window.history.replaceState = originalReplaceState;
+    };
+  }, []);
+  
+  return null;
+};
 import MyOrdersAndPayments from "./payment/pages/MyOrdersAndPayments";
 import MyCoursesPage from "./payment/pages/MyCourses";
 import CourseDiscountEvent from "./payment/pages/CourseDiscountEvent";
@@ -53,6 +87,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
+        <DebugNavigationInterceptor />
         <Toaster />
         <AuthProvider>
           <Routes>

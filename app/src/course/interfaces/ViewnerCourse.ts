@@ -54,6 +54,8 @@ export interface Course {
     discountEvents: DiscountEvent[];
     totalDiscountPercentage: number;
     savings: number;
+    isFree?: boolean;
+    priceDisplay?: string;
   };
 }
 

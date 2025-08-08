@@ -398,9 +398,9 @@ class CartController extends BaseController {
             body: {
               items,
               back_urls: {
-                success: `${process.env.MP_PAYMENT_SUCCESS_URL}`,
-                failure: `${process.env.MP_PAYMENT_FAILURE_URL}`,
-                pending: `${process.env.MP_PAYMENT_PENDING_URL}`,
+                success: `${process.env.MP_BACK_URL}/payment/success`,
+                failure: `${process.env.MP_BACK_URL}/payment/failure`,
+                pending: `${process.env.MP_BACK_URL}/payment/pending`,
               },
               auto_return: "approved",
               external_reference: cart.id.toString(),
@@ -418,7 +418,7 @@ class CartController extends BaseController {
               installments: 1, // Permitir hasta 12 cuotas
               default_installments: 1, // Cuota por defecto
             },
-            notification_url: `${process.env.MP_WEBHOOK_URL}`,
+            notification_url: `${process.env.MP_BACK_URL}/api/webhook/mercadopago`,
             expires: true,
             expiration_date_from: new Date().toISOString(),
             expiration_date_to: new Date(

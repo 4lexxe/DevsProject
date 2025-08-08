@@ -5,13 +5,34 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/user/contexts/AuthContext';
 import NavLink from '../navbar/NavLink';
 import AuthButton from '../../buttons/AuthButton';
+import { cartService } from '@/payment/services/cartService';
 
 export default function DesktopNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [cartItemsCount, setCartItemsCount] = useState(0);
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Obtener la cantidad de items en el carrito
+  useEffect(() => {
+    const fetchCartData = async () => {
+      if (user) {
+        try {
+          const cartData = await cartService.getActiveCart();
+          setCartItemsCount(cartData?.summary?.courseCount || 0);
+        } catch (error) {
+          console.error('Error obteniendo datos del carrito:', error);
+          setCartItemsCount(0);
+        }
+      } else {
+        setCartItemsCount(0);
+      }
+    };
+
+    fetchCartData();
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -67,9 +88,16 @@ export default function DesktopNavbar() {
             <NavLink href="/plans" icon={<CreditCard className="w-4 h-4" />}>
               Planes
             </NavLink>
-            <NavLink href="/cart" icon={<ShoppingCart className="w-4 h-4" />}>
-              Carrito
-            </NavLink>
+            <div className="relative">
+              <NavLink href="/cart" icon={<ShoppingCart className="w-4 h-4" />}>
+                Carrito
+              </NavLink>
+              {user && cartItemsCount > 0 && (
+                <span className="absolute -top-2 -right-2 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium" style={{backgroundColor: "rgb(66, 215, 199)", color: "#0c154c"}}>
+                  {cartItemsCount}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Right section */}

@@ -20,14 +20,16 @@ export const getCourses = async () => {
 
 // Obtener curso por id
 export const getById = async(id: string) => {
-  if(id){
-    try {
-      const response = await api.get(COURSES_ENDPOINT + `/${id}/price`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error al obtener los cursos:', error);
-      throw error;
-    }
+  if (!id || id === 'undefined') {
+    throw new Error('ID del curso no válido');
+  }
+  
+  try {
+    const response = await api.get(COURSES_ENDPOINT + `/${id}/price`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener los cursos:', error);
+    throw error;
   }
 }
 

@@ -32,14 +32,16 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
               No se encontraron cursos.
             </p>
           ) : (
-            courses.map((course) => (
-              <CourseListItem
-                key={course.id}
-                {...course}
-                categories={course.categories}
-                pricing={course.pricing}
-              />
-            ))
+            courses
+              .filter((course) => course.id && course.id !== undefined)
+              .map((course) => (
+                <CourseListItem
+                  key={course.id}
+                  {...course}
+                  categories={course.categories}
+                  pricing={course.pricing}
+                />
+              ))
           )}
         </div>
       </div>
