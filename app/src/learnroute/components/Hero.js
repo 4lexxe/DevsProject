@@ -1,5 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { RocketIcon } from "lucide-react";
-export default function HeroSection() {
-    return (_jsx("div", { className: "bg-gradient-to-b from-blue-50 to-white py-16 px-4", children: _jsxs("div", { className: "max-w-4xl mx-auto text-center", children: [_jsx("div", { className: "inline-block mb-6", children: _jsx("div", { className: "flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mx-auto", children: _jsx(RocketIcon, { className: "w-8 h-8 text-blue-600" }) }) }), _jsx("h1", { className: "text-4xl md:text-5xl font-bold text-gray-900 mb-6", children: "\uD83D\uDE80 Domina el Desarrollo Fullstack con PERN / Next.js" }), _jsx("p", { className: "text-xl text-gray-600 leading-relaxed mb-8", children: "Aprende paso a paso c\u00F3mo construir aplicaciones web modernas, escalables y eficientes con tecnolog\u00EDas como PostgreSQL, Express, React y Node.js (PERN) o Next.js. Desde los fundamentos hasta arquitecturas avanzadas, \u00A1convi\u00E9rtete en un desarrollador fullstack listo para cualquier desaf\u00EDo!" })] }) }));
-}

@@ -66,7 +66,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
       summary: "",
       about: "",
       learningOutcomes: "",
-      price: undefined,
+      price: 100,
       isActive: false,
       isInDevelopment: false,
       adminId: "1",
@@ -101,6 +101,7 @@ export default function CourseForm({ course }: { course?: ICourse }) {
   const handleSubmitCourse = async (courseData: any) => {
     setIsLoading(true);
     try {
+      console.log(courseData);
       const response = course
         ? await editFullCourse(course.id, courseData)
         : await createFullCourse(courseData);
@@ -128,7 +129,6 @@ export default function CourseForm({ course }: { course?: ICourse }) {
       categoryIds: data.categoryIds?.map(Number) ?? [],
       careerTypeId: data.careerTypeId ? Number(data.careerTypeId) : null,
       adminId: Number(data.adminId),
-      price: data.price ? Number(data.price) : undefined,
     });
   };
 
@@ -190,8 +190,8 @@ export default function CourseForm({ course }: { course?: ICourse }) {
               error={errors["price"]?.message}
               labelText="Precio del Curso"
               placeholder="0.00"
-              step="1000"
-              min="0"
+              hideSpinners={true}
+              
             />
           </div>
 

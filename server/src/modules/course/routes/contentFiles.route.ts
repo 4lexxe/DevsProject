@@ -4,7 +4,7 @@ import {
   validateContentId, 
   validateFileId, 
   validateMultipleFiles
-} from '../validations/contentFilesValidations';
+} from '../validators/contentFilesValidator';
 
 import { 
   uploadMultipleFiles,
