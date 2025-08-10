@@ -56,13 +56,6 @@ export const validateCourse = [
   body("isInDevelopment")
     .isBoolean().withMessage("isInDevelopment debe ser un booleano."),
 
-  body("isActive").custom((value, { req }) => {
-    if (value === req.body.isInDevelopment) {
-      throw new Error("isActive e isInDevelopment deben ser valores opuestos.");
-    }
-    return true;
-  }),
-
   body("adminId")
     .isInt().withMessage("adminId debe ser un número."),
 

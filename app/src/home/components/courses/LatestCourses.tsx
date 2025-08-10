@@ -20,16 +20,18 @@ interface Course {
     originalPrice: number;
     finalPrice: number;
     hasDiscount: boolean;
-    activeDiscount?: {
+    discount?: {
       id: number;
       event: string;
       description: string;
-      percentage: number;
-      amount: number;
+      value: number;
       startDate: string;
       endDate: string;
-    };
+    } | null;
+    discountValue: number;
     savings: number;
+    isFree: boolean;
+    priceDisplay: string;
   };
 }
 

@@ -9,6 +9,7 @@ import CartCourse from "../models/CartCourse";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
+import { Order } from "../models/Associations";
 
 /**
  * Controlador para gestionar pagos de cursos usando MercadoPago
@@ -20,8 +21,6 @@ class CoursePaymentController extends BaseController {
 
   /**
    * Crea un nuevo registro de pago en la base de datos
-   * @param courseId - ID del curso
-   * @param cartId - ID del carrito
    * @param paymentData - Datos del pago desde MercadoPago
    */
   static async createPaymentInDB(
@@ -30,18 +29,49 @@ class CoursePaymentController extends BaseController {
     try {
       const { payer, additional_info: { items }, ...data } = paymentData;
 
+      // Debug: Log de la metadata para verificar estructura
+      console.log('🔍 Metadata del pago:', JSON.stringify(paymentData.metadata, null, 2));
+      console.log('🔍 External reference:', paymentData.external_reference);
 
-      const order = await retryWithExponentialBackoff(
-        () => this.merchantOrder.get({ merchantOrderId: paymentData.order.id }),
-        3, // máximo 3 reintentos
-        1000 // delay inicial de 1 segundo
-      );
+      // Buscar la orden asociada al pago usando external_reference
+      let order = null;
+      
+      // Verificar el tipo de compra basándose en la metadata
+      const isDirectPurchase = paymentData.metadata?.purchase_type === "direct" || 
+                              paymentData.external_reference?.startsWith('direct_');
+      const isCartPurchase = paymentData.metadata?.type === "cart";
+      
+      console.log('🔍 Tipo de compra detectado:', { isDirectPurchase, isCartPurchase });
+      
+      if (isDirectPurchase) {
+        // Compra directa: buscar por external_reference
+        order = await Order.findOne({ 
+          where: { externalReference: paymentData.external_reference }
+        });
+        console.log('🔍 Orden encontrada (directa):', order?.id);
+      } else if (isCartPurchase) {
+        // Compra de carrito: extraer cartId de la metadata
+        const cartId = paymentData.metadata?.cart_id;
+        if (cartId) {
+          order = await Order.findOne({
+            where: { cartId: parseInt(cartId) }
+          });
+          console.log('🔍 Buscando orden para cartId:', cartId, 'Orden encontrada:', order?.id);
+        } else {
+          console.warn('🔍 No se encontró cart_id en metadata para pago de carrito');
+        }
+      }
+
+      if (!order) {
+        console.warn("No se encontró la orden asociada al pago:", paymentData.id, "external_reference:", paymentData.external_reference);
+      }
 
       const paymentRecord = await PreferencePayment.create({
         id: paymentData.id,
-        preferenceId: order.preference_id,
+        orderId: order?.id || null,
         externalReference: paymentData.external_reference || null,
         status: paymentData.status || "pending",
+        metadata: paymentData.metadata || null,
         transactionAmount: paymentData.transaction_amount || 0,
         paymentMethodId: paymentData.payment_method_id || null,
         paymentTypeId: paymentData.payment_type_id || null,
@@ -51,20 +81,14 @@ class CoursePaymentController extends BaseController {
         data: data, // Guardar todos los datos del pago en formato JSON
       });
 
-      // Si el pago está aprobado, crear accesos a cursos
+      // Si el pago está aprobado, crear accesos a cursos y actualizar orden
       if (paymentData.status === 'approved') {
-        // Obtener el carrito asociado al pago
-        const cartId = paymentData.external_reference;
-        if (!cartId) {
-          console.warn("No se encontró external_reference (cartId) en el pago:", paymentData.id);
-          return paymentRecord;
+        // Actualizar estado de la orden si existe
+        if (order) {
+          await order.update({ status: 'paid' });
         }
-        const cart = await Cart.findByPk(cartId);
-        if (!cart) {
-          console.warn("No se encontró el carrito con ID:", cartId);
-          return paymentRecord;
-        }
-        await cart.update({ status: 'paid' });
+        
+        // Crear accesos a cursos
         await this.createCourseAccessesForPayment(paymentData);
       }
 
@@ -89,13 +113,24 @@ class CoursePaymentController extends BaseController {
         return;
       }
 
-      // Detectar si es compra directa o carrito basándose en el external_reference
-      if (externalReference.startsWith('direct_')) {
+      // Verificar el tipo de compra basándose en la metadata y external_reference
+      const isDirectPurchase = paymentData.metadata?.purchase_type === "direct" || 
+                              externalReference.startsWith('direct_');
+      const isCartPurchase = paymentData.metadata?.type === "cart";
+
+      if (isDirectPurchase) {
         // Es una compra directa: formato "direct_{courseId}_{userId}_{timestamp}"
         await this.handleDirectPurchaseAccess(paymentData, externalReference);
+      } else if (isCartPurchase || (!isDirectPurchase && !externalReference.startsWith('direct_'))) {
+        // Es un pago de carrito: usar cart_id de la metadata
+        const cartId = paymentData.metadata?.cart_id;
+        if (cartId) {
+          await this.handleCartPurchaseAccess(paymentData, cartId);
+        } else {
+          console.error("No se encontró cart_id en metadata para pago de carrito:", paymentData.id);
+        }
       } else {
-        // Es un pago de carrito: external_reference es el cartId
-        await this.handleCartPurchaseAccess(paymentData, externalReference);
+        console.warn("No se pudo determinar el tipo de compra para el pago:", paymentData.id);
       }
 
     } catch (error) {
@@ -251,8 +286,17 @@ class CoursePaymentController extends BaseController {
       // Guardar los cambios
       await payment.save();
 
-      // Si el pago cambió a aprobado, crear accesos a cursos
+      // Si el pago cambió a aprobado, crear accesos a cursos y actualizar orden
       if (wasNotApproved && isNowApproved) {
+        // Actualizar estado de la orden si existe
+        if (payment.orderId) {
+          const order = await Order.findByPk(payment.orderId);
+          if (order) {
+            await order.update({ status: 'paid' });
+          }
+        }
+        
+        // Crear accesos a cursos
         await this.createCourseAccessesForPayment(paymentData);
       }
 
@@ -318,6 +362,52 @@ class CoursePaymentController extends BaseController {
         return { items: payments, total };
       },
       "Pagos obtenidos exitosamente"
+    );
+  });
+
+  /**
+   * Lista los pagos del usuario autenticado
+   */
+  static getUserPayments = this.asyncHandler(async (req: Request, res: Response) => {
+    const userId = (req.user as any)?.id;
+    
+    if (!userId) {
+      return this.unauthorized(res, req, "Usuario no autenticado");
+    }
+
+    await this.handleList(
+      req,
+      res,
+      async (limit, offset) => {
+        // Buscar pagos a través de las órdenes del usuario
+        const payments = await PreferencePayment.findAll({
+          include: [
+            {
+              model: Order,
+              as: 'order',
+              where: { userId },
+              required: true
+            }
+          ],
+          limit,
+          offset,
+          order: [["createdAt", "DESC"]],
+        });
+        
+        const total = await PreferencePayment.count({
+          include: [
+            {
+              model: Order,
+              as: 'order',
+              where: { userId },
+              required: true
+            }
+          ]
+        });
+        
+        return { items: payments, total };
+      },
+      "Pagos del usuario obtenidos exitosamente"
     );
   });
 

@@ -3,6 +3,43 @@ import axiosInstance from '@/shared/api/axios';
 export interface Course {
   id: number;
   title: string;
+  summary?: string;
+  image?: string;
+  price: number;
+  courseDiscount?: {
+    id: number;
+    event: string;
+    value: number;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+  };
+}
+
+export interface CartCourse {
+  id: number;
+  cartId: number;
+  courseId: number;
+  unitPrice: string;
+  discountValue: number;
+  priceWithDiscount: string;
+  course: Course;
+}
+
+export interface CartBackendResponse {
+  id: number;
+  userId: number;
+  status: string;
+  totalPrice: string;
+  finalPrice: string;
+  discountAmount: string;
+  cartCourses: CartCourse[];
+}
+
+// Interfaces para compatibilidad con el frontend existente
+export interface CourseDisplay {
+  id: number;
+  title: string;
   description?: string;
   image?: string;
   originalPrice: number;
@@ -16,7 +53,7 @@ export interface Course {
 
 export interface CartItem {
   cartCourseId: number;
-  course: Course;
+  course: CourseDisplay;
 }
 
 export interface CartSummary {
@@ -60,11 +97,48 @@ class CartService {
   /**
    * Obtiene el resumen del carrito con precios y descuentos
    */
-  async getCartSummary(): Promise<CartSummary> {
+  async getCartSummary(): Promise<CartSummary | null> {
     try {
       const response = await axiosInstance.get(`${this.baseUrl}/summary`);
-      return response.data.data;
-    } catch (error) {
+      const backendData: CartBackendResponse = response.data.data;
+      
+      if (!backendData || !backendData.cartCourses) {
+        return null;
+      }
+      
+      // Transformar datos del backend a la estructura esperada por el frontend
+      const transformedData: CartSummary = {
+        id: backendData.id,
+        status: backendData.status,
+        courses: backendData.cartCourses.map((cartCourse) => ({
+          cartCourseId: cartCourse.id,
+          course: {
+            id: cartCourse.course.id,
+            title: cartCourse.course.title,
+            description: cartCourse.course.summary,
+            image: cartCourse.course.image,
+            originalPrice: parseFloat(cartCourse.unitPrice),
+            finalPrice: parseFloat(cartCourse.priceWithDiscount),
+            discountApplied: cartCourse.course.courseDiscount ? {
+              event: cartCourse.course.courseDiscount.event,
+              percentage: cartCourse.discountValue,
+              amount: parseFloat(cartCourse.unitPrice) - parseFloat(cartCourse.priceWithDiscount)
+            } : undefined
+          }
+        })),
+        summary: {
+          totalOriginal: parseFloat(backendData.totalPrice || '0'),
+          totalWithDiscounts: parseFloat(backendData.finalPrice || '0'),
+          totalSavings: parseFloat(backendData.discountAmount || '0'),
+          courseCount: backendData.cartCourses.length
+        }
+      };
+      
+      return transformedData;
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        return null; // No hay carrito activo
+      }
       console.error('Error obteniendo resumen del carrito:', error);
       throw error;
     }
@@ -140,64 +214,27 @@ class CartService {
       id: string;
       status: 'pending' | 'paid' | 'cancelled';
       finalPrice: number;
+      totalPrice: number;
+      discountAmount: number;
       preferenceId?: string;
+      externalReference?: string;
+      initPoint?: string;
       createdAt: string;
       updatedAt: string;
-      preference?: {
+      orderCourses: Array<{
         id: string;
-        preferenceId: string;
-        externalReference: string;
-        status: string;
-        total: number;
-        createdAt: string;
-        initPoint?: string;
-        items?: Array<{
-          id: string;
-          title: string;
-          description: string;
-          unit_price: number;
-          quantity: number;
-        }>;
-        payments?: Array<{
-          id: string;
-          status: string;
-          dateApproved: string;
-          transactionAmount: number;
-          paymentMethodId: string;
-          paymentTypeId: string;
-          payer: {
-            first_name?: string;
-            last_name?: string;
-            email: string;
-            identification?: {
-              type: string;
-              number: string;
-            };
-          };
-        }>;
-      };
-      courses: Array<{
-        cartCourseId: string;
+        orderId: string;
+        courseId: string;
+        unitPrice: number;
+        discountValue: number;
+        priceWithDiscount: number;
         course: {
           id: string;
           title: string;
-          description: string;
-          originalPrice: number;
-          finalPrice: number;
-          discountApplied?: {
-            id: string;
-            event: string;
-            percentage: number;
-            amount: number;
-          };
+          image?: string;
+          summary?: string;
         };
       }>;
-      summary: {
-        totalOriginal: number;
-        totalWithDiscounts: number;
-        totalSavings: number;
-        courseCount: number;
-      };
     }>;
     pagination: {
       currentPage: number;
@@ -207,7 +244,7 @@ class CartService {
     };
   }> {
     try {
-      const response = await axiosInstance.get('/cart/orders', {
+      const response = await axiosInstance.get('/orders/user', {
         params: { page, limit }
       });
       return response.data;

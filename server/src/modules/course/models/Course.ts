@@ -3,9 +3,11 @@ import sequelize from "../../../infrastructure/database/db";
 import CareerType from "../models/CareerType";
 import Category from "../models/Category";
 import Admin from "../../admin/Admin";
+import CourseDiscount from "../../purchase/models/CourseDiscount";
 
 class Course extends Model {
   public id!: bigint;
+  public courseDiscountId?: bigint;
   public title!: string;
   public image!: string;
   public summary!: string;
@@ -21,6 +23,8 @@ class Course extends Model {
   public readonly createdAt!: Date; 
   public readonly updatedAt!: Date; 
 
+  courseDiscount?: CourseDiscount;
+
   // Asociaciones
   public sections?: any[]; // Relación con secciones
 }
@@ -31,6 +35,13 @@ Course.init(
       type: DataTypes.BIGINT,
       autoIncrement: true,
       primaryKey: true,
+    },
+    courseDiscountId: {
+      type: DataTypes.BIGINT,
+      references: { model: CourseDiscount, key: "id" },
+      allowNull: true,
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
     },
     title: {
       type: DataTypes.STRING,

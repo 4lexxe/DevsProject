@@ -41,6 +41,7 @@ export default function DiscountEventsPage() {
     formState: { errors },
     setValue,
     reset,
+    watch,
   } = useForm<DiscountEventFormData>({
     resolver: zodResolver(discountEventSchema),
     defaultValues: {
@@ -73,10 +74,15 @@ export default function DiscountEventsPage() {
     try {
       setLoading(true)
       const discountEvent = await discountEventService.getDiscountEventById(parseInt(editId))
+      console.log('Loaded discount event:', discountEvent)
       
-      // Convertir las fechas string a Date objects
+      // Convertir las fechas ISO a Date objects locales
       const startDate = new Date(discountEvent.startDate)
       const endDate = new Date(discountEvent.endDate)
+      
+      // Crear fechas locales para evitar problemas de timezone
+      const localStartDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+      const localEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
       
       // Cargar los cursos asociados al evento
       const eventCourses = await discountEventService.getCoursesForDiscountEvent(parseInt(editId))
@@ -87,8 +93,8 @@ export default function DiscountEventsPage() {
       setValue('event', discountEvent.event)
       setValue('description', discountEvent.description)
       setValue('value', discountEvent.value)
-      setValue('startDate', startDate)
-      setValue('endDate', endDate)
+      setValue('startDate', localStartDate)
+      setValue('endDate', localEndDate)
       setValue('isActive', discountEvent.isActive)
     } catch (error) {
       console.error('Error loading discount event:', error)
@@ -201,6 +207,7 @@ export default function DiscountEventsPage() {
                   <DiscountEventFormFields
                     register={register}
                     errors={errors}
+                    watch={watch}
                   />
 
                   <SubmitButtons

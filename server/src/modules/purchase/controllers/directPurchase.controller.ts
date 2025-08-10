@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { BaseController } from "./BaseController";
 import Course from "../../course/models/Course";
 import CourseAccess from "../models/CourseAccess";
-import CourseDiscountEvent from "../models/CourseDiscountEvent";
+import CourseDiscount from "../models/CourseDiscount";
 import User from "../../user/User";
+import Order from "../models/Order";
 import { Op } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { Preference } from "mercadopago";
 import { MpConfig } from "../../../infrastructure/config/mercadopagoConfig";
-import PreferenceModel from "../models/Preference";
 import { retryWithExponentialBackoff } from "../../../shared/utils/retryService";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
@@ -26,8 +26,8 @@ export class DirectPurchaseController extends BaseController {
     const course = await Course.findByPk(courseId, {
       include: [
         {
-          model: CourseDiscountEvent,
-          as: "discountEvents",
+          model: CourseDiscount,
+          as: "courseDiscount",
           where: {
             isActive: true,
             startDate: { [Op.lte]: new Date() },
@@ -45,18 +45,13 @@ export class DirectPurchaseController extends BaseController {
     const courseData = course.toJSON() as any;
     const originalPrice = parseFloat(courseData.price.toString());
     let finalPrice = originalPrice;
-    let totalDiscountPercentage = 0;
+    let discountPercentage = 0;
 
-    // Si hay descuentos activos, calcular el total acumulado
-    if (courseData.discountEvents && courseData.discountEvents.length > 0) {
-      // Sumar todos los porcentajes de descuento
-      totalDiscountPercentage = courseData.discountEvents.reduce((total: number, discount: any) => {
-        return total + discount.value;
-      }, 0);
-
-      // Calcular el precio final
-      const totalDiscountAmount = (originalPrice * totalDiscountPercentage) / 100;
-      finalPrice = originalPrice - totalDiscountAmount;
+    // Si hay descuento activo, calcular el precio final
+    if (courseData.courseDiscount) {
+      discountPercentage = courseData.courseDiscount.value;
+      const discountAmount = (originalPrice * discountPercentage) / 100;
+      finalPrice = originalPrice - discountAmount;
 
       // Asegurar que el precio final no sea negativo
       if (finalPrice < 0) {
@@ -65,7 +60,7 @@ export class DirectPurchaseController extends BaseController {
     }
 
     // Un curso es gratuito si el precio original es 0 o si el descuento es 100% o más
-    const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+    const isFree = originalPrice === 0 || discountPercentage >= 100 || finalPrice === 0;
 
     return {
       isFree,
@@ -251,17 +246,19 @@ export class DirectPurchaseController extends BaseController {
         unit_price: roundedPrice,
       };
 
+      const externalReference = `direct_${course.id}_${userId}_${Date.now()}`;
+
       const result = await retryWithExponentialBackoff(() =>
         preference.create({
           body: {
             items: [item],
             back_urls: {
-              success: `${process.env.MP_BACK_URL}/payment/success`,
-              failure: `${process.env.MP_BACK_URL}/payment/failure`,
-              pending: `${process.env.MP_BACK_URL}/payment/pending`,
+              success: `${process.env.MP_PAYMENT_SUCCESS_URL}`,
+              failure: `${process.env.MP_PAYMENT_FAILURE_URL}`,
+              pending: `${process.env.MP_PAYMENT_PENDING_URL}`,
             },
             auto_return: "approved",
-            external_reference: `direct_${course.id}_${userId}_${Date.now()}`,
+            external_reference: externalReference,
             metadata: {
               purchase_type: "direct",
               course_id: course.id.toString(),
@@ -276,7 +273,7 @@ export class DirectPurchaseController extends BaseController {
               installments: 1,
               default_installments: 1,
             },
-            notification_url: `${process.env.MP_BACK_URL}/api/webhook/mercadopago`,
+            notification_url: `${process.env.MP_WEBHOOK_URL}`,
             expires: true,
             expiration_date_from: new Date().toISOString(),
             expiration_date_to: new Date(
@@ -288,7 +285,6 @@ export class DirectPurchaseController extends BaseController {
 
       // Debug: Log de la respuesta de MercadoPago
       console.log('🔍 Respuesta completa de MercadoPago:', JSON.stringify(result, null, 2));
-      console.log('🔍 init_point de MercadoPago:', result.init_point, 'tipo:', typeof result.init_point);
 
       // Validar que el init_point sea válido
       if (!result.init_point || result.init_point === 'undefined' || typeof result.init_point !== 'string') {
@@ -301,15 +297,21 @@ export class DirectPurchaseController extends BaseController {
         );
       }
 
-      // Guardar preferencia en la base de datos
-      await PreferenceModel.create({
-        id: result.id,
-        userId: BigInt(userId),
+      // Crear registro de Order para compra directa
+      const order = await Order.create({
+        cartId: null, // No hay carrito para compras directas
+        userId: userId,
+        preferenceId: result.id,
+        type: "direct",
         externalReference: result.external_reference,
-        items: result.items,
         initPoint: result.init_point,
+        metadata: result.metadata,
+        totalPrice: originalPrice,
+        discountAmount: originalPrice - roundedPrice,
+        finalPrice: roundedPrice,
         expirationDateFrom: result.expiration_date_from,
         expirationDateTo: result.expiration_date_to,
+        status: "pending"
       });
 
       DirectPurchaseController.created(
@@ -317,6 +319,7 @@ export class DirectPurchaseController extends BaseController {
         req,
         {
           initPoint: result.init_point,
+          orderId: order.id,
           course: {
             id: course.id,
             title: course.title,

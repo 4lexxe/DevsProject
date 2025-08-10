@@ -13,6 +13,25 @@ export const discountEventSchema = z
     }),
     isActive: z.boolean(),
   })
+  .refine((data) => {
+    const today = new Date();
+    
+    // Para evitar problemas de zona horaria, trabajar con fechas locales
+    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    // Si la fecha viene con offset de zona horaria, ajustar para obtener la fecha real seleccionada
+    const startDateAdjusted = new Date(data.startDate.getTime() + data.startDate.getTimezoneOffset() * 60000);
+    const startDateLocal = new Date(
+      startDateAdjusted.getFullYear(),
+      startDateAdjusted.getMonth(), 
+      startDateAdjusted.getDate()
+    );
+    
+    return startDateLocal >= todayLocal;
+  }, {
+    message: "La fecha de inicio debe ser hoy o en el futuro",
+    path: ["startDate"],
+  })
   .refine((data) => data.endDate > data.startDate, {
     message: "La fecha de fin debe ser posterior a la fecha de inicio",
     path: ["endDate"],

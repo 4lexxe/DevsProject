@@ -7,6 +7,7 @@ import { cartService } from "../services/cartService"
 import { paymentService } from "../services"
 import type { Payment } from "../services/paymentService"
 import { useAuth } from "@/user/contexts/AuthContext"
+import axiosInstance from "@/shared/api/axios"
 
 // Define types based on our backend response
 interface PaymentInfo {
@@ -25,54 +26,40 @@ interface PaymentInfo {
       number: string;
     };
   };
+  items?: Array<{
+    id: string;
+    title: string;
+    unit_price: number;
+    description: string;
+  }>;
 }
 
 interface Order {
   id: string;
   status: 'pending' | 'paid' | 'cancelled';
   finalPrice: number;
+  totalPrice: number;
+  discountAmount: number;
   preferenceId?: string;
+  externalReference?: string;
+  initPoint?: string;
   createdAt: string;
   updatedAt: string;
-  preference?: {
+  orderCourses: Array<{
     id: string;
-    preferenceId: string;
-    externalReference: string;
-    status: string;
-    total: number;
-    createdAt: string;
-    initPoint?: string;
-    items?: Array<{
-      id: string;
-      title: string;
-      description: string;
-      unit_price: number;
-      quantity: number;
-    }>;
-    payments?: PaymentInfo[];
-  };
-  courses: Array<{
-    cartCourseId: string;
+    orderId: string;
+    courseId: string;
+    unitPrice: number;
+    discountValue: number;
+    priceWithDiscount: number;
     course: {
       id: string;
       title: string;
-      description: string;
-      originalPrice: number;
-      finalPrice: number;
-      discountApplied?: {
-        id: string;
-        event: string;
-        percentage: number;
-        amount: number;
-      };
+      image?: string;
+      summary?: string;
     };
   }>;
-  summary: {
-    totalOriginal: number;
-    totalWithDiscounts: number;
-    totalSavings: number;
-    courseCount: number;
-  };
+  payments?: PaymentInfo[];
 }
 
 export default function MyOrdersAndPayments() {
@@ -381,11 +368,12 @@ export default function MyOrdersAndPayments() {
   const handleCancelOrder = async (orderId: string) => {
     try {
       setCancellingOrder(orderId)
-      await cartService.cancelPendingCart()
+      // Use the order-specific cancel endpoint instead of cart cancel
+      await axiosInstance.put(`/orders/${orderId}/cancel`)
       // Recargar las órdenes para reflejar el cambio
       await loadOrders()
     } catch (error) {
-      console.error('Error cancelling order:', error)
+      console.error('Error cancelando orden:', error)
       setError('Error al cancelar la orden')
     } finally {
       setCancellingOrder(null)
@@ -531,7 +519,7 @@ export default function MyOrdersAndPayments() {
                           </span>
                           <span className="flex items-center gap-1">
                             <ShoppingCart className="h-4 w-4" />
-                            {order.courses.length} {order.courses.length === 1 ? "curso" : "cursos"}
+                            {order.orderCourses.length} {order.orderCourses.length === 1 ? "curso" : "cursos"}
                           </span>
                         </div>
                       </div>
@@ -556,7 +544,7 @@ export default function MyOrdersAndPayments() {
                         Cursos incluidos:
                       </h4>
                       <div className="space-y-3">
-                        {order.courses.map((courseItem, index) => (
+                        {order.orderCourses.map((orderCourse, index) => (
                           <div
                             key={index}
                             className="flex justify-between items-center p-4 rounded-lg"
@@ -564,25 +552,24 @@ export default function MyOrdersAndPayments() {
                           >
                             <div className="flex-1">
                               <div className="font-medium" style={{ color: "#0c154c" }}>
-                                {courseItem.course.title}
+                                {orderCourse.course.title}
                               </div>
-                              <div className="text-sm text-gray-600 mt-1">{courseItem.course.description}</div>
-                              {courseItem.course.discountApplied && (
+                              <div className="text-sm text-gray-600 mt-1">{orderCourse.course.summary}</div>
+                              {orderCourse.discountValue > 0 && (
                                 <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
                                   <Target className="h-3 w-3" />
-                                  Descuento: {courseItem.course.discountApplied.percentage}% 
-                                  ({courseItem.course.discountApplied.event})
+                                  Descuento: {orderCourse.discountValue}%
                                 </div>
                               )}
                             </div>
                             <div className="flex flex-col items-end ml-4">
-                              {courseItem.course.discountApplied && (
+                              {orderCourse.discountValue > 0 && (
                                 <div className="text-sm text-gray-500 line-through">
-                                  {formatCurrency(courseItem.course.originalPrice)}
+                                  {formatCurrency(orderCourse.unitPrice)}
                                 </div>
                               )}
                               <div className="font-bold text-lg" style={{ color: "#1d4ed8" }}>
-                                {formatCurrency(courseItem.course.finalPrice)}
+                                {formatCurrency(orderCourse.priceWithDiscount)}
                               </div>
                             </div>
                           </div>
@@ -591,22 +578,22 @@ export default function MyOrdersAndPayments() {
                     </div>
 
                     {/* Order Summary */}
-                    {order.summary.totalSavings > 0 && (
+                    {order.discountAmount > 0 && (
                       <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: "#f0fdf4" }}>
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="text-sm text-gray-600">Resumen del pedido</div>
                             <div className="flex items-center gap-4 mt-1">
                               <span className="text-sm text-gray-500">
-                                Precio original: {formatCurrency(order.summary.totalOriginal)}
+                                Precio original: {formatCurrency(order.totalPrice)}
                               </span>
                               <span className="text-sm text-green-600 font-medium">
-                                Descuento: -{formatCurrency(order.summary.totalSavings)}
+                                Descuento: -{formatCurrency(order.discountAmount)}
                               </span>
                             </div>
                           </div>
                           <div className="text-lg font-bold text-green-600">
-                            ¡Ahorraste {formatCurrency(order.summary.totalSavings)}!
+                            ¡Ahorraste {formatCurrency(order.discountAmount)}!
                           </div>
                         </div>
                       </div>
@@ -614,10 +601,10 @@ export default function MyOrdersAndPayments() {
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3">
-                      {order.status === "pending" && order.preference?.initPoint && (
+                      {order.status === "pending" && order.initPoint && (
                         <>
                           <button
-                            onClick={() => handlePayment(order.preference?.initPoint)}
+                            onClick={() => handlePayment(order.initPoint)}
                             className="flex-1 px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:opacity-90"
                             style={{ backgroundColor: "#42d7c7" }}
                           >
@@ -650,9 +637,9 @@ export default function MyOrdersAndPayments() {
                         </>
                       )}
 
-                      {order.status === "paid" && order.preference?.payments && order.preference.payments.length > 0 && (
+                      {order.status === "paid" && order.payments && order.payments.length > 0 && (
                         <button
-                          onClick={() => showPaymentInfo(order.preference!.payments![0])}
+                          onClick={() => showPaymentInfo(order.payments![0])}
                           className="px-6 py-3 font-semibold rounded-lg border-2 transition-all duration-300 hover:opacity-80"
                           style={{ borderColor: "#1d4ed8", color: "#1d4ed8", backgroundColor: "white" }}
                         >

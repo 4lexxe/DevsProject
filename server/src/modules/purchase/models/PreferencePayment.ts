@@ -1,11 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
-import Preference from "./Preference";
+import Order from "./Order";
+
+import { UUID } from "crypto";
 
 class PreferencePayment extends Model {
-  public id!: bigint;
-  public preferenceId!: string;
+  public id!: string;
+  public orderId!: UUID;
   public externalReference!: string;
+  public metadata!: Object;
   public dateApproved!: Date;
   public status!: string;
   public transactionAmount!: number;
@@ -21,16 +24,16 @@ class PreferencePayment extends Model {
 PreferencePayment.init(
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
       comment: "ID del pago en MercadoPago",
     },
-    preferenceId: {
-      type: DataTypes.STRING,
+    orderId: {
+      type: DataTypes.UUID,
       allowNull: false,
-      references: { model: "Preferences", key: "id" },
-      comment: "ID de la preferencia asociada",
+      references: { model: Order, key: "id" },
+      comment: "ID de la orden asociada",
     },
     externalReference: {
       type: DataTypes.STRING,

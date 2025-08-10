@@ -1,7 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 
-class CourseDiscountEvent extends Model {
+class CourseDiscount extends Model {
   public id!: bigint;
   public event!: string;
   public description!: string;
@@ -13,7 +13,7 @@ class CourseDiscountEvent extends Model {
   public readonly updatedAt!: Date;
 }
 
-CourseDiscountEvent.init(
+CourseDiscount.init(
   {
     id: {
       type: DataTypes.BIGINT,
@@ -55,44 +55,11 @@ CourseDiscountEvent.init(
   },
   {
     sequelize,
-    tableName: "CourseDiscountEvents",
+    tableName: "CourseDiscounts",
     timestamps: true,
     paranoid: true,
     comment: "Tabla para almacenar eventos de descuento de cursos",
   }
 );
 
-// Tabla intermedia para la relación muchos a muchos
-class CourseDiscountEventAssociation extends Model {
-  public courseId!: bigint;
-  public discountEventId!: bigint;
-}
-
-CourseDiscountEventAssociation.init(
-  {
-    courseId: {
-      type: DataTypes.BIGINT,
-      references: { model: "Courses", key: "id" },
-      allowNull: false,
-      primaryKey: true,
-      comment: "ID del curso",
-    },
-    discountEventId: {
-      type: DataTypes.BIGINT,
-      references: { model: CourseDiscountEvent, key: "id" },
-      allowNull: false,
-      primaryKey: true,
-      comment: "ID del evento de descuento",
-    },
-  },
-  {
-    sequelize,
-    modelName: "CourseDiscountEventAssociation",
-    tableName: "CourseDiscountEventAssociations",
-    timestamps: false,
-    comment: "Tabla intermedia para relación muchos a muchos entre Courses y CourseDiscountEvents",
-  }
-);
-
-export default CourseDiscountEvent;
-export { CourseDiscountEventAssociation };
+export default CourseDiscount;

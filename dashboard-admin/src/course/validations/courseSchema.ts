@@ -49,9 +49,5 @@ export const courseSchema = z
     isInDevelopment: z.boolean(),
     adminId: z.string()
   })
-  .refine((data) => data.isActive !== data.isInDevelopment, {
-    message: "El curso no puede estar activo y en desarrollo a la vez",
-    path: ["isActive"],
-  });
 
 export type CourseType = z.infer<typeof courseSchema>;

@@ -11,8 +11,21 @@ import {
 interface PurchaseButtonsProps {
   courseId: string;
   pricing?: {
-    isFree?: boolean;
+    originalPrice: number;
     finalPrice: number;
+    hasDiscount: boolean;
+    discount?: {
+      id: number;
+      event: string;
+      description: string;
+      value: number;
+      startDate: string;
+      endDate: string;
+    } | null;
+    discountValue: number;
+    savings: number;
+    isFree: boolean;
+    priceDisplay: string;
   };
   className?: string;
 }
@@ -248,7 +261,7 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
         ) : (
           <>
             <Zap className="w-5 h-5" />
-            {pricing?.finalPrice === 0 ? 'Obtener Gratis' : `Comprar ahora $${pricing?.finalPrice?.toFixed(2) || '0.00'}`}
+            {pricing?.isFree ? 'Obtener Gratis' : `Comprar ahora ${pricing?.priceDisplay || '$0.00'}`}
           </>
         )}
       </button>

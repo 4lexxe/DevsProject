@@ -1,12 +1,29 @@
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { UseFormRegister, FieldErrors, UseFormWatch } from "react-hook-form";
 import { DiscountEventFormData } from "../../validations/discountEvent";
 
 interface DiscountEventFormFieldsProps {
   register: UseFormRegister<DiscountEventFormData>;
   errors: FieldErrors<DiscountEventFormData>;
+  watch: UseFormWatch<DiscountEventFormData>;
 }
 
-export default function DiscountEventFormFields({ register, errors }: DiscountEventFormFieldsProps) {
+// Helper function to format date for input[type="date"]
+const formatDateForInput = (date: Date | null): string => {
+  if (!date) return '';
+  
+  // Ensure we get the local date without timezone conversion
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
+export default function DiscountEventFormFields({ register, errors, watch }: DiscountEventFormFieldsProps) {
+  // Watch the date values to display them correctly
+  const startDateValue = watch("startDate");
+  const endDateValue = watch("endDate");
+
   return (
     <>
       {/* Event Name */}
@@ -86,7 +103,27 @@ export default function DiscountEventFormFields({ register, errors }: DiscountEv
             type="date"
             className="w-full p-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ borderColor: "#42d7c7" }}
-            {...register("startDate", { valueAsDate: true })}
+            value={formatDateForInput(startDateValue)}
+            {...register("startDate", { 
+              setValueAs: (value) => {
+                if (!value) return null;
+                
+                // Si es un string de fecha del input (YYYY-MM-DD)
+                if (typeof value === 'string' && value.includes('-') && !value.includes('T')) {
+                  const [year, month, day] = value.split('-').map(Number);
+                  return new Date(year, month - 1, day);
+                }
+                
+                // Si es un string ISO o Date object del backend
+                if (value instanceof Date) {
+                  return value;
+                }
+                
+                // Si es string ISO del backend
+                const date = new Date(value);
+                return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+              }
+            })}
           />
           {errors.startDate && (
             <p className="text-sm text-red-500 flex items-center gap-1">
@@ -106,7 +143,27 @@ export default function DiscountEventFormFields({ register, errors }: DiscountEv
             type="date"
             className="w-full p-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ borderColor: "#42d7c7" }}
-            {...register("endDate", { valueAsDate: true })}
+            value={formatDateForInput(endDateValue)}
+            {...register("endDate", { 
+              setValueAs: (value) => {
+                if (!value) return null;
+                
+                // Si es un string de fecha del input (YYYY-MM-DD)
+                if (typeof value === 'string' && value.includes('-') && !value.includes('T')) {
+                  const [year, month, day] = value.split('-').map(Number);
+                  return new Date(year, month - 1, day);
+                }
+                
+                // Si es un string ISO o Date object del backend
+                if (value instanceof Date) {
+                  return value;
+                }
+                
+                // Si es string ISO del backend
+                const date = new Date(value);
+                return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+              }
+            })}
           />
           {errors.endDate && (
             <p className="text-sm text-red-500 flex items-center gap-1">

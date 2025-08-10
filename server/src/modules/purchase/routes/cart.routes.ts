@@ -39,13 +39,6 @@ router.post("/courses", addCourseToCartValidation, CartController.addCourseToCar
 router.delete("/courses/:courseId", removeCourseFromCartValidation, CartController.removeCourseFromCart);
 
 /**
- * @route   GET /api/cart/courses/:courseId/check
- * @desc    Verificar si un curso está en el carrito
- * @access  Private
- */
-router.get("/courses/:courseId/check", CartController.checkCourseInCart);
-
-/**
  * @route   GET /api/cart/count
  * @desc    Obtener el número de cursos en el carrito
  * @access  Private
@@ -72,12 +65,5 @@ router.post("/payment", CartController.createCartPaymentPreference);
  * @access  Private
  */
 router.put("/cancel-pending", CartController.cancelPendingCart);
-
-/**
- * @route   GET /api/cart/orders
- * @desc    Obtener pedidos (carritos con preferencias) del usuario
- * @access  Private
- */
-router.get("/orders", CartController.getOrders);
 
 export default router;

@@ -396,7 +396,7 @@ export default function CartPage() {
 
                     {totalSavings > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-green-600 font-medium">Descuentos aplicados</span>
+                        <span className="text-green-600 font-medium">Valor descontado</span>
                         <span className="text-green-600 font-bold">-${totalSavings}</span>
                       </div>
                     )}
