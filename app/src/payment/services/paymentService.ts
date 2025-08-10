@@ -26,8 +26,8 @@ class PaymentService {
    */
   async getPaymentHistory(): Promise<Payment[]> {
     try {
-      const response = await axiosInstance.get(`${this.baseUrl}`);
-      return response.data.data;
+      const response = await axiosInstance.get(`/payments/user`);
+      return response.data.data || [];
     } catch (error) {
       console.error('Error obteniendo historial de pagos:', error);
       throw error;
@@ -39,7 +39,7 @@ class PaymentService {
    */
   async getPaymentById(paymentId: string): Promise<Payment> {
     try {
-      const response = await axiosInstance.get(`${this.baseUrl}/${paymentId}`);
+      const response = await axiosInstance.get(`/payments/${paymentId}`);
       return response.data.data;
     } catch (error) {
       console.error('Error obteniendo pago:', error);
@@ -47,18 +47,16 @@ class PaymentService {
     }
   }
 
-  /**
-   * Obtiene todos los pagos (con paginación)
-   */
-  async getAllPayments(page: number = 1, limit: number = 10): Promise<{ items: Payment[], total: number }> {
+  async cancelOrder(orderId: string): Promise<Payment> {
     try {
-      const response = await axiosInstance.get(`${this.baseUrl}?page=${page}&limit=${limit}`);
+      const response = await axiosInstance.delete(`/orders/${orderId}/cancel`);
       return response.data.data;
     } catch (error) {
-      console.error('Error obteniendo pagos:', error);
+      console.error('Error cancelando orden:', error);
       throw error;
     }
   }
+
 }
 
 export const paymentService = new PaymentService();

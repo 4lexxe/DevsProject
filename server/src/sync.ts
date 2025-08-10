@@ -33,9 +33,10 @@ import Plan from "./modules/subscription/models/Plan";
 /* Modelos relacionados con las compras de cursos */
 import Cart from "./modules/purchase/models/Cart";
 import CartCourse from "./modules/purchase/models/CartCourse";
-import Preference from "./modules/purchase/models/Preference";
+import Order from "./modules/purchase/models/Order";
+import OrderCourse from "./modules/purchase/models/OrderCourse";
 import PreferencePayment from "./modules/purchase/models/PreferencePayment";
-import CourseDiscountEvent, { CourseDiscountEventAssociation } from "./modules/purchase/models/CourseDiscountEvent";
+import CourseDiscount from "./modules/purchase/models/CourseDiscount";
 import CourseAccess from "./modules/purchase/models/CourseAccess";
 
 import MPWebhookEvent from "./modules/webhook/MPWebhookEvent";
@@ -72,6 +73,7 @@ async function syncDatabase() {
     /* Area de cursos */
     await Category.sync({ force: true });
     await CareerType.sync({ force: true });
+    await CourseDiscount.sync({ force: true });
     await Course.sync({ force: true });
     await CourseCategory.sync({ force: true });
     await Section.sync({ force: true });
@@ -88,12 +90,11 @@ async function syncDatabase() {
     await Invoice.sync({ force: true });
 
     // Area de compras de cursos
-    await CourseDiscountEvent.sync({ force: true });
-    await CourseDiscountEventAssociation.sync({ force: true });
     await CourseAccess.sync({ force: true });
-    await Preference.sync({ force: true });
     await Cart.sync({ force: true });
     await CartCourse.sync({ force: true });
+    await Order.sync({ force: true });
+    await OrderCourse.sync({ force: true });
     await PreferencePayment.sync({ force: true });
 
     console.log("¡Sincronización exitosa!");

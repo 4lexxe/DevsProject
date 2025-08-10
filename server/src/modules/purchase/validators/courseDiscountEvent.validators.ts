@@ -231,11 +231,11 @@ export const removeCoursesFromDiscountEventValidation = [
     }),
 ];
 
-// Validaciones para obtener cursos de un evento de descuento
-export const getCoursesForDiscountEventValidation = [
-  param("eventId")
+// Validaciones para obtener descuento activo de un curso específico
+export const getActiveDiscountForCourseValidation = [
+  param("courseId")
     .isInt({ gt: 0 })
-    .withMessage("El ID del evento debe ser un número entero positivo"),
+    .withMessage("El ID del curso debe ser un número entero positivo"),
 ];
 
 // Validaciones para obtener descuentos activos de un curso

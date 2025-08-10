@@ -1,5 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-const ResourceVisibilityToggle = ({ isVisible, onChange, }) => {
-    return (_jsxs("div", { children: [_jsx("label", { htmlFor: "isVisible", className: "block text-sm font-medium text-gray-700", children: "Visibilidad del recurso" }), _jsxs("button", { type: "button", onClick: () => onChange(!isVisible), className: `relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500/20 ${isVisible ? 'bg-blue-600' : 'bg-gray-200'}`, children: [_jsx("span", { className: "sr-only", children: "Visibilidad del recurso" }), _jsx("span", { className: `${isVisible ? 'translate-x-5' : 'translate-x-0'} inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition-transform duration-200 ease-in-out` })] }), _jsx("span", { className: "ml-3 text-sm text-gray-700", children: isVisible ? 'Visible' : 'No visible' })] }));
-};
-export default ResourceVisibilityToggle;

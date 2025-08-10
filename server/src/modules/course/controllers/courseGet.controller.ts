@@ -4,7 +4,7 @@ import Category from "../models/Category";
 import CareerType from "../models/CareerType";
 import Section from "../models/Section";
 import Content from "../models/Content";
-import CourseDiscountEvent from "../../purchase/models/CourseDiscountEvent";
+import CourseDiscount from "../../purchase/models/CourseDiscount";
 import { Op } from "sequelize";
 import { BaseController } from "./BaseController";
 // Importar asociaciones para asegurar que están cargadas
@@ -36,58 +36,49 @@ export default class CourseGetController extends BaseController {
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
           {
-            model: CourseDiscountEvent,
-            as: "discountEvents",
+            model: CourseDiscount,
+            as: "courseDiscount",
             where: {
               isActive: true,
               startDate: { [Op.lte]: new Date() },
               endDate: { [Op.gte]: new Date() },
             },
-            required: false, // LEFT JOIN para incluir cursos sin descuentos
+            required: false,
           },
         ],
         order: [["id", "ASC"]],
       });
 
-      // Procesar precios y descuentos para cada curso
+      // Procesar precios y descuentos para cada curso (relación uno a uno)
       const coursesWithPricing = courses.map(course => {
         const courseData = course.toJSON() as any;
         const originalPrice = parseFloat(courseData.price.toString());
         let finalPrice = originalPrice;
-        let totalDiscountPercentage = 0;
-        let totalDiscountAmount = 0;
+        let discountValue = 0;
+        let savings = 0;
 
-        // Si hay descuentos activos, calcular el total acumulado
-        if (courseData.discountEvents && courseData.discountEvents.length > 0) {
-          // Sumar todos los porcentajes de descuento
-          totalDiscountPercentage = courseData.discountEvents.reduce((total: number, discount: any) => {
-            return total + discount.value;
-          }, 0);
-
-          // Calcular el monto total de descuento
-          totalDiscountAmount = (originalPrice * totalDiscountPercentage) / 100;
-          finalPrice = originalPrice - totalDiscountAmount;
-
-          // Asegurar que el precio final no sea negativo
+        if (courseData.courseDiscount) {
+          discountValue = courseData.courseDiscount.value;
+          savings = (originalPrice * discountValue) / 100;
+          finalPrice = originalPrice - savings;
           if (finalPrice < 0) {
             finalPrice = 0;
-            totalDiscountAmount = originalPrice;
+            savings = originalPrice;
           }
         }
 
-        // Determinar si el curso es gratuito
-        const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+        const isFree = originalPrice === 0 || discountValue >= 100 || finalPrice === 0;
         const priceDisplay = isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`;
 
         return {
           ...courseData,
           pricing: {
             originalPrice,
-            finalPrice: Math.round(finalPrice * 100) / 100, // Redondear a 2 decimales
-            hasDiscount: courseData.discountEvents && courseData.discountEvents.length > 0,
-            discountEvents: courseData.discountEvents || [],
-            totalDiscountPercentage,
-            savings: Math.round(totalDiscountAmount * 100) / 100, // Redondear a 2 decimales
+            finalPrice: Math.round(finalPrice * 100) / 100,
+            hasDiscount: !!courseData.courseDiscount,
+            discount: courseData.courseDiscount || null,
+            discountValue,
+            savings: Math.round(savings * 100) / 100,
             isFree,
             priceDisplay
           },
@@ -168,14 +159,14 @@ export default class CourseGetController extends BaseController {
           { model: CareerType, as: "careerType" },
           { model: Section, as: "sections" },
           {
-            model: CourseDiscountEvent,
-            as: "discountEvents",
+            model: CourseDiscount,
+            as: "courseDiscount",
             where: {
               isActive: true,
               startDate: { [Op.lte]: new Date() },
               endDate: { [Op.gte]: new Date() },
             },
-            required: false, // LEFT JOIN para incluir cursos sin descuentos
+            required: false,
           },
         ],
       });
@@ -184,45 +175,34 @@ export default class CourseGetController extends BaseController {
         return;
       }
 
-      // Calcular precio con TODOS los descuentos aplicados
       const courseData = course.toJSON() as any;
       const originalPrice = parseFloat(courseData.price.toString());
       let finalPrice = originalPrice;
-      let totalDiscountPercentage = 0;
-      let totalDiscountAmount = 0;
+      let discountValue = 0;
+      let savings = 0;
 
-      // Si hay descuentos activos, calcular el total acumulado
-      if (courseData.discountEvents && courseData.discountEvents.length > 0) {
-        // Sumar todos los porcentajes de descuento
-        totalDiscountPercentage = courseData.discountEvents.reduce((total: number, discount: any) => {
-          return total + discount.value;
-        }, 0);
-
-        // Calcular el monto total de descuento
-        totalDiscountAmount = (originalPrice * totalDiscountPercentage) / 100;
-        finalPrice = originalPrice - totalDiscountAmount;
-
-        // Asegurar que el precio final no sea negativo
+      if (courseData.courseDiscount) {
+        discountValue = courseData.courseDiscount.value;
+        savings = (originalPrice * discountValue) / 100;
+        finalPrice = originalPrice - savings;
         if (finalPrice < 0) {
           finalPrice = 0;
-          totalDiscountAmount = originalPrice;
+          savings = originalPrice;
         }
       }
 
-      // Determinar si el curso es gratuito
-      const isFree = originalPrice === 0 || totalDiscountPercentage >= 100 || finalPrice === 0;
+      const isFree = originalPrice === 0 || discountValue >= 100 || finalPrice === 0;
       const priceDisplay = isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`;
 
-      // Agregar información de precios al objeto de respuesta
       const responseData = {
         ...courseData,
         pricing: {
           originalPrice,
-          finalPrice: Math.round(finalPrice * 100) / 100, // Redondear a 2 decimales
-          hasDiscount: courseData.discountEvents && courseData.discountEvents.length > 0,
-          discountEvents: courseData.discountEvents || [],
-          totalDiscountPercentage,
-          savings: Math.round(totalDiscountAmount * 100) / 100, // Redondear a 2 decimales
+          finalPrice: Math.round(finalPrice * 100) / 100,
+          hasDiscount: !!courseData.courseDiscount,
+          discount: courseData.courseDiscount || null,
+          discountValue,
+          savings: Math.round(savings * 100) / 100,
           isFree,
           priceDisplay
         },

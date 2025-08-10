@@ -118,11 +118,19 @@ export const createDiscountEventWithCourses = async (eventData: DiscountEventFor
       courseIds: courseIds,
     };
 
+    console.log(payload)
+
     const response = await api.post<ApiResponse<DiscountEvent>>('/course/discount-events', payload);
     return response.data.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating discount event with courses:', error);
-    throw error;
+    
+    // Extraer el mensaje de error del backend
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    
+    throw new Error('Error al crear el evento de descuento');
   }
 };
 
@@ -159,9 +167,15 @@ export const updateDiscountEventWithCourses = async (id: number, eventData: Disc
 
     const response = await api.put<ApiResponse<DiscountEvent>>(`/course/discount-events/${id}`, payload);
     return response.data.data;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating discount event with courses:', error);
-    throw error;
+    
+    // Extraer el mensaje de error del backend
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    
+    throw new Error('Error al actualizar el evento de descuento');
   }
 };
 

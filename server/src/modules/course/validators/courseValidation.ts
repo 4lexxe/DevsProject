@@ -22,7 +22,14 @@ export const validateCourse = [
     .isInt().withMessage("careerTypeId debe ser un número."),
   
   body("price")
-    .isInt({ min: 0 }).withMessage("El precio debe ser un número entero positivo o cero."),
+    .isFloat().withMessage("El precio debe ser un número.").bail()
+    .custom((value) => {
+      const price = parseFloat(value);
+      if (price === 0 || price >= 100) {
+        return true;
+      }
+      throw new Error("El precio debe ser 0 (gratis) o al menos 1000.");
+    }),
 
   body("learningOutcomes")
     .isArray({ min: 1 }).withMessage("Debe haber al menos un resultado de aprendizaje.").bail()
@@ -48,13 +55,6 @@ export const validateCourse = [
 
   body("isInDevelopment")
     .isBoolean().withMessage("isInDevelopment debe ser un booleano."),
-
-  body("isActive").custom((value, { req }) => {
-    if (value === req.body.isInDevelopment) {
-      throw new Error("isActive e isInDevelopment deben ser valores opuestos.");
-    }
-    return true;
-  }),
 
   body("adminId")
     .isInt().withMessage("adminId debe ser un número."),

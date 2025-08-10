@@ -5,7 +5,7 @@ export { default as CourseDetail } from './pages/courseDetail'
 export { default as SectionFormPage } from './pages/SectionFormPage'
 
 export { default as SectionPage } from './pages/SectionPage'
-export { default as CourseDiscountEvent } from './pages/CourseDiscountEvent'
+export { default as CourseDiscountEvent } from './pages/CourseDiscountForm'
 export { default as DiscountEventsList } from './pages/DiscountEventsList'
 export { default as QuizFormPage } from './pages/QuizForm'
 

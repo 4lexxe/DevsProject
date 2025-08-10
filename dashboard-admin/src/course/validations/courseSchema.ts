@@ -39,7 +39,9 @@ export const courseSchema = z
 
     price: z
       .number({ message: "El precio debe ser un número" })
-      .min(0, { message: "El precio debe ser mayor o igual a 0" })
+      .refine((val) => val === 0 || val >= 100, { 
+        message: "El precio debe ser 0 (gratis) o al menos 1000" 
+      })
       .max(999999, { message: "El precio no puede ser mayor a 999,999" })
       .optional(),
 
@@ -47,9 +49,5 @@ export const courseSchema = z
     isInDevelopment: z.boolean(),
     adminId: z.string()
   })
-  .refine((data) => data.isActive !== data.isInDevelopment, {
-    message: "El curso no puede estar activo y en desarrollo a la vez",
-    path: ["isActive"],
-  });
 
 export type CourseType = z.infer<typeof courseSchema>;

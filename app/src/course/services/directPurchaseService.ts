@@ -44,6 +44,13 @@ export interface DirectPurchaseResponse {
   };
 }
 
+export interface CancelOrderResponse {
+  orderId: string;
+  status: string;
+  orderType: string;
+  message: string;
+}
+
 /**
  * Verificar si un curso es gratuito
  */
@@ -103,6 +110,19 @@ export const directPurchaseCourse = async (courseId: string): Promise<DirectPurc
     return response.data.data;
   } catch (error: any) {
     console.error('Error with direct purchase:', error);
+    throw error;
+  }
+};
+
+/**
+ * Cancelar una orden pendiente específica
+ */
+export const cancelPendingOrder = async (orderId: string): Promise<CancelOrderResponse> => {
+  try {
+    const response = await api.delete(`/direct/order/${orderId}/cancel`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Error cancelling pending order:', error);
     throw error;
   }
 };

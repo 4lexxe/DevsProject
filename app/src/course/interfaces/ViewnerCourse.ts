@@ -51,11 +51,18 @@ export interface Course {
     originalPrice: number;
     finalPrice: number;
     hasDiscount: boolean;
-    discountEvents: DiscountEvent[];
-    totalDiscountPercentage: number;
+    discount?: {
+      id: number;
+      event: string;
+      description: string;
+      value: number;
+      startDate: string;
+      endDate: string;
+    } | null;
+    discountValue: number;
     savings: number;
-    isFree?: boolean;
-    priceDisplay?: string;
+    isFree: boolean;
+    priceDisplay: string;
   };
 }
 

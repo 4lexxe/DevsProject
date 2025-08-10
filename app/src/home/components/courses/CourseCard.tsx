@@ -14,18 +14,18 @@ interface CourseCardProps {
     originalPrice: number;
     finalPrice: number;
     hasDiscount: boolean;
-    activeDiscount?: {
+    discount?: {
       id: number;
       event: string;
       description: string;
-      percentage: number;
-      amount: number;
+      value: number;
       startDate: string;
       endDate: string;
-    };
+    } | null;
+    discountValue: number;
     savings: number;
-    isFree?: boolean;
-    priceDisplay?: string;
+    isFree: boolean;
+    priceDisplay: string;
   };
 }
 
@@ -74,10 +74,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
 
         {/* Badge de descuento en la esquina superior derecha */}
-        {pricing?.hasDiscount && pricing.activeDiscount && (
+        {pricing?.hasDiscount && pricing.discount && (
           <div className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-lg">
             <Percent className="w-3 h-3" />
-            {pricing.activeDiscount.percentage}% OFF
+            {pricing.discountValue}% OFF
           </div>
         )}
       </div>
@@ -98,7 +98,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
               <DollarSign className="w-4 h-4 text-green-600" />
               {pricing.isFree ? (
                 <span className="text-lg font-bold text-green-600">
-                  GRATIS
+                  {pricing.priceDisplay}
                 </span>
               ) : pricing.hasDiscount ? (
                 <div className="flex items-center gap-2">

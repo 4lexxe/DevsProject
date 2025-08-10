@@ -51,21 +51,26 @@ export interface Section {
   updatedAt: string;
 }
 
+export interface Discount {
+    id: number;
+    event: string;
+    description: string;
+    value: number;
+    startDate: string;
+    endDate: string;
+}
+
 export interface PricingInfo {
   originalPrice: number;
   finalPrice: number;
   hasDiscount: boolean;
-  activeDiscount?: {
-    id: string;
-    event: string;
-    description: string;
-    percentage: number;
-    amount: number;
-    startDate: string;
-    endDate: string;
-  };
+  discount?: Discount | null;
+  discountValue: number;
   savings: number;
+  isFree: boolean;
+  priceDisplay: string;
 }
+
 
 export interface CourseData {
   id: string;

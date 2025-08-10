@@ -23,11 +23,18 @@ interface PricingCardProps {
     originalPrice: number;
     finalPrice: number;
     hasDiscount: boolean;
-    discountEvents: DiscountEvent[];
-    totalDiscountPercentage: number;
+    discount?: {
+      id: number;
+      event: string;
+      description: string;
+      value: number;
+      startDate: string;
+      endDate: string;
+    } | null;
+    discountValue: number;
     savings: number;
-    isFree?: boolean;
-    priceDisplay?: string;
+    isFree: boolean;
+    priceDisplay: string;
   };
 }
 
@@ -56,7 +63,7 @@ export default function PricingCard({ pricing }: PricingCardProps) {
           {pricing.isFree ? (
             <div className="flex items-center justify-center gap-2">
               <span className="text-4xl font-bold text-green-600">
-                GRATIS
+                {pricing.priceDisplay}
               </span>
             </div>
           ) : pricing.hasDiscount ? (
@@ -83,11 +90,11 @@ export default function PricingCard({ pricing }: PricingCardProps) {
           )}
         </div>
 
-        {/* Badge de descuento total */}
-        {pricing.hasDiscount && pricing.totalDiscountPercentage > 0 && (
+        {/* Badge de descuento */}
+        {pricing.hasDiscount && pricing.discountValue > 0 && (
           <div className="inline-flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full text-sm font-bold shadow-lg mb-4">
             <Percent className="w-4 h-4" />
-            <span>{pricing.totalDiscountPercentage}% OFF</span>
+            <span>{pricing.discountValue}% OFF</span>
           </div>
         )}
 
@@ -99,59 +106,39 @@ export default function PricingCard({ pricing }: PricingCardProps) {
         )}
       </div>
 
-      {/* Lista de promociones activas */}
-      {pricing.hasDiscount && pricing.discountEvents && pricing.discountEvents.length > 0 && (
+      {/* Información del descuento activo */}
+      {pricing.hasDiscount && pricing.discount && (
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center gap-2 mb-3">
             <Tag className="w-4 h-4 text-orange-500" />
             <h4 className="text-sm font-semibold text-gray-700">
-              {pricing.discountEvents.length === 1 ? 'Promoción Activa' : 'Promociones Activas'}
+              Promoción Activa
             </h4>
           </div>
           
-          <div className="space-y-3">
-            {pricing.discountEvents
-              .filter(discount => discount.isActive)
-              .map((discount) => (
-                <div 
-                  key={discount.id}
-                  className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h5 className="font-semibold text-gray-800 text-sm">
-                      {discount.event}
-                    </h5>
-                    <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                      {discount.value}% OFF
-                    </span>
-                  </div>
-                  
-                  {discount.description && (
-                    <p className="text-gray-600 text-xs mb-2">
-                      {discount.description}
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <Clock className="w-3 h-3" />
-                    <span>
-                      Válido hasta {formatDate(discount.endDate)}
-                    </span>
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-
-          {/* Mensaje informativo */}
-          {pricing.discountEvents.filter(d => d.isActive).length > 1 && (
-            <div className="mt-3 p-2 bg-green-50 border border-green-200 rounded text-center">
-              <p className="text-xs text-green-700 flex items-center justify-center gap-1">
-                <span>✨</span>
-                <span>Descuentos combinados automáticamente</span>
-              </p>
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <h5 className="font-semibold text-gray-800 text-sm">
+                {pricing.discount.event}
+              </h5>
+              <span className="bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                {pricing.discount.value}% OFF
+              </span>
             </div>
-          )}
+            
+            {pricing.discount.description && (
+              <p className="text-gray-600 text-xs mb-2">
+                {pricing.discount.description}
+              </p>
+            )}
+            
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Clock className="w-3 h-3" />
+              <span>
+                Válido hasta {formatDate(pricing.discount.endDate)}
+              </span>
+            </div>
+          </div>
         </div>
       )}
 

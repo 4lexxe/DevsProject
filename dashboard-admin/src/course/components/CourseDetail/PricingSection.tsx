@@ -34,7 +34,7 @@ export default function PricingSection({ courseData, onViewDiscounts, formatDate
           </div>
           <div className="text-center p-4 rounded-lg" style={{ backgroundColor: "#1d4ed8", color: "white" }}>
             <p className="text-sm text-white">% Descuento Aplicado</p>
-            <p className="text-2xl font-bold text-white">{courseData.pricing.activeDiscount?.percentage || 0}%</p>
+            <p className="text-2xl font-bold text-white">{courseData.pricing.discountValue || 0}%</p>
           </div>
           <div className="text-center p-4 rounded-lg" style={{ backgroundColor: "#02ffff", color: "#0c154c" }}>
             <p className="text-sm" style={{ color: "#0c154c" }}>
@@ -46,7 +46,7 @@ export default function PricingSection({ courseData, onViewDiscounts, formatDate
           </div>
         </div>
         
-        {courseData.pricing.hasDiscount && courseData.pricing.activeDiscount && (
+        {courseData.pricing.hasDiscount && courseData.pricing.discount && (
           <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: "#eff6ff", border: "1px solid #42d7c7" }}>
             <div className="flex items-center gap-2 mb-2">
               <Tag className="h-4 w-4 inline-block" style={{ color: "#1d4ed8" }} />
@@ -55,8 +55,8 @@ export default function PricingSection({ courseData, onViewDiscounts, formatDate
               </span>
             </div>
             <p className="text-sm" style={{ color: "#0c154c" }}>
-              Válido desde {formatDate(courseData.pricing.activeDiscount.startDate)} hasta{" "}
-              {formatDate(courseData.pricing.activeDiscount.endDate)}
+              Válido desde {formatDate(courseData.pricing.discount.startDate)} hasta{" "}
+              {formatDate(courseData.pricing.discount.endDate)}
             </p>
           </div>
         )}

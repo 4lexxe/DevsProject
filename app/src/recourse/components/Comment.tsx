@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCommentsByResource, createComment, updateComment, deleteComment, Comment } from '../services/comment.service';
+import { getCommentsByResource, createComment, updateComment, deleteComment, Comment as CommentType } from '../services/comment.service';
 import { usePermissions } from '../../shared/hooks/usePermissions';
 
 interface CommentProps {
@@ -9,7 +9,7 @@ interface CommentProps {
 const Comment: React.FC<CommentProps> = ({ resourceId }) => {
   const { user, canModifyComment, hasPermission } = usePermissions();
 
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentType[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -24,7 +24,7 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
 
       const commentsData = await getCommentsByResource(resourceId);
 
-      const commentsWithUserInfo = commentsData.map((comment: Comment) => ({
+      const commentsWithUserInfo = commentsData.map((comment: CommentType) => ({
         ...comment,
         User: comment.User || {
           id: comment.userId,
@@ -90,7 +90,7 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
     }
   };
 
-  const startEdit = (comment: Comment) => {
+  const startEdit = (comment: CommentType) => {
     if (comment.id) {
       setEditingId(comment.id);
       setEditContent(comment.content);
