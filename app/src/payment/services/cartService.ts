@@ -100,41 +100,14 @@ class CartService {
   async getCartSummary(): Promise<CartSummary | null> {
     try {
       const response = await axiosInstance.get(`${this.baseUrl}/summary`);
-      const backendData: CartBackendResponse = response.data.data;
+      const backendData: CartSummary = response.data.data;
       
-      if (!backendData || !backendData.cartCourses) {
+      if (!backendData) {
         return null;
       }
       
-      // Transformar datos del backend a la estructura esperada por el frontend
-      const transformedData: CartSummary = {
-        id: backendData.id,
-        status: backendData.status,
-        courses: backendData.cartCourses.map((cartCourse) => ({
-          cartCourseId: cartCourse.id,
-          course: {
-            id: cartCourse.course.id,
-            title: cartCourse.course.title,
-            description: cartCourse.course.summary,
-            image: cartCourse.course.image,
-            originalPrice: parseFloat(cartCourse.unitPrice),
-            finalPrice: parseFloat(cartCourse.priceWithDiscount),
-            discountApplied: cartCourse.course.courseDiscount ? {
-              event: cartCourse.course.courseDiscount.event,
-              percentage: cartCourse.discountValue,
-              amount: parseFloat(cartCourse.unitPrice) - parseFloat(cartCourse.priceWithDiscount)
-            } : undefined
-          }
-        })),
-        summary: {
-          totalOriginal: parseFloat(backendData.totalPrice || '0'),
-          totalWithDiscounts: parseFloat(backendData.finalPrice || '0'),
-          totalSavings: parseFloat(backendData.discountAmount || '0'),
-          courseCount: backendData.cartCourses.length
-        }
-      };
-      
-      return transformedData;
+      // El backend ya devuelve los datos transformados
+      return backendData;
     } catch (error: any) {
       if (error.response?.status === 404) {
         return null; // No hay carrito activo

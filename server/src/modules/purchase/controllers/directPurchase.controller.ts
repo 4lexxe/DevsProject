@@ -228,7 +228,7 @@ export class DirectPurchaseController extends BaseController {
       where: {
         userId,
         status: "pending",
-        expirationDateTo: { [Op.gt]: new Date() } // Solo órdenes que no han expirado
+        expired: false
       },
       include: [
         {
@@ -354,7 +354,8 @@ export class DirectPurchaseController extends BaseController {
         finalPrice: roundedPrice,
         expirationDateFrom: result.expiration_date_from,
         expirationDateTo: result.expiration_date_to,
-        status: "pending"
+        status: "pending",
+        expired: false
       });
 
       // Obtener información del descuento activo si existe
@@ -470,7 +471,8 @@ export class DirectPurchaseController extends BaseController {
       where: {
         id: orderId,
         userId,
-        status: "pending"
+        status: "pending",
+        expired: false
       }
     });
 

@@ -6,7 +6,7 @@ import CourseDiscount from "../models/CourseDiscount";
 import Course from "../../course/models/Course";
 import User from "../../user/User";
 import { Preference } from "mercadopago";
-import { Op, Transaction, where } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import sequelize from "../../../infrastructure/database/db";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
@@ -396,7 +396,7 @@ class CartController extends BaseController {
         where: {
           userId,
           status: "pending",
-          expirationDateTo: { [Op.gt]: new Date() } // Solo órdenes que no han expirado
+          expired: false,
         },
         include: [
           {
@@ -555,6 +555,7 @@ class CartController extends BaseController {
           finalPrice: cart.finalPrice,
           expirationDateFrom: result.expiration_date_from,
           expirationDateTo: result.expiration_date_to,
+          espired: false
         });
 
         // Crear registros de OrderCourse para cada curso del carrito
@@ -699,7 +700,7 @@ class CartController extends BaseController {
   }
 
   /**
-   * Obtiene el resumen del carrito con precios y descuentos
+   * Obtiene el resumen del carrito con precios y descuentos transformado para el frontend
    */
   static getCartSummary = this.asyncHandler(
     async (req: Request, res: Response) => {
@@ -724,11 +725,6 @@ class CartController extends BaseController {
                   {
                     model: CourseDiscount,
                     as: "courseDiscount",
-                    where: {
-                      isActive: true,
-                      startDate: { [Op.lte]: new Date() },
-                      endDate: { [Op.gte]: new Date() },
-                    },
                     required: false,
                   },
                 ],
@@ -739,17 +735,114 @@ class CartController extends BaseController {
       });
 
       if (!cart) {
-        return this.sendSuccess(
-          res,
-          req,
-          "No hay carrito activo"
-        );
+        return this.sendSuccess(res, req, null, "No hay carrito activo");
       }
+
+      // Verificar y actualizar descuentos expirados antes de transformar
+      const transaction = await sequelize.transaction();
+      let needsUpdate = false;
+
+      try {
+        const now = new Date();
+        
+        for (const cartCourse of cart.cartCourses as any[]) {
+          const course = cartCourse.course;
+          const originalPrice = parseFloat(course.price.toString());
+          let finalPrice = originalPrice;
+          let discountValue = 0;
+
+          // Verificar si hay descuento activo y válido
+          const courseDiscount = course.courseDiscount;
+          if (courseDiscount && 
+              courseDiscount.isActive && 
+              courseDiscount.startDate <= now && 
+              courseDiscount.endDate >= now) {
+            discountValue = courseDiscount.value;
+            finalPrice = originalPrice - (originalPrice * discountValue) / 100;
+          }
+
+          // Verificar si los precios actuales son diferentes
+          const currentFinalPrice = parseFloat(cartCourse.priceWithDiscount);
+          const currentDiscountValue = cartCourse.discountValue || 0;
+          
+          if (Math.abs(currentFinalPrice - finalPrice) > 0.01 || currentDiscountValue !== discountValue) {
+            needsUpdate = true;
+            
+            // Actualizar CartCourse
+            await CartCourse.update(
+              {
+                unitPrice: originalPrice,
+                discountValue: discountValue,
+                priceWithDiscount: finalPrice,
+              },
+              {
+                where: { id: cartCourse.id },
+                transaction
+              }
+            );
+
+            // Actualizar el objeto en memoria para la transformación
+            cartCourse.unitPrice = originalPrice.toString();
+            cartCourse.discountValue = discountValue;
+            cartCourse.priceWithDiscount = finalPrice.toString();
+          }
+        }
+
+        // Si hubo cambios, recalcular totales del carrito
+        if (needsUpdate) {
+          await this.updateCartInTransaction(cart.id, transaction);
+          
+          // Recargar el carrito con los nuevos valores
+          const updatedCart = await Cart.findOne({
+            where: { id: cart.id },
+            transaction
+          });
+          
+          if (updatedCart) {
+            cart.totalPrice = updatedCart.totalPrice;
+            cart.finalPrice = updatedCart.finalPrice;
+            cart.discountAmount = updatedCart.discountAmount;
+          }
+        }
+
+        await transaction.commit();
+      } catch (error) {
+        await transaction.rollback();
+        console.error("Error actualizando precios del carrito:", error);
+      }
+
+      // Transformar datos para el frontend
+      const transformedData = {
+        id: cart.id,
+        status: cart.status,
+        courses: cart.cartCourses.map((cartCourse: any) => ({
+          cartCourseId: cartCourse.id,
+          course: {
+            id: cartCourse.course.id,
+            title: cartCourse.course.title,
+            description: cartCourse.course.summary,
+            image: cartCourse.course.image,
+            originalPrice: parseFloat(cartCourse.unitPrice),
+            finalPrice: parseFloat(cartCourse.priceWithDiscount),
+            discountApplied: cartCourse.discountValue > 0 ? {
+              event: cartCourse.course.courseDiscount?.event || "Descuento aplicado",
+              percentage: cartCourse.discountValue,
+              amount: parseFloat(cartCourse.unitPrice) - parseFloat(cartCourse.priceWithDiscount)
+            } : undefined
+          }
+        })),
+        summary: {
+          totalOriginal: parseFloat(cart.totalPrice?.toString() || '0'),
+          totalWithDiscounts: parseFloat(cart.finalPrice?.toString() || '0'),
+          totalSavings: parseFloat(cart.discountAmount?.toString() || '0'),
+          courseCount: cart.cartCourses.length
+        }
+      };
 
       this.sendSuccess(
         res,
         req,
-        cart,
+        transformedData,
         "Resumen del carrito obtenido exitosamente"
       );
     }

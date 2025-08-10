@@ -18,7 +18,7 @@ interface OrderCourse {
 
 interface Order {
   id: string;
-  status: 'pending' | 'paid' | 'cancelled';
+  status: 'pending' | 'paid' | 'cancelled' | 'expired';
   finalPrice: number;
   totalPrice: number;
   discountAmount: number;
@@ -29,6 +29,7 @@ interface Order {
   updatedAt: string;
   expirationDateFrom?: string;
   expirationDateTo?: string;
+  expired?: boolean; // Campo adicional del modelo
   orderCourses: OrderCourse[];
 }
 
@@ -93,11 +94,15 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string, expired?: boolean) => {
+    // Si la orden está marcada como expirada, usar color de expirada
+    if (expired || status === "expired") {
+      return { backgroundColor: "#f97316", color: "white" };
+    }
+    
     switch (status) {
       case "paid":
-      case "approved":
-        return { backgroundColor: "#42d7c7", color: "#0c154c" };
+        return { backgroundColor: "#10b981", color: "white" };
       case "active":
         return { backgroundColor: "#02ffff", color: "#0c154c" };
       case "pending":
@@ -110,10 +115,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string, expired?: boolean) => {
+    // Si la orden está marcada como expirada, usar ícono de expirada
+    if (expired || status === "expired") {
+      return <Clock className="h-4 w-4" />;
+    }
+    
     switch (status) {
       case "paid":
-      case "approved":
         return <CheckCircle className="h-4 w-4" />;
       case "active":
         return <CheckCircle className="h-4 w-4" />;
@@ -127,12 +136,15 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: string, expired?: boolean) => {
+    // Si la orden está marcada como expirada, mostrar texto de expirada
+    if (expired || status === "expired") {
+      return "Expirada";
+    }
+    
     switch (status) {
       case "paid":
         return "Pagado";
-      case "approved":
-        return "Aprobado";
       case "active":
         return "Activo";
       case "pending":
@@ -146,24 +158,28 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
     }
   };
 
-  const expired = isOrderExpired(order.expirationDateTo);
+  // Determinar si la orden está expirada (por fecha o por campo expired)
+  const orderExpired = order.expired || isOrderExpired(order.expirationDateTo) || order.status === "expired";
   const timeRemaining = getTimeRemaining(order.expirationDateTo);
   const isUrgent = timeRemaining && (timeRemaining.includes('h') || timeRemaining.includes('m')) && !timeRemaining.includes('día');
 
   return (
     <div
       className={`border-2 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 ${
-        order.status === 'pending' && expired ? 'border-red-300 bg-red-50' : ''
+        order.status === 'pending' && orderExpired ? 'border-red-300 bg-red-50' : 
+        orderExpired ? 'border-orange-300 bg-orange-50' : ''
       }`}
       style={{ 
-        borderColor: order.status === 'pending' && expired ? "#fca5a5" : "#42d7c7", 
-        backgroundColor: order.status === 'pending' && expired ? "#fef2f2" : "white" 
+        borderColor: order.status === 'pending' && orderExpired ? "#fca5a5" : 
+                    orderExpired ? "#fdba74" : "#42d7c7", 
+        backgroundColor: order.status === 'pending' && orderExpired ? "#fef2f2" : 
+                        orderExpired ? "#fff7ed" : "white" 
       }}
     >
       {/* Alerta de expiración */}
       {order.status === 'pending' && order.expirationDateTo && (
         <>
-          {expired ? (
+          {orderExpired ? (
             <div className="bg-red-600 text-white px-4 py-2 text-sm font-medium flex items-center gap-2">
               <XCircle className="h-4 w-4" />
               Esta orden ha expirado el {formatDateTime(order.expirationDateTo)}
@@ -179,6 +195,14 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
         </>
       )}
 
+      {/* Alerta para órdenes con estado expirado */}
+      {order.status === 'expired' && (
+        <div className="bg-orange-600 text-white px-4 py-2 text-sm font-medium flex items-center gap-2">
+          <Clock className="h-4 w-4" />
+          Esta orden ha expirado automáticamente
+        </div>
+      )}
+
       <div className="p-6">
         {/* Order Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
@@ -192,9 +216,9 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
                 Creada: {formatDate(order.createdAt)}
               </span>
               {order.expirationDateTo && order.status === 'pending' && (
-                <span className={`flex items-center gap-1 ${expired ? 'text-red-600' : 'text-orange-600'}`}>
+                <span className={`flex items-center gap-1 ${orderExpired ? 'text-red-600' : 'text-orange-600'}`}>
                   <Clock className="h-4 w-4" />
-                  {expired ? (
+                  {orderExpired ? (
                     <span className="font-medium">Expirada el {formatDateTime(order.expirationDateTo)}</span>
                   ) : (
                     <span>Expira: {getTimeRemaining(order.expirationDateTo)}</span>
@@ -214,10 +238,10 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
             </div>
             <div
               className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
-              style={getStatusColor(order.status)}
+              style={getStatusColor(order.status, orderExpired)}
             >
-              <span className="mr-2">{getStatusIcon(order.status)}</span>
-              {getStatusText(order.status)}
+              <span className="mr-2">{getStatusIcon(order.status, orderExpired)}</span>
+              {getStatusText(order.status, orderExpired)}
             </div>
           </div>
         </div>
@@ -285,21 +309,16 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3">
-          {order.status === "pending" && order.initPoint && (
+          {order.status === "pending" && order.initPoint && !orderExpired && (
             <>
               <button
                 onClick={() => onPayment(order.initPoint)}
-                disabled={expired}
-                className={`flex-1 px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 ${
-                  expired 
-                    ? 'opacity-50 cursor-not-allowed bg-gray-400' 
-                    : 'hover:opacity-90'
-                }`}
-                style={!expired ? { backgroundColor: "#42d7c7" } : {}}
+                className="flex-1 px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:opacity-90"
+                style={{ backgroundColor: "#42d7c7" }}
               >
                 <span className="flex items-center justify-center gap-2">
                   <CreditCard className="h-4 w-4" />
-                  {expired ? 'Orden Expirada' : 'Completar Pago'}
+                  Completar Pago
                 </span>
               </button>
               
@@ -324,6 +343,30 @@ const OrderCard: React.FC<OrderCardProps> = ({ order, onPayment, onCancel, cance
                 </span>
               </button>
             </>
+          )}
+          
+          {/* Botón de cancelar para órdenes expiradas pendientes */}
+          {order.status === "pending" && orderExpired && (
+            <button
+              onClick={() => onCancel(order.id)}
+              disabled={cancellingOrder === order.id}
+              className="w-full px-6 py-3 font-semibold rounded-lg border-2 transition-all duration-300 hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ borderColor: "#ef4444", color: "#ef4444", backgroundColor: "white" }}
+            >
+              <span className="flex items-center justify-center gap-2">
+                {cancellingOrder === order.id ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                    Cancelando...
+                  </>
+                ) : (
+                  <>
+                    <XCircle className="h-4 w-4" />
+                    Eliminar Orden Expirada
+                  </>
+                )}
+              </span>
+            </button>
           )}
         </div>
       </div>

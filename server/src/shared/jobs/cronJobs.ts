@@ -9,12 +9,20 @@ import { MpConfig } from "../../infrastructure/config/mercadopagoConfig";
 import { retryWithExponentialBackoff } from "../utils/retryService";
 import MPSubscription from "../../modules/subscription/models/MPSubscription";
 import { SessionService } from "../../modules/auth/services/session.service";
+import CourseDiscount from "../../modules/purchase/models/CourseDiscount";
+import Order from "../../modules/purchase/models/Order";
+import Cart from "../../modules/purchase/models/Cart";
+import CartCourse from "../../modules/purchase/models/CartCourse";
+import Course from "../../modules/course/models/Course";
+import sequelize from "../../infrastructure/database/db";
 
 const preApprovalPlan = new PreApprovalPlan(MpConfig);
 
 const updateExpiredDiscounts = async () => {
   try {
     const now = new Date();
+    
+    // Desactivar descuentos de suscripciones expirados
     const expiredDiscounts = await DiscountEvent.findAll({
       where: {
         isActive: true,
@@ -26,7 +34,7 @@ const updateExpiredDiscounts = async () => {
 
     for (const discount of expiredDiscounts) {
       await discount.update({ isActive: false });
-      console.log(`Descuento con ID ${discount.id} ha sido desactivado.`);
+      console.log(`Descuento de suscripción con ID ${discount.id} ha sido desactivado.`);
 
       const plan = await Plan.findByPk(discount.planId);
 
@@ -37,11 +45,173 @@ const updateExpiredDiscounts = async () => {
         continue;
       }
     }
+    
+    // Desactivar descuentos de cursos expirados
+    const expiredCourseDiscounts = await CourseDiscount.findAll({
+      where: {
+        isActive: true,
+        endDate: {
+          [Op.lte]: now,
+        },
+      },
+    });
+
+    for (const courseDiscount of expiredCourseDiscounts) {
+      await courseDiscount.update({ isActive: false });
+      console.log(`Descuento de curso con ID ${courseDiscount.id} ha sido desactivado.`);
+    }
+
+    // Actualizar precios en carritos activos si hay descuentos expirados
+    if (expiredCourseDiscounts.length > 0) {
+      await updateCartPricesAfterDiscountExpiration();
+    }
+
+    console.log(`Se desactivaron ${expiredDiscounts.length} descuentos de suscripción y ${expiredCourseDiscounts.length} descuentos de curso.`);
   } catch (error) {
     console.error(
-      "Error al desactivar descuentos expirados o actualizar planes:",
+      "Error al desactivar descuentos expirados:",
       error
     );
+  }
+};
+
+/**
+ * Actualiza los precios de los carritos activos después de que expiren descuentos
+ */
+const updateCartPricesAfterDiscountExpiration = async () => {
+  try {
+    const activeCarts = await Cart.findAll({
+      where: { status: "active" },
+      include: [
+        {
+          model: CartCourse,
+          as: "cartCourses",
+          include: [
+            {
+              model: Course,
+              as: "course",
+              include: [
+                {
+                  model: CourseDiscount,
+                  as: "courseDiscount",
+                  required: false,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    for (const cart of activeCarts) {
+      const transaction = await sequelize.transaction();
+      
+      try {
+        let totalOriginal = 0;
+        let totalWithDiscounts = 0;
+        let hasChanges = false;
+
+        // Recalcular precios para cada curso en el carrito
+        for (const cartCourse of cart.cartCourses as any[]) {
+          const course = cartCourse.course;
+          const originalPrice = parseFloat(course.price.toString());
+          let finalPrice = originalPrice;
+          let discountValue = 0;
+
+          // Verificar si hay descuento activo
+          const activeDiscount = course.courseDiscount;
+          if (activeDiscount && activeDiscount.isActive) {
+            const now = new Date();
+            if (activeDiscount.startDate <= now && activeDiscount.endDate >= now) {
+              discountValue = activeDiscount.value;
+              finalPrice = originalPrice - (originalPrice * discountValue) / 100;
+            }
+          }
+
+          // Verificar si los precios han cambiado
+          const currentFinalPrice = parseFloat(cartCourse.priceWithDiscount);
+          if (Math.abs(currentFinalPrice - finalPrice) > 0.01) {
+            hasChanges = true;
+            
+            // Actualizar CartCourse
+            await CartCourse.update(
+              {
+                unitPrice: originalPrice,
+                discountValue: discountValue,
+                priceWithDiscount: finalPrice,
+              },
+              {
+                where: { id: cartCourse.id },
+                transaction
+              }
+            );
+          }
+
+          totalOriginal += originalPrice;
+          totalWithDiscounts += finalPrice;
+        }
+
+        // Si hubo cambios, actualizar el carrito
+        if (hasChanges) {
+          totalOriginal = Math.round(totalOriginal * 100) / 100;
+          totalWithDiscounts = Math.round(totalWithDiscounts * 100) / 100;
+          const totalDiscountAmount = Math.round((totalOriginal - totalWithDiscounts) * 100) / 100;
+
+          await Cart.update(
+            {
+              totalPrice: totalOriginal,
+              finalPrice: totalWithDiscounts,
+              discountAmount: totalDiscountAmount,
+            },
+            {
+              where: { id: cart.id },
+              transaction
+            }
+          );
+
+          console.log(`Precios actualizados en carrito ID ${cart.id}`);
+        }
+
+        await transaction.commit();
+      } catch (error) {
+        await transaction.rollback();
+        console.error(`Error actualizando precios del carrito ID ${cart.id}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error("Error al actualizar precios de carritos:", error);
+  }
+};
+
+/**
+ * Marca como expiradas las órdenes que han pasado su fecha de expiración
+ */
+const updateExpiredOrders = async () => {
+  try {
+    const now = new Date();
+    
+    const expiredOrders = await Order.findAll({
+      where: {
+        status: "pending",
+        expired: false,
+        expirationDateTo: {
+          [Op.lte]: now,
+        },
+      },
+    });
+
+    for (const order of expiredOrders) {
+      await order.update({ 
+        expired: true,
+        status: "expired"
+      });
+      
+      console.log(`Orden ID ${order.id} marcada como expirada y cancelada.`);
+    }
+
+    console.log(`Se marcaron como expiradas ${expiredOrders.length} órdenes.`);
+  } catch (error) {
+    console.error("Error al marcar órdenes como expiradas:", error);
   }
 };
 
@@ -93,6 +263,7 @@ cron.schedule("0 0 * * *", () => {
   console.log("Ejecutando tareas programadas diarias...");
   updateExpiredDiscounts();
   updateExpiredSubscriptions();
+  updateExpiredOrders();
 });
 
 // Ejecutar limpieza de sesiones cada hora
@@ -100,3 +271,9 @@ cron.schedule("0 * * * *", () => {
   console.log("Ejecutando limpieza de sesiones...");
   cleanupExpiredSessions();
 });
+
+// Ejecutar verificación de órdenes expiradas cada 15 minutos
+//cron.schedule("*/15 * * * *", () => {
+//  console.log("Verificando órdenes expiradas...");
+//  updateExpiredOrders();
+//});

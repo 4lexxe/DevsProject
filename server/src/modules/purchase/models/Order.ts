@@ -10,7 +10,7 @@ class Order extends Model {
   public userId!: bigint; // ID del usuario que realizó la orden
 
   public type!: "direct" | "cart"; // Tipo de orden: compra directa o carrito
-  public status!: "pending" | "paid" | "cancelled";
+  public status!: "pending" | "paid" | "cancelled" | "expired" ;
   public externalReference!: string;
   public initPoint!: string;
   public metadata!: Array<{}>
