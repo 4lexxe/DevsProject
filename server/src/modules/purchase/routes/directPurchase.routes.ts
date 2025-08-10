@@ -25,4 +25,10 @@ router.post('/course/:courseId/direct-purchase',
   DirectPurchaseController.directPurchase
 );
 
+// Cancelar orden pendiente (requiere autenticación)
+router.delete('/order/:orderId/cancel', 
+  authMiddleware, 
+  DirectPurchaseController.cancelPendingOrder
+);
+
 export default router;

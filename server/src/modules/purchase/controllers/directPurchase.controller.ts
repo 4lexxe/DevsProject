@@ -5,6 +5,8 @@ import CourseAccess from "../models/CourseAccess";
 import CourseDiscount from "../models/CourseDiscount";
 import User from "../../user/User";
 import Order from "../models/Order";
+import OrderCourse from "../models/OrderCourse";
+import Cart from "../models/Cart";
 import { Op } from "sequelize";
 import { v4 as uuidv4 } from "uuid";
 import { Preference } from "mercadopago";
@@ -221,6 +223,47 @@ export class DirectPurchaseController extends BaseController {
       return DirectPurchaseController.sendError(res, req, "Ya tienes acceso a este curso", 422);
     }
 
+    // Verificar si ya existe una orden pendiente para este curso y usuario (cualquier tipo)
+    const pendingOrder = await Order.findOne({
+      where: {
+        userId,
+        status: "pending",
+        expirationDateTo: { [Op.gt]: new Date() } // Solo órdenes que no han expirado
+      },
+      include: [
+        {
+          model: OrderCourse,
+          as: "orderCourses",
+          where: {
+            courseId: parseInt(courseId)
+          },
+          required: true,
+          include: [
+            {
+              model: Course,
+              as: "course"
+            }
+          ]
+        }
+      ]
+    });
+
+    if (pendingOrder) {
+      return DirectPurchaseController.sendError(
+        res, 
+        req, 
+        "Ya tienes una orden de compra pendiente para este curso. Por favor, completa el pago o cancelala.", 
+        422,
+        {
+          errorType: "PENDING_ORDER", // Campo específico para identificar este error
+          orderId: pendingOrder.id,
+          orderType: pendingOrder.type,
+          expirationDate: pendingOrder.expirationDateTo,
+          courseName: (pendingOrder as any).orderCourses?.[0]?.course?.title
+        }
+      );
+    }
+
     // Crear preferencia de MercadoPago para compra directa
     try {
       const preference = new Preference(MpConfig);
@@ -314,6 +357,44 @@ export class DirectPurchaseController extends BaseController {
         status: "pending"
       });
 
+      // Obtener información del descuento activo si existe
+      const courseWithDiscount = await Course.findByPk(parseInt(courseId), {
+        include: [
+          {
+            model: CourseDiscount,
+            as: "courseDiscount",
+            where: {
+              isActive: true,
+              startDate: { [Op.lte]: new Date() },
+              endDate: { [Op.gte]: new Date() },
+            },
+            required: false,
+          },
+        ],
+      });
+
+      const courseData = courseWithDiscount?.toJSON() as any;
+      const discountSnapshot = courseData?.courseDiscount || null;
+
+      // Crear registro de OrderCourse para la compra directa
+      await OrderCourse.create({
+        courseId: parseInt(courseId),
+        OrderId: order.id,
+        courseSnapshot: {
+          id: course.id.toString(),
+          title: course.title,
+          sumary: course.summary || '',
+          about: course.about || '',
+          isInDevelopment: course.isInDevelopment,
+          adminId: course.adminId?.toString() || '',
+          price: originalPrice,
+        },
+        discountEventSnapshot: discountSnapshot || {},
+        discountValue: discountSnapshot ? discountSnapshot.value : 0,
+        unitPrice: originalPrice,
+        priceWithDiscount: roundedPrice,
+      });
+
       DirectPurchaseController.created(
         res,
         req,
@@ -370,6 +451,53 @@ export class DirectPurchaseController extends BaseController {
         } : null
       },
       courseAccess ? "Usuario tiene acceso al curso" : "Usuario no tiene acceso al curso"
+    );
+  });
+
+  /**
+   * Cancela una orden pendiente específica del usuario
+   */
+  public static cancelPendingOrder = DirectPurchaseController.asyncHandler(async (req: Request, res: Response) => {
+    const { orderId } = req.params;
+    const userId = (req.user as User)?.id;
+
+    if (!userId) {
+      return DirectPurchaseController.unauthorized(res, req, "Usuario no autenticado");
+    }
+
+    // Buscar la orden que pertenece al usuario y está pendiente
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        userId,
+        status: "pending"
+      }
+    });
+
+    if (!order) {
+      return DirectPurchaseController.notFound(res, req, "Orden pendiente no encontrada");
+    }
+
+    // Actualizar el estado de la orden a cancelada
+    await order.update({ status: "cancelled" });
+
+    // Si la orden tiene un carrito asociado, cambiar su estado también
+    if (order.cartId) {
+      await Cart.update(
+        { status: "cancelled" },
+        { where: { id: order.cartId } }
+      );
+    }
+
+    DirectPurchaseController.sendSuccess(
+      res,
+      req,
+      {
+        orderId: order.id,
+        status: "cancelled",
+        orderType: order.type
+      },
+      "Orden cancelada exitosamente"
     );
   });
 }

@@ -326,18 +326,6 @@ class CartController extends BaseController {
         return this.notFound(res, req, "No hay carrito activo ni pendiente");
       }
 
-      const order = await Order.findOne({
-        where: { cartId: cart.id, status: "pending" },
-      });
-
-      if (order && order.status === "pending") {
-        return this.validationFailed(
-          res,
-          req,
-          "Ya existe una orden pendiente de pago"
-        );
-      }
-
       const cartCoursesData = await CartCourse.findAll({
         where: { cartId: cart.id },
         include: [
@@ -400,6 +388,68 @@ class CartController extends BaseController {
             })),
           },
           `Ya tienes acceso a los siguientes cursos: ${courseTitles}`
+        );
+      }
+
+      // Verificar si existe alguna orden pendiente para cualquiera de los cursos del carrito
+      const pendingOrders = await Order.findAll({
+        where: {
+          userId,
+          status: "pending",
+          expirationDateTo: { [Op.gt]: new Date() } // Solo órdenes que no han expirado
+        },
+        include: [
+          {
+            model: OrderCourse,
+            as: "orderCourses",
+            where: {
+              courseId: { [Op.in]: courseIds }
+            },
+            required: true,
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["id", "title"]
+              }
+            ]
+          }
+        ]
+      });
+
+      if (pendingOrders.length > 0) {
+        // Obtener información de los cursos con órdenes pendientes
+        const coursesWithPendingOrders = [];
+        const orderDetails = [];
+        
+        for (const order of pendingOrders) {
+          const orderCourses = (order as any).orderCourses;
+          for (const orderCourse of orderCourses) {
+            coursesWithPendingOrders.push({
+              id: orderCourse.course.id,
+              title: orderCourse.course.title
+            });
+          }
+          orderDetails.push({
+            orderId: order.id,
+            type: order.type,
+            expirationDate: order.expirationDateTo
+          });
+        }
+
+        const courseTitles = coursesWithPendingOrders
+          .map(course => course.title)
+          .join(", ");
+
+        return this.validationFailed(
+          res,
+          req,
+          {
+            errorType: "PENDING_ORDER", // Campo específico para identificar este error
+            coursesWithPendingOrders,
+            orderDetails
+          },
+          `Ya tienes órdenes de compra pendientes para los siguientes cursos: ${courseTitles}. Por favor, completa los pagos o cancela la orden`
         );
       }
 

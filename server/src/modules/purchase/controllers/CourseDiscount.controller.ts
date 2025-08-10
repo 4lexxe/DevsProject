@@ -105,8 +105,8 @@ class CourseDiscountController extends BaseController {
       // Crear el descuento
       const newDiscount = await CourseDiscount.create({
         ...discountData,
-        startDate: new Date(discountData.startDate.getFullYear(), discountData.startDate.getMonth(), discountData.startDate.getDate()),
-        endDate: new Date(discountData.endDate.getFullYear(), discountData.endDate.getMonth(), discountData.endDate.getDate()),
+        startDate: new Date(discountData.startDate),
+        endDate: new Date(discountData.endDate),
         isActive: discountData.isActive !== undefined ? discountData.isActive : false
       });
 
@@ -212,14 +212,12 @@ class CourseDiscountController extends BaseController {
         ...discountData
       };
 
-      // Solo actualizar fechas si se proporcionan, manejando timezone correctamente
+      // Solo actualizar fechas si se proporcionan
       if (discountData.startDate) {
-        const startDate = new Date(discountData.startDate);
-        updateData.startDate = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+        updateData.startDate = new Date(discountData.startDate);
       }
       if (discountData.endDate) {
-        const endDate = new Date(discountData.endDate);
-        updateData.endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        updateData.endDate = new Date(discountData.endDate);
       }
 
       const [updatedRows] = await CourseDiscount.update(

@@ -20,6 +20,7 @@ class Order extends Model {
 
   public expirationDateFrom!: Date;
   public expirationDateTo!: Date;
+  public expired!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -97,6 +98,12 @@ Order.init(
       type: DataTypes.DATE,
       allowNull: true,
       comment: "Fecha de expiración de la orden",
+    },
+    expired: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      comment: "Indica si la orden ha expirado",
     },
   },
   {

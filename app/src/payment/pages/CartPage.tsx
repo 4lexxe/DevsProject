@@ -1,13 +1,15 @@
 "use client"
 
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { Trash2, ShoppingBag, ArrowLeft, CreditCard, Tag, AlertTriangle, X, BookOpen, Loader2, Heart, Star, Clock } from "lucide-react"
 import { useEffect, useState } from "react"
 import { cartService } from "../services"
+import { cancelPendingOrder } from "@/course/services/directPurchaseService"
 import type { CartSummary } from "../services/cartService"
-import PendingPaymentModal from "../components/PendingPaymentModal"
+import PendingOrderModal from "@/course/components/CourseDetail/PendingOrderModal"
 
 export default function CartPage() {
+  const navigate = useNavigate()
   const [cartData, setCartData] = useState<CartSummary | null>(null)
   const [loading, setLoading] = useState(true)
   const [removing, setRemoving] = useState<number | null>(null)
@@ -18,6 +20,13 @@ export default function CartPage() {
     message: string;
     coursesWithAccess: Array<{id: number; title: string}>;
   } | null>(null)
+  const [pendingOrderData, setPendingOrderData] = useState<{
+    orderId: string;
+    orderType: string;
+    expirationDate?: string;
+    courseName?: string;
+  } | null>(null)
+  const [showPendingOrderModal, setShowPendingOrderModal] = useState(false)
 
   useEffect(() => {
     loadCart()
@@ -61,6 +70,8 @@ export default function CartPage() {
     try {
       setProcessingPayment(true)
       setCourseAccessError(null) // Limpiar errores previos
+      setPendingOrderData(null) // Limpiar errores previos
+      setShowPendingOrderModal(false) // Cerrar modal previo
       const preference = await cartService.createPaymentPreference()
       // Redirigir a MercadoPago
       window.location.href = preference.initPoint
@@ -70,7 +81,10 @@ export default function CartPage() {
       // Verificar si es error de carrito pendiente
       if (error.response?.status === 422) {
         const errorMessage = error.response?.data?.message;
-        const errorData = error.response?.data?.data;
+        const errorData = error.response?.data?.errors; // Usar errors en lugar de data
+        
+        console.log('🔍 Cart Error 422 - errorMessage:', errorMessage);
+        console.log('🔍 Cart Error 422 - errorData (errors):', errorData);
         
         if (errorMessage?.includes('carrito pendiente') || errorMessage?.includes('Ya existe un carrito pendiente')) {
           setShowPendingModal(true);
@@ -83,6 +97,26 @@ export default function CartPage() {
             message: errorMessage,
             coursesWithAccess: errorData.coursesWithAccess
           });
+          return;
+        }
+        
+        // Verificar si es error de órdenes pendientes usando errorType
+        if (errorData?.errorType === 'PENDING_ORDER') {
+          console.log('🔍 Detectado error de orden pendiente en carrito');
+          
+          // Tomar la primera orden pendiente
+          const firstOrder = errorData.orderDetails?.[0];
+          const firstCourse = errorData.coursesWithPendingOrders?.[0];
+          
+          if (firstOrder && firstCourse) {
+            setPendingOrderData({
+              orderId: firstOrder.orderId,
+              orderType: firstOrder.type,
+              expirationDate: firstOrder.expirationDate,
+              courseName: firstCourse.title
+            });
+            setShowPendingOrderModal(true);
+          }
           return;
         }
       }
@@ -138,6 +172,60 @@ export default function CartPage() {
 
   const handleDismissCourseAccessError = () => {
     setCourseAccessError(null);
+  };
+
+  const handleRemoveCoursesWithPendingOrders = async () => {
+    if (!pendingOrderData) return;
+
+    try {
+      // Eliminar cada curso del carrito que tiene órdenes pendientes
+      // Para este caso, necesitamos el courseId que deberíamos almacenar en pendingOrderData
+      // Por ahora, removemos todos los cursos del carrito
+      await cartService.clearCart();
+      
+      // Recargar el carrito
+      await loadCart();
+      
+      // Limpiar el modal
+      setPendingOrderData(null);
+      setShowPendingOrderModal(false);
+      
+    } catch (error) {
+      console.error('Error eliminando cursos con órdenes pendientes del carrito:', error);
+    }
+  };
+
+  const handleCancelPendingOrder = async () => {
+    if (!pendingOrderData) return;
+
+    try {
+      // Cancelar la orden pendiente
+      if (pendingOrderData.orderType === 'cart') {
+        await cartService.cancelPendingCart();
+      } else {
+        await cancelPendingOrder(pendingOrderData.orderId);
+      }
+      
+      // Limpiar el modal
+      setPendingOrderData(null);
+      setShowPendingOrderModal(false);
+
+      // Reintentar la compra automáticamente
+      proceedToPayment();
+    } catch (error) {
+      console.error('Error cancelando orden pendiente:', error);
+      setPendingOrderData(null);
+      setShowPendingOrderModal(false);
+    }
+  };
+
+  const handleViewPendingOrders = () => {
+    // Cerrar modal
+    setPendingOrderData(null);
+    setShowPendingOrderModal(false);
+    
+    // Navegar a la página de órdenes
+    navigate('/user/orders');
   };
 
   if (loading) {
@@ -451,13 +539,6 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Modal de pago pendiente */}
-        <PendingPaymentModal
-          isOpen={showPendingModal}
-          onClose={handleCloseModal}
-          onContinue={handleCancelPendingAndContinue}
-          loading={cancelingPending}
-        />
 
         {/* Modal de error de cursos con acceso */}
         {courseAccessError && (
@@ -515,6 +596,21 @@ export default function CartPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Modal de orden pendiente usando componente reutilizable */}
+        {pendingOrderData && (
+          <PendingOrderModal 
+            isOpen={showPendingOrderModal}
+            onClose={() => setShowPendingOrderModal(false)}
+            orderData={pendingOrderData}
+            errorMessage="Tienes una orden pendiente de pago para este curso. Puedes completar el pago o cancelar la orden."
+            onOrderCancelled={() => {
+              setPendingOrderData(null);
+              setShowPendingOrderModal(false);
+              proceedToPayment(); // Reintentar automáticamente
+            }}
+          />
         )}
       </div>
     </div>
