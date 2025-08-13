@@ -1,6 +1,6 @@
 import { GraduationCap } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
 import CategoryCard from "./CategoryCard";
 import { getCategoriesActivesLimited } from "@/home/services/categoriesService";
 import { useState, useEffect } from "react";
@@ -9,7 +9,8 @@ import { useState, useEffect } from "react";
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/pagination';
-import 'swiper/css/navigation'
+import 'swiper/css/navigation';
+import { Autoplay } from "swiper/modules";
 import "@/shared/assets/styles/categorySwiper.css";
 
 export default function CourseCategories() {
@@ -49,7 +50,7 @@ export default function CourseCategories() {
         </div>
 
         <Swiper
-          modules={[Navigation, Pagination/* , Autoplay */]}
+          modules={[Navigation, Pagination, Autoplay]}
           navigation
           autoplay={{
             delay: 2000,

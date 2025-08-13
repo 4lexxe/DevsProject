@@ -50,20 +50,27 @@ const DashboardHome = () => {
     queryFn: getCourses,
   })
 
-  const { data: userStats } = useQuery({
+  interface UserStats {
+    totalUsers: number;
+    // agrega aquí otros campos si los necesitas
+  }
+
+  const { data: userStats } = useQuery<UserStats>({
     queryKey: ['user-stats'],
     queryFn: getUserStats,
     retry: false,
-    onError: (error) => {
-      console.warn('Error loading user stats:', error);
-    }
   })
 
   const stats = {
     totalCourses: courses?.length || 0,
     activeCourses: courses?.filter((course: Course) => course.isActive && !course.isInDevelopment).length || 0,
-    totalStudents: userStats?.totalUsers || 0,
+    totalStudents: (userStats && typeof userStats.totalUsers === 'number') ? userStats.totalUsers : 0,
     draftCourses: courses?.filter((course: Course) => course.isInDevelopment).length || 0,
+  }
+  
+  interface UserStats {
+    totalUsers: number;
+    // agrega aquí otros campos si los necesitas
   }
 
   const recentCourses = courses?.slice(0, 5) || []

@@ -3,7 +3,7 @@ import { Clock, BookOpen, GraduationCap, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface CourseCardProps {
-  id: number;
+  id: string;
   title: string;
   summary: string;
   courseName: string;

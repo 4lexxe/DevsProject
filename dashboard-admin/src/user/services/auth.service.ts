@@ -51,7 +51,7 @@ export interface User {
   username: string;
   displayName?: string;
   roleId: number;
-  Role?: {  
+  role?: {  
     id: number;
     name: string;
     description: string;
@@ -192,7 +192,7 @@ class AuthService {
   async isSuperAdmin(): Promise<boolean> {
     try {
       const user = await this.getCurrentUser();
-      return user?.isSuperAdmin === true || user?.Role?.name === 'superadmin';
+      return user?.isSuperAdmin === true || user?.role?.name === 'superadmin';
     } catch (error) {
       console.error('Error checking super admin status:', error);
       return false;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Eye, Trash2, Upload, Globe, Lock, FileText, GripVertical } from 'lucide-react';
+import { ArrowLeft, Download, Eye, Trash2, Upload, FileText, GripVertical } from 'lucide-react';
 import {
   DndContext,
   closestCenter,

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import CourseCard from './CourseCard';
-import { getCourses, type Course } from '@/course/services/courseServices';
+import { getCourses } from '@/course/services/courseServices';
+import type { CourseData } from '@/course/interfaces/CourseDetail'; 
 
 export default function LatestCourses() {
-  const [courses, setCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<CourseData[]>([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -12,7 +13,7 @@ export default function LatestCourses() {
         const data = await getCourses(); // Llamada a la API para obtener los cursos
         // Ordenar los cursos por fecha de creación, de más reciente a más antiguo
         const sortedCourses = data
-          .sort((a: Course, b: Course) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .sort((a: CourseData, b: CourseData) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, 3); // Obtener solo los tres más recientes
         setCourses(sortedCourses); // Establecer los cursos en el estado
       } catch (error) {

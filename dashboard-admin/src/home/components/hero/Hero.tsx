@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import CarouselButton from './CarouselButton';
 import HeroContent from './HeroContent';
 import { getHeaderSections } from '../../services/headerSectionServices';

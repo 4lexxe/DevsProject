@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Search, ChevronLeft, ChevronRight, Zap, Clock, AlertCircle, Brain } from 'lucide-react';
-import CoursesList from '../components/courses/CoursesList';
+import CoursesList from '../components/Courses/CoursesList';
 import { CourseSearchService, SearchResult } from '../services/searchService';
 
 export default function SearchResultsPage() {

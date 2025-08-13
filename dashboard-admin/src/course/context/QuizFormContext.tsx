@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { createContentQuiz } from "../services/contentServices";
+import { saveContentQuiz } from "../services/contentServices";
 import { Quiz } from "../interfaces/Content";
 
 interface QuizState {
@@ -47,7 +47,7 @@ export function QuizProvider({ children }: { children: React.ReactNode }) {
   // Guardar quiz usando el servicio
   const saveQuiz = async (quizData: Quiz[]) => {
     try {
-      await createContentQuiz(quizState.contentId, { quiz: quizData });
+      await saveContentQuiz(quizState.contentId, { quiz: quizData });
       cancelQuizAction();
     } catch (error) {
       console.error("Error al guardar el quiz:", error);

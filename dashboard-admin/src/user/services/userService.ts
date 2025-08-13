@@ -46,7 +46,7 @@ export const getAllUsers = async (filters?: UserFilters): Promise<User[]> => {
       }
       
       // Filtro por rol
-      if (filters.role && user.Role?.name.toLowerCase() !== filters.role.toLowerCase()) {
+      if (filters.role && user.role?.name.toLowerCase() !== filters.role.toLowerCase()) {
         return false
       }
       

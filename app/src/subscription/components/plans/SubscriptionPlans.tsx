@@ -1,5 +1,5 @@
 import React from 'react';
-import SubscriptionCard from './SubscriptionPlanCard';
+import SubscriptionCard from '@/subscription/components/Plans/SubscriptionPlanCard'
 import { Plan } from '../../interfaces/plan';
 
 interface SubscriptionPlansProps {

@@ -145,14 +145,14 @@ const StudentProfilePage = () => {
             </div>
             <div className="flex items-center space-x-4">
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                user.Role?.name === 'superadmin' 
+                user.role?.name === 'superadmin' 
                   ? 'bg-red-100 text-red-800'
-                  : user.Role?.name === 'admin'
+                  : user.role?.name === 'admin'
                   ? 'bg-purple-100 text-purple-800'
                   : 'bg-blue-100 text-blue-800'
               }`}>
-                {user.Role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
-                {user.Role?.description || user.Role?.name || 'Usuario'}
+                {user.role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
+                {user.role?.description || user.role?.name || 'Usuario'}
               </span>
             </div>
           </div>
@@ -229,26 +229,26 @@ const StudentProfilePage = () => {
                 <p className="text-sm font-medium text-gray-500">Nivel de acceso</p>
                 <div className="mt-1">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    user.Role?.name === 'superadmin' 
+                    user.role?.name === 'superadmin' 
                       ? 'bg-red-100 text-red-800'
-                      : user.Role?.name === 'admin'
+                      : user.role?.name === 'admin'
                       ? 'bg-purple-100 text-purple-800'
                       : 'bg-blue-100 text-blue-800'
                   }`}>
-                    {user.Role?.description || user.Role?.name || 'Usuario'}
+                    {user.role?.description || user.role?.name || 'Usuario'}
                   </span>
                 </div>
               </div>
             </div>
             
             {/* Mostrar permisos si existen */}
-            {user.Role?.permissions && user.Role.permissions.length > 0 && (
+            {user.role?.permissions && user.role.permissions.length > 0 && (
               <div className="flex items-start">
                 <Shield className="h-5 w-5 text-gray-400 mr-3 mt-1" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-500 mb-2">Permisos</p>
                   <div className="flex flex-wrap gap-2">
-                    {user.Role.permissions.map((permission: string, index: number) => (
+                    {user.role.permissions.map((permission: string, index: number) => (
                       <span 
                         key={index}
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"

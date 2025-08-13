@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react"
 import Markdown from "markdown-to-jsx"
 
 export default function MarkdownPreview({ markdown }: { markdown: string }) {

@@ -68,7 +68,7 @@ const StudentsPage = () => {
 
       // Filtro por rol
       if (filterRole !== 'all') {
-        if (user.Role?.name.toLowerCase() !== filterRole.toLowerCase()) {
+        if (user.role?.name.toLowerCase() !== filterRole.toLowerCase()) {
           return false
         }
       }
@@ -341,14 +341,14 @@ const StudentsPage = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.Role?.name === 'superadmin'
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role?.name === 'superadmin'
                       ? 'bg-red-100 text-red-800'
-                      : user.Role?.name === 'admin'
+                      : user.role?.name === 'admin'
                         ? 'bg-purple-100 text-purple-800'
                         : 'bg-blue-100 text-blue-800'
                       }`}>
-                      {user.Role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
-                      {user.Role?.name}
+                      {user.role?.name === 'superadmin' && <Shield className="w-3 h-3 mr-1" />}
+                      {user.role?.name}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

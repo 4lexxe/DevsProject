@@ -9,7 +9,10 @@ interface Course {
   title: string
   image: string
   category: string
-  careerType: object[]
+  careerType: {
+    id: number
+    name: string
+  }
   isInDevelopment: boolean
   createdAt: string
 }

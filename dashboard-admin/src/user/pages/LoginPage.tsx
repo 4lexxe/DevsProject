@@ -1,6 +1,4 @@
 import LoginForm from "../components/login/LoginForm";
-import { Github, MessageCircle } from "lucide-react";
-import { Link } from "react-router-dom";
 
 function LoginPage() {
   return (

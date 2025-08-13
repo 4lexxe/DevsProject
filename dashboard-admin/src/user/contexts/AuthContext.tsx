@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(response.user);
       
       // Verificar si el usuario es superadmin o admin
-      if (response.user.Role?.name !== 'superadmin' && response.user.Role?.name !== 'admin') {
+      if (response.user.role?.name !== 'superadmin' && response.user.role?.name !== 'admin') {
         await logout();
         throw new Error('Acceso denegado. Solo administradores pueden usar esta aplicación.');
       }

@@ -1,10 +1,5 @@
 import api from '../../shared/api/axios';
 
-interface Course {
-  id: number;
-  name: string;
-}
-
 const COURSES_ENDPOINT = '/courses';
 
 //Obtener todos los cursos activos

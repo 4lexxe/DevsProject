@@ -1,4 +1,4 @@
-import CourseListItem from "./CourseListItem";
+import CourseListItem from "@/course/components/Courses/CourseListItem"
 import { Category, CareerType } from "@/course/interfaces/ViewnerCourse";
 import { Loader2 } from "lucide-react";
 

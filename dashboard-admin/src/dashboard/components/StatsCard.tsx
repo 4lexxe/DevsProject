@@ -1,5 +1,5 @@
 import { LucideIcon } from 'lucide-react'
-import { cn } from '@utils/cn'
+import { cn } from '@/dashboard/utils/cn'
 
 interface StatsCardProps {
   title: string
