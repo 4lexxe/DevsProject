@@ -2,7 +2,6 @@ import express from 'express';
 import { ResourceController } from '../controllers/resource.controller';
 import { body } from 'express-validator';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
-import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = express.Router();
 
@@ -22,21 +21,18 @@ router.get('/:id', ResourceController.getResourceById);
 // Rutas protegidas
 router.post('/',
   authMiddleware,
-  permissionsMiddleware(['upload:resources']),
   validateResource,
   ResourceController.createResource
 );
 
 router.put('/:id',
   authMiddleware,
-  permissionsMiddleware(['manage:own_resources', 'moderate:all_resources']),
   validateResource,
   ResourceController.updateResource
 );
 
 router.delete('/:id',
   authMiddleware,
-  permissionsMiddleware(['manage:own_resources', 'moderate:all_resources']),
   ResourceController.deleteResource
 );
 

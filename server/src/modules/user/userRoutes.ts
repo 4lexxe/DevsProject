@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { UserController } from '../user/userController';
 import { authMiddleware } from '../../shared/middleware/authMiddleware';
 import { geoMiddleware } from '../../shared/middleware/geo.middleware';
-import { permissionsMiddleware } from '../../shared/middleware/permissionsMiddleware';
 import validatorUser from './validators/userValidator';
 import subscriptionDataValidator from './validators/SubscriptionDataValidator';
 
@@ -19,20 +18,17 @@ router.get('/users/public/:id', UserController.getPublicUserById);
 // Rutas protegidas (requieren permisos administrativos)
 router.get('/users', 
   authMiddleware,
-  permissionsMiddleware(['read:users', 'manage:all_users']),
   UserController.getUsers
 );
 
 router.get('/users/:id', 
   authMiddleware,
-  permissionsMiddleware(['read:users', 'manage:all_users']),
   UserController.getUserById
 );
 
 // Rutas que requieren autenticación y permisos específicos
 router.get('/users/:id/security',
   authMiddleware,
-  permissionsMiddleware(['read:users', 'manage:all_users']),
   UserController.getUserSecurityDetails
 );
 
@@ -41,16 +37,13 @@ router.put('/users/:id/subscription',  subscriptionDataValidator, UserController
 
 router.put('/users/:id', 
   authMiddleware, // Requiere autenticación
-  permissionsMiddleware(['manage:users']),  // Verificar permisos
   validatorUser,
   authMiddleware,
-  permissionsMiddleware(['write:users', 'manage:all_users']),
   UserController.updateUser
 );
 
 router.delete('/users/:id', 
   authMiddleware,
-  permissionsMiddleware(['delete:users']),
   UserController.deleteUser
 );
 

@@ -3,7 +3,6 @@ import express from 'express';
 import multer from 'multer';
 import { uploadToImgBB } from '../services/imgBB.service';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
-import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -11,7 +10,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Endpoint para subir archivos al backend (requiere autenticación)
 router.post('/', 
   authMiddleware,
-  permissionsMiddleware(['upload:resources']),
   upload.single('file'), 
   async (req, res): Promise<void> => {
     try {

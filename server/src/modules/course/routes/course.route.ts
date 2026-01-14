@@ -4,7 +4,6 @@ import CourseController from '../controllers/course.controller';
 import CourseGetController from '../controllers/courseGet.controller';
 import { validateCourse } from '../validators/courseValidation';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
-import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
@@ -41,7 +40,6 @@ router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
 // Ruta para crear un curso (requiere autenticación y permisos)
 router.post('/courses', 
   authMiddleware, 
-  permissionsMiddleware(['manage:courses']), 
   validateCourse, 
   CourseController.create
 );
@@ -49,7 +47,6 @@ router.post('/courses',
 // Ruta para actualizar un curso (requiere autenticación y permisos)
 router.put('/courses/:id', 
   authMiddleware, 
-  permissionsMiddleware(['manage:courses']), 
   validateCourse, 
   CourseController.update
 );
@@ -57,7 +54,6 @@ router.put('/courses/:id',
 // Ruta para eliminar un curso (requiere autenticación y permisos)
 router.delete('/courses/:id', 
   authMiddleware, 
-  permissionsMiddleware(['delete:courses']), 
   CourseController.delete
 );
 

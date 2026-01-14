@@ -3,7 +3,6 @@ import SectionController from '../controllers/section.controller';
 import SectionGetController from '../controllers/sectionGet.controller';
 import { validateSectionAndContents } from '../validators/SectionValidation';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
-import { permissionsMiddleware } from '../../../shared/middleware/permissionsMiddleware';
 
 const router = Router();
 
@@ -17,33 +16,28 @@ router.get('/sections/:id/contents', SectionGetController.getByIdWithContents);
 // Rutas protegidas (requieren autenticación y permisos)
 router.post('/sections', 
   authMiddleware, 
-  permissionsMiddleware(['manage:course_content']), 
   SectionController.create
 );
 
 router.post('/sections/contents', 
   authMiddleware, 
-  permissionsMiddleware(['manage:course_content']), 
   validateSectionAndContents, 
   SectionController.createSectionAndContents
 );
 
 router.put('/sections/:id/contents', 
   authMiddleware, 
-  permissionsMiddleware(['manage:course_content']), 
   validateSectionAndContents, 
   SectionController.updateSectionAndContents
 );
 
 router.put('/sections/:id', 
   authMiddleware, 
-  permissionsMiddleware(['manage:course_content']), 
   SectionController.update
 );
 
 router.delete('/sections/:id', 
   authMiddleware, 
-  permissionsMiddleware(['delete:content']), 
   SectionController.delete
 );
 

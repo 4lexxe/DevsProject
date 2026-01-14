@@ -115,23 +115,6 @@ export class UserController {
   // Obtener todos los usuarios (solo para roles importantes)
   static async getUsers(req: Request, res: Response): Promise<void> {
     try {
-      const user = req.user as User;
-
-      // Verificar permisos adicionales
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      const canViewAllUsers = userPermissions.includes('read:users') || 
-                             userPermissions.includes('manage:all_users') || 
-                             user.Role?.name === 'superadmin';
-
-      if (!canViewAllUsers) {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: 'No tienes permisos para ver información completa de usuarios'
-        });
-        return;
-      }
-
       const users = await User.findAll({
         attributes: { 
           exclude: [
@@ -175,22 +158,6 @@ export class UserController {
   static async getUserById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = req.user as User;
-
-      // Verificar permisos adicionales
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      const canViewUserDetails = userPermissions.includes('read:users') || 
-                                userPermissions.includes('manage:all_users') || 
-                                user.Role?.name === 'superadmin';
-
-      if (!canViewUserDetails) {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: 'No tienes permisos para ver información completa de usuarios'
-        });
-        return;
-      }
 
       const targetUser = await User.findByPk(id, {
         attributes: { 
@@ -225,7 +192,7 @@ export class UserController {
       }
 
       // Transformar los datos para incluir permisos en el formato esperado
-      const userData = user.toJSON();
+      const userData = targetUser.toJSON();
       if (userData.Role && userData.Role.Permissions) {
         userData.Role.permissions = userData.Role.Permissions.map((permission: any) => permission.name);
         delete userData.Role.Permissions; // Eliminar la propiedad original
@@ -241,22 +208,6 @@ export class UserController {
   static async getUserSecurityDetails(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const user = req.user as User;
-
-      // Verificar permisos adicionales
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      const canViewSecurityDetails = userPermissions.includes('read:users') || 
-                                   userPermissions.includes('manage:all_users') || 
-                                   user.Role?.name === 'superadmin';
-
-      if (!canViewSecurityDetails) {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: 'No tienes permisos para ver detalles de seguridad'
-        });
-        return;
-      }
 
       const targetUser = await User.findByPk(id, {
         attributes: [
@@ -339,23 +290,6 @@ export class UserController {
         displayName,
         isActiveSession, 
       } = req.body;
-
-      const user = req.user as User;
-
-      // Verificar permisos adicionales
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      const canUpdateUsers = userPermissions.includes('write:users') || 
-                           userPermissions.includes('manage:all_users') || 
-                           user.Role?.name === 'superadmin';
-
-      if (!canUpdateUsers) {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: 'No tienes permisos para actualizar usuarios'
-        });
-        return;
-      }
 
       const targetUser = await User.findByPk(id);
       if (!targetUser) {
@@ -471,17 +405,6 @@ export class UserController {
     try {
       const { id } = req.params;
       const user = req.user as User;
-
-      // Verificar permisos adicionales
-      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
-      if (!userPermissions.includes('delete:users') && user.Role?.name !== 'superadmin') {
-        res.status(403).json({
-          ...metadata(req, res),
-          status: "error",
-          message: 'No tienes permisos para eliminar usuarios'
-        });
-        return;
-      }
 
       const targetUser = await User.findByPk(id);
       if (!targetUser) {
