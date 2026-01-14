@@ -10,6 +10,7 @@
 history/
 .history/
 /.kiro/
+kiro/
 
 # Ignorar archivos de build de TypeScript en las carpetas app y server
 /app/dist/
