@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
 import type { SubmitHandler } from "react-hook-form";
 import type { FormInputLoginZod } from '../../lib/type';
 import { loginSchemaZod } from '../../lib/type';
@@ -9,11 +10,11 @@ import axios from 'axios';
 
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const { register, handleSubmit, setError, formState: { errors } } = useForm<FormInputLoginZod>({
     resolver: zodResolver(loginSchemaZod),
-    mode: 'onSubmit', // Cambiado de 'onChange' a 'onSubmit'
+    mode: 'onSubmit',
   });
-  // const navigate = useNavigate(); // No se usa actualmente
 
   // Tipos para errores de validación
   type ValidationError = { path: string[]; message: string };
@@ -24,9 +25,7 @@ export default function LoginForm() {
     try {
       const response = await AuthService.login(data);
       if (response.token) {
-        // Si AuthService.setToken no existe, comentar la línea siguiente y dejar nota:
-        // AuthService.setToken(response.token);
-        window.location.href = "/";
+        navigate('/');
       }
     } catch (error: unknown) {
       let errorMessage = 'Error al iniciar sesión';
