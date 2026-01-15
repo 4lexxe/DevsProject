@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import User from "../../modules/user/User";
-import Permission from "../../modules/role/Permission";
+import Permission from "../../modules/rbac/models/Permission";
 
 // Extender el tipo Request de Express para incluir nuestro modelo User
 declare global {
@@ -8,31 +8,6 @@ declare global {
     interface User extends InstanceType<typeof User> {}
   }
 }
-
-/**
- * Middleware modular para verificar permisos de usuario
- * 
- * Uso básico:
- * - requirePermission('read:courses') - Un solo permiso
- * - requirePermission('write:users', 'delete:users') - Varios permisos (requiere todos)
- * - requireAnyPermission('write:users', 'moderate:content') - Al menos uno
- * 
- * Ejemplos prácticos:
- * 
- *  Requiere un permiso específico
- * router.get('/courses', requirePermission('read:courses'), courseController.getAll);
- * 
- *  Requiere múltiples permisos (AND)
- * router.delete('/users/:id', requirePermission('read:users', 'delete:users'), userController.delete);
- * 
- *  Requiere al menos uno de los permisos (OR)
- * router.post('/content/moderate', requireAnyPermission('moderate:content', 'manage:system_settings'), contentController.moderate);
- * 
- *  Verificación personalizada en el controlador
- * if (hasPermission(req.user, 'write:courses')) {
- *   // lógica específica
- * }
- */
 
 /**
  * Verifica si un usuario tiene un permiso específico

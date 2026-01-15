@@ -12,13 +12,6 @@ export interface UserFilters {
   search?: string
 }
 
-export interface UserStats {
-  totalUsers: number
-  activeUsers: number
-  inactiveUsers: number
-  newUsersThisMonth: number
-}
-
 // Obtener todos los usuarios con filtros
 export const getAllUsers = async (filters?: UserFilters): Promise<User[]> => {
   try {
@@ -76,10 +69,8 @@ export const getAllUsers = async (filters?: UserFilters): Promise<User[]> => {
 // Obtener usuario por ID
 export const getUserById = async (userId: number): Promise<User> => {
   try {
-    console.log(`Fetching user with ID: ${userId}`)
-    console.log(`API endpoint: ${USERS_ENDPOINT}/${userId}`)
+
     const response = await api.get(`${USERS_ENDPOINT}/${userId}`)
-    console.log('User API response:', response.data)
     return response.data.data || response.data
   } catch (error) {
     console.error(`Error al obtener el usuario con id ${userId}:`, error)
@@ -141,33 +132,11 @@ export const activateUser = async (userId: number): Promise<User> => {
   }
 }
 
-// Obtener estadísticas de usuarios
-export const getUserStats = async (): Promise<UserStats> => {
-  try {
-    const response = await api.get(`${USERS_ENDPOINT}/stats`)
-    return response.data.data || response.data
-  } catch (error) {
-    console.error('Error al obtener las estadísticas de usuarios:', error)
-    // Si el endpoint no existe, calculamos desde todos los usuarios
-    const users = await getAllUsers()
-    const now = new Date()
-    const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
-    
-    return {
-      totalUsers: users.length,
-      activeUsers: users.filter(user => user.isActiveSession).length,
-      inactiveUsers: users.filter(user => !user.isActiveSession).length,
-      newUsersThisMonth: users.filter(user => 
-        new Date(user.lastActiveAt) >= thisMonth
-      ).length
-    }
-  }
-}
 
 // Obtener roles disponibles
 export const getRoles = async () => {
   try {
-    const response = await api.get('/roles/roles')
+    const response = await api.get('/roles')
     return response.data.data || response.data
   } catch (error) {
     console.error('Error al obtener los roles:', error)

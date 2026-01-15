@@ -24,7 +24,8 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       const response = await AuthService.login(data);
-      if (response.token) {
+      
+      if (response.user) {
         navigate('/');
       }
     } catch (error: unknown) {

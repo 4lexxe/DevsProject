@@ -4,8 +4,8 @@
 
 import { Request, Response } from "express";
 import User from "../../user/User";
-import Role from "../../role/Role";
-import Permission from "../../role/Permission";
+import Role from "../../rbac/models/Role";
+import Permission from "../../rbac/models/Permission";
 
 export interface AuthRequest extends Request {
   user?: User & { id: string | number };

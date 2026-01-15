@@ -5,9 +5,11 @@ import { AuthProvider } from "./user/contexts";
 import ProtectedRoute from "./user/contexts/ProtectedRoute";
 import Layout from "./dashboard/layout/Layout";
 import DashboardHome from "./dashboard/pages/DashboardHome";
-import StudentsPage from "./user/pages/StudentsPage";
-import StudentEditPage from "./user/pages/StudentEditPage";
-import StudentProfilePage from "./user/pages/StudentProfilePage";
+import UsersPage from "./user/pages/UsersPage";
+import UserEditPage from "./user/pages/UserEditPage";
+import UserProfilePage from "./user/pages/UserProfilePage";
+import RolesPage from "./user/pages/RolesPage";
+import RoleEditPage from "./user/pages/RoleEditPage";
 import LoginPage from "./user/pages/LoginPage";
 
 import {
@@ -57,9 +59,15 @@ function App() {
             >
               {/* Aquí dentro ya heredan la protección */}
               <Route index element={<DashboardHome />} />
-              <Route path="students" element={<StudentsPage />} />
-              <Route path="students/:id" element={<StudentProfilePage />} />
-              <Route path="students/:id/edit" element={<StudentEditPage />} />
+              <Route path="users" element={<UsersPage />} />
+              <Route path="users/:id" element={<UserProfilePage />} />
+              <Route path="users/:id/edit" element={<UserEditPage />} />
+              
+              {/* Rutas de Roles */}
+              <Route path="roles" element={<RolesPage />} />
+              <Route path="roles/new" element={<RoleEditPage />} />
+              <Route path="roles/:id/edit" element={<RoleEditPage />} />
+              
               <Route
                 path="header-section"
                 element={<HeaderSectionAdminPage />}

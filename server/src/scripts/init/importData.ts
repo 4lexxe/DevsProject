@@ -2,18 +2,18 @@
 
 import fs from 'fs';
 import path from 'path';
-import sequelize from '../infrastructure/database/db';
-import User from '../modules/user/User';
-import Plan from '../modules/subscription/models/Plan';
-import DiscountEvent from '../modules/subscription/models/PlanDiscountEvent';
-import Payment from '../modules/subscription/models/SubscriptionPayment';
-import Invoice from '../modules/subscription/models/Invoice';
-import Subscription from '../modules/subscription/models/Subscription';
-import MPSubscription from '../modules/subscription/models/MPSubscription';
-import Course from '../modules/course/models/Course';
-import Section from '../modules/course/models/Section';
-import Content from '../modules/course/models/Content';
-import { CourseCategory } from '../modules/course/models/Course';
+import sequelize from '../../infrastructure/database/db';
+import User from '../../modules/user/User';
+import Plan from '../../modules/subscription/models/Plan';
+import DiscountEvent from '../../modules/subscription/models/PlanDiscountEvent';
+import Payment from '../../modules/subscription/models/SubscriptionPayment';
+import Invoice from '../../modules/subscription/models/Invoice';
+import Subscription from '../../modules/subscription/models/Subscription';
+import MPSubscription from '../../modules/subscription/models/MPSubscription';
+import Course from '../../modules/course/models/Course';
+import Section from '../../modules/course/models/Section';
+import Content from '../../modules/course/models/Content';
+import { CourseCategory } from '../../modules/course/models/Course';
 
 async function importData() {
   try {
@@ -22,7 +22,7 @@ async function importData() {
     console.log('Conexión a la base de datos establecida correctamente.');
 
     // Leer el archivo de datos
-    const filePath = path.join(__dirname, 'data/exportedDataTest.json');
+    const filePath = path.join(__dirname, '../data/exportedDataTest.json');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const data = JSON.parse(fileContent);
 

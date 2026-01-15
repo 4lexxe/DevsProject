@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../user/User';
-import Role from '../role/Role';
-import Permission from '../role/Permission';
+import Role from '../rbac/models/Role';
+import Permission from '../rbac/models/Permission';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
 

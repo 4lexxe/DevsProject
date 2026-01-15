@@ -1,3 +1,6 @@
+// Registrar tsconfig-paths para resolver aliases
+import 'tsconfig-paths/register';
+
 // ==================================================
 // Importaciones de librerías y módulos necesarios
 // ==================================================
@@ -24,7 +27,8 @@ import authRoutes from './modules/auth/routes/auth.routes';
 // Rutas de Usuarios
 import userRoutes from './modules/user/userRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
-import roleRoutes from './modules/role/roleRoutes';
+import roleRoutes from './modules/rbac/routes/roleRoutes';
+import permissionRoutes from './modules/rbac/routes/permissionRoutes';
 
 // Rutas de Contenido
 import HeaderSectionRoutes from './modules/headerSection/headerSectionRoutes';
@@ -260,6 +264,7 @@ admin y roles no necesitan de la ruta de autenticación para poder acceder a sus
 app.use('/api', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api/permissions', permissionRoutes);
 
 /*
 --------------------------

@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
+import sequelize from '../../../infrastructure/database/db';
 
 class RolePermission extends Model {
   declare roleId: number;

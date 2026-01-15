@@ -1,9 +1,9 @@
 import type { Transaction } from "sequelize"
 import User from "../../modules/user/User"
-import Role from "../../modules/role/Role"
+import Role from "../../modules/rbac/models/Role"
 import Admin from "../../modules/admin/Admin"
-import Permission from "../../modules/role/Permission"
-import RolePermission from "../../modules/role/RolePermission"
+import Permission from "../../modules/rbac/models/Permission"
+import RolePermission from "../../modules/rbac/models/RolePermission"
 import bcrypt from "bcrypt"
 import { AuthProvider } from "../../modules/user/User"
 

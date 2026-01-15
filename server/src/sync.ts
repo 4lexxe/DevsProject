@@ -1,9 +1,9 @@
 import sequelize from "./infrastructure/database/db";
 
-import Role from "./modules/role/Role";
-import { rolesIniciales } from "./modules/role/Role";
-import Permission from "./modules/role/Permission";
-import RolePermission from "./modules/role/RolePermission";
+import Role from "./modules/rbac/models/Role";
+import { rolesIniciales } from "./modules/rbac/models/Role";
+import Permission from "./modules/rbac/models/Permission";
+import RolePermission from "./modules/rbac/models/RolePermission";
 import User from "./modules/user/User";
 import Admin from "./modules/admin/Admin";
 import Session from "./modules/auth/models/Session";

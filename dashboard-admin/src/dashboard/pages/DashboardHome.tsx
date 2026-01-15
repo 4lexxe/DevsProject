@@ -7,7 +7,6 @@ import {
   Clock
 } from 'lucide-react'
 import { getCourses } from '../../course/services/courseServices'
-import { getUserStats } from '../../user/services/userService'
 import { Link } from 'react-router-dom'
 
 interface Category {
@@ -50,19 +49,10 @@ const DashboardHome = () => {
     queryFn: getCourses,
   })
 
-  const { data: userStats } = useQuery({
-    queryKey: ['user-stats'],
-    queryFn: getUserStats,
-    retry: false,
-    onError: (error) => {
-      console.warn('Error loading user stats:', error);
-    }
-  })
-
   const stats = {
     totalCourses: courses?.length || 0,
     activeCourses: courses?.filter((course: Course) => course.isActive && !course.isInDevelopment).length || 0,
-    totalStudents: userStats?.totalUsers || 0,
+    totalStudents: 0, // Puedes obtener esto de otra fuente si lo necesitas
     draftCourses: courses?.filter((course: Course) => course.isInDevelopment).length || 0,
   }
 

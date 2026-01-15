@@ -5,35 +5,45 @@ import {
   getRoleById,
   updateRole,
   deleteRole,
-} from '../rbac/controllers/role.controller';
-import { authMiddleware } from '../../shared/middleware/authMiddleware';
+} from '../controllers/role.controller';
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import {
+  createRoleValidation,
+  updateRoleValidation,
+  getRoleByIdValidation,
+  deleteRoleValidation
+} from '../validators/role.validators';
 
 const router = Router();
 
 // Rutas públicas (solo lectura básica para algunos casos)
-router.get('/roles', 
+router.get('/', 
   authMiddleware,
   getRoles
 );
 
-router.get('/roles/:id', 
+router.get('/:id', 
   authMiddleware,
+  getRoleByIdValidation,
   getRoleById
 );
 
 // Rutas protegidas (requieren permisos administrativos)
-router.post('/roles',
+router.post('/',
   authMiddleware,
+  createRoleValidation,
   createRole
 );
 
-router.put('/roles/:id',
+router.put('/:id',
   authMiddleware,
+  updateRoleValidation,
   updateRole
 );
 
-router.delete('/roles/:id',
+router.delete('/:id',
   authMiddleware,
+  deleteRoleValidation,
   deleteRole
 );
 

@@ -89,7 +89,7 @@ const StudentEditPage = () => {
       queryClient.invalidateQueries({ queryKey: ['user-profile', id] })
       queryClient.invalidateQueries({ queryKey: ['dashboard-users'] })
       toast.success('Usuario actualizado exitosamente')
-      navigate(`/students/${id}`)
+      navigate(`/users/${id}`)
     },
     onError: (error) => {
       console.error('Error al actualizar:', error)
@@ -213,7 +213,7 @@ const StudentEditPage = () => {
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
         <p className="text-red-600">Usuario no encontrado</p>
         <Link 
-          to="/students" 
+          to="/users" 
           className="text-blue-600 hover:text-blue-800 mt-2 inline-block"
         >
           ← Volver a la lista
@@ -228,7 +228,7 @@ const StudentEditPage = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
-            to={`/students/${id}`}
+            to={`/users/${id}`}
             className="inline-flex items-center text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -575,7 +575,7 @@ const StudentEditPage = () => {
           {/* Actions */}
           <div className="border-t pt-6 flex justify-end space-x-4">
             <Link
-              to={`/students/${id}`}
+              to={`/users/${id}`}
               className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             >
               Cancelar

@@ -6,14 +6,16 @@ import {
   BarChart3, 
   Settings,
   GraduationCap,
-  Image
+  Image,
+  Shield
 } from 'lucide-react'
 // Update the import path to the correct relative location
 import { cn } from '../utils/cn'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: Users, label: 'Estudiantes', path: '/students' },
+  { icon: Users, label: 'Usuarios', path: '/users' },
+  { icon: Shield, label: 'Roles', path: '/roles' },
   { icon: BookOpen, label: 'Cursos', path: '/courses' },
   { icon: Image, label: 'Secciones Hero', path: '/header-section' },
   { icon: BarChart3, label: 'Analytics', path: '/analytics' },

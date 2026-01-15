@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes, Model, Op } from "sequelize";
 import sequelize from "../../infrastructure/database/db";
-import Role from "../role/Role";
-import Permission from "../role/Permission";
+import Role from "../rbac/models/Role";
+import Permission from "../rbac/models/Permission";
 
 export enum AuthProvider {
   LOCAL = "local",
@@ -10,7 +10,7 @@ export enum AuthProvider {
 }
 
 // Extender tipo Role con Permissions
-declare module "../role/Role" {
+declare module "../rbac/models/Role" {
   interface Role {
     Permissions?: Permission[];
   }

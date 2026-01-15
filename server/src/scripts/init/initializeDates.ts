@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-import sequelize from "../infrastructure/database/db";
-import Category from "../modules/course/models/Category";
-import CareerType from "../modules/course/models/CareerType";
-import { CourseCategory } from "../modules/course/models/Course";
-import Course from "../modules/course/models/Course";
-import Section from "../modules/course/models/Section";
-import Content from "../modules/course/models/Content";
-import HeaderSection from "../modules/headerSection/HeaderSection";
+import sequelize from "../../infrastructure/database/db";
+import Category from "../../modules/course/models/Category";
+import CareerType from "../../modules/course/models/CareerType";
+import { CourseCategory } from "../../modules/course/models/Course";
+import Course from "../../modules/course/models/Course";
+import Section from "../../modules/course/models/Section";
+import Content from "../../modules/course/models/Content";
+import HeaderSection from "../../modules/headerSection/HeaderSection";
 
 
 // Carga las variables de entorno del archivo .env

@@ -32,7 +32,7 @@ export const RoleService = {
   // Obtener todos los roles
   async getRoles() {
     try {
-      const response = await api.get('/roles/roles');
+      const response = await api.get('/roles');
       return response.data.data || [];
     } catch (error) {
       console.error('Error fetching roles:', error);
@@ -43,7 +43,7 @@ export const RoleService = {
   // Obtener un rol por ID
   async getRoleById(id: number) {
     try {
-      const response = await api.get(`/roles/roles/${id}`);
+      const response = await api.get(`/roles/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching role with id ${id}:`, error);
@@ -54,7 +54,7 @@ export const RoleService = {
   // Crear un nuevo rol
   async createRole(roleData: RoleCreateRequest) {
     try {
-      const response = await api.post('/roles/roles', roleData);
+      const response = await api.post('/roles', roleData);
       return response.data;
     } catch (error) {
       console.error('Error creating role:', error);
@@ -65,7 +65,7 @@ export const RoleService = {
   // Actualizar un rol
   async updateRole(id: number, roleData: RoleUpdateRequest) {
     try {
-      const response = await api.put(`/roles/roles/${id}`, roleData);
+      const response = await api.put(`/roles/${id}`, roleData);
       return response.data;
     } catch (error) {
       console.error(`Error updating role with id ${id}:`, error);
@@ -76,7 +76,7 @@ export const RoleService = {
   // Eliminar un rol
   async deleteRole(id: number) {
     try {
-      const response = await api.delete(`/roles/roles/${id}`);
+      const response = await api.delete(`/roles/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error deleting role with id ${id}:`, error);
@@ -98,7 +98,7 @@ export const RoleService = {
   // Obtener todos los roles con sus permisos
   async getRolesWithPermissions() {
     try {
-      const response = await api.get('/roles/roles');
+      const response = await api.get('/roles');
       // La API ya devuelve los permisos incluidos en cada rol
       return response.data.data || [];
     } catch (error) {
@@ -110,10 +110,8 @@ export const RoleService = {
   // Obtener todos los permisos disponibles en el sistema
   async getAllPermissions() {
     try {
-      // Por ahora, como no existe el endpoint de permisos, retornamos un array vacío
-      // TODO: Crear el endpoint /api/permissions en el servidor
-      console.warn('Permissions endpoint not implemented yet');
-      return [];
+      const response = await api.get('/permissions');
+      return response.data.data || [];
     } catch (error) {
       console.error('Error fetching all permissions:', error);
       throw error;

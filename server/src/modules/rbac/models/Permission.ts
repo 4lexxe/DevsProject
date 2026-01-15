@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
+import sequelize from '../../../infrastructure/database/db';
 
 class Permission extends Model {
   static permisos = [

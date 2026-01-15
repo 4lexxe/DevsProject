@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import sequelize from '../infrastructure/database/db';
-import Course, { CourseCategory } from '../modules/course/models/Course';
-import Category from '../modules/course/models/Category';
-import CareerType from '../modules/course/models/CareerType';
-import Admin from '../modules/admin/Admin';
+import sequelize from '../../infrastructure/database/db';
+import Course, { CourseCategory } from '../../modules/course/models/Course';
+import Category from '../../modules/course/models/Category';
+import CareerType from '../../modules/course/models/CareerType';
+import Admin from '../../modules/admin/Admin';
 
 interface CourseData {
   id: number;

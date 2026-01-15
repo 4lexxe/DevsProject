@@ -5,7 +5,7 @@ import Course from '../models/Course';
 import Content from '../models/Content';
 import Section from '../models/Section';
 import User from '../../user/User';
-import Role from '../../role/Role';
+import Role from '../../rbac/models/Role';
 import CourseAccess from '../../purchase/models/CourseAccess';
 import { Op } from 'sequelize';
 import sequelize from '../../../infrastructure/database/db';

@@ -10,7 +10,19 @@
     "outDir": "./dist",
     "rootDir": ".",
     "typeRoots": ["./node_modules/@types", "./types"],
-    "types": ["express", "node"]
+    "types": ["express", "node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@modules/*": ["src/modules/*"],
+      "@shared/*": ["src/shared/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@config/*": ["src/infrastructure/config/*"],
+      "@database/*": ["src/infrastructure/database/*"],
+      "@middleware/*": ["src/shared/middleware/*"],
+      "@utils/*": ["src/shared/utils/*"],
+      "@scripts/*": ["src/scripts/*"]
+    }
   },
   "include": [
     "./**/*",

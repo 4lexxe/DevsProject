@@ -6,7 +6,7 @@ import Section from "../modules/course/models/Section";
 import Content from "../modules/course/models/Content";
 import CourseAccess from "../modules/purchase/models/CourseAccess";
 import User from "../modules/user/User";
-import Role from "../modules/role/Role";
+import Role from "../modules/rbac/models/Role";
 import Admin from "../modules/admin/Admin";
 
 // Carga las variables de entorno del archivo .env

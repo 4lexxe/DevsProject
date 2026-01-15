@@ -18,7 +18,6 @@ import {
   deleteUser,
   deactivateUser,
   activateUser,
-  getUserStats,
   getRoles
 } from '@/user/services/userService'
 import type { User } from '@/user/services/auth.service'
@@ -32,7 +31,7 @@ interface Role {
   description: string
 }
 
-const StudentsPage = () => {
+const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterRole, setFilterRole] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
@@ -96,13 +95,6 @@ const StudentsPage = () => {
     setFilterStatus(e.target.value)
   }, [])
 
-  const { data: stats } = useQuery({
-    queryKey: ['user-stats'],
-    queryFn: getUserStats,
-    staleTime: 10 * 60 * 1000, // Las estadísticas no cambian tan frecuentemente
-    retry: false
-  })
-
   const { data: roles = [] } = useQuery({
     queryKey: ['roles'],
     queryFn: getRoles,
@@ -115,7 +107,6 @@ const StudentsPage = () => {
     mutationFn: deleteUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] })
-      queryClient.invalidateQueries({ queryKey: ['user-stats'] })
       toast.success('Usuario eliminado exitosamente')
     },
     onError: (error) => {
@@ -130,7 +121,6 @@ const StudentsPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-users'] })
-      queryClient.invalidateQueries({ queryKey: ['user-stats'] })
       toast.success('Estado del usuario actualizado')
     },
     onError: (error) => {
@@ -183,18 +173,18 @@ const StudentsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Estudiantes</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
           <p className="text-gray-600">Administra todos los usuarios registrados en la plataforma</p>
         </div>
         <Link
-          to="/students/create"
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          to="/users/create"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md hover:shadow-lg"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-5 w-5" />
           Nuevo Usuario
         </Link>
       </div>
@@ -206,7 +196,7 @@ const StudentsPage = () => {
             <Users className="h-8 w-8 text-blue-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total Usuarios</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.totalUsers || filteredUsers.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{allUsers.length}</p>
             </div>
           </div>
         </div>
@@ -216,7 +206,7 @@ const StudentsPage = () => {
             <UserCheck className="h-8 w-8 text-green-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Usuarios Activos</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.activeUsers || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{allUsers.filter((u: User) => u.isActiveSession).length}</p>
             </div>
           </div>
         </div>
@@ -226,7 +216,7 @@ const StudentsPage = () => {
             <UserX className="h-8 w-8 text-red-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Usuarios Inactivos</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.inactiveUsers || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{allUsers.filter((u: User) => !u.isActiveSession).length}</p>
             </div>
           </div>
         </div>
@@ -236,7 +226,11 @@ const StudentsPage = () => {
             <Calendar className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Nuevos este mes</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.newUsersThisMonth || 0}</p>
+              <p className="text-2xl font-bold text-gray-900">{allUsers.filter((u: User) => {
+                const createdDate = new Date(u.createdAt);
+                const now = new Date();
+                return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
+              }).length}</p>
             </div>
           </div>
         </div>
@@ -368,14 +362,14 @@ const StudentsPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <Link
-                        to={`/students/${user.id}`}
+                        to={`/users/${user.id}`}
                         className="text-blue-600 hover:text-blue-900 p-1"
                         title="Ver perfil"
                       >
                         <Eye className="h-4 w-4" />
                       </Link>
                       <Link
-                        to={`/students/${user.id}/edit`}
+                        to={`/users/${user.id}/edit`}
                         className="text-green-600 hover:text-green-900 p-1"
                         title="Editar usuario"
                       >
@@ -425,4 +419,4 @@ const StudentsPage = () => {
   )
 }
 
-export default StudentsPage
+export default UsersPage

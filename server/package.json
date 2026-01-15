@@ -9,7 +9,7 @@
     "dev": "nodemon src/index.ts",
     "create-super-user": "ts-node scripts/createInitialSuperUser.ts",
     "update-geo": "npm run-script update-geoip",
-    "sync": "npx ts-node ./src/sync.ts && npx ts-node ./src/scripts/initializeSuperUser.ts && npx ts-node ./src/scripts/initializeDates.ts && npx ts-node src/scripts/importData.ts"
+    "sync": "npx ts-node ./src/sync.ts && npx ts-node ./src/scripts/init/initializeSuperUser.ts && npx ts-node ./src/scripts/init/initializeDates.ts && npx ts-node src/scripts/init/importData.ts"
   },
   "keywords": [],
   "author": "",
@@ -76,6 +76,7 @@
     "@types/sequelize": "^4.28.10",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3"
   }
 }

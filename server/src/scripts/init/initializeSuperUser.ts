@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
-import { createSuperUser } from "../shared/utils/createSuperUser"
-import sequelize from "../infrastructure/database/db"
+import { createSuperUser } from "../../shared/utils/createSuperUser"
+import sequelize from "../../infrastructure/database/db"
 
 // Carga las variables de entorno del archivo .env
 dotenv.config()

@@ -1,5 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
-import sequelize from '../../infrastructure/database/db';
+import sequelize from '../../../infrastructure/database/db';
 import Permission from './Permission';
 import RolePermission from './RolePermission';
 

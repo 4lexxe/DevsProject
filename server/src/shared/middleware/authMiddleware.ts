@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import User from "../../modules/user/User";
-import Role from "../../modules/role/Role";
+import Role from "../../modules/rbac/models/Role";
 import { GeoUtils } from "../../modules/auth/utils/geo.utils";
 import { SessionService } from "../../modules/auth/services/session.service";
 
