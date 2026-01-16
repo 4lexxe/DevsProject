@@ -90,3 +90,43 @@ export const deleteCourse = async (id: string) => {
     throw error;
   }
 }; */
+
+// Servicio para obtener usuarios con acceso a un curso
+export const getCourseUsers = async (courseId: number) => {
+  try {
+    // Este endpoint debería devolver todos los usuarios que tienen acceso al curso
+    // Basado en el modelo CourseAccess del backend
+    const response = await api.get(`/course-access/course/${courseId}/users`);
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error al obtener usuarios del curso ${courseId}:`, error);
+    throw error;
+  }
+};
+
+// Servicio para otorgar acceso a múltiples usuarios a un curso
+export const grantCourseAccess = async (userIds: number[], courseId: number) => {
+  try {
+    const promises = userIds.map(userId =>
+      api.post('/course-access/grant', { userId, courseId })
+    );
+    const responses = await Promise.all(promises);
+    return responses.map(res => res.data.data);
+  } catch (error) {
+    console.error('Error al otorgar acceso:', error);
+    throw error;
+  }
+};
+
+// Servicio para revocar acceso a un usuario de un curso
+export const revokeCourseAccess = async (userId: number, courseId: number, revokeReason: string) => {
+  try {
+    const response = await api.put(`/course-access/${userId}/courses/${courseId}/revoke`, {
+      revokeReason
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al revocar acceso:', error);
+    throw error;
+  }
+};

@@ -38,6 +38,13 @@ router.get('/:userId/courses/:courseId/check', validateUserIdAndCourseId, Course
 router.get('/:userId/stats', validateUserId, CourseAccessController.getUserCourseStats);
 
 /**
+ * @route GET /course-access/course/:courseId/users
+ * @desc Obtiene todos los usuarios que tienen acceso a un curso
+ * @access Private - Admin only
+ */
+router.get('/course/:courseId/users', CourseAccessController.getCourseUsers);
+
+/**
  * @route POST /course-access/grant
  * @desc Otorga acceso a un curso para un usuario (usado después de una compra exitosa)
  * @access Private - Admin only

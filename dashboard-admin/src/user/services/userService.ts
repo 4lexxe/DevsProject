@@ -100,6 +100,31 @@ export const updateUser = async (userId: number, userData: Partial<User>): Promi
   }
 }
 
+// Interfaz para cursos del usuario
+export interface UserCourse {
+  id: number;
+  title: string;
+  summary: string;
+  image: string;
+  price: number;
+  progress: number;
+  accessToken: string;
+  grantedAt: string;
+  isActive: boolean;
+  courseId: number;
+}
+
+// Obtener cursos a los que el usuario tiene acceso
+export const getUserCourses = async (userId: number): Promise<UserCourse[]> => {
+  try {
+    const response = await api.get(`/course-access/${userId}/courses`)
+    return response.data.data || response.data || []
+  } catch (error) {
+    console.error(`Error al obtener los cursos del usuario ${userId}:`, error)
+    throw error
+  }
+}
+
 // Eliminar usuario
 export const deleteUser = async (userId: number): Promise<void> => {
   try {

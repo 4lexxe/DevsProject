@@ -1,6 +1,8 @@
 export { default as CoursesPage } from './pages/CoursesPage'
 export { default as CourseFormPage } from './pages/CourseFormPage'
 export { default as CourseDetail } from './pages/courseDetail'
+export { default as GrantAccessPage } from './pages/GrantAccessPage'
+export { default as CourseUsersAccessPage } from './pages/CourseUsersAccessPage'
 
 export { default as SectionFormPage } from './pages/SectionFormPage'
 

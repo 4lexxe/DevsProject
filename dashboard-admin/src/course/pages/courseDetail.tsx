@@ -13,7 +13,8 @@ import {
   LearningOutcomes,
   SectionsGrid,
   DiscountEvents,
-  TechnicalInfo
+  TechnicalInfo,
+  CourseUsers
 } from "../components/CourseDetail";
 
 export default function CourseDetail() {
@@ -59,15 +60,15 @@ export default function CourseDetail() {
   const getModuleTypeBg = (type: string) => {
     switch (type.toLowerCase()) {
       case "introductorio":
-        return "#1d4ed8";
+        return "#3b82f6"; // blue-500
       case "principiante":
-        return "#42d7c7";
+        return "#10b981"; // emerald-500
       case "intermedio":
-        return "#0c154c";
+        return "#f59e0b"; // amber-500
       case "avanzado":
-        return "#02ffff";
+        return "#8b5cf6"; // violet-500
       default:
-        return "#1d4ed8";
+        return "#3b82f6";
     }
   };
 
@@ -129,10 +130,10 @@ export default function CourseDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando curso...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium text-lg">Cargando curso...</p>
         </div>
       </div>
     );
@@ -140,12 +141,17 @@ export default function CourseDetail() {
 
   if (error || !courseData) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Curso no encontrado'}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md">
+          <div className="mb-4">
+            <svg className="mx-auto h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-red-600 font-semibold text-lg mb-6">{error || 'Curso no encontrado'}</p>
           <button 
             onClick={() => navigate('/courses')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg font-medium"
           >
             Volver a cursos
           </button>
@@ -155,8 +161,8 @@ export default function CourseDetail() {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header del curso */}
         <CourseHeader 
           courseData={courseData} 
@@ -191,6 +197,9 @@ export default function CourseDetail() {
           formatDate={formatDate}
           getModuleTypeBg={getModuleTypeBg}
         />
+
+        {/* Usuarios con acceso al curso */}
+        <CourseUsers courseId={parseInt(id!)} />
 
         {/* Eventos de descuento */}
         <DiscountEvents 

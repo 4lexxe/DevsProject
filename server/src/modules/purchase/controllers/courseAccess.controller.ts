@@ -179,7 +179,7 @@ export class CourseAccessController extends BaseController {
   });
 
   /**
-   * Otorga acceso a un curso para un usuario (usado después de una compra exitosa)
+   * Otorga acceso a un curso para un usuario
    */
   public static grantCourseAccess = this.asyncHandler(async (req: Request, res: Response) => {
     // Verificar errores de validación
@@ -292,6 +292,37 @@ export class CourseAccessController extends BaseController {
     }));
 
     this.sendPaginated(res, req, accessHistory, count, currentPage, pageLimit, "Historial de accesos obtenido exitosamente");
+  });
+
+  /**
+   * Obtiene todos los usuarios que tienen acceso a un curso específico
+   */
+  public static getCourseUsers = this.asyncHandler(async (req: Request, res: Response) => {
+    if (!this.handleValidationErrors(req, res)) return;
+
+    const { courseId } = req.params;
+
+    const courseAccesses = await CourseAccess.findAll({
+      where: {
+        courseId: parseInt(courseId),
+        revokedAt: null
+      },
+      attributes: ['id', 'userId', 'accessToken', 'grantedAt'],
+      order: [['grantedAt', 'DESC']]
+    });
+
+    const usersData = await Promise.all(
+      courseAccesses.map(async (access: any) => ({
+        id: access.userId,
+        accessToken: access.accessToken,
+        grantedAt: access.grantedAt,
+        isActive: true,
+        courseId: parseInt(courseId),
+        progress: await this.calculateCourseProgress(access.userId, parseInt(courseId))
+      }))
+    );
+
+    this.sendSuccess(res, req, usersData, "Usuarios del curso obtenidos exitosamente");
   });
 
   /**

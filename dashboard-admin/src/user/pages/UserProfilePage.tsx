@@ -10,9 +10,11 @@ import {
   Clock,
   Globe,
   Github,
-  MessageCircle
+  MessageCircle,
+  BookOpen,
+  BarChart
 } from 'lucide-react'
-import { getUserById } from '@/user/services/userService'
+import { getUserById, getUserCourses } from '@/user/services/userService'
 
 
 const StudentProfilePage = () => {
@@ -21,6 +23,12 @@ const StudentProfilePage = () => {
   const { data: user, isLoading, error } = useQuery({
     queryKey: ['user-profile', id],
     queryFn: () => getUserById(Number(id)),
+    enabled: !!id
+  })
+
+  const { data: userCourses = [], isLoading: coursesLoading } = useQuery({
+    queryKey: ['user-courses', id],
+    queryFn: () => getUserCourses(Number(id)),
     enabled: !!id
   })
 
@@ -318,6 +326,86 @@ const StudentProfilePage = () => {
                 </>
               )}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Cursos con Acceso */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <BookOpen className="h-6 w-6 text-blue-600" />
+          Cursos con Acceso
+        </h2>
+        
+        {coursesLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-200 border-t-blue-600"></div>
+          </div>
+        ) : userCourses.length === 0 ? (
+          <div className="text-center py-12">
+            <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 font-medium">No tiene acceso a ningún curso</p>
+            <p className="text-gray-400 text-sm mt-2">El usuario no ha adquirido ningún curso todavía</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userCourses.map((course) => (
+              <div 
+                key={course.courseId} 
+                className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all bg-gradient-to-br from-white to-blue-50"
+              >
+                <div className="relative h-40">
+                  <img 
+                    src={course.image} 
+                    alt={course.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full text-xs font-bold text-blue-600">
+                    ${course.price}
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-1">{course.title}</h3>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{course.summary}</p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(course.grantedAt).toLocaleDateString('es-ES')}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <BarChart className="h-3 w-3" />
+                        {course.progress}%
+                      </span>
+                    </div>
+                    
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all"
+                        style={{ width: `${course.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                      course.isActive 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-gray-100 text-gray-700'
+                    }`}>
+                      {course.isActive ? 'Activo' : 'Inactivo'}
+                    </span>
+                    <Link
+                      to={`/courses/${course.courseId}`}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      Ver curso →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

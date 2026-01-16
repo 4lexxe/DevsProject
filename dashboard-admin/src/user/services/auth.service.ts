@@ -71,6 +71,8 @@ export interface User {
     admin_since: string;
     admin_notes?: string;
   };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // Clase AuthService para manejar la autenticación del super admin

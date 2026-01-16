@@ -22,7 +22,9 @@ import {
   DiscountEventsList,
   QuizFormPage,
   FileUploadPage,
-  FileManagementPage
+  FileManagementPage,
+  GrantAccessPage,
+  CourseUsersAccessPage
 } from "@/course/index";
 
 
@@ -77,6 +79,8 @@ function App() {
               <Route path="courses" element={<CoursesPage />} />
               <Route path="courses/:id" element={<CourseDetail />} />
               <Route path="courses/:id/edit" element={<CourseFormPage />} />
+              <Route path="courses/:id/grant-access" element={<GrantAccessPage />} />
+              <Route path="courses/:id/users-access" element={<CourseUsersAccessPage />} />
               <Route path="courses/new" element={<CourseFormPage />} />
               <Route
                 path="courses/:courseId/section/form"

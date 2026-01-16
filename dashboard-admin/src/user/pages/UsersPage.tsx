@@ -225,12 +225,8 @@ const UsersPage = () => {
           <div className="flex items-center">
             <Calendar className="h-8 w-8 text-purple-600" />
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Nuevos este mes</p>
-              <p className="text-2xl font-bold text-gray-900">{allUsers.filter((u: User) => {
-                const createdDate = new Date(u.createdAt);
-                const now = new Date();
-                return createdDate.getMonth() === now.getMonth() && createdDate.getFullYear() === now.getFullYear();
-              }).length}</p>
+              <p className="text-sm font-medium text-gray-600">Usuarios Activos</p>
+              <p className="text-2xl font-bold text-gray-900">{allUsers.filter((u: User) => u.isActiveSession).length}</p>
             </div>
           </div>
         </div>
