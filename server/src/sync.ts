@@ -1,7 +1,6 @@
 import sequelize from "./infrastructure/database/db";
 
 import Role from "./modules/rbac/models/Role";
-import { rolesIniciales } from "./modules/rbac/models/Role";
 import Permission from "./modules/rbac/models/Permission";
 import RolePermission from "./modules/rbac/models/RolePermission";
 import User from "./modules/user/User";
@@ -43,6 +42,9 @@ import MPWebhookEvent from "./modules/webhook/MPWebhookEvent";
 // Importar las asociaciones
 import "./modules/purchase/models/Associations";
 
+// Importar script de inicialización
+import initializeRolesAndPermissions from "./scripts/init/initializeRolesAndPermissions";
+
 // sync.ts
 async function syncDatabase() {
   try {
@@ -52,9 +54,6 @@ async function syncDatabase() {
     await Permission.sync({ force: true });
     await Role.sync({ force: true });
     await RolePermission.sync({ force: true }); // ¡Primero debe existir esta tabla!
-
-    // Poblar datos DESPUÉS de crear todas las tablas
-    await seedInitialData();
 
     await User.sync({ force: true });
     await Admin.sync({ force: true });
@@ -98,35 +97,15 @@ async function syncDatabase() {
     await PreferencePayment.sync({ force: true });
 
     console.log("¡Sincronización exitosa!");
+    
+    // Inicializar roles y permisos
+    console.log("\n🔄 Inicializando roles y permisos...");
+    await initializeRolesAndPermissions();
+    
   } catch (error) {
     console.error("Error:", error);
   } finally {
     await sequelize.close();
-  }
-}
-
-async function seedInitialData() {
-  for (const roleData of rolesIniciales) {
-    const [role] = await Role.findOrCreate({
-      where: { name: roleData.name },
-      defaults: {
-        name: roleData.name,
-        description: roleData.description,
-      },
-    });
-
-    const permissions = await Permission.findAll({
-      where: { name: roleData.permissions },
-    });
-
-    // Modificar esta parte
-    if (permissions.length > 0) {
-      await Promise.all(
-        permissions.map(async (permission) => {
-          await role.addPermission(permission);
-        })
-      );
-    }
   }
 }
 

@@ -10,6 +10,7 @@ import UserEditPage from "./user/pages/UserEditPage";
 import UserProfilePage from "./user/pages/UserProfilePage";
 import RolesPage from "./user/pages/RolesPage";
 import RoleEditPage from "./user/pages/RoleEditPage";
+import RoleDetailPage from "./user/pages/RoleDetailPage";
 import LoginPage from "./user/pages/LoginPage";
 
 import {
@@ -68,6 +69,7 @@ function App() {
               {/* Rutas de Roles */}
               <Route path="roles" element={<RolesPage />} />
               <Route path="roles/new" element={<RoleEditPage />} />
+              <Route path="roles/:id" element={<RoleDetailPage />} />
               <Route path="roles/:id/edit" element={<RoleEditPage />} />
               
               <Route

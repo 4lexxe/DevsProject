@@ -10,6 +10,7 @@ import {
   Key,
   Users,
   AlertCircle,
+  Eye,
 } from 'lucide-react';
 import { RoleService } from '@/user/services/role.service';
 import type { Role, Permission } from '@/user/interfaces/role.interface';
@@ -294,6 +295,13 @@ const RolesPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
+                        <Link
+                          to={`/roles/${role.id}`}
+                          className="text-gray-600 hover:text-gray-900 p-2 hover:bg-gray-50 rounded-lg transition-colors"
+                          title="Ver detalles"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Link>
                         <Link
                           to={`/roles/${role.id}/edit`}
                           className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
