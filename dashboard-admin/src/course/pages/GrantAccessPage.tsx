@@ -14,9 +14,9 @@ export default function GrantAccessPage() {
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: users = [], isLoading: loadingUsers } = useQuery({
+  const { data: users = [], isLoading: loadingUsers } = useQuery<User[]>({
     queryKey: ['all-users'],
-    queryFn: getAllUsers,
+    queryFn: () => getAllUsers(),
   });
 
   const { data: course } = useQuery({

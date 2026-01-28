@@ -4,6 +4,7 @@ import CourseController from '../controllers/course.controller';
 import CourseGetController from '../controllers/courseGet.controller';
 import { validateCourse } from '../validators/courseValidation';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { verifyCourseAccess } from '../../../shared/middleware/courseAccessMiddleware';
 
 const router = Router();
 
@@ -35,7 +36,11 @@ router.get('/courses/:id', CourseGetController.getById);
 router.get('/courses/:id/price', CourseGetController.getByIdWithPrices);
 
 // Ruta para obtener un curso por ID y la navegacion entre sus secciones y contenidos de cada una
-router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
+router.get('/courses/:id/navigate', 
+  authMiddleware,
+  verifyCourseAccess,
+  CourseGetController.getCourseNavigation
+);
 
 // Ruta para crear un curso (requiere autenticación y permisos)
 router.post('/courses', 

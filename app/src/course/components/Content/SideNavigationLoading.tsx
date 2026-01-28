@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
 import SideNavigation from "./SideNavigation";
-import { getNavegationById } from "@/course/services/courseServices";
 
 interface Props {
   contentId: string;
   courseId: string;
+  navigation: any;
+  isLoading: boolean;
   sidebarExpanded: boolean;
   setSidebarExpanded: (expanded: boolean) => void;
 }
@@ -12,26 +12,13 @@ interface Props {
 function SideNavigationLoading({
   contentId,
   courseId,
+  navigation,
+  isLoading,
   sidebarExpanded,
   setSidebarExpanded,
 }: Props) {
-  const [navigate, setNavigate] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchNavegation = async () => {
-      if (!courseId) return; // Evita hacer la petición si no hay un ID válido
-      try {
-        const data = await getNavegationById(courseId);
-        setNavigate(data);
-      } catch (err) {
-        console.error("Error al obtener la navegacion:", err);
-      }
-    };
-
-    fetchNavegation();
-  }, [courseId]);
-
-  if (!navigate) {
+  if (isLoading || !navigation) {
     return (
       <div
         className={`transition-all duration-500 ease-in-out rounded-lg md:w-1/3 lg:w-1/4 h-full hidden md:block `}
@@ -81,7 +68,7 @@ function SideNavigationLoading({
     >
       <SideNavigation
         currentId={contentId}
-        navigate={navigate}
+        navigate={navigation}
         isExpanded={sidebarExpanded}
         setIsExpanded={setSidebarExpanded}
       />

@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from 'react';
-import { getQuizByContentId } from '../services/contentServices';
 
 // Definir tipos para los datos del quiz
 interface QuizAnswer {
@@ -47,7 +46,7 @@ interface QuizContextState {
 
 // Acciones del contexto
 interface QuizContextActions {
-  loadQuiz: (contentId: string) => Promise<void>;
+  loadQuiz: (contentId: string, data: QuizData) => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
   goToQuestion: (index: number) => void;
@@ -185,45 +184,27 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   };
 
   // Acciones optimizadas con useCallback
-  const loadQuiz = useCallback(async (contentId: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-    setCurrentContentId(contentId);
+  const loadQuiz = useCallback((contentId: string, data: QuizData): void => {
+    console.log('=== CARGANDO QUIZ EN CONTEXTO ===');
+    console.log('Content ID:', contentId);
+    console.log('Datos recibidos:', JSON.stringify(data, null, 2));
     
-    try {
-      console.log('=== CARGANDO QUIZ ===');
-      console.log('Content ID:', contentId);
-      
-      const data = await getQuizByContentId(contentId);
-      console.log('Datos recibidos:', JSON.stringify(data, null, 2));
-      
-      if (data && data.quiz && data.quiz.length > 0) {
-        setQuizData(data);
-        
-        // Intentar cargar el progreso guardado
-        const sessionLoaded = loadSessionData(contentId);
-        
-        if (!sessionLoaded) {
-          // Si no hay datos de sesión, empezar desde el inicio
-          console.log('No hay progreso guardado, empezando desde el inicio');
-          setCurrentQuestionIndex(0);
-          setUserAnswers({});
-          setQuizCompleted(false);
-          setScore(0);
-        }
-        
-        console.log('Quiz cargado correctamente:', data.quiz.length, 'preguntas');
-      } else {
-        setError('No hay quiz disponible para este contenido');
-        setQuizData(null);
-      }
-    } catch (err) {
-      console.error('Error al cargar el quiz:', err);
-      setError('Error al cargar el quiz. Por favor, inténtalo de nuevo.');
-      setQuizData(null);
-    } finally {
-      setLoading(false);
+    setCurrentContentId(contentId);
+    setQuizData(data);
+    
+    // Intentar cargar el progreso guardado
+    const sessionLoaded = loadSessionData(contentId);
+    
+    if (!sessionLoaded) {
+      // Si no hay datos de sesión, empezar desde el inicio
+      console.log('No hay progreso guardado, empezando desde el inicio');
+      setCurrentQuestionIndex(0);
+      setUserAnswers({});
+      setQuizCompleted(false);
+      setScore(0);
     }
+    
+    console.log('Quiz cargado en contexto correctamente:', data.quiz.length, 'preguntas');
   }, []);
 
   const nextQuestion = useCallback((): void => {

@@ -1,8 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { QuizProvider, useQuiz } from "../contexts/QuizContext";
 import { Quiz } from "../interfaces/Content";
 import QuizComponent from "../components/Quiz/PaginationQuiz";
+import AccessDenied from "@/shared/components/AccessDenied";
+import { getQuizByContentId } from "../services/contentServices";
 
 // Función para transformar los datos del backend al formato que espera el componente
 const transformQuizData = (backendQuiz: any[]): Quiz[] => {
@@ -24,14 +26,37 @@ function QuizPageContent() {
   const { contentId } = useParams<{ contentId: string }>();
   const { 
     quizData, 
-    loading, 
-    error, 
     loadQuiz
   } = useQuiz();
+  
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    if (contentId) {
-      loadQuiz(contentId);
-    }
+    const fetchQuiz = async () => {
+      if (!contentId) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        
+        const data = await getQuizByContentId(contentId);
+        
+        if (data && data.quiz && data.quiz.length > 0) {
+          loadQuiz(contentId, data);
+        } else {
+          setError('No hay quiz disponible para este contenido');
+        }
+      } catch (err: any) {
+        console.error('Error al cargar el quiz:', err);
+        setError(err.response?.data?.message || 'Error al cargar el quiz. Por favor, inténtalo de nuevo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchQuiz();
   }, [contentId, loadQuiz]);
 
   // Estados de carga
@@ -47,6 +72,11 @@ function QuizPageContent() {
   }
 
   if (error) {
+    const isAccessDenied = error.includes('acceso') || error.includes('No tienes acceso') || error.toLowerCase().includes('denied');
+    if (isAccessDenied) {
+      return <AccessDenied message={error} fullScreen />;
+    }
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="text-center max-w-md mx-auto p-6">
@@ -54,7 +84,7 @@ function QuizPageContent() {
           <div className="text-xl text-gray-800 mb-2">Error al cargar el quiz</div>
           <div className="text-gray-600 mb-4">{error}</div>
           <button
-            onClick={() => contentId && loadQuiz(contentId)}
+            onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Reintentar

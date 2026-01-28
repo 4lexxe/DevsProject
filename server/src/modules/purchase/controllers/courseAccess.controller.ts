@@ -242,12 +242,18 @@ export class CourseAccessController extends BaseController {
       return this.notFound(res, req, "Acceso al curso");
     }
 
+    // Actualizar revokedAt y revokeReason antes de eliminar
     await courseAccess.update({
       revokedAt: new Date(),
       revokeReason: revokeReason || "Revocado por administrador"
     });
 
-    this.updated(res, req, {
+    // Eliminar el acceso (soft delete)
+    await courseAccess.destroy();
+
+    this.sendSuccess(res, req, {
+      userId: parseInt(userId),
+      courseId: parseInt(courseId),
       revokedAt: courseAccess.revokedAt,
       revokeReason: courseAccess.revokeReason
     }, "Acceso al curso revocado exitosamente");

@@ -1,18 +1,42 @@
 import { Router } from "express";
 import ContentController from "../controllers/content.controller";
 import { authMiddleware } from "../../../shared/middleware/authMiddleware";
+import { requirePermission } from "../../../shared/middleware/permissionsMiddleware";
+import { verifyCourseAccessFromContent } from "../../../shared/middleware/courseAccessMiddleware";
 import { validateQuiz } from "../validators/QuizValidation";
 
 const router = Router();
 
-// Rutas públicas (sin autenticación)
-router.get("/contents", ContentController.getAll);
-router.get("/contents/:id/quiz", ContentController.getQuizById);
-router.get("/contents/:id", ContentController.getById);
-router.get("/contents/navigate/:id", ContentController.getByIdWithNavigation);
-router.get("/contents/section/:sectionId", ContentController.getBySectionId);
+router.get("/contents", 
+  authMiddleware,
+  requirePermission('content:view'),
+  ContentController.getAll
+);
 
-// Rutas protegidas (requieren autenticación y permisos)
+router.get("/contents/:id/quiz", 
+  authMiddleware,
+  verifyCourseAccessFromContent,
+  ContentController.getQuizById
+);
+
+router.get("/contents/:id", 
+  authMiddleware,
+  requirePermission('content:view'),
+);
+
+router.get("/contents/navigate/:id", 
+  authMiddleware,
+  verifyCourseAccessFromContent,
+  ContentController.getByIdWithNavigation
+);
+
+router.get("/contents/section/:sectionId", 
+  authMiddleware,
+  requirePermission('content:view'),
+  ContentController.getBySectionId
+);
+
+
 router.post("/contents", 
   authMiddleware,
   ContentController.create

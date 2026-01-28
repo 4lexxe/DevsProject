@@ -93,14 +93,19 @@ function App() {
           <Routes>
             <Route path="/" element={<DefaultLayout />}>
               <Route index element={<Home />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="cursos" element={<CoursesPage />} />
+              
               <Route path="/search" element={<SearchResultsPage />} />
-              <Route path="/course/:id" element={<CourseDetail />} />
+              
+              <Route path="/profile" element={<Profile />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
+
               <Route path="/ruta-aprendizaje" element={<LearnRoute />} />
               <Route path="/recursos" element={<ResourcePage />} />
+
+              {/* Rutas de cursos */}
+              <Route path="cursos" element={<CoursesPage />} />
+              <Route path="/course/:id" element={<CourseDetail />} />
               <Route path='/course/:courseId/section/content/:contentId' element={<ContentPage />} />
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />

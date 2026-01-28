@@ -203,7 +203,6 @@ const rolePermissions: Record<string, string[]> = {
     // Cursos
     'courses:view',
     'courses:enroll',
-    'content:view',
     
     // Progreso y perfil
     'progress:view_own',

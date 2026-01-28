@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Users, Calendar, Key, UserX, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Users, Calendar, Key, UserX, AlertCircle, UserPlus } from 'lucide-react';
 import { getCourseUsers, revokeCourseAccess, getById } from '../services/courseServices';
 import toast from 'react-hot-toast';
 
@@ -102,9 +102,18 @@ export default function CourseUsersAccessPage() {
             </h1>
             <p className="text-gray-600">{course?.title}</p>
           </div>
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg px-6 py-3">
-            <p className="text-sm text-gray-600">Total de usuarios</p>
-            <p className="text-3xl font-bold text-green-600">{users.length}</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(`/courses/${id}/grant-access`)}
+              className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg font-medium"
+            >
+              <UserPlus className="h-5 w-5" />
+              Otorgar Acceso
+            </button>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg px-6 py-3">
+              <p className="text-sm text-gray-600">Total de usuarios</p>
+              <p className="text-3xl font-bold text-green-600">{users.length}</p>
+            </div>
           </div>
         </div>
       </div>

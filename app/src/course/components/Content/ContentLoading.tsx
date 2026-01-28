@@ -1,60 +1,23 @@
-import { useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import ContentDetail from "./ContentDetail";
-import { getContentById } from "@/course/services/contentServices";
-import { accessContent, markContentCompleted } from "@/course/services/progressService";
-import { toast } from 'react-hot-toast';
+
+interface ContentLoadingProps {
+  contentId: string;
+  courseId: string;
+  content: any;
+  error: { status?: number; message?: string } | null;
+  isLoading: boolean;
+}
 
 function ContentLoading({
   contentId,
   courseId,
-}: {
-  contentId: string;
-  courseId: string;
-}) {
-  const [content, setContent] = useState<any>(null);
+  content,
+  error,
+  isLoading,
+}: ContentLoadingProps) {
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchContent = async () => {
-      if (!contentId) return;
-      try {
-        const data = await getContentById(contentId);
-        if (isMounted) {
-          setContent(data);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("Error al obtener el contenido:", err);
-        }
-      }
-    };
-
-    const registerContentAccess = async () => {
-      try {
-        // Registrar acceso al contenido
-        await accessContent(parseInt(courseId), parseInt(contentId));
-        console.log('Acceso al contenido registrado');
-        
-        // Marcar automáticamente como completado
-        await markContentCompleted(parseInt(courseId), parseInt(contentId));
-        console.log('Contenido marcado como completado automáticamente');
-        toast.success('¡Contenido completado!');
-      } catch (error) {
-        console.error('Error al procesar contenido:', error);
-      }
-    };
-
-    setContent(null);
-    fetchContent();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [contentId, courseId]);
-
-  if (!content) {
+  if (isLoading || !content) {
     return (
       <div className="flex-1 transition-all duration-500 ease-in-out">
         {/* Loading TopBar */}
