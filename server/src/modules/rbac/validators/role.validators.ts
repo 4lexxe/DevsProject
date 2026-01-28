@@ -109,3 +109,16 @@ export const getRoleByIdValidation = [
     .isInt({ gt: 0 })
     .withMessage('El ID del rol debe ser un número entero positivo')
 ];
+
+// Validación para asignar rol a usuario
+export const assignRoleToUserValidation = [
+  param('userId')
+    .isInt({ gt: 0 })
+    .withMessage('El ID del usuario debe ser un número entero positivo'),
+  
+  body('roleId')
+    .notEmpty()
+    .withMessage('El roleId es requerido')
+    .isInt({ gt: 0 })
+    .withMessage('El roleId debe ser un número entero positivo')
+];

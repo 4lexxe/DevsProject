@@ -8,11 +8,10 @@ import bcrypt from 'bcrypt';
  * Ejecutar con: npx ts-node src/scripts/user/createUserTest.ts
  * 
 👤 Usuarios que creará:
-test.student@example.com - Rol: student
 test.instructor@example.com - Rol: instructor
-test.moderator@example.com - Rol: moderator
+test.user_moderator@example.com - Rol: user_moderator
+test.manager@example.com - Rol: manager
 test.admin@example.com - Rol: admin
-test.superadmin@example.com - Rol: superadmin
 Contraseña para todos: Test123!
  */
 

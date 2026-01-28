@@ -5,13 +5,15 @@ import {
   getRoleById,
   updateRole,
   deleteRole,
+  assignRoleToUser,
 } from '../controllers/role.controller';
 import { authMiddleware } from '../../../shared/middleware/authMiddleware';
 import {
   createRoleValidation,
   updateRoleValidation,
   getRoleByIdValidation,
-  deleteRoleValidation
+  deleteRoleValidation,
+  assignRoleToUserValidation
 } from '../validators/role.validators';
 
 const router = Router();
@@ -45,6 +47,13 @@ router.delete('/:id',
   authMiddleware,
   deleteRoleValidation,
   deleteRole
+);
+
+// Asignar rol a usuario
+router.put('/assign-user/:userId',
+  authMiddleware,
+  assignRoleToUserValidation,
+  assignRoleToUser
 );
 
 export default router;

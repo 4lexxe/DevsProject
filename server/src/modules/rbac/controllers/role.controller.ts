@@ -225,12 +225,6 @@ export const deleteRole: RequestHandler<{ id: string }, RoleResponse> = async (r
       return;
     }
 
-    // Prevenir eliminación de roles del sistema
-    if (['superadmin', 'admin', 'student', 'instructor', 'moderator'].includes(role.name)) {
-      handleError(res, 403, 'No se pueden eliminar roles del sistema');
-      return;
-    }
-
     // Verificar si hay usuarios usando este rol
     const usersWithRole = await User.count({ where: { roleId: role.id } });
     if (usersWithRole > 0) {
@@ -248,5 +242,70 @@ export const deleteRole: RequestHandler<{ id: string }, RoleResponse> = async (r
     res.status(200).json(response);
   } catch (error) {
     handleError(res, 500, 'Error al eliminar el rol', error);
+  }
+};
+
+// ASIGNAR ROL A USUARIO
+export const assignRoleToUser: RequestHandler<{ userId: string }, RoleResponse, { roleId: number }> = async (req, res) => {
+  try {
+    // Validar datos de entrada
+    const errors = validationResult(req as Request);
+    if (!errors.isEmpty()) {
+      res.status(400).json({
+        status: 400,
+        message: 'Error de validación',
+        errors: errors.array()
+      });
+      return;
+    }
+
+    const { userId } = req.params;
+    const { roleId } = req.body;
+
+    // Verificar que el usuario existe
+    const user = await User.findByPk(userId);
+    if (!user) {
+      handleError(res, 404, 'Usuario no encontrado');
+      return;
+    }
+
+    // Verificar que el rol existe
+    const role = await Role.findByPk(roleId);
+    if (!role) {
+      handleError(res, 404, 'Rol no encontrado');
+      return;
+    }
+
+    // Asignar el rol al usuario
+    user.roleId = roleId;
+    await user.save();
+
+    // Obtener el usuario actualizado con su rol
+    const updatedUser = await User.findByPk(userId, {
+      include: [{
+        model: Role,
+        as: 'role',
+        attributes: ['id', 'name', 'description']
+      }]
+    });
+
+    const response: RoleResponse = {
+      status: 200,
+      message: 'Rol asignado exitosamente al usuario',
+      data: {
+        userId: updatedUser!.id,
+        userName: updatedUser!.name,
+        userEmail: updatedUser!.email,
+        role: {
+          id: role.id,
+          name: role.name,
+          description: role.description
+        }
+      }
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    handleError(res, 500, 'Error al asignar el rol al usuario', error);
   }
 };
