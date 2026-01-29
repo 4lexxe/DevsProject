@@ -47,7 +47,18 @@ export const courseSchema = z
 
     isActive: z.boolean(),
     isInDevelopment: z.boolean(),
-    adminId: z.string()
+    adminId: z.string(),
+
+    // Campos del header dinámico
+    headerType: z.enum(['default', 'programming', 'hacking', 'custom', 'iframe']).optional(),
+    headerTitle: z.string().max(255).optional(),
+    headerSubtitle: z.string().max(255).optional(),
+    headerDescription: z.string().max(2000).optional(),
+    headerButtonText: z.string().max(100).optional(),
+    headerButtonLink: z.string().optional(),
+    techStack: z.array(z.string().max(50)).optional(),
+    customHeaderContent: z.string().optional(),
+    affiliatedCourseId: z.string().optional().or(z.literal(null))
   })
 
 export type CourseType = z.infer<typeof courseSchema>;

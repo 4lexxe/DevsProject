@@ -11,7 +11,13 @@ export default class SectionGetController extends BaseController {
   static getAll: RequestHandler = async (req, res) => {
     try {
       const sections = await Section.findAll({
-        include: [{ model: Course, as: "course" }],
+        include: [
+          { 
+            model: Course, 
+            as: "course",
+            attributes: ["id", "title", "image", "isActive"]
+          }
+        ],
         order: [["id", "ASC"]],
       });
       SectionGetController.sendSuccess(res, req, sections, "Secciones obtenidas correctamente");
@@ -20,12 +26,26 @@ export default class SectionGetController extends BaseController {
     }
   };
 
-  // Obtener una sección por ID
+  // Obtener una sección por ID o slug
   static getById: RequestHandler = async (req, res) => {
     try {
-      const section = await Section.findByPk(req.params.id, {
-        include: ["course", "contents"],
-      });
+      const identifier = req.params.id;
+      const isNumeric = /^\d+$/.test(identifier);
+      
+      let section;
+      if (isNumeric) {
+        // Buscar por ID
+        section = await Section.findByPk(identifier, {
+          include: ["course", "contents"],
+        });
+      } else {
+        // Buscar por slug
+        section = await Section.findOne({
+          where: { slug: identifier },
+          include: ["course", "contents"],
+        });
+      }
+      
       if (!section) {
         SectionGetController.notFound(res, req, "Sección");
         return;
@@ -53,12 +73,26 @@ export default class SectionGetController extends BaseController {
     }
   };
 
-  // Obtener una seccion con sus contenidos por ID de la seccion
+  // Obtener una seccion con sus contenidos por ID o slug de la seccion
   static getByIdWithContents: RequestHandler = async (req, res) => {
     try {
-      const section = await Section.findByPk(req.params.id, {
-        include: ["contents"],
-      });
+      const identifier = req.params.id;
+      const isNumeric = /^\d+$/.test(identifier);
+      
+      let section;
+      if (isNumeric) {
+        // Buscar por ID
+        section = await Section.findByPk(identifier, {
+          include: ["contents"],
+        });
+      } else {
+        // Buscar por slug
+        section = await Section.findOne({
+          where: { slug: identifier },
+          include: ["contents"],
+        });
+      }
+      
       if (!section) {
         SectionGetController.notFound(res, req, "Sección");
         return;

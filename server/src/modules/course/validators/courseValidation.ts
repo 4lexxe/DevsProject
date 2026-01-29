@@ -67,4 +67,48 @@ export const validateCourse = [
       }
       return true;
     }),
+
+  // Validaciones para campos del header dinámico
+  body("headerType")
+    .optional()
+    .isIn(['default', 'programming', 'hacking', 'custom', 'iframe'])
+    .withMessage("headerType debe ser: default, programming, hacking, custom o iframe"),
+
+  body("headerTitle")
+    .optional()
+    .isLength({ max: 255 }).withMessage("headerTitle no puede superar los 255 caracteres."),
+
+  body("headerSubtitle")
+    .optional()
+    .isLength({ max: 255 }).withMessage("headerSubtitle no puede superar los 255 caracteres."),
+
+  body("headerDescription")
+    .optional()
+    .isLength({ max: 2000 }).withMessage("headerDescription no puede superar los 2000 caracteres."),
+
+  body("headerButtonText")
+    .optional()
+    .isLength({ max: 100 }).withMessage("headerButtonText no puede superar los 100 caracteres."),
+
+  body("headerButtonLink")
+    .optional()
+    .isString().withMessage("headerButtonLink debe ser una cadena."),
+
+  body("techStack")
+    .optional()
+    .isArray().withMessage("techStack debe ser un array.").bail()
+    .custom((value) => {
+      if (!value.every((tech: string) => typeof tech === "string" && tech.length <= 50)) {
+        throw new Error("Cada tecnología debe ser una cadena con máximo 50 caracteres.");
+      }
+      return true;
+    }),
+
+  body("customHeaderContent")
+    .optional()
+    .isString().withMessage("customHeaderContent debe ser una cadena."),
+
+  body("affiliatedCourseId")
+    .optional()
+    .isInt().withMessage("affiliatedCourseId debe ser un número."),
 ];

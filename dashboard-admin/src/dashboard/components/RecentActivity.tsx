@@ -42,24 +42,24 @@ const activities = [
 const RecentActivity = () => {
   return (
     <div className="card">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Actividad Reciente</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Actividad Reciente</h3>
       <div className="space-y-4">
         {activities.map((activity) => {
           const Icon = activity.icon
           return (
             <div key={activity.id} className="flex items-start space-x-3">
               <div className="flex-shrink-0">
-                <div className="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center">
-                  <Icon className="h-4 w-4 text-primary-600" />
+                <div className="h-8 w-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                  <Icon className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-gray-900">
+                <p className="text-sm text-gray-900 dark:text-white">
                   <span className="font-medium">{activity.user}</span>{' '}
                   {activity.action}{' '}
                   <span className="font-medium">{activity.target}</span>
                 </p>
-                <p className="text-xs text-gray-500">{activity.time}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
               </div>
             </div>
           )

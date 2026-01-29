@@ -9,6 +9,7 @@ class Course extends Model {
   public id!: bigint;
   public courseDiscountId?: bigint;
   public title!: string;
+  public slug!: string; // Slug para URLs SEO-friendly
   public image!: string;
   public summary!: string;
   public about!: string;
@@ -20,6 +21,16 @@ class Course extends Model {
   public price!: number; // Precio del curso
   public adminId!: bigint;
   public driveFolderId?: string; // ID de la carpeta en Google Drive para el curso
+  // Campos para header dinámico
+  public headerType?: string; // 'default' | 'programming' | 'hacking' | 'custom' | 'iframe'
+  public headerTitle?: string; // Título personalizado del header
+  public headerSubtitle?: string; // Subtítulo/eslogan del header
+  public headerDescription?: string; // Descripción del header
+  public headerButtonText?: string; // Texto del botón del header
+  public headerButtonLink?: string; // Link del botón del header
+  public techStack?: string[]; // Array de tecnologías (React, Node, TS, Next, etc.)
+  public customHeaderContent?: string; // HTML/CSS/JS personalizado o URL de iframe
+  public affiliatedCourseId?: bigint; // ID del curso afiliado (opcional)
   public readonly createdAt!: Date; 
   public readonly updatedAt!: Date; 
 
@@ -46,6 +57,11 @@ Course.init(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: true, // Temporalmente permitir null hasta que se cree la migración
+      comment: "Slug único para URLs SEO-friendly",
     },
     image: {
       type: DataTypes.STRING,
@@ -96,6 +112,56 @@ Course.init(
       allowNull: true,
       comment: "ID de la carpeta en Google Drive para el curso",
     },
+    // Campos para header dinámico
+    headerType: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'default',
+      comment: "Tipo de header: default, programming, hacking, custom, iframe",
+    },
+    headerTitle: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Título personalizado del header (si no se proporciona, usa title)",
+    },
+    headerSubtitle: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Subtítulo/eslogan del header",
+    },
+    headerDescription: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: "Descripción del header",
+    },
+    headerButtonText: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Text del botón del header",
+    },
+    headerButtonLink: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Link del botón del header",
+    },
+    techStack: {
+      type: DataTypes.ARRAY(DataTypes.STRING),
+      allowNull: true,
+      comment: "Array de tecnologías (React, Node, TS, Next, etc.)",
+    },
+    customHeaderContent: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      comment: "HTML/CSS/JS personalizado o URL de iframe",
+    },
+    affiliatedCourseId: {
+      type: DataTypes.BIGINT,
+      references: { model: Course, key: "id" },
+      allowNull: true,
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+      comment: "ID del curso afiliado (opcional)",
+    },
   },
   {
     sequelize,
@@ -103,6 +169,10 @@ Course.init(
     tableName: "Courses", // 🔹 Corrección del espacio extra
     timestamps: true,
     paranoid: true,
+    indexes: [
+      { fields: ["slug"], unique: true },
+      { fields: ["title"] },
+    ],
   }
 );
 
@@ -165,6 +235,10 @@ CareerType.hasMany(Course, { foreignKey: "careerTypeId", as: "courses" });
 // 🔹 Uno a Muchos (Course → Admin)
 Course.belongsTo(Admin, { foreignKey: "adminId", as: "admin" });
 Admin.hasMany(Course, { foreignKey: "adminId", as: "courses" });
+
+// 🔹 Relación con curso afiliado (auto-referencia)
+Course.belongsTo(Course, { foreignKey: "affiliatedCourseId", as: "affiliatedCourse" });
+Course.hasMany(Course, { foreignKey: "affiliatedCourseId", as: "affiliatedCourses" });
 
 export default Course;
 export { CourseCategory };

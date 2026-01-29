@@ -2,6 +2,17 @@ import api from '../../shared/api/axios';
 
 const COURSES_ENDPOINT = '/courses';
 
+// Obtener todos los cursos (incluyendo inactivos)
+export const getAll = async () => {
+  try {
+    const response = await api.get(COURSES_ENDPOINT);
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener todos los cursos:', error);
+    throw error;
+  }
+};
+
 //Obtener todos los cursos activos
 export const getCourses = async () => {
   try {
@@ -61,13 +72,37 @@ export const updateCourse = async (id: string, courseData: any) => {
   }
 };
 
-// Servicio para 
+// Servicio para eliminar curso
 export const deleteCourse = async (id: string) => {
   try {
     const response = await api.delete(`${COURSES_ENDPOINT}/${id}`);
     return response.data.data;
   } catch (error) {
     console.error('Error al eliminar el curso:', error);
+    throw error;
+  }
+};
+
+// Obtener información completa del curso (creador, instructor, secciones, contenidos, usuarios inscritos)
+export const getCourseCompleteInfo = async (id: string) => {
+  try {
+    const response = await api.get(`${COURSES_ENDPOINT}/${id}/complete`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener la información completa del curso:', error);
+    throw error;
+  }
+};
+
+// Obtener usuarios inscritos en un curso
+export const getCourseEnrolledUsers = async (id: string, includeRevoked: boolean = false) => {
+  try {
+    const response = await api.get(`${COURSES_ENDPOINT}/${id}/enrolled-users`, {
+      params: { includeRevoked }
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener los usuarios inscritos:', error);
     throw error;
   }
 };

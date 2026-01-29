@@ -5,8 +5,12 @@ import CareerType from "../models/CareerType";
 import Section from "../models/Section";
 import Content from "../models/Content";
 import CourseDiscount from "../../purchase/models/CourseDiscount";
+import Admin from "../../admin/Admin";
+import User from "../../user/User";
+import CourseAccess from "../../purchase/models/CourseAccess";
 import { Op } from "sequelize";
 import { BaseController } from "./BaseController";
+import { generateSlug, generateUniqueSlug } from "../../../shared/utils/slugGenerator";
 // Importar asociaciones para asegurar que están cargadas
 import "../../purchase/models/Associations";
 
@@ -127,33 +131,94 @@ export default class CourseGetController extends BaseController {
     }
   };
 
-  // Obtener un curso por ID
+  // Helper para encontrar curso por slug o id
+  private static async findCourseByIdentifier(identifier: string) {
+    // Intentar primero por slug (más común)
+    let course = await Course.findOne({
+      where: { slug: identifier },
+    });
+
+    // Si no se encuentra por slug, intentar por ID
+    if (!course) {
+      const id = parseInt(identifier);
+      if (!isNaN(id)) {
+        course = await Course.findByPk(id);
+      }
+    }
+
+    return course;
+  }
+
+  // Obtener un curso por ID o slug
   static getById: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const course = await Course.findByPk(id, {
-        include: [
-          { model: Category, as: "categories" },
-          { model: CareerType, as: "careerType" },
-          { model: Section, as: "sections" },
-        ],
-      });
+      const course = await CourseGetController.findCourseByIdentifier(id);
+      
       if (!course) {
         CourseGetController.notFound(res, req, "Curso");
         return;
       }
 
-      CourseGetController.sendSuccess(res, req, course, "Curso obtenido correctamente");
+      const courseData = await Course.findByPk(course.id, {
+        include: [
+          { model: Category, as: "categories" },
+          { model: CareerType, as: "careerType" },
+          { 
+            model: Section, 
+            as: "sections",
+            include: [
+              {
+                model: Content,
+                as: "contents",
+                order: [["position", "ASC"]]
+              }
+            ],
+            order: [["id", "ASC"]]
+          },
+          {
+            model: Admin,
+            as: "admin",
+            include: [
+              {
+                model: User,
+                as: "adminUser",
+                attributes: ["id", "name", "surname", "email", "username", "avatar", "displayName"]
+              }
+            ],
+            attributes: ["id", "name", "isSuperAdmin", "admin_since"]
+          },
+          {
+            model: Course,
+            as: "affiliatedCourse",
+            attributes: ["id", "title", "slug", "image", "summary"],
+            required: false
+          }
+        ],
+      });
+      if (!courseData) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      CourseGetController.sendSuccess(res, req, courseData, "Curso obtenido correctamente");
     } catch (error) {
       CourseGetController.handleServerError(res, req, error, "Error al obtener el curso");
     }
   };
 
-  // Obtener un curso por ID con todos los descuentos aplicados
+  // Obtener un curso por ID o slug con todos los descuentos aplicados
   static getByIdWithPrices: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const course = await Course.findByPk(id, {
+      const course = await CourseGetController.findCourseByIdentifier(id);
+      
+      if (!course) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      const courseWithData = await Course.findByPk(course.id, {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
@@ -170,12 +235,12 @@ export default class CourseGetController extends BaseController {
           },
         ],
       });
-      if (!course) {
+      if (!courseWithData) {
         CourseGetController.notFound(res, req, "Curso");
         return;
       }
 
-      const courseData = course.toJSON() as any;
+      const courseData = courseWithData.toJSON() as any;
       const originalPrice = parseFloat(courseData.price.toString());
       let finalPrice = originalPrice;
       let discountValue = 0;
@@ -214,11 +279,18 @@ export default class CourseGetController extends BaseController {
     }
   };
 
-  // Obtener un curso por ID con secciones y contenidos para navegación
+  // Obtener un curso por ID o slug con secciones y contenidos para navegación
   static getCourseNavigation: RequestHandler = async (req, res) => {
     try {
       const { id } = req.params;
-      const course = await Course.findByPk(id, {
+      const course = await CourseGetController.findCourseByIdentifier(id);
+      
+      if (!course) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      const courseData = await Course.findByPk(course.id, {
         attributes: ['id', 'title'],
         include: [
           {
@@ -240,7 +312,7 @@ export default class CourseGetController extends BaseController {
         ],
       });
 
-      if (!course) {
+      if (!courseData) {
         CourseGetController.notFound(res, req, "Curso");
         return;
       }
@@ -293,4 +365,189 @@ export default class CourseGetController extends BaseController {
     }
   };
 
+  // Obtener información completa del curso con creador, instructor, secciones, contenidos y usuarios inscritos
+  static getCourseCompleteInfo: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const course = await CourseGetController.findCourseByIdentifier(id);
+      
+      if (!course) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+      
+      // Obtener el curso con todas sus relaciones
+      const courseWithRelations = await Course.findByPk(course.id, {
+        include: [
+          { model: Category, as: "categories" },
+          { model: CareerType, as: "careerType" },
+          { 
+            model: Section, 
+            as: "sections",
+            include: [
+              {
+                model: Content,
+                as: "contents",
+                separate: true,
+                order: [["position", "ASC"]]
+              }
+            ],
+            order: [["id", "ASC"]]
+          },
+          {
+            model: Admin,
+            as: "admin",
+            include: [
+              {
+                model: User,
+                as: "adminUser",
+                attributes: ["id", "name", "surname", "email", "username", "avatar", "displayName"]
+              }
+            ],
+            attributes: ["id", "name", "isSuperAdmin", "admin_since"]
+          }
+        ],
+      });
+
+      if (!courseWithRelations) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      // Obtener usuarios inscritos (con acceso activo y no expirado)
+      const enrolledUsers = await CourseAccess.findAll({
+        where: {
+          courseId: parseInt(course.id.toString()),
+          revokedAt: null, // Solo usuarios con acceso activo
+          [Op.or]: [
+            { expiresAt: null },
+            { expiresAt: { [Op.gt]: new Date() } }
+          ]
+        },
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "name", "surname", "email", "username", "avatar", "displayName", "createdAt"]
+          }
+        ],
+        attributes: ["id", "userId", "grantedAt", "expiresAt", "createdAt"],
+        order: [["grantedAt", "DESC"]]
+      });
+
+      // Contar total de inscripciones (incluyendo revocadas)
+      const totalEnrollments = await CourseAccess.count({
+        where: {
+          courseId: parseInt(course.id.toString())
+        }
+      });
+
+      // Contar inscripciones activas
+      const activeEnrollments = enrolledUsers.length;
+
+      const courseData = courseWithRelations.toJSON() as any;
+      
+      const responseData = {
+        ...courseData,
+        creator: courseData.admin ? {
+          id: courseData.admin.id,
+          name: courseData.admin.name,
+          isSuperAdmin: courseData.admin.isSuperAdmin,
+          adminSince: courseData.admin.admin_since,
+          user: courseData.admin.adminUser
+        } : null,
+        instructor: courseData.admin ? {
+          id: courseData.admin.id,
+          name: courseData.admin.name,
+          user: courseData.admin.adminUser
+        } : null,
+        sections: courseData.sections || [],
+        contentsCount: courseData.sections?.reduce((total: number, section: any) => {
+          return total + (section.contents?.length || 0);
+        }, 0) || 0,
+        enrolledUsers: enrolledUsers.map((access: any) => ({
+          id: access.user.id,
+          name: access.user.name,
+          surname: access.user.surname,
+          email: access.user.email,
+          username: access.user.username,
+          avatar: access.user.avatar,
+          displayName: access.user.displayName,
+          enrolledAt: access.grantedAt,
+          expiresAt: access.expiresAt,
+          isPermanent: !access.expiresAt,
+          isExpired: access.expiresAt ? new Date(access.expiresAt) <= new Date() : false,
+          accessId: access.id,
+          courseId: parseInt(course.id.toString())
+        })),
+        enrollmentStats: {
+          total: totalEnrollments,
+          active: activeEnrollments,
+          revoked: totalEnrollments - activeEnrollments
+        }
+      };
+
+      CourseGetController.sendSuccess(res, req, responseData, "Información completa del curso obtenida correctamente");
+    } catch (error) {
+      CourseGetController.handleServerError(res, req, error, "Error al obtener la información completa del curso");
+    }
+  };
+
+  // Obtener usuarios inscritos en un curso por ID o slug
+  static getCourseEnrolledUsers: RequestHandler = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { includeRevoked } = req.query;
+
+      const course = await CourseGetController.findCourseByIdentifier(id);
+      
+      if (!course) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      const whereClause: any = {
+        courseId: parseInt(course.id.toString())
+      };
+
+      if (includeRevoked !== 'true') {
+        whereClause.revokedAt = null;
+      }
+
+      const enrolledUsers = await CourseAccess.findAll({
+        where: whereClause,
+        include: [
+          {
+            model: User,
+            as: "user",
+            attributes: ["id", "name", "surname", "email", "username", "avatar", "displayName", "createdAt"]
+          }
+        ],
+        attributes: ["id", "userId", "grantedAt", "revokedAt", "revokeReason", "expiresAt", "createdAt"],
+        order: [["grantedAt", "DESC"]]
+      });
+
+      const usersData = enrolledUsers.map((access: any) => ({
+        id: access.user.id,
+        name: access.user.name,
+        surname: access.user.surname,
+        email: access.user.email,
+        username: access.user.username,
+        avatar: access.user.avatar,
+        displayName: access.user.displayName,
+        enrolledAt: access.grantedAt,
+        revokedAt: access.revokedAt,
+        expiresAt: access.expiresAt,
+        isPermanent: !access.expiresAt,
+        isExpired: access.expiresAt ? new Date(access.expiresAt) <= new Date() : false,
+        revokeReason: access.revokeReason,
+        accessId: access.id,
+        isActive: access.revokedAt === null
+      }));
+
+      CourseGetController.sendSuccess(res, req, usersData, "Usuarios inscritos obtenidos correctamente");
+    } catch (error) {
+      CourseGetController.handleServerError(res, req, error, "Error al obtener los usuarios inscritos");
+    }
+  };
 }

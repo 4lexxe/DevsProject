@@ -41,6 +41,7 @@ export interface DiscountEvent {
 
 export interface Section {
   id: string;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   description: string;
   courseId: string;
@@ -74,6 +75,7 @@ export interface PricingInfo {
 
 export interface CourseData {
   id: string;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   image: string;
   summary: string;

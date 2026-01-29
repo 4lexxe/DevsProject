@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   getHeaderSections, 
   createHeaderSection, 
@@ -8,9 +8,9 @@ import {
 } from '../services/headerSectionServices';
 import HeaderSectionForm from './HeaderSectionForm';
 import HeaderSectionList from './HeaderSectionList';
-import HeaderSectionPreview from './HeaderSectionPreview';
+import HeroPreview from './HeroPreview';
 import { useAuth } from '../../user/contexts';
-import { Plus, AlertCircle, Loader2 } from 'lucide-react';
+import { Plus, AlertCircle, Loader2, Eye, X } from 'lucide-react';
 
 const initialFormState: HeaderSection = {
   image: '',
@@ -19,6 +19,8 @@ const initialFormState: HeaderSection = {
   about: '',
   buttonName: '',
   buttonLink: '',
+  contentType: 'default',
+  techStack: [],
 };
 
 const HeaderSectionCRUD: React.FC = () => {
@@ -56,10 +58,13 @@ const HeaderSectionCRUD: React.FC = () => {
     setError(null);
     try {
       const data = await getHeaderSections();
-      setHeaderSections(data);
+      // Asegurar que siempre sea un array
+      setHeaderSections(Array.isArray(data) ? data : []);
     } catch (err) {
       setError('Error al cargar las secciones de encabezado');
       console.error(err);
+      // Asegurar que siempre sea un array incluso en caso de error
+      setHeaderSections([]);
     } finally {
       setLoading(false);
     }
@@ -167,10 +172,11 @@ const HeaderSectionCRUD: React.FC = () => {
     }
   };
 
-  const handleFormChange = (headerSection: HeaderSection) => {
-    setCurrentHeaderSection(headerSection);
-    setShowPreview(true);
-  };
+  // Memoizar initialData para evitar recreaciones innecesarias
+  // Debe estar en el nivel superior del componente, no dentro del JSX
+  const memoizedInitialData = useMemo(() => {
+    return currentHeaderSection || initialFormState;
+  }, [currentHeaderSection?.id, currentHeaderSection?.title, currentHeaderSection?.slogan, currentHeaderSection?.image, currentHeaderSection?.about, currentHeaderSection?.buttonName, currentHeaderSection?.buttonLink, currentHeaderSection?.contentType]);
 
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -180,58 +186,94 @@ const HeaderSectionCRUD: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="flex flex-col space-y-6">
-        {/* Encabezado con título y botón de acción */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Gestión de Secciones de Encabezado</h1>
-            <p className="text-gray-500 mt-1">Administra las secciones que aparecen en el carrusel principal</p>
-          </div>
-          
-          {isMobile && (
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+      {/* Header fijo estilo VS Code */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center space-x-6">
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Editor de Header Sections</h1>
+          {!isMobile && !showPreview && (
             <button
-              onClick={toggleForm}
-              className={`mt-4 sm:mt-0 flex items-center justify-center px-4 py-2 rounded-md text-white font-medium transition-colors ${
-                showForm ? 'bg-gray-600 hover:bg-gray-700' : 'bg-blue-600 hover:bg-blue-700'
-              }`}
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+                setShowPreview(false);
+              }}
+              className="flex items-center px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
             >
-              {showForm ? (
-                'Cancelar'
-              ) : (
-                <>
-                  <Plus className="h-5 w-5 mr-2" />
-                  {isEditing ? 'Editar sección' : 'Nueva sección'}
-                </>
-              )}
+              <Plus className="h-4 w-4 mr-2" />
+              Nueva Sección
             </button>
           )}
         </div>
-        
-        {/* Mensaje de error */}
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-md shadow-sm">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-400 mr-3" />
-              <p className="text-red-700">{error}</p>
-            </div>
+        <div className="flex items-center space-x-3">
+          {showPreview && currentHeaderSection && (
+            <button
+              onClick={() => {
+                setShowPreview(false);
+                setShowForm(true);
+              }}
+              className="flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium"
+              title="Volver al editor"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cerrar Vista
+            </button>
+          )}
+          {!showPreview && currentHeaderSection && (
+            <button
+              onClick={() => {
+                setShowPreview(true);
+                setShowForm(false);
+              }}
+              className="flex items-center px-5 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium shadow-sm"
+              title="Ver solo previsualización"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Previsualizar
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Mensaje de error */}
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/50 border-l-4 border-red-500 p-4 mx-8 mt-4 rounded-md shadow-sm">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mr-3" />
+            <p className="text-red-700 dark:text-red-200">{error}</p>
           </div>
-        )}
-        
-        {/* Contenido principal */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 auto-rows-auto">
-          {/* Formulario y vista previa */}
-          {(showForm || !isMobile) && (
-            <div className="flex flex-col space-y-6">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <div className="border-b border-gray-200 p-4 sm:p-6">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    {isEditing ? 'Editar Sección' : 'Crear Nueva Sección'}
-                  </h2>
-                </div>
-                <div className="p-4 sm:p-6">
+        </div>
+      )}
+
+      {/* Contenido principal - Layout tipo VS Code */}
+      {showPreview && currentHeaderSection ? (
+        /* Vista única de previsualización */
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+          <HeroPreview headerSection={currentHeaderSection} />
+        </div>
+      ) : (
+        /* Vista de editor dividida */
+        <div className="flex-1 flex overflow-hidden">
+          {/* Panel izquierdo - Editor/Formulario */}
+          <div className={`${!showPreview && headerSections.length > 0 ? 'w-3/5' : 'w-full'} border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-y-auto transition-all duration-300`}>
+            <div className="p-8">
+              {showForm ? (
+                <div className="max-w-5xl mx-auto">
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                      {isEditing ? 'Editar Sección' : 'Crear Nueva Sección'}
+                    </h2>
+                    {isMobile && (
+                      <button
+                        onClick={toggleForm}
+                        className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                      >
+                        ← Volver a la lista
+                      </button>
+                    )}
+                  </div>
                   <HeaderSectionForm 
-                    initialData={currentHeaderSection || initialFormState}
+                    initialData={memoizedInitialData}
                     onSubmit={handleSubmit}
                     onCancel={() => {
                       resetForm();
@@ -239,41 +281,49 @@ const HeaderSectionCRUD: React.FC = () => {
                     }}
                     isEditing={isEditing}
                     loading={loading}
-                    onChange={handleFormChange}
                   />
                 </div>
-              </div>
-              
-              {showPreview && currentHeaderSection && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="border-b border-gray-200 p-4 sm:p-6">
-                    <h2 className="text-xl font-semibold text-gray-800">Vista Previa</h2>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center py-20">
+                  <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-8 mb-6">
+                    <Plus className="h-16 w-16 text-gray-400 dark:text-gray-500" />
                   </div>
-                  <div className="p-4 sm:p-6">
-                    <HeaderSectionPreview headerSection={currentHeaderSection} />
-                  </div>
+                  <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-3">Selecciona una sección para editar</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-8 text-lg">O crea una nueva sección de encabezado</p>
+                  <button
+                    onClick={() => {
+                      resetForm();
+                      setShowForm(true);
+                    }}
+                    className="flex items-center px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-base font-medium shadow-sm"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Nueva Sección
+                  </button>
                 </div>
               )}
             </div>
-          )}
-          
-          {/* Lista de secciones */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-fit">
-            <div className="border-b border-gray-200 p-4 sm:p-6 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">Secciones Existentes</h2>
-              {loading && <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />}
-            </div>
-            <div className="p-4 sm:p-6">
-              <HeaderSectionList 
-                headerSections={headerSections}
-                onEdit={editHeaderSection}
-                onDelete={handleDelete}
-                loading={loading}
-              />
-            </div>
           </div>
+
+          {/* Panel derecho - Lista de secciones */}
+          {!showPreview && headerSections.length > 0 && (
+            <div className="w-2/5 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto">
+              <div className="p-8">
+                <div className="mb-8 flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Secciones Existentes</h2>
+                  {loading && <Loader2 className="h-5 w-5 text-blue-500 dark:text-blue-400 animate-spin" />}
+                </div>
+                <HeaderSectionList 
+                  headerSections={headerSections}
+                  onEdit={editHeaderSection}
+                  onDelete={handleDelete}
+                  loading={loading}
+                />
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

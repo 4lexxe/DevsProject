@@ -71,9 +71,20 @@ export const deleteSection = async (id: string) => {
 export const getSectionCount = async () => {
   try {
     const response = await api.get(`${SECTIONS_ENDPOINT}/count`);
-    return response.data.data;
+    return response.data.data?.count || response.data.data || 0;
   } catch (error) {
     console.error('Error al obtener el conteo de secciones:', error);
+    throw error;
+  }
+};
+
+// Obtener todas las secciones
+export const getAllSections = async () => {
+  try {
+    const response = await api.get(SECTIONS_ENDPOINT);
+    return response.data.data || [];
+  } catch (error) {
+    console.error('Error al obtener todas las secciones:', error);
     throw error;
   }
 };

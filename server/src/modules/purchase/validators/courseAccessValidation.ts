@@ -29,7 +29,20 @@ export const validateGrantAccess = [
   body('courseId')
     .isInt({ min: 1 })
     .withMessage('El ID del curso debe ser un número entero positivo')
-    .toInt()
+    .toInt(),
+  body('expiresAt')
+    .optional()
+    .isISO8601()
+    .withMessage('La fecha de expiración debe ser una fecha válida en formato ISO 8601')
+    .custom((value) => {
+      if (value) {
+        const expiresDate = new Date(value);
+        if (expiresDate <= new Date()) {
+          throw new Error('La fecha de expiración debe ser futura');
+        }
+      }
+      return true;
+    })
 ];
 
 // Validación para revocar acceso

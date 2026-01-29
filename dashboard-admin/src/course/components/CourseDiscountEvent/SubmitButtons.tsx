@@ -1,3 +1,5 @@
+import { Save, Loader2 } from "lucide-react";
+
 interface SubmitButtonsProps {
   isEditing: boolean;
   isSubmitting: boolean;
@@ -6,13 +8,12 @@ interface SubmitButtonsProps {
 
 export default function SubmitButtons({ isEditing, isSubmitting, onCancel }: SubmitButtonsProps) {
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-3 pt-4 border-t border-gray-200">
       {isEditing && (
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 text-gray-700 font-semibold py-3 px-6 rounded-lg border-2 transition-all duration-300 hover:bg-gray-50"
-          style={{ borderColor: "#d1d5db" }}
+          className="flex-1 text-gray-700 font-medium py-2.5 px-4 rounded-lg border border-gray-300 transition-colors hover:bg-gray-50"
         >
           Cancelar
         </button>
@@ -20,19 +21,18 @@ export default function SubmitButtons({ isEditing, isSubmitting, onCancel }: Sub
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`${isEditing ? 'flex-1' : 'w-full'} text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
-        style={{ backgroundColor: "#42d7c7" }}
+        className={`${isEditing ? 'flex-1' : 'w-full'} flex items-center justify-center gap-2 text-white font-medium py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-gray-900 hover:bg-gray-800`}
       >
         {isSubmitting ? (
-          <span className="flex items-center justify-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
             {isEditing ? 'Actualizando Evento...' : 'Creando Evento...'}
-          </span>
+          </>
         ) : (
-          <span className="flex items-center justify-center gap-2">
-            <span>💾</span>
-            {isEditing ? 'Actualizar Evento de Descuento' : 'Crear Evento de Descuento'}
-          </span>
+          <>
+            <Save className="w-4 h-4" />
+            {isEditing ? 'Actualizar Evento' : 'Crear Evento'}
+          </>
         )}
       </button>
     </div>

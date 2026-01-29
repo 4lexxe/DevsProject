@@ -1,5 +1,5 @@
-import { Tag, GraduationCap } from "lucide-react";
 import { CourseData } from "../../interfaces/CourseDetail";
+import { Folder, GraduationCap, CheckCircle2, XCircle, Hash, Calendar } from "lucide-react";
 
 interface CategoriesAndCareerProps {
   courseData: CourseData;
@@ -10,55 +10,50 @@ export default function CategoriesAndCareer({ courseData, formatDate }: Categori
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
       {/* Categorías */}
-      <div className="rounded-lg border shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight" style={{ color: "#0c154c" }}>
-            <Tag className="h-5 w-5 inline-block mr-2" />
-            Categorías Asignadas ({courseData.categories.length})
-          </h3>
+      <div className="rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <Folder className="w-5 h-5 text-gray-600" />
+            <h3 className="text-xl font-semibold text-gray-900">
+              Categorías Asignadas ({courseData.categories.length})
+            </h3>
+          </div>
         </div>
-        <div className="p-6 pt-0">
-          <div className="space-y-4">
+        <div className="p-6">
+          <div className="space-y-3">
             {courseData.categories.map((category) => (
               <div
                 key={category.id}
-                className="border rounded-lg p-4"
-                style={{ backgroundColor: "#eff6ff", borderColor: "#1d4ed8" }}
+                className="border border-gray-200 rounded-lg p-4 bg-white hover:border-gray-300 transition-colors"
               >
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="relative w-12 h-12 flex-shrink-0">
-                    <img
-                      src={category.icon || "/placeholder.svg"}
-                      alt={category.name}
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-lg" style={{ color: "#0c154c" }}>
+                <div className="flex items-start gap-3">
+                  <Folder className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <h4 className="font-semibold text-base text-gray-900">
                         {category.name}
                       </h4>
                       <div
-                        className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-white"
-                        style={{ backgroundColor: category.isActive ? "#42d7c7" : "#6b7280" }}
+                        className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium text-white"
+                        style={{ backgroundColor: category.isActive ? "#10b981" : "#6b7280" }}
                       >
+                        {category.isActive ? (
+                          <CheckCircle2 className="w-3 h-3" />
+                        ) : (
+                          <XCircle className="w-3 h-3" />
+                        )}
                         {category.isActive ? "Activa" : "Inactiva"}
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-2">{category.description}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-gray-500">
-                      <div>
-                        <span className="font-medium">Categoría ID:</span> {category.id}
+                    <p className="text-sm text-gray-600 mb-3 leading-relaxed">{category.description}</p>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-1">
+                        <Hash className="w-3 h-3" />
+                        <span>ID: {category.id}</span>
                       </div>
-                      <div>
-                        <span className="font-medium">Relación:</span> {category.CourseCategory.courseId}-
-                        {category.CourseCategory.categoryId}
-                      </div>
-                      <div>
-                        <span className="font-medium">Creada:</span> {formatDate(category.createdAt)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Actualizada:</span> {formatDate(category.updatedAt)}
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>{formatDate(category.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -70,27 +65,27 @@ export default function CategoriesAndCareer({ courseData, formatDate }: Categori
       </div>
 
       {/* Tipo de carrera */}
-      <div className="rounded-lg border shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="text-2xl font-semibold leading-none tracking-tight" style={{ color: "#0c154c" }}>
-            <GraduationCap className="h-5 w-5 inline-block mr-2" />
-            Carrera Asociada (ID: {courseData.careerTypeId})
-          </h3>
+      <div className="rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-2">
+            <GraduationCap className="w-5 h-5 text-gray-600" />
+            <h3 className="text-xl font-semibold text-gray-900">
+              Carrera Asociada
+            </h3>
+          </div>
         </div>
-        <div className="p-6 pt-0">
-          <div className="flex items-center gap-4 p-4 rounded-lg" style={{ backgroundColor: "#eff6ff" }}>
-            <div className="relative w-16 h-16">
-              <img
-                src={courseData.careerType.icon || "/placeholder.svg"}
-                alt={courseData.careerType.name}
-                className="object-contain"
-              />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-lg font-semibold" style={{ color: "#0c154c" }}>
+        <div className="p-6">
+          <div className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 bg-white">
+            <GraduationCap className="w-6 h-6 text-gray-400 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 {courseData.careerType.name}
               </h3>
-              <p style={{ color: "#1d4ed8" }}>{courseData.careerType.description}</p>
+              <p className="text-sm text-gray-600 mb-2 leading-relaxed">{courseData.careerType.description}</p>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <Hash className="w-3 h-3" />
+                <span>ID: {courseData.careerTypeId}</span>
+              </div>
             </div>
           </div>
         </div>

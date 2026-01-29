@@ -31,8 +31,14 @@
 }
 
 .swiper-slide {
-
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  align-items: stretch;
+  height: auto;
+}
+
+.swiper-slide > * {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }

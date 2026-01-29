@@ -31,7 +31,10 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
     return `${text.substring(0, maxLength)}...`;
   };
 
-  if (headerSections.length === 0) {
+  // Asegurar que headerSections siempre sea un array
+  const safeHeaderSections = Array.isArray(headerSections) ? headerSections : [];
+
+  if (safeHeaderSections.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
         <ImageIcon className="h-12 w-12 text-gray-400 mb-4" />
@@ -50,21 +53,21 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
     const maxHeight = 400; // Altura máxima en píxeles (reducida)
     
     // Si hay pocas secciones, usar altura exacta
-    if (headerSections.length <= 3) {
-      return baseHeight + (headerSections.length * rowHeight);
+    if (safeHeaderSections.length <= 3) {
+      return baseHeight + (safeHeaderSections.length * rowHeight);
     }
     
     // Para más secciones, usar altura máxima
-    return Math.min(baseHeight + (headerSections.length * rowHeight), maxHeight);
+    return Math.min(baseHeight + (safeHeaderSections.length * rowHeight), maxHeight);
   };
 
   return (
     <div className="space-y-6">
       {/* Vista para móviles (tarjetas) */}
       <div className="lg:hidden space-y-4">
-        {headerSections.map((section) => (
+        {safeHeaderSections.map((section, index) => (
           <div 
-            key={section.id} 
+            key={section.id || `mobile-${index}`} 
             className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="relative h-32 bg-gray-200">
@@ -86,7 +89,7 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
             <div className="p-4 flex justify-between items-center">
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-gray-500 truncate">
-                  {section.about.length > 50 ? `${section.about.substring(0, 50)}...` : section.about}
+                  {section.about && section.about.length > 50 ? `${section.about.substring(0, 50)}...` : (section.about || '')}
                 </p>
               </div>
               
@@ -140,11 +143,11 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {headerSections.map((section) => {
+              {safeHeaderSections.map((section, index) => {
                 const isExpanded = expandedRows[section.id || ''];
                 
                 return (
-                  <tr key={section.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={section.id || `desktop-${index}`} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-3">
                         <button
@@ -186,15 +189,15 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
                       >
                         <div>
                           <div className="text-sm font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-center">
-                            {isExpanded ? section.title : truncateText(section.title, 15)}
-                            {section.title.length > 15 && (
+                            {isExpanded ? (section.title || '') : truncateText(section.title || '', 15)}
+                            {section.title && section.title.length > 15 && (
                               isExpanded ? 
                                 <ChevronUp className="h-4 w-4 ml-1 text-gray-400" /> : 
                                 <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
                             )}
                           </div>
                           <div className="text-sm text-gray-500 md:hidden">
-                            {isExpanded ? section.slogan : truncateText(section.slogan, 20)}
+                            {isExpanded ? (section.slogan || '') : truncateText(section.slogan || '', 20)}
                           </div>
                         </div>
                       </button>
@@ -205,8 +208,8 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
                         className="text-left focus:outline-none group"
                       >
                         <div className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors flex items-center">
-                          {isExpanded ? section.slogan : truncateText(section.slogan, 20)}
-                          {section.slogan.length > 20 && (
+                          {isExpanded ? (section.slogan || '') : truncateText(section.slogan || '', 20)}
+                          {section.slogan && section.slogan.length > 20 && (
                             isExpanded ? 
                               <ChevronUp className="h-4 w-4 ml-1 text-gray-400" /> : 
                               <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
@@ -221,11 +224,11 @@ const HeaderSectionList: React.FC<HeaderSectionListProps> = ({
                       >
                         <div className="text-sm text-gray-500 group-hover:text-blue-600 transition-colors flex items-center">
                           {isExpanded ? (
-                            <span className="whitespace-normal">{section.about}</span>
+                            <span className="whitespace-normal">{section.about || ''}</span>
                           ) : (
-                            <span className="truncate max-w-xs inline-block">{truncateText(section.about, 30)}</span>
+                            <span className="truncate max-w-xs inline-block">{truncateText(section.about || '', 30)}</span>
                           )}
-                          {section.about.length > 30 && (
+                          {section.about && section.about.length > 30 && (
                             isExpanded ? 
                               <ChevronUp className="h-4 w-4 ml-1 text-gray-400 flex-shrink-0" /> : 
                               <ChevronDown className="h-4 w-4 ml-1 text-gray-400 flex-shrink-0" />

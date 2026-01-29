@@ -327,12 +327,52 @@ app.use((err: any, req: Request, res: express.Response, next: express.NextFuncti
 });
 
 // ==================================================
-// 9. Configuración del servidor web
+// 9. Sincronización de nuevas columnas del modelo Course y HeaderSection
+// ==================================================
+import Course from './modules/course/models/Course';
+import HeaderSection from './modules/headerSection/HeaderSection';
+
+async function syncCourseModel() {
+  try {
+    // Usar alter: true para agregar nuevas columnas sin eliminar datos
+    await Course.sync({ alter: true });
+    console.log('✅ Modelo Course sincronizado (nuevas columnas agregadas si es necesario)');
+  } catch (error) {
+    console.error('⚠️  Error al sincronizar modelo Course:', error);
+    // No detener el servidor si hay error, solo mostrar advertencia
+  }
+}
+
+async function syncHeaderSectionModel() {
+  try {
+    // Usar alter: true para agregar nuevas columnas sin eliminar datos
+    await HeaderSection.sync({ alter: true });
+    console.log('✅ Modelo HeaderSection sincronizado (nuevas columnas agregadas si es necesario)');
+  } catch (error: any) {
+    console.error('⚠️  Error al sincronizar modelo HeaderSection:', error);
+    console.error('Detalles del error:', {
+      message: error.message,
+      name: error.name,
+      sql: error.sql
+    });
+    // No detener el servidor si hay error, solo mostrar advertencia
+    // Las columnas se crearán automáticamente cuando se intente usar
+  }
+}
+
+// ==================================================
+// 10. Configuración del servidor web
 // ==================================================
 const server = app.listen(PORT, async () => {
   console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Estado geolocalización:', GeoUtils.checkServiceStatus());
+  
+  // Sincronizar modelos al iniciar
+  // Importante: Course primero porque HeaderSection puede depender de él indirectamente
+  await syncCourseModel();
+  // HeaderSection después, asegurando que Admin ya existe
+  await syncHeaderSectionModel();
 });
 
 // ==================================================

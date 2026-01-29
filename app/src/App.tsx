@@ -96,7 +96,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="cursos" element={<CoursesPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
-              <Route path="/course/:id" element={<CourseDetail />} />
+              <Route path="/course/:slug" element={<CourseDetail />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="/ruta-aprendizaje" element={<LearnRoute />} />

@@ -68,7 +68,7 @@ const ChartCard = ({ title, type }: ChartCardProps) => {
 
   return (
     <div className="card">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
       <div className="h-64">
         {type === 'line' ? (
           <Line data={lineData} options={options} />

@@ -80,6 +80,8 @@ class Permission extends Model {
   declare id: number;
   declare name: string;
   declare description: string;
+  declare createdAt: Date;
+  declare updatedAt: Date;
 }
 
 Permission.init(

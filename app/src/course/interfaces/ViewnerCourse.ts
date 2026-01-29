@@ -34,6 +34,7 @@ export interface DiscountEvent {
 
 export interface Course {
   id: number;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   image: string;
   summary: string;
@@ -64,10 +65,22 @@ export interface Course {
     isFree: boolean;
     priceDisplay: string;
   };
+  // Campos del header dinámico
+  headerType?: 'default' | 'programming' | 'hacking' | 'custom' | 'iframe';
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerDescription?: string;
+  headerButtonText?: string;
+  headerButtonLink?: string;
+  techStack?: string[];
+  customHeaderContent?: string;
+  affiliatedCourse?: Course | null;
+  affiliatedCourseId?: number | null;
 }
 
 export interface Section {
   id: number;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   description: string;
   moduleType: string;

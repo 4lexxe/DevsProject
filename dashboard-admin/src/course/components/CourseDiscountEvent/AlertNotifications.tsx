@@ -1,3 +1,5 @@
+import { CheckCircle2, AlertCircle, AlertTriangle } from "lucide-react";
+
 interface AlertNotificationsProps {
   submitSuccess: boolean;
   error: string | null;
@@ -14,15 +16,12 @@ export default function AlertNotifications({ submitSuccess, error, isEditing }: 
     <>
       {/* Success Alert */}
       {submitSuccess && (
-        <div
-          className="mb-6 p-4 rounded-lg border-2 flex items-center gap-2"
-          style={{ borderColor: "#42d7c7", backgroundColor: "#f0fdfa" }}
-        >
-          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: "#42d7c7" }}></div>
-          <span style={{ color: "#0c154c" }}>
+        <div className="mb-6 p-4 rounded-lg border border-green-200 bg-green-50 flex items-center gap-3">
+          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+          <span className="text-green-800 font-medium">
             {isEditing 
-              ? '¡Evento de descuento actualizado exitosamente!' 
-              : '¡Evento de descuento creado exitosamente!'
+              ? 'Evento de descuento actualizado exitosamente' 
+              : 'Evento de descuento creado exitosamente'
             }
           </span>
         </div>
@@ -30,21 +29,22 @@ export default function AlertNotifications({ submitSuccess, error, isEditing }: 
 
       {/* Error Alert */}
       {error && (
-        <div
-          className="mb-6 p-4 rounded-lg border-2"
-          style={{ borderColor: "#ef4444", backgroundColor: "#fef2f2" }}
-        >
+        <div className="mb-6 p-4 rounded-lg border border-red-200 bg-red-50">
           <div className="flex items-start gap-3">
-            <div className="w-4 h-4 rounded-full mt-0.5" style={{ backgroundColor: "#ef4444" }}></div>
+            {isConflictError ? (
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+            )}
             <div className="flex-1">
-              <div className="font-medium text-red-800 mb-1">
-                {isConflictError ? '⚠️ Conflicto con descuentos existentes' : '❌ Error'}
+              <div className="font-semibold text-red-900 mb-1">
+                {isConflictError ? 'Conflicto con descuentos existentes' : 'Error'}
               </div>
               <div className="text-red-700 text-sm leading-relaxed">
                 {error}
               </div>
               {isConflictError && (
-                <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded border border-red-200">
+                <div className="mt-3 text-xs text-red-800 bg-red-100 p-3 rounded border border-red-200">
                   <strong>Sugerencia:</strong> Desactiva los descuentos existentes de esos cursos antes de asignar el nuevo descuento, o selecciona otros cursos que no tengan descuentos activos.
                 </div>
               )}

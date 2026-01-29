@@ -29,14 +29,21 @@ router.get('/courses/careerType', CourseGetController.getByCareerType)
 // Obtener los cursos por admin
 router.get('/courses/admin/:id', CourseGetController.getByAdminId)
 
-// Ruta para obtener un curso por ID (público)
-router.get('/courses/:id', CourseGetController.getById);
+// IMPORTANTE: Las rutas más específicas deben ir ANTES de las genéricas
+// Ruta para obtener información completa del curso (creador, instructor, secciones, contenidos, usuarios inscritos)
+router.get('/courses/:id/complete', CourseGetController.getCourseCompleteInfo);
 
-// Ruta para obtener un curso por ID (público)
-router.get('/courses/:id/price', CourseGetController.getByIdWithPrices);
+// Ruta para obtener usuarios inscritos en un curso
+router.get('/courses/:id/enrolled-users', CourseGetController.getCourseEnrolledUsers);
 
 // Ruta para obtener un curso por ID y la navegacion entre sus secciones y contenidos de cada una
 router.get('/courses/:id/navigate', CourseGetController.getCourseNavigation);
+
+// Ruta para obtener un curso por ID con precios
+router.get('/courses/:id/price', CourseGetController.getByIdWithPrices);
+
+// Ruta para obtener un curso por ID (público) - DEBE IR AL FINAL
+router.get('/courses/:id', CourseGetController.getById);
 
 // Ruta para crear un curso (requiere autenticación y permisos)
 router.post('/courses', 

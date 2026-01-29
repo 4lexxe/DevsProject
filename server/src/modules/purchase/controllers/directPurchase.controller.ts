@@ -437,7 +437,11 @@ export class DirectPurchaseController extends BaseController {
       where: {
         userId,
         courseId: parseInt(courseId),
-        revokedAt: null
+        revokedAt: null,
+        [Op.or]: [
+          { expiresAt: null },
+          { expiresAt: { [Op.gt]: new Date() } }
+        ]
       }
     });
 

@@ -5,6 +5,7 @@ import Course from "./Course";
 class Section extends Model {
   public id!: bigint;
   public title!: string;
+  public slug!: string;
   public description!: string;
   public courseId!: bigint;
   public coverImage!: string;
@@ -30,6 +31,12 @@ Section.init(
     title: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: true, // Temporalmente permitir null hasta que se cree la migración
+      unique: true,
+      comment: "Slug único para URLs SEO-friendly",
     },
     description: {
       type: DataTypes.TEXT,
@@ -67,6 +74,10 @@ Section.init(
     tableName: "Sections",
     timestamps: true,
     paranoid: true,
+    indexes: [
+      { fields: ["slug"], unique: true },
+      { fields: ["title"] },
+    ],
   }
 );
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { getCourses } from '@/course/services/courseServices';
 
@@ -96,13 +96,12 @@ export default function LatestCourses() {
     <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-black">Últimos Cursos</h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black">Destacados</h2>
           <a
             href="/cursos"
-            className="flex items-center text-[#00D7FF] hover:text-[#66E7FF] transition-colors text-sm sm:text-base"
+            className="flex items-center text-gray-500 hover:text-gray-700 transition-colors text-sm sm:text-base"
           >
-            Ver todos
-            <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
+            Ver más <span className="ml-1">&gt;</span>
           </a>
         </div>
 
@@ -141,12 +140,12 @@ export default function LatestCourses() {
               {courses.map((course) => (
                 <div 
                   key={course.id} 
-                  className={`flex-none px-2 sm:px-3 ${
+                  className={`flex-none px-2 sm:px-3 flex ${
                     slidesToShow === 1 ? 'w-full' : 
                     slidesToShow === 2 ? 'w-1/2' : 'w-1/3'
                   }`}
                 >
-                  <div className="w-full">
+                  <div className="w-full flex">
                     <CourseCard
                       id={course.id}
                       title={course.title}
@@ -154,6 +153,14 @@ export default function LatestCourses() {
                       courseName={course.category}
                       image={course.image}
                       careerType={course.careerType?.name || 'Sin categoría'}
+                      instructor={course.admin?.name}
+                      // Datos mock - reemplazar cuando estén disponibles en el backend
+                      studentsCount={Math.floor(Math.random() * 50000) + 1000}
+                      rating={Math.floor(Math.random() * 10) + 90} // 90-100%
+                      reviewsCount={Math.floor(Math.random() * 2000) + 100}
+                      duration={course.careerType?.name ? `${Math.floor(Math.random() * 20) + 10}H` : undefined}
+                      isTopSales={Math.random() > 0.7} // 30% de probabilidad
+                      isFreeWithPlus={course.pricing?.isFree || false}
                       pricing={course.pricing}
                     />          
                   </div>

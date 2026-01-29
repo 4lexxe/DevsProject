@@ -21,7 +21,7 @@ type CourseNavigate = {
 
 interface Props {
   currentId: string;
-  navigate: CourseNavigate;
+  navigate: CourseNavigate | null;
   isExpanded?: boolean;
   setIsExpanded?: (expanded: boolean) => void;
 }
@@ -40,16 +40,21 @@ export default function Sidebar({
     externalIsExpanded !== undefined ? externalIsExpanded : internalIsExpanded;
   const setIsExpanded = setExternalIsExpanded || setInternalIsExpanded;
 
+  // Validar que navigate y sections existan
+  const sections = navigate?.sections || [];
+
   // Auto expand section that contains current content
   useEffect(() => {
-    navigate.sections.forEach((section) => {
-      if (section.contents.some((content) => content.id === currentId)) {
-        setExpandedSections((prev) =>
-          prev.includes(section.id) ? prev : [...prev, section.id]
-        );
-      }
-    });
-  }, [currentId, navigate.sections]);
+    if (sections.length > 0) {
+      sections.forEach((section) => {
+        if (section.contents?.some((content) => content.id === currentId)) {
+          setExpandedSections((prev) =>
+            prev.includes(section.id) ? prev : [...prev, section.id]
+          );
+        }
+      });
+    }
+  }, [currentId, sections]);
 
   const toggleSection = (sectionId: number) => {
     setExpandedSections((prev) =>
@@ -62,6 +67,39 @@ export default function Sidebar({
   const toggleSidebar = () => {
     setIsExpanded(!isExpanded);
   };
+
+  // Si no hay navigate o sections, mostrar mensaje
+  if (!navigate || sections.length === 0) {
+    return (
+      <div className="p-4 h-full">
+        <div className="flex items-center gap-2">
+          <button
+            className="p-2 hover:bg-gray-200 rounded transition-colors duration-300"
+            onClick={toggleSidebar}
+          >
+            <ChevronRight
+              className={`transform transition-transform duration-500 ${
+                isExpanded ? "" : "rotate-180"
+              }`}
+              size={20}
+            />
+          </button>
+          <div
+            className={`overflow-hidden transition-all duration-500 ${
+              isExpanded ? "opacity-100" : "opacity-0 max-w-0"
+            }`}
+          >
+            <h1 className="text-lg font-medium">Navegación</h1>
+          </div>
+        </div>
+        {isExpanded && (
+          <div className="mt-4 text-sm text-gray-500">
+            No hay secciones disponibles
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 h-full">
@@ -82,7 +120,7 @@ export default function Sidebar({
             isExpanded ? "opacity-100" : "opacity-0 max-w-0"
           }`}
         >
-          <h1 className="text-lg font-medium ">{navigate.title}</h1>
+          <h1 className="text-lg font-medium">{navigate.title}</h1>
         </div>
       </div>
 
@@ -91,7 +129,7 @@ export default function Sidebar({
           isExpanded ? "opacity-100 " : "opacity-0 max-h-0"
         }`}
       >
-        {navigate.sections.map((section) => (
+        {sections.map((section) => (
           <div key={section.id} className="rounded-lg bg-gray-200 mt-4">
             <button
               onClick={() => toggleSection(section.id)}
@@ -122,9 +160,9 @@ export default function Sidebar({
                   : "max-h-0 opacity-0 pb-0"
               }`}
             >
-              {section.contents.map((content) => (
+              {(section.contents || []).map((content) => (
                 <Link
-                  to={`/course/${navigate.id}/section/content/${content.id}`}
+                  to={`/course/${navigate?.id || ''}/section/content/${content.id}`}
                   className="w-full"
                   key={content.id}
                 >

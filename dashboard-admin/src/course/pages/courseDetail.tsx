@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getById } from "../services/courseServices";
+import { getById, getCourseCompleteInfo } from "../services/courseServices";
 import { getSectionsByCourse, deleteSection } from "../services/sectionServices";
+import { getSectionUrl } from "../../shared/utils/sectionUrl";
 
 import { CourseData, Section } from "../interfaces/CourseDetail";
 
@@ -13,30 +14,43 @@ import {
   LearningOutcomes,
   SectionsGrid,
   DiscountEvents,
-  TechnicalInfo
+  TechnicalInfo,
+  CourseInfo
 } from "../components/CourseDetail";
 
 export default function CourseDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [completeInfo, setCompleteInfo] = useState<any>(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
-      if (!id) return;
+      if (!slug) return;
       
       try {
         setLoading(true);
-        const [course, courseSections] = await Promise.all([
-          getById(id),
-          getSectionsByCourse(id)
+        // Obtener información completa del curso usando slug
+        const course = await getById(slug);
+        
+        if (!course) {
+          setError('Curso no encontrado');
+          setLoading(false);
+          return;
+        }
+        
+        // Usar el ID del curso para obtener las secciones
+        const [courseSections, complete] = await Promise.all([
+          getSectionsByCourse(course.id.toString()),
+          getCourseCompleteInfo(slug).catch(() => null) // Si falla, continuar sin esta info
         ]);
         
         setCourseData(course);
         setSections(courseSections || []);
+        setCompleteInfo(complete);
       } catch (error) {
         console.error('Error loading course data:', error);
         setError('Error al cargar los datos del curso');
@@ -46,7 +60,7 @@ export default function CourseDetail() {
     };
 
     fetchCourseData();
-  }, [id]);
+  }, [slug]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
@@ -71,13 +85,16 @@ export default function CourseDetail() {
     }
   };
 
-  const handleSectionClick = (sectionId: string) => {
-    navigate(`/sections/${sectionId}`);
+  const handleSectionClick = (section: Section) => {
+    navigate(getSectionUrl(section));
   };
 
-  const handleEditSection = (e: React.MouseEvent, sectionId: string) => {
+  const handleEditSection = (e: React.MouseEvent, section: Section) => {
     e.stopPropagation();
-    navigate(`/courses/${id}/section/${sectionId}/edit`);
+    if (courseData?.id) {
+      const sectionIdentifier = section.slug || section.id;
+      navigate(`/courses/${courseData.id}/section/${sectionIdentifier}/edit`);
+    }
   };
 
   const handleDeleteSection = async (e: React.MouseEvent, sectionId: string) => {
@@ -101,8 +118,8 @@ export default function CourseDetail() {
         await deleteSection(sectionId);
         
         // Actualizar la lista de secciones después de eliminar
-        if (id) {
-          const updatedSections = await getSectionsByCourse(id);
+        if (courseData?.id) {
+          const updatedSections = await getSectionsByCourse(courseData.id.toString());
           setSections(updatedSections || []);
         }
         
@@ -116,11 +133,17 @@ export default function CourseDetail() {
   };
 
   const handleCreateSection = () => {
-    navigate(`/courses/${id}/section/form`);
+    if (courseData?.id) {
+      navigate(`/courses/${courseData.id}/section/form`);
+    }
   };
 
   const handleEditCourse = () => {
-    navigate(`/courses/${id}/edit`);
+    if (courseData?.slug) {
+      navigate(`/courses/${courseData.slug}/edit`);
+    } else if (courseData?.id) {
+      navigate(`/courses/${courseData.id}/edit`);
+    }
   };
 
   const handleViewDiscounts = () => {
@@ -203,6 +226,20 @@ export default function CourseDetail() {
           courseData={courseData}
           formatDate={formatDate}
         />
+
+        {/* Información completa del curso (creador, instructor, usuarios inscritos) */}
+        {completeInfo && (
+          <CourseInfo
+            creator={completeInfo.creator}
+            instructor={completeInfo.instructor}
+            enrolledUsers={completeInfo.enrolledUsers || []}
+            enrollmentStats={completeInfo.enrollmentStats || { total: 0, active: 0, revoked: 0 }}
+            sectionsCount={completeInfo.sections?.length || 0}
+            contentsCount={completeInfo.contentsCount || 0}
+            courseId={courseData?.id ? Number(courseData.id) : undefined}
+            courseTitle={courseData?.title}
+          />
+        )}
       </div>
     </div>
   );

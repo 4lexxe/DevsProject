@@ -12,22 +12,22 @@ import {
   LoadingAndErrorStates
 } from "../components/Section"
 
-export default function SectionDetailPage() {
+export default function SectionPage() {
   const navigate = useNavigate()
   const params = useParams()
-  const sectionId = params.id as string
+  const sectionSlugOrId = params.id as string
   const [section, setSection] = useState<SectionType | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchSection = async () => {
-      if (!sectionId) return
+      if (!sectionSlugOrId) return
       
       try {
         setLoading(true)
         setError(null)
-        const sectionData = await getSectionByIdWithContents(sectionId)
+        const sectionData = await getSectionByIdWithContents(sectionSlugOrId)
         setSection(sectionData)
       } catch (err) {
         console.error('Error fetching section:', err)
@@ -38,7 +38,7 @@ export default function SectionDetailPage() {
     }
 
     fetchSection()
-  }, [sectionId])
+  }, [sectionSlugOrId])
 
   // Quiz management functions
   const handleAddQuiz = (contentId: string) => {
@@ -54,7 +54,7 @@ export default function SectionDetailPage() {
       try {
         await deleteContentQuiz(contentId)
         // Refresh section data after deletion
-        const sectionData = await getSectionByIdWithContents(sectionId)
+        const sectionData = await getSectionByIdWithContents(sectionSlugOrId)
         setSection(sectionData)
       } catch (err) {
         console.error('Error deleting quiz:', err)

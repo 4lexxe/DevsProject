@@ -25,13 +25,60 @@ export class DiscordController {
   static async callback(req: Request, res: Response): Promise<void> {
     passport.authenticate("discord", async (err: any, user: User | undefined, info: any) => {
       if (err) {
-        console.error("Error de autenticación:", err);
-        return res.status(500).json({ error: "Error en la autenticación" });
+        console.error("❌ Error de autenticación con Discord:", err);
+        
+        // Proporcionar información más detallada sobre el error
+        if (err.code === 'invalid_client') {
+          const clientId = process.env.DISCORD_CLIENT_ID || '';
+          const maxSnowflake = BigInt('9223372036854775807');
+          const clientIdBigInt = clientId ? BigInt(clientId) : null;
+          
+          console.error("🔍 Diagnóstico del error 'invalid_client':");
+          console.error(`   Client ID actual: ${clientId} (${clientId.length} dígitos)`);
+          
+          if (clientIdBigInt && clientIdBigInt > maxSnowflake) {
+            console.error("   ❌ El Client ID es demasiado grande (máximo permitido: 19 dígitos)");
+            console.error("   💡 Posibles causas:");
+            console.error("      - Estás copiando el Application ID en lugar del Client ID");
+            console.error("      - Hay un error al copiar (quizás un dígito extra)");
+            console.error("      - Estás copiando dos números juntos");
+            console.error("   💡 Solución:");
+            console.error("      1. Ve a https://discord.com/developers/applications");
+            console.error("      2. Selecciona tu aplicación > OAuth2 > General");
+            console.error("      3. Copia SOLO el 'Client ID' (debe tener 17-19 dígitos)");
+            console.error("      4. Verifica que no tenga espacios ni caracteres extra");
+            console.error("      5. Actualiza DISCORD_CLIENT_ID en tu .env");
+          } else {
+            console.error("   - Verifica que DISCORD_CLIENT_ID y DISCORD_CLIENT_SECRET sean correctos");
+            console.error("   - Verifica que la URL de callback coincida con la configurada en Discord:");
+            console.error(`     Configurada en .env: ${process.env.DISCORD_CALLBACK_URL}`);
+            console.error("   - Ve a https://discord.com/developers/applications y verifica:");
+            console.error("     * Que la aplicación esté activa");
+            console.error("     * Que las credenciales coincidan");
+            console.error("     * Que la URL de redirect esté en la lista de OAuth2 Redirects");
+          }
+          
+          return res.status(500).json({ 
+            error: "Error de autenticación con Discord: credenciales inválidas",
+            details: clientIdBigInt && clientIdBigInt > maxSnowflake 
+              ? `El Client ID es inválido (${clientId.length} dígitos, máximo permitido: 19). Verifica que estés copiando el Client ID correcto de Discord.`
+              : "Verifica que las credenciales de Discord sean correctas y que la URL de callback esté configurada en el panel de Discord"
+          });
+        }
+        
+        return res.status(500).json({ 
+          error: "Error en la autenticación con Discord",
+          details: err.message || "Error desconocido"
+        });
       }
   
       if (!user) {
-        console.error("No se encontró/creó usuario");
-        return res.status(401).json({ error: "No se pudo autenticar el usuario" });
+        console.error("❌ No se encontró/creó usuario");
+        console.error("   Info adicional:", info);
+        return res.status(401).json({ 
+          error: "No se pudo autenticar el usuario",
+          details: info?.message || "El usuario no pudo ser autenticado o creado"
+        });
       }
   
       try {

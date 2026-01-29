@@ -15,22 +15,23 @@ const refreshToken = process.env.GOOGLE_DRIVE_REFRESH_TOKEN || '';
 const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || '';  
 
 // Logging de configuración (sin mostrar valores sensibles)
+const isDriveConfigured = !!(clientId && clientSecret && refreshToken);
 console.log('🔧 Configuración de Google Drive:', {
   clientIdConfigured: !!clientId,
   clientSecretConfigured: !!clientSecret,
   refreshTokenConfigured: !!refreshToken,
   folderIdConfigured: !!folderId,
+  isConfigured: isDriveConfigured,
   clientIdLength: clientId.length,
   refreshTokenLength: refreshToken.length
 });
 
-if(!clientId || !clientSecret || !refreshToken) {
-  const missingVars = [];
-  if (!clientId) missingVars.push('GOOGLE_DRIVE_CLIENT_ID');
-  if (!clientSecret) missingVars.push('GOOGLE_DRIVE_CLIENT_SECRET');
-  if (!refreshToken) missingVars.push('GOOGLE_DRIVE_REFRESH_TOKEN');
-  
-  throw new Error(`Faltan variables de entorno necesarias para la configuración de Google Drive: ${missingVars.join(', ')}`);
+if (!isDriveConfigured) {
+  console.warn('⚠️  Google Drive no está configurado. Las funciones de Drive no estarán disponibles.');
+  console.warn('   Para habilitar Google Drive, configura las siguientes variables de entorno:');
+  if (!clientId) console.warn('   - GOOGLE_DRIVE_CLIENT_ID');
+  if (!clientSecret) console.warn('   - GOOGLE_DRIVE_CLIENT_SECRET');
+  if (!refreshToken) console.warn('   - GOOGLE_DRIVE_REFRESH_TOKEN');
 }
 
 
@@ -46,9 +47,32 @@ export const driveConfig: DriveConfig = {
 };
 
 /**
+ * Verifica si Google Drive está configurado
+ */
+export function isDriveEnabled(): boolean {
+  return !!(clientId && clientSecret && refreshToken);
+}
+
+/**
+ * Valida que Google Drive esté configurado antes de usarlo
+ */
+function validateDriveConfig() {
+  if (!isDriveEnabled()) {
+    const missingVars = [];
+    if (!clientId) missingVars.push('GOOGLE_DRIVE_CLIENT_ID');
+    if (!clientSecret) missingVars.push('GOOGLE_DRIVE_CLIENT_SECRET');
+    if (!refreshToken) missingVars.push('GOOGLE_DRIVE_REFRESH_TOKEN');
+    
+    throw new Error(`Faltan variables de entorno necesarias para la configuración de Google Drive: ${missingVars.join(', ')}`);
+  }
+}
+
+/**
  * Crea y configura el cliente OAuth2 para Google Drive
  */
 export function createDriveAuth() {
+  validateDriveConfig();
+  
   const oauth2Client = new google.auth.OAuth2(
     driveConfig.clientId,
     driveConfig.clientSecret,
@@ -66,6 +90,7 @@ export function createDriveAuth() {
  * Crea instancia de Google Drive API
  */
 export function createDriveClient() {
+  validateDriveConfig();
   const auth = createDriveAuth();
   return google.drive({ version: 'v3', auth });
 }
@@ -172,7 +197,7 @@ export default {
   driveConfig,
   createDriveAuth,
   createDriveClient,
-  /* validateDriveConfig, */
+  isDriveEnabled,
   allowedFileTypes,
   fileLimits,
   getAllowedMimeTypes,

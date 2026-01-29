@@ -131,14 +131,14 @@ const InputFile: React.FC<InputFileProps> = ({
   return (
     <div className="w-full">
       {/* Selector de modo */}
-      <div className="flex mb-2 bg-gray-100 rounded-lg p-1">
+      <div className="flex mb-2 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
         <button
           type="button"
           onClick={() => setInputMode('upload')}
           className={`flex-1 py-1.5 px-3 rounded-md flex items-center justify-center gap-1.5 text-sm font-medium transition-colors ${
             inputMode === 'upload' 
-              ? 'bg-white text-blue-600 shadow-sm' 
-              : 'text-gray-600 hover:bg-gray-200'
+              ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm' 
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
           }`}
           disabled={disabled}
         >
@@ -150,8 +150,8 @@ const InputFile: React.FC<InputFileProps> = ({
           onClick={() => setInputMode('url')}
           className={`flex-1 py-1.5 px-3 rounded-md flex items-center justify-center gap-1.5 text-sm font-medium transition-colors ${
             inputMode === 'url' 
-              ? 'bg-white text-blue-600 shadow-sm' 
-              : 'text-gray-600 hover:bg-gray-200'
+              ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm' 
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
           }`}
           disabled={disabled}
         >
@@ -167,9 +167,9 @@ const InputFile: React.FC<InputFileProps> = ({
             <div
               className={`
                 relative rounded-lg border-2 border-dashed
-                ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
+                ${isDragging ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-300 dark:border-gray-600'}
                 transition-all duration-200 ease-in-out
-                hover:border-blue-400 hover:bg-blue-50
+                hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
               onDragOver={handleDragOver}
@@ -188,13 +188,13 @@ const InputFile: React.FC<InputFileProps> = ({
               <div className="flex flex-col items-center justify-center px-6 py-8">
                 <Upload className="w-12 h-12 text-gray-400 mb-3" />
                 <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-blue-600 hover:text-blue-500">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    <span className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500">
                       Haz clic para subir
                     </span>{' '}
                     o arrastra y suelta
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">Solo imágenes (máx. 10MB)</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Solo imágenes (máx. 10MB)</p>
                 </div>
               </div>
             </div>
@@ -206,7 +206,7 @@ const InputFile: React.FC<InputFileProps> = ({
                   value={urlInput}
                   onChange={handleUrlInputChange}
                   placeholder="https://ejemplo.com/imagen.jpg"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                   disabled={disabled}
                 />
                 <button
@@ -218,7 +218,7 @@ const InputFile: React.FC<InputFileProps> = ({
                   Aplicar
                 </button>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 Ingresa la URL completa de una imagen (jpg, png, gif, etc.)
               </p>
             </div>
@@ -227,7 +227,7 @@ const InputFile: React.FC<InputFileProps> = ({
       ) : (
         <div className="mt-2 relative">
           <div className="relative group">
-            <div className="relative w-full aspect-video bg-gray-100 rounded-lg overflow-hidden">
+            <div className="relative w-full aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
               <img
                 src={previewUrl}
                 alt="Vista previa"
@@ -241,10 +241,10 @@ const InputFile: React.FC<InputFileProps> = ({
                 {!disabled && (
                   <button
                     onClick={handleRemove}
-                    className="p-2 rounded-full bg-white shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-200"
+                    className="p-2 rounded-full bg-white dark:bg-gray-900 shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-200"
                     type="button"
                   >
-                    <X className="w-5 h-5 text-gray-600" />
+                    <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
                 )}
               </div>
@@ -254,14 +254,14 @@ const InputFile: React.FC<InputFileProps> = ({
       )}
       {/* Estado de carga */}
       {isLoading && (
-        <div className="mt-2 flex items-center text-sm text-blue-600">
+        <div className="mt-2 flex items-center text-sm text-blue-600 dark:text-blue-400">
           <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500 mr-2"></div>
           Subiendo imagen...
         </div>
       )}
       {/* Mensaje de error */}
       {error && (
-        <div className="mt-2 flex items-center text-sm text-red-600">
+        <div className="mt-2 flex items-center text-sm text-red-600 dark:text-red-400">
           <AlertCircle className="h-4 w-4 mr-1" />
           {error}
         </div>

@@ -1,12 +1,44 @@
 /* Importar fuentes de Google de manera asíncrona */
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* Fuente amigable y divertida - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 /* Tailwind CSS v4 */
 @import "tailwindcss";
 
+/* Configurar dark mode para usar la clase .dark en lugar de media queries */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Configuración de Tailwind v4 */
 @theme {
-  --font-family-sans: 'Rubik', sans-serif;
+  --font-family-sans: 'Poppins', 'Rubik', 'Inter', sans-serif;
+}
+
+/* Aplicar Poppins a todos los textos globalmente */
+body,
+html {
+  font-family: 'Poppins', 'Rubik', 'Inter', sans-serif !important;
+  /* Transición suave para cambio de tema */
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Asegurar que el modo oscuro funcione correctamente */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+/* Aplicar Poppins a todos los elementos de texto */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, button, input, textarea, select, label,
+li, td, th, caption,
+.font-sans {
+  font-family: 'Poppins', 'Rubik', 'Inter', sans-serif !important;
 }
 
 /* Overlay de grano para el Hero */
@@ -86,4 +118,176 @@
   .resize-none {
     resize: none;
   }
+}
+
+/* Asegurar que el modo oscuro funcione correctamente */
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
+}
+
+/* Estilos de respaldo para modo oscuro - solo si Tailwind no los aplica */
+html.dark body {
+  background-color: #111827 !important;
+}
+
+html:not(.dark) body {
+  background-color: #f9fafb !important;
+}
+
+/* Transiciones mínimas para evitar parpadeo durante la animación de ola */
+/* Las transiciones son muy rápidas para que el cambio sea inmediato */
+*,
+*::before,
+*::after {
+  transition-property: background-color, color, border-color, fill, stroke;
+  transition-timing-function: ease-out;
+  transition-duration: 0.15s; /* Muy rápido para cambio inmediato */
+}
+
+/* Excluir elementos que no necesitan transición (como animaciones) */
+svg,
+img,
+video,
+canvas,
+iframe,
+[data-theme-transition] {
+  transition: none;
+}
+
+/* Transición más rápida para elementos interactivos */
+button,
+a,
+input,
+select,
+textarea {
+  transition-duration: 0.1s;
+}
+
+/* Sin transición en html para cambio inmediato */
+html {
+  transition: none;
+}
+
+/* Variables CSS para sincronizar colores de transición */
+html {
+  --theme-transition-light: #f9fafb;
+  --theme-transition-dark: #111827;
+}
+
+html.dark {
+  --theme-transition-light: #f9fafb;
+  --theme-transition-dark: #111827;
+}
+
+/* Transición de tema - minimalista y optimizada */
+.theme-transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  /* Optimizaciones de rendimiento - críticas para evitar lag */
+  will-change: clip-path;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Usar contain para aislar el rendering y mejorar performance */
+  contain: layout style paint;
+  /* Animación CSS pura - más rápida que JS, GPU acelerada */
+  animation: themeWave 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Color según el tema nuevo - sincronizado desde HTML */
+.theme-transition-overlay[data-theme="dark"] {
+  background-color: var(--theme-transition-dark);
+  opacity: 0.5; /* Transparente pero manteniendo el color */
+}
+
+.theme-transition-overlay[data-theme="light"] {
+  background-color: var(--theme-transition-light);
+  opacity: 0.5; /* Transparente pero manteniendo el color */
+}
+
+/* Animación de ola desde esquina superior izquierda - optimizada */
+@keyframes themeWave {
+  0% {
+    clip-path: circle(0% at 0% 0%);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.5; /* Pico de opacidad en el medio */
+  }
+  100% {
+    /* Usar vmax para cubrir toda la pantalla diagonalmente */
+    clip-path: circle(150vmax at 0% 0%);
+    opacity: 0;
+  }
+}
+
+/* Sincronización de colores durante la transición */
+html[data-theme-transition="dark"] {
+  --theme-transition-active: var(--theme-transition-dark);
+}
+
+html[data-theme-transition="light"] {
+  --theme-transition-active: var(--theme-transition-light);
+}
+
+/* Scrollbar personalizado para listados horizontales */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(209, 213, 219);
+  border-radius: 3px;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(75, 85, 99);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(156, 163, 175);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(107, 114, 128);
+}
+
+/* Animaciones para el login */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.login-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.login-pulse {
+  animation: pulse-glow 3s ease-in-out infinite;
 }

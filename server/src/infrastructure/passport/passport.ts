@@ -187,13 +187,44 @@ passport.use(
   ),
 )
 
+// Validar variables de entorno de Discord antes de configurar la estrategia
+const discordClientId = process.env.DISCORD_CLIENT_ID?.trim();
+const discordClientSecret = process.env.DISCORD_CLIENT_SECRET?.trim();
+const discordCallbackUrl = process.env.DISCORD_CALLBACK_URL?.trim();
+
+if (!discordClientId || !discordClientSecret || !discordCallbackUrl) {
+  console.warn('⚠️  Discord OAuth no está completamente configurado:');
+  if (!discordClientId) console.warn('   - DISCORD_CLIENT_ID no está definido');
+  if (!discordClientSecret) console.warn('   - DISCORD_CLIENT_SECRET no está definido');
+  if (!discordCallbackUrl) console.warn('   - DISCORD_CALLBACK_URL no está definido');
+  console.warn('   La autenticación con Discord no funcionará hasta que estas variables estén configuradas.');
+} else {
+  // Validar formato del Client ID
+  const maxSnowflake = BigInt('9223372036854775807'); // Máximo valor de Int64
+  const clientIdBigInt = discordClientId ? BigInt(discordClientId) : null;
+  
+  if (clientIdBigInt && clientIdBigInt > maxSnowflake) {
+    console.error('❌ DISCORD_CLIENT_ID es demasiado grande para un snowflake de Discord');
+    console.error(`   Valor actual: ${discordClientId} (${discordClientId.length} dígitos)`);
+    console.error(`   Máximo permitido: ${maxSnowflake.toString()} (19 dígitos)`);
+    console.error('   ⚠️  Verifica que estés usando el Client ID correcto de Discord');
+    console.error('   💡 En Discord Developer Portal, el Client ID está en OAuth2 > General');
+    console.error('   💡 Asegúrate de copiar el "Client ID", no el "Application ID" si son diferentes');
+  } else {
+    console.log('✅ Discord OAuth configurado correctamente');
+    console.log(`   Client ID: ${discordClientId} (${discordClientId.length} dígitos)`);
+    console.log(`   Callback URL: ${discordCallbackUrl}`);
+  }
+}
+
 // Estrategia de Discord (versión corregida)
+// Nota: passport-discord espera el clientID como string, no como número
 passport.use(
   new DiscordStrategy(
     {
-      clientID: process.env.DISCORD_CLIENT_ID!,
-      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
-      callbackURL: process.env.DISCORD_CALLBACK_URL,
+      clientID: discordClientId || '',
+      clientSecret: discordClientSecret || '',
+      callbackURL: discordCallbackUrl || '',
       scope: ["identify", "email"],
       passReqToCallback: true
     },

@@ -1,4 +1,4 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2, AlertCircle } from "lucide-react";
 import CourseForm from "../components/CourseForm/CourseForm";
@@ -6,37 +6,44 @@ import { getById } from "../services/courseServices";
 
 function CourseFormPage() {
   // Estados para manejar el curso y estados de carga/error
-  const { id } = useParams();
+  const { slug } = useParams<{ slug?: string }>();
   const [course, setCourse] = useState<any>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Efecto para cargar los datos del curso si estamos en modo edición
   useEffect(() => {
     const getCourse = async () => {
-      if (id) {
+      if (slug) {
         setIsLoading(true);
         setError(null);
         try {
-          const c = await getById(id);
-          setCourse(transformCourseData(c));
+          const c = await getById(slug);
+          if (c) {
+            setCourse(transformCourseData(c));
+          } else {
+            setError("Curso no encontrado");
+          }
         } catch (err) {
           console.error("Error al cargar el curso:", err);
           setError("No se pudo cargar la información del curso. Por favor, intente nuevamente.");
         } finally {
           setIsLoading(false);
         }
+      } else {
+        // No hay slug, es un curso nuevo
+        setIsLoading(false);
       }
     };
 
     getCourse();
-  }, [id]);
+  }, [slug]);
 
   // Función para transformar los datos del curso al formato requerido
   const transformCourseData = (course: any) => {
     return {
       ...course,
-      categoryIds: course.categories.map((category: any) => category.id),
+      categoryIds: course.categories?.map((category: any) => category.id) || [],
       careerTypeId: course.careerTypeId || "",
       learningOutcomes: Array.isArray(course.learningOutcomes)
         ? course.learningOutcomes.length > 0
@@ -48,6 +55,16 @@ function CourseFormPage() {
           ? course.prerequisites.join("\n")
           : ""
         : "",
+      // Campos del header dinámico
+      headerType: course.headerType || "default",
+      headerTitle: course.headerTitle || "",
+      headerSubtitle: course.headerSubtitle || "",
+      headerDescription: course.headerDescription || "",
+      headerButtonText: course.headerButtonText || "",
+      headerButtonLink: course.headerButtonLink || "",
+      techStack: course.techStack || [],
+      customHeaderContent: course.customHeaderContent || "",
+      affiliatedCourseId: course.affiliatedCourseId || null,
     };
   };
 
@@ -77,7 +94,7 @@ function CourseFormPage() {
       );
     }
 
-    return id ? <CourseForm course={course} /> : <CourseForm />;
+    return slug && course ? <CourseForm course={course} /> : <CourseForm />;
   };
 
   return (

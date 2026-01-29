@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, CreditCard, Wallet, Zap, Building2, Ticket, Smartphone } from 'lucide-react';
+import FontelloIcon from '@/shared/components/icons/FontelloIcon';
 
 interface PaymentInfo {
   id: string;
@@ -52,7 +52,7 @@ const PaymentInfoModal: React.FC<PaymentInfoModalProps> = ({ payment, isOpen, on
     });
   };
 
-  const getPaymentMethodName = (paymentMethodId: string, paymentTypeId: string) => {
+  const getPaymentMethodInfo = (paymentMethodId: string, paymentTypeId: string) => {
     const methods: { [key: string]: string } = {
       visa: "Visa",
       master: "Mastercard", 
@@ -111,161 +111,177 @@ const PaymentInfoModal: React.FC<PaymentInfoModalProps> = ({ payment, isOpen, on
     const type = types[paymentTypeId?.toLowerCase()] || paymentTypeId || 'Tipo desconocido';
 
     if (paymentMethodId?.toLowerCase() === 'account_money' || paymentTypeId?.toLowerCase() === 'account_money') {
-      return (
-        <span className="flex items-center gap-2">
-          <Wallet className="h-4 w-4" />
-          Dinero en cuenta MercadoPago
-        </span>
-      );
+      return { name: 'Dinero en cuenta MercadoPago', icon: 'icon-wallet' };
     }
 
     if (paymentMethodId?.toLowerCase() === 'pix' || paymentTypeId?.toLowerCase() === 'pix') {
-      return (
-        <span className="flex items-center gap-2">
-          <Zap className="h-4 w-4" />
-          PIX - Transferencia Instantánea
-        </span>
-      );
+      return { name: 'PIX - Transferencia Instantánea', icon: 'icon-flash' };
     }
 
     if (paymentMethodId?.toLowerCase() === 'debin') {
-      return (
-        <span className="flex items-center gap-2">
-          <Building2 className="h-4 w-4" />
-          Débito inmediato (DEBIN)
-        </span>
-      );
+      return { name: 'Débito inmediato (DEBIN)', icon: 'icon-bank' };
     }
 
     if (paymentTypeId?.toLowerCase().includes('card')) {
-      return (
-        <span className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4" />
-          {type} {method}
-        </span>
-      );
+      return { name: `${type} ${method}`, icon: 'icon-credit-card' };
     }
 
     if (paymentTypeId?.toLowerCase() === 'ticket') {
-      return (
-        <span className="flex items-center gap-2">
-          <Ticket className="h-4 w-4" />
-          {method}
-        </span>
-      );
+      return { name: method, icon: 'icon-ticket' };
     }
 
     if (paymentTypeId?.toLowerCase() === 'bank_transfer') {
-      return (
-        <span className="flex items-center gap-2">
-          <Building2 className="h-4 w-4" />
-          {method}
-        </span>
-      );
+      return { name: method, icon: 'icon-bank' };
     }
 
     if (paymentTypeId?.toLowerCase() === 'digital_wallet') {
-      return (
-        <span className="flex items-center gap-2">
-          <Smartphone className="h-4 w-4" />
-          {method}
-        </span>
-      );
+      return { name: method, icon: 'icon-mobile' };
     }
 
-    return (
-      <span className="flex items-center gap-2">
-        <CreditCard className="h-4 w-4" />
-        {type} - {method}
-      </span>
-    );
+    return { name: `${type} - ${method}`, icon: 'icon-credit-card' };
   };
 
+  const paymentMethod = getPaymentMethodInfo(payment.paymentMethodId, payment.paymentTypeId);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={onClose}
+    >
       <div
-        className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto"
-        style={{ border: `2px solid #42d7c7` }}
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold" style={{ color: "#0c154c" }}>
+        <div className="p-6 sm:p-8">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8 pb-6 border-b border-gray-200">
+            <h3 className="text-2xl font-light text-gray-900 tracking-tight">
               Información del Pago
             </h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700 text-2xl">
-              ×
+            <button 
+              onClick={onClose} 
+              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+            >
+              <FontelloIcon 
+                name="icon-cancel" 
+                className="text-xl"
+                fallback={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                }
+              />
             </button>
           </div>
 
-          <div className="space-y-4">
-            <div className="p-4 rounded-lg" style={{ backgroundColor: "#eff6ff" }}>
-              <div className="text-center">
-                <div className="mb-2">
-                  <CheckCircle className="h-10 w-10 mx-auto text-green-500" />
+          <div className="space-y-6">
+            {/* Status Badge */}
+            <div className="text-center py-6 bg-green-50 rounded-xl border border-green-100">
+              <div className="mb-3 flex justify-center">
+                <div className="w-16 h-16 flex items-center justify-center bg-green-100 rounded-full">
+                  <FontelloIcon 
+                    name="icon-ok" 
+                    className="text-3xl text-green-600"
+                    fallback={
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    }
+                  />
                 </div>
-                <div className="font-bold text-lg" style={{ color: "#42d7c7" }}>
-                  Pago Aprobado
-                </div>
+              </div>
+              <div className="font-light text-lg text-green-700">
+                Pago Aprobado
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <div className="text-sm text-gray-600">ID de Pago</div>
-                <div className="font-mono text-sm" style={{ color: "#1d4ed8" }}>
+            {/* Payment Details */}
+            <div className="space-y-5">
+              <div className="pb-4 border-b border-gray-100">
+                <div className="text-xs text-gray-500 mb-2 font-light uppercase tracking-wide">ID de Pago</div>
+                <div className="font-mono text-sm text-gray-900 font-light">
                   {payment.id}
                 </div>
               </div>
 
-              <div>
-                <div className="text-sm text-gray-600">Método de Pago</div>
-                <div className="font-medium" style={{ color: "#0c154c" }}>
-                  {getPaymentMethodName(payment.paymentMethodId, payment.paymentTypeId)}
+              <div className="pb-4 border-b border-gray-100">
+                <div className="text-xs text-gray-500 mb-2 font-light uppercase tracking-wide">Método de Pago</div>
+                <div className="flex items-center gap-2 text-gray-900 font-light">
+                  <FontelloIcon 
+                    name={paymentMethod.icon} 
+                    className="text-base"
+                    fallback={
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    }
+                  />
+                  {paymentMethod.name}
                 </div>
               </div>
 
-              <div>
-                <div className="text-sm text-gray-600">Fecha y Hora del Pago</div>
-                <div className="font-medium" style={{ color: "#0c154c" }}>
+              <div className="pb-4 border-b border-gray-100">
+                <div className="text-xs text-gray-500 mb-2 font-light uppercase tracking-wide">Fecha y Hora</div>
+                <div className="flex items-center gap-2 text-gray-900 font-light">
+                  <FontelloIcon 
+                    name="icon-calendar" 
+                    className="text-base"
+                    fallback={
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    }
+                  />
                   {formatDateTime(payment.dateApproved)}
                 </div>
               </div>
 
-              <div>
-                <div className="text-sm text-gray-600">Monto</div>
-                <div className="font-bold text-lg" style={{ color: "#1d4ed8" }}>
+              <div className="pb-4 border-b border-gray-100">
+                <div className="text-xs text-gray-500 mb-2 font-light uppercase tracking-wide">Monto</div>
+                <div className="font-light text-2xl text-gray-900">
                   {formatCurrency(payment.transactionAmount)}
                 </div>
               </div>
 
-              <div>
-                <div className="text-sm text-gray-600">Estado</div>
-                <div className="font-medium" style={{ color: "#42d7c7" }}>
+              <div className="pb-4 border-b border-gray-100">
+                <div className="text-xs text-gray-500 mb-2 font-light uppercase tracking-wide">Estado</div>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-sm font-light border border-green-200">
+                  <FontelloIcon 
+                    name="icon-ok" 
+                    className="text-sm"
+                    fallback={
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    }
+                  />
                   {payment.status === "approved" ? "Aprobado" : payment.status}
                 </div>
               </div>
 
               <div>
-                <div className="text-sm text-gray-600">Comprador</div>
-                <div className="font-medium" style={{ color: "#0c154c" }}>
-                  {payment.payer.first_name && payment.payer.last_name
-                    ? `${payment.payer.first_name} ${payment.payer.last_name}`
-                    : payment.payer.email}
-                </div>
-                <div className="text-sm text-gray-500">{payment.payer.email}</div>
-                {payment.payer.identification && (
-                  <div className="text-sm text-gray-500">
-                    {payment.payer.identification.type}: {payment.payer.identification.number}
+                <div className="text-xs text-gray-500 mb-3 font-light uppercase tracking-wide">Comprador</div>
+                <div className="space-y-2">
+                  <div className="font-light text-gray-900">
+                    {payment.payer.first_name && payment.payer.last_name
+                      ? `${payment.payer.first_name} ${payment.payer.last_name}`
+                      : payment.payer.email}
                   </div>
-                )}
+                  <div className="text-sm text-gray-500 font-light">{payment.payer.email}</div>
+                  {payment.payer.identification && (
+                    <div className="text-sm text-gray-500 font-light">
+                      {payment.payer.identification.type}: {payment.payer.identification.number}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="pt-4 border-t" style={{ borderColor: "#e5e7eb" }}>
+            {/* Close Button */}
+            <div className="pt-6 border-t border-gray-200">
               <button
                 onClick={onClose}
-                className="w-full px-6 py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:opacity-90"
-                style={{ backgroundColor: "#1d4ed8" }}
+                className="w-full px-6 py-3 bg-gray-900 text-white font-light rounded-lg transition-all duration-300 hover:bg-gray-800"
               >
                 Cerrar
               </button>

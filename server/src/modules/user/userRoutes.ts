@@ -17,6 +17,13 @@ router.get('/users/public', UserController.getPublicUsers);
 router.get('/users/public/:id', UserController.getPublicUserById);
 
 // Rutas protegidas (requieren permisos administrativos)
+// IMPORTANTE: Las rutas más específicas deben ir ANTES de las genéricas
+router.get('/users/stats',
+  authMiddleware,
+  permissionsMiddleware(['read:users', 'manage:all_users']),
+  UserController.getUserStats
+);
+
 router.get('/users', 
   authMiddleware,
   permissionsMiddleware(['read:users', 'manage:all_users']),

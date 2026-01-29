@@ -44,7 +44,7 @@ export const RoleService = {
   async getRoleById(id: number) {
     try {
       const response = await api.get(`/roles/roles/${id}`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Error fetching role with id ${id}:`, error);
       throw error;
@@ -55,7 +55,7 @@ export const RoleService = {
   async createRole(roleData: RoleCreateRequest) {
     try {
       const response = await api.post('/roles/roles', roleData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error creating role:', error);
       throw error;
@@ -66,7 +66,7 @@ export const RoleService = {
   async updateRole(id: number, roleData: RoleUpdateRequest) {
     try {
       const response = await api.put(`/roles/roles/${id}`, roleData);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Error updating role with id ${id}:`, error);
       throw error;

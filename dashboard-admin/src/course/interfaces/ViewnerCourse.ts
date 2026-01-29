@@ -17,6 +17,7 @@ export type CareerType = {
 
 export interface Course {
   id: number;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   image: string;
   summary: string;
@@ -49,6 +50,7 @@ export interface Course {
 
 export interface Section {
   id: number;
+  slug?: string; // Slug para URLs SEO-friendly
   title: string;
   description: string;
   moduleType: string;

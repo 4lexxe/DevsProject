@@ -9,6 +9,7 @@ class CourseAccess extends Model {
   public revokedAt!: Date | null;
   public revokeReason!: string | null;
   public grantedAt!: Date;
+  public expiresAt!: Date | null; // Fecha de expiración del acceso (null = permanente)
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
@@ -52,6 +53,11 @@ CourseAccess.init(
       type: DataTypes.DATE,
       allowNull: false,
       comment: "Fecha de concesión del acceso",
+    },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "Fecha de expiración del acceso (null = acceso permanente)",
     },
   },
   {

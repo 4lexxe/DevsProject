@@ -6,28 +6,26 @@ interface LearningOutcomesProps {
 
 export default function LearningOutcomes({ learningOutcomes }: LearningOutcomesProps) {
   return (
-    <div className="rounded-lg border shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6">
-        <h3 className="text-2xl font-semibold leading-none tracking-tight" style={{ color: "#0c154c" }}>
-          <Star className="h-5 w-5 inline-block mr-2" />
-          Objetivos de Aprendizaje Configurados ({learningOutcomes.length})
-        </h3>
+    <div className="rounded-lg border border-gray-200 shadow-sm bg-white overflow-hidden">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center gap-2">
+          <Star className="w-5 h-5 text-gray-600" />
+          <h3 className="text-xl font-semibold text-gray-900">
+            Objetivos de Aprendizaje ({learningOutcomes.length})
+          </h3>
+        </div>
       </div>
-      <div className="p-6 pt-0">
+      <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {learningOutcomes.map((outcome, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 rounded-lg"
-              style={{ backgroundColor: "#eff6ff" }}
+              className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-white"
             >
-              <div
-                className="w-6 h-6 text-white rounded-full flex items-center justify-center text-sm font-bold"
-                style={{ backgroundColor: "#1d4ed8" }}
-              >
+              <div className="w-6 h-6 text-white rounded flex items-center justify-center text-xs font-semibold bg-gray-700 flex-shrink-0 mt-0.5">
                 {index + 1}
               </div>
-              <span className="font-medium" style={{ color: "#0c154c" }}>
+              <span className="font-medium text-gray-900 text-sm leading-relaxed pt-0.5">
                 {outcome}
               </span>
             </div>

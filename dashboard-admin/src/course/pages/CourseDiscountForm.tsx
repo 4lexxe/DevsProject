@@ -174,8 +174,8 @@ export default function DiscountEventsPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#eff6ff" }}>
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <DiscountEventHeader isEditing={isEditing} />
         
         <AlertNotifications 
@@ -184,13 +184,12 @@ export default function DiscountEventsPage() {
           isEditing={isEditing}
         />
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Form */}
           <div className="lg:col-span-2">
-            <div className="border-2 rounded-lg overflow-hidden" style={{ borderColor: "#42d7c7" }}>
-              <div className="p-6 text-white" style={{ backgroundColor: "#0c154c" }}>
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                  <span className="text-2xl">+</span>
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm">
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="text-xl font-semibold text-gray-900">
                   Información del Evento
                 </h2>
               </div>

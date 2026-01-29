@@ -1,19 +1,10 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  Eye, 
-  BookOpen,
-  Users,
-  Clock,
-  Search,
-  Filter
-} from 'lucide-react'
-import { getCourses, deleteCourse } from '../services/courseServices'
 import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { getCourses, deleteCourse } from '../services/courseServices'
+import FontelloIcon from '../../shared/components/icons/FontelloIcon'
 
 interface Category {
   id: string
@@ -32,6 +23,7 @@ interface CareerType {
 
 interface Course {
   id: number
+  slug?: string
   title: string
   image: string
   summary: string
@@ -44,7 +36,6 @@ interface Course {
   isInDevelopment: boolean
   adminId: number
   createdAt: string
-  // Propiedades adicionales que podrían venir del backend
   studentsCount?: number
   duration?: number
 }
@@ -52,6 +43,7 @@ interface Course {
 const CoursesPage = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string } | null>(null)
   const queryClient = useQueryClient()
 
   const { data: courses = [], isLoading, error } = useQuery({
@@ -64,16 +56,22 @@ const CoursesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dashboard-courses'] })
       toast.success('Curso eliminado exitosamente')
+      setDeleteConfirm(null)
     },
     onError: (error) => {
       console.error('Error al eliminar:', error)
       toast.error('Error al eliminar el curso')
+      setDeleteConfirm(null)
     }
   })
 
   const handleDelete = async (courseId: string, courseName: string) => {
-    if (window.confirm(`¿Estás seguro de que quieres eliminar el curso "${courseName}"?`)) {
-      deleteMutation.mutate(courseId)
+    setDeleteConfirm({ id: courseId, name: courseName })
+  }
+
+  const confirmDelete = () => {
+    if (deleteConfirm) {
+      deleteMutation.mutate(deleteConfirm.id)
     }
   }
 
@@ -87,260 +85,331 @@ const CoursesPage = () => {
     return matchesSearch && matchesFilter
   })
 
+  const totalCourses = courses?.length || 0
+  const totalStudents = courses?.reduce((total: number, course: Course) => total + (course.studentsCount || 0), 0) || 0
+  const activeCourses = courses?.filter((course: Course) => course.isActive && !course.isInDevelopment).length || 0
+  const draftCourses = courses?.filter((course: Course) => course.isInDevelopment).length || 0
+
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <FontelloIcon
+            name="icon-spin6"
+            className="text-2xl text-gray-600 dark:text-gray-400 animate-spin"
+            fallback={
+              <div className="h-8 w-8 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+            }
+          />
+          <p className="text-gray-600 dark:text-gray-400">Cargando cursos...</p>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-600">Error al cargar los cursos</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 border border-red-200 dark:border-red-900/30 rounded-lg p-6 shadow-sm max-w-md">
+          <div className="flex items-start gap-3">
+            <FontelloIcon name="icon-attention" className="text-lg text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Error</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Error al cargar los cursos</p>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Cursos</h1>
-          <p className="text-gray-600">Administra todos los cursos de la plataforma</p>
-        </div> 
-        <div className="flex gap-3">
-          <Link
-            to="/courses/discount-events"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            Descuentos
-          </Link>
-          <Link
-            to="/courses/new"
-            className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            Nuevo Curso
-          </Link>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <BookOpen className="h-8 w-8 text-blue-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Cursos</p>
-              <p className="text-2xl font-bold text-gray-900">{courses?.length || 0}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <Users className="h-8 w-8 text-green-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Estudiantes</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {courses?.reduce((total: number, course: Course) => total + (course.studentsCount || 0), 0)}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <Clock className="h-8 w-8 text-yellow-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Cursos Activos</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {courses?.filter((course: Course) => course.isActive && !course.isInDevelopment).length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center">
-            <Edit2 className="h-8 w-8 text-purple-600" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">En Borrador</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {courses?.filter((course: Course) => course.isInDevelopment).length || 0}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input
-                type="text"
-                placeholder="Buscar cursos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="all">Todos los estados</option>
-              <option value="active">Activos</option>
-              <option value="draft">Borrador</option>
-              <option value="inactive">Inactivos</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Courses Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Curso
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Categorías
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estado
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Estudiantes
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Duración
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredCourses?.map((course: Course) => (
-                <tr key={course.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10">
-                        <div className="h-10 w-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                          <BookOpen className="h-5 w-5 text-primary-600" />
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{course.title}</div>
-                        <div className="text-sm text-gray-500 truncate max-w-xs">
-                          {course.summary}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex flex-wrap gap-1">
-                      {course.categories?.map((category) => (
-                        <span
-                          key={category.id}
-                          className="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full"
-                        >
-                          {category.name}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      (course.isActive && !course.isInDevelopment)
-                        ? 'bg-green-100 text-green-800'
-                        : course.isInDevelopment
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {(course.isActive && !course.isInDevelopment) ? 'Activo' : 
-                       course.isInDevelopment ? 'Borrador' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {course.studentsCount || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {course.duration ? `${course.duration}h` : 'N/A'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <Link
-                        to={`/courses/${course.id}`}
-                        className="text-blue-600 hover:text-blue-900 p-1"
-                        title="Ver curso"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        to={`/courses/${course.id}/edit`}
-                        className="text-green-600 hover:text-green-900 p-1"
-                        title="Editar curso"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() => handleDelete(course.id.toString(), course.title)}
-                        className="text-red-600 hover:text-red-900 p-1"
-                        title="Eliminar curso"
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {filteredCourses?.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay cursos</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || filterStatus !== 'all' 
-                ? 'No se encontraron cursos con los filtros aplicados'
-                : 'Comienza creando tu primer curso'
-              }
-            </p>
-            {!searchTerm && filterStatus === 'all' && (
-              <div className="mt-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="py-8 lg:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                  <FontelloIcon
+                    name="icon-book"
+                    className="text-xl text-gray-700 dark:text-gray-300"
+                    fallback={
+                      <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    }
+                  />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+                    Gestión de Cursos
+                  </h1>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Administra todos los cursos de la plataforma
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Link
+                  to="/courses/discount-events"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+                >
+                  <FontelloIcon name="icon-tag" className="text-sm" />
+                  Descuentos
+                </Link>
                 <Link
                   to="/courses/new"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors shadow-sm"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
+                  <FontelloIcon name="icon-plus" className="text-sm" />
                   Nuevo Curso
                 </Link>
               </div>
-            )}
+            </div>
+
+            {/* Minimalista Stats */}
+            <div className="flex items-center gap-6 text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 rounded-lg px-6 py-3 border border-gray-200 dark:border-gray-700 shadow-sm">
+              <div className="flex items-center gap-2">
+                <FontelloIcon name="icon-book" className="text-xs" />
+                <span className="font-medium text-gray-900 dark:text-white">{totalCourses}</span>
+                <span>Total</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+              <div className="flex items-center gap-2">
+                <FontelloIcon name="icon-users" className="text-xs" />
+                <span className="font-medium text-gray-900 dark:text-white">{totalStudents}</span>
+                <span>Estudiantes</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+              <div className="flex items-center gap-2">
+                <FontelloIcon name="icon-check" className="text-xs text-green-600" />
+                <span className="font-medium text-gray-900 dark:text-white">{activeCourses}</span>
+                <span>Activos</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300 dark:bg-gray-600" />
+              <div className="flex items-center gap-2">
+                <FontelloIcon name="icon-edit" className="text-xs text-yellow-600" />
+                <span className="font-medium text-gray-900 dark:text-white">{draftCourses}</span>
+                <span>Borrador</span>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Search and Filter */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1 relative">
+                <FontelloIcon
+                  name="icon-search"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Buscar cursos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <FontelloIcon name="icon-filter" className="text-gray-400 text-sm" />
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100"
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="active">Activos</option>
+                  <option value="draft">Borrador</option>
+                  <option value="inactive">Inactivos</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Courses Grid */}
+          {filteredCourses?.length === 0 ? (
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-12">
+              <div className="flex flex-col items-center justify-center text-center">
+                <div className="p-4 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
+                  <FontelloIcon name="icon-book" className="text-3xl text-gray-400" />
+                </div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                  {searchTerm || filterStatus !== 'all' ? 'No se encontraron cursos' : 'No hay cursos disponibles'}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm mb-6">
+                  {searchTerm || filterStatus !== 'all'
+                    ? 'Intenta con otros términos de búsqueda o filtros'
+                    : 'Comienza creando tu primer curso'}
+                </p>
+                {!searchTerm && filterStatus === 'all' && (
+                  <Link
+                    to="/courses/new"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+                  >
+                    <FontelloIcon name="icon-plus" className="text-sm" />
+                    Nuevo Curso
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+              <AnimatePresence>
+                {filteredCourses?.map((course: Course) => (
+                  <motion.div
+                    key={course.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-colors group"
+                  >
+                    {/* Course Image */}
+                    {course.image && (
+                      <div className="relative w-full h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                        <Link to={`/courses/${course.slug || course.id}`}>
+                          <img
+                            src={course.image}
+                            alt={course.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </Link>
+                        <div className="absolute top-2 right-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            (course.isActive && !course.isInDevelopment)
+                              ? 'bg-green-500/90 text-white'
+                              : course.isInDevelopment
+                              ? 'bg-yellow-500/90 text-white'
+                              : 'bg-gray-500/90 text-white'
+                          }`}>
+                            {(course.isActive && !course.isInDevelopment) ? 'Activo' : 
+                             course.isInDevelopment ? 'Borrador' : 'Inactivo'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="p-4">
+                      {/* Title */}
+                      <Link to={`/courses/${course.slug || course.id}`}>
+                        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1.5 line-clamp-2 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors cursor-pointer">
+                          {course.title}
+                        </h3>
+                      </Link>
+                      
+                      {/* Summary */}
+                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-3">
+                        {course.summary}
+                      </p>
+
+                      {/* Minimal Info */}
+                      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
+                        <div className="flex items-center gap-3">
+                          {course.studentsCount !== undefined && (
+                            <span>{course.studentsCount} estudiantes</span>
+                          )}
+                          {course.duration && (
+                            <span>{course.duration}h</span>
+                          )}
+                        </div>
+                        {course.categories && course.categories.length > 0 && (
+                          <span className="text-gray-400 dark:text-gray-500">
+                            {course.categories.length} {course.categories.length === 1 ? 'categoría' : 'categorías'}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Minimal Actions */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
+                        <Link
+                          to={`/courses/${course.slug || course.id}`}
+                          className="flex-1 text-center text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors py-1.5"
+                        >
+                          Ver
+                        </Link>
+                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
+                        <Link
+                          to={`/courses/${course.slug || course.id}/edit`}
+                          className="flex-1 text-center text-xs font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-colors py-1.5"
+                        >
+                          Editar
+                        </Link>
+                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(course.id.toString(), course.title);
+                          }}
+                          className="flex-1 text-center text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors py-1.5"
+                          disabled={deleteMutation.isPending}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setDeleteConfirm(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 border border-gray-200 dark:border-gray-700"
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+                  <FontelloIcon name="icon-attention" className="text-xl text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                    Confirmar eliminación
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    ¿Estás seguro de que quieres eliminar el curso <strong>"{deleteConfirm.name}"</strong>? Esta acción no se puede deshacer.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeleteConfirm(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleteMutation.isPending}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

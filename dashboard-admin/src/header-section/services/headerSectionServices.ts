@@ -9,6 +9,20 @@ export interface HeaderSection {
   about: string;
   buttonName: string;
   buttonLink: string;
+  // Campos de personalización
+  contentType?: 'default' | 'code' | 'iframe' | 'custom';
+  customCode?: string;
+  iframeUrl?: string;
+  customHtml?: string;
+  customCss?: string;
+  customJs?: string;
+  backgroundColor?: string;
+  titleColor?: string;
+  sloganColor?: string;
+  textColor?: string;
+  buttonColor?: string;
+  buttonTextColor?: string;
+  techStack?: string[];
 }
 
 const HEADER_SECTION_ENDPOINT = '/header-sections';
@@ -17,10 +31,20 @@ const HEADER_SECTION_ENDPOINT = '/header-sections';
 export const getHeaderSections = async (): Promise<HeaderSection[]> => {
   try {
     const response = await api.get(HEADER_SECTION_ENDPOINT);
-    return response.data;
+    // El backend devuelve { status: "success", data: [...] }
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      return response.data.data;
+    }
+    // Si la respuesta es directamente un array
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    // Si no hay datos, retornar array vacío
+    return [];
   } catch (error) {
     console.error('Error al obtener las secciones de encabezado:', error);
-    throw error;
+    // Retornar array vacío en caso de error en lugar de lanzar excepción
+    return [];
   }
 };
 

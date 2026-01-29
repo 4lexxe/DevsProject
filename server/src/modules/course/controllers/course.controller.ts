@@ -7,6 +7,7 @@ import { BaseController } from "./BaseController";
 import { Op } from "sequelize";
 import DriveService from "../../drive/services/driveService";
 import { formField } from "pdfkit";
+import { generateSlug, generateUniqueSlug } from "../../../shared/utils/slugGenerator";
 
 export default class CourseController extends BaseController {
   static driveService = new DriveService();
@@ -28,16 +29,33 @@ export default class CourseController extends BaseController {
         isInDevelopment,
         adminId,
         categoryIds,
+        // Campos del header dinámico
+        headerType,
+        headerTitle,
+        headerSubtitle,
+        headerDescription,
+        headerButtonText,
+        headerButtonLink,
+        techStack,
+        customHeaderContent,
+        affiliatedCourseId,
       } = req.body;
 
       
       // Crear carpeta en Google Drive para el curso
-      
       const response = await this.driveService.createFolder(title);
 
+      // Generar slug único
+      const existingSlugs = await Course.findAll({
+        attributes: ['slug'],
+        raw: true,
+      }).then(courses => courses.map((c: any) => c.slug));
+      
+      const slug = generateUniqueSlug(title, existingSlugs);
 
       const newCourse = await Course.create({
         title,
+        slug,
         image,
         summary,
         about,
@@ -49,6 +67,16 @@ export default class CourseController extends BaseController {
         isInDevelopment,
         adminId,
         driveFolderId: response.folderId,
+        // Campos del header dinámico
+        headerType,
+        headerTitle,
+        headerSubtitle,
+        headerDescription,
+        headerButtonText,
+        headerButtonLink,
+        techStack,
+        customHeaderContent,
+        affiliatedCourseId,
       });
 
       if (categoryIds && categoryIds.length > 0) {
@@ -94,6 +122,16 @@ export default class CourseController extends BaseController {
         adminId,
         price,
         categoryIds,
+        // Campos del header dinámico
+        headerType,
+        headerTitle,
+        headerSubtitle,
+        headerDescription,
+        headerButtonText,
+        headerButtonLink,
+        techStack,
+        customHeaderContent,
+        affiliatedCourseId,
       } = req.body;
 
       const course = await Course.findByPk(id);
@@ -102,8 +140,21 @@ export default class CourseController extends BaseController {
         return;
       }
 
+      // Si el título cambió, regenerar el slug
+      let slug = course.slug;
+      if (title && title !== course.title) {
+        const existingSlugs = await Course.findAll({
+          attributes: ['slug'],
+          where: { id: { [Op.ne]: id } },
+          raw: true,
+        }).then(courses => courses.map((c: any) => c.slug));
+        
+        slug = generateUniqueSlug(title, existingSlugs);
+      }
+
       await course.update({
         title,
+        slug,
         image,
         summary,
         about,
@@ -114,6 +165,16 @@ export default class CourseController extends BaseController {
         isInDevelopment,
         adminId,
         price,
+        // Campos del header dinámico
+        headerType,
+        headerTitle,
+        headerSubtitle,
+        headerDescription,
+        headerButtonText,
+        headerButtonLink,
+        techStack,
+        customHeaderContent,
+        affiliatedCourseId,
       });
 
       if (Array.isArray(categoryIds)) {

@@ -2,6 +2,7 @@ import { Request, Response, RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import Content from "../models/Content";
 import Section from "../models/Section";
+import Course from "../models/Course";
 import User from "../../user/User";
 import { BaseController } from "./BaseController";
 import ContentFiles from "../models/ContentFiles";
@@ -13,7 +14,20 @@ export default class ContentController extends BaseController {
   static getAll: RequestHandler = async (req, res) => {
     try {
       const contents = await Content.findAll({
-        include: [{ model: Section, as: "section" }],
+        include: [
+          { 
+            model: Section, 
+            as: "section",
+            include: [
+              {
+                model: Course,
+                as: "course",
+                attributes: ["id", "title", "image", "isActive"]
+              }
+            ],
+            attributes: ["id", "title", "courseId", "moduleType"]
+          }
+        ],
         order: [["id", "ASC"]],
       });
       ContentController.sendSuccess(res, req, contents, "Contenidos obtenidos correctamente");

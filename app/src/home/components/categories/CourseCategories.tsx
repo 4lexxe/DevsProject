@@ -1,9 +1,9 @@
-import { GraduationCap } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import CategoryCard from "./CategoryCard";
 import { getCategoriesActivesLimited } from "@/home/services/categoriesService";
 import { useState, useEffect } from "react";
+import FontelloIcon from "@/shared/components/icons/FontelloIcon";
 
 // Import Swiper styles
 import 'swiper/css';
@@ -36,21 +36,15 @@ export default function CourseCategories() {
   }, []);
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-slate-50">
+    <section className="py-16 bg-white">
       <div className="w-full max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center p-4 bg-blue-50 rounded-2xl mb-6">
-            <GraduationCap className="w-10 h-10 text-blue-600" />
-          </div>
-          
-          <h2 className="text-4xl lg:text-5xl font-black text-gray-900 mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Categorías de Cursos
-            </span>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+            Categorías de Cursos
           </h2>
           
-          <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto font-medium">
+          <p className="text-base lg:text-lg text-gray-600 max-w-2xl mx-auto">
             Explora nuestra amplia variedad de cursos organizados por categorías especializadas
           </p>
         </div>
@@ -91,23 +85,35 @@ export default function CourseCategories() {
             className="categories-swiper pb-12"
           >
             {categories.map((category: Category) => (
-              <SwiperSlide key={category.id}>
+              <SwiperSlide key={category.id} className="h-auto">
                 <CategoryCard {...category} />
               </SwiperSlide>
             ))}
           </Swiper>
 
           {/* Custom Navigation Buttons */}
-          <div className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl border border-gray-200 hover:border-blue-300 transition-all duration-300 cursor-pointer group">
-            <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+          <div className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2.5 bg-white rounded-full shadow-md hover:shadow-lg border border-gray-200 hover:border-gray-300 transition-all duration-300 cursor-pointer group">
+            <FontelloIcon
+              name="icon-left-open"
+              className="text-base text-gray-600 group-hover:text-gray-900 transition-colors"
+              fallback={
+                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              }
+            />
           </div>
           
-          <div className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl border border-gray-200 hover:border-blue-300 transition-all duration-300 cursor-pointer group">
-            <svg className="w-5 h-5 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+          <div className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2.5 bg-white rounded-full shadow-md hover:shadow-lg border border-gray-200 hover:border-gray-300 transition-all duration-300 cursor-pointer group">
+            <FontelloIcon
+              name="icon-right-open"
+              className="text-base text-gray-600 group-hover:text-gray-900 transition-colors"
+              fallback={
+                <svg className="w-4 h-4 text-gray-600 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              }
+            />
           </div>
         </div>
       </div>

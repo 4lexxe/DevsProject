@@ -4,6 +4,7 @@ import Role from '../role/Role';
 import Permission from '../role/Permission';
 import { body, validationResult } from 'express-validator';
 import bcrypt from 'bcrypt';
+import { Op } from 'sequelize';
 
 
 // Interface para los campos actualizables
@@ -109,6 +110,71 @@ export class UserController {
       });
     } catch (error) {
       handleServerError(res, req, error, "Error al obtener usuario público");
+    }
+  }
+
+  // Obtener estadísticas de usuarios
+  static async getUserStats(req: Request, res: Response): Promise<void> {
+    try {
+      const user = req.user as User;
+
+      // Verificar permisos adicionales
+      const userPermissions = user.Role?.Permissions?.map(p => p.name) || [];
+      const canViewStats = userPermissions.includes('read:users') || 
+                         userPermissions.includes('manage:all_users') || 
+                         user.Role?.name === 'superadmin';
+
+      if (!canViewStats) {
+        res.status(403).json({
+          ...metadata(req, res),
+          status: "error",
+          message: 'No tienes permisos para ver estadísticas de usuarios'
+        });
+        return;
+      }
+
+      const now = new Date();
+      const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+      const totalUsers = await User.count();
+      const activeUsers = await User.count({
+        where: {
+          isActiveSession: true
+        }
+      });
+      const newUsersThisMonth = await User.count({
+        where: {
+          createdAt: {
+            [Op.gte]: thisMonth
+          }
+        }
+      });
+      const newUsersLastMonth = await User.count({
+        where: {
+          createdAt: {
+            [Op.gte]: lastMonth,
+            [Op.lt]: thisMonth
+          }
+        }
+      });
+
+      const stats = {
+        totalUsers,
+        activeUsers,
+        inactiveUsers: totalUsers - activeUsers,
+        newUsersThisMonth,
+        newUsersLastMonth
+      };
+
+      res.status(200).json({
+        ...metadata(req, res),
+        status: "success",
+        message: "Estadísticas de usuarios obtenidas correctamente",
+        data: stats
+      });
+    } catch (error) {
+      handleServerError(res, req, error, "Error al obtener estadísticas de usuarios");
     }
   }
 

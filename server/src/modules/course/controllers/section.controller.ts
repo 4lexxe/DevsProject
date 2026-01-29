@@ -8,6 +8,7 @@ import { Sequelize, Op } from "sequelize";
 import { BaseController } from "./BaseController";
 import DriveService from "../../drive/services/driveService";
 import { drive } from "googleapis/build/src/apis/drive";
+import { generateSlug, generateUniqueSlug } from "../../../shared/utils/slugGenerator";
 
 export default class SectionController extends BaseController {
   static driveService = new DriveService();
@@ -33,8 +34,17 @@ export default class SectionController extends BaseController {
 
       const response = await SectionController.driveService.createFolder(title, course.driveFolderId);
 
+      // Generar slug único
+      const existingSlugs = await Section.findAll({
+        attributes: ['slug'],
+        raw: true,
+      }).then(sections => sections.map((s: any) => s.slug).filter(Boolean));
+      
+      const slug = generateUniqueSlug(title, existingSlugs);
+
       const newSection = await Section.create({
         title,
+        slug,
         description,
         courseId,
         coverImage,
@@ -66,9 +76,20 @@ export default class SectionController extends BaseController {
 
       const response = await SectionController.driveService.createFolder(section.title, course.driveFolderId);
       const sectionFolderId = response.folderId;
+      
+      // Generar slug único
+      const existingSlugs = await Section.findAll({
+        attributes: ['slug'],
+        raw: true,
+        transaction,
+      }).then(sections => sections.map((s: any) => s.slug).filter(Boolean));
+      
+      const slug = generateUniqueSlug(section.title, existingSlugs);
+      
       const newSection = await Section.create(
         {
           title: section.title,
+          slug,
           courseId,
           description: section.description,
           moduleType: section.moduleType,
@@ -113,23 +134,43 @@ export default class SectionController extends BaseController {
   static updateSectionAndContents: RequestHandler = async (req, res) => {
     if (!SectionController.handleValidationErrors(req, res)) return;
     const { section } = req.body;
-      const { id } = req.params;
+    const identifier = req.params.id;
 
     const transaction = await sequelize.transaction();
     try {
       const { section } = req.body;
-      const { id } = req.params;
+      const identifier = req.params.id;
 
-      const existingSection = await Section.findByPk(id, { transaction });
+      const isNumeric = /^\d+$/.test(identifier);
+      let existingSection;
+      if (isNumeric) {
+        existingSection = await Section.findByPk(identifier, { transaction });
+      } else {
+        existingSection = await Section.findOne({ where: { slug: identifier }, transaction });
+      }
+      
       if (!existingSection) {
         await transaction.rollback();
         SectionController.notFound(res, req, "Sección");
         return;
       }
 
+      // Generar slug único si el título cambió
+      let slug = existingSection.slug;
+      if (section.title !== existingSection.title) {
+        const existingSlugs = await Section.findAll({
+          attributes: ['slug'],
+          raw: true,
+          transaction,
+        }).then(sections => sections.map((s: any) => s.slug).filter(Boolean).filter((s: string) => s !== existingSection.slug));
+        
+        slug = generateUniqueSlug(section.title, existingSlugs);
+      }
+
       await existingSection.update(
         {
           title: section.title,
+          slug,
           description: section.description,
           moduleType: section.moduleType,
           coverImage: section.coverImage,
@@ -145,7 +186,7 @@ export default class SectionController extends BaseController {
       // Obtener contenidos que van a ser eliminados para eliminar sus carpetas de Drive
       const contentsToDelete = await Content.findAll({
         where: {
-          sectionId: id,
+          sectionId: existingSection.id,
           id: { [Op.notIn]: incomingContentIds },
         },
         transaction,
@@ -165,7 +206,7 @@ export default class SectionController extends BaseController {
 
       await Content.destroy({
         where: {
-          sectionId: id,
+          sectionId: existingSection.id,
           id: { [Op.notIn]: incomingContentIds },
         },
         transaction,
@@ -185,7 +226,7 @@ export default class SectionController extends BaseController {
               position: contentData.position,
             },
             {
-              where: { id: contentData.id, sectionId: id },
+              where: { id: contentData.id, sectionId: existingSection.id },
               transaction,
             }
           );
@@ -210,7 +251,7 @@ export default class SectionController extends BaseController {
 
           await Content.create(
             {
-              sectionId: id,
+              sectionId: existingSection.id,
               title: contentData.title,
               text: contentData.text,
               markdown: contentData.markdown,
@@ -238,7 +279,7 @@ export default class SectionController extends BaseController {
   // Actualizar una sección
   static update: RequestHandler = async (req, res) => {
     try {
-      const { id } = req.params;
+      const identifier = req.params.id;
       const { title, description, courseId, coverImage, moduleType, colorGradient } = req.body;
       const user = req.user as User;
 
@@ -249,14 +290,33 @@ export default class SectionController extends BaseController {
         return;
       }
 
-      const section = await Section.findByPk(id);
+      const isNumeric = /^\d+$/.test(identifier);
+      let section;
+      if (isNumeric) {
+        section = await Section.findByPk(identifier);
+      } else {
+        section = await Section.findOne({ where: { slug: identifier } });
+      }
+      
       if (!section) {
         SectionController.notFound(res, req, "Sección");
         return;
       }
 
+      // Generar slug único si el título cambió
+      let slug = section.slug;
+      if (title !== section.title) {
+        const existingSlugs = await Section.findAll({
+          attributes: ['slug'],
+          raw: true,
+        }).then(sections => sections.map((s: any) => s.slug).filter(Boolean).filter((s: string) => s !== section.slug));
+        
+        slug = generateUniqueSlug(title, existingSlugs);
+      }
+
       await section.update({
         title,
+        slug,
         description,
         courseId,
         coverImage,
@@ -273,7 +333,7 @@ export default class SectionController extends BaseController {
   // Eliminar una sección
   static delete: RequestHandler = async (req, res) => {
     try {
-      const { id } = req.params;
+      const identifier = req.params.id;
       const user = req.user as User;
 
       // Verificar que el usuario tenga permisos para eliminar contenido
@@ -282,7 +342,14 @@ export default class SectionController extends BaseController {
         SectionController.forbidden(res, req, "No tienes permisos para eliminar secciones");
       }
 
-      const section = await Section.findByPk(id);
+      const isNumeric = /^\d+$/.test(identifier);
+      let section;
+      if (isNumeric) {
+        section = await Section.findByPk(identifier);
+      } else {
+        section = await Section.findOne({ where: { slug: identifier } });
+      }
+      
       if (!section) {
         SectionController.notFound(res, req, "Sección");
         return;

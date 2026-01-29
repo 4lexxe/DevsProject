@@ -1,9 +1,11 @@
 import type React from "react"
 import type { Category, CareerType } from "@/course/interfaces/ViewnerCourse"
 import { GraduationCap } from "lucide-react"
+import { getCourseUrlFromSlugOrId } from "@/shared/utils/courseUrl"
 
 interface CourseListItemProps {
   id: number
+  slug?: string // Slug para URLs SEO-friendly
   title: string
   summary: string
   categories: Category[]
@@ -17,13 +19,13 @@ interface CourseListItemProps {
   }
 }
 
-const CourseListItem: React.FC<CourseListItemProps> = ({ id, title, summary, categories, image, careerType, pricing }) => {
+const CourseListItem: React.FC<CourseListItemProps> = ({ id, slug, title, summary, categories, image, careerType, pricing }) => {
   return (
     <div
       className="group w-full flex gap-4 p-4 border-b border-gray-200 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer"
       onClick={() => {
         if (id && id !== undefined) {
-          window.location.href = `/course/${id}`;
+          window.location.href = getCourseUrlFromSlugOrId(slug, id);
         } else {
           console.error('ID del curso no válido:', id);
         }

@@ -21,6 +21,16 @@ export interface ICourseInput {
   isActive: boolean;
   isInDevelopment: boolean;
   adminId: string;
+  // Campos del header dinámico
+  headerType?: 'default' | 'programming' | 'hacking' | 'custom' | 'iframe';
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerDescription?: string;
+  headerButtonText?: string;
+  headerButtonLink?: string;
+  techStack?: string[];
+  customHeaderContent?: string;
+  affiliatedCourseId?: string | null;
 }
 
 export interface ICourse {
@@ -36,6 +46,16 @@ export interface ICourse {
   isActive: boolean;
   isInDevelopment: boolean;
   adminId: string;
+  // Campos del header dinámico
+  headerType?: 'default' | 'programming' | 'hacking' | 'custom' | 'iframe';
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerDescription?: string;
+  headerButtonText?: string;
+  headerButtonLink?: string;
+  techStack?: string[];
+  customHeaderContent?: string;
+  affiliatedCourseId?: string | null;
 }
 
 // Seccion ----------------------------------------------------------------------------------------------------------------------------

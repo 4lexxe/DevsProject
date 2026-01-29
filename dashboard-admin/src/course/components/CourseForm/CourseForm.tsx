@@ -12,6 +12,10 @@ import {
   XCircle,
   Save,
   X,
+  Layout,
+  Code,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
@@ -70,13 +74,47 @@ export default function CourseForm({ course }: { course?: ICourse }) {
       isActive: false,
       isInDevelopment: false,
       adminId: "1",
+      headerType: "default",
+      headerTitle: "",
+      headerSubtitle: "",
+      headerDescription: "",
+      headerButtonText: "",
+      headerButtonLink: "",
+      techStack: [],
+      customHeaderContent: "",
+      affiliatedCourseId: null,
     },
   });
 
   // Resetear formulario cuando cambia el curso
   useEffect(() => {
     if (course) {
-      reset(course);
+      // Asegurar que todos los campos estén presentes
+      const courseData = {
+        ...course,
+        title: course.title || "",
+        image: course.image || "",
+        summary: course.summary || "",
+        about: course.about || "",
+        prerequisites: course.prerequisites || "",
+        learningOutcomes: course.learningOutcomes || "",
+        price: course.price || 100,
+        isActive: course.isActive ?? false,
+        isInDevelopment: course.isInDevelopment ?? false,
+        careerTypeId: course.careerTypeId || undefined,
+        categoryIds: course.categoryIds || [],
+        adminId: course.adminId || "1",
+        headerType: course.headerType || "default",
+        headerTitle: course.headerTitle || "",
+        headerSubtitle: course.headerSubtitle || "",
+        headerDescription: course.headerDescription || "",
+        headerButtonText: course.headerButtonText || "",
+        headerButtonLink: course.headerButtonLink || "",
+        techStack: course.techStack || [],
+        customHeaderContent: course.customHeaderContent || "",
+        affiliatedCourseId: course.affiliatedCourseId || null,
+      };
+      reset(courseData);
     }
   }, [course, reset]);
 
@@ -274,6 +312,196 @@ export default function CourseForm({ course }: { course?: ICourse }) {
             error={errors["learningOutcomes"]?.message}
             rows={4}
           />
+        </div>
+
+        {/* Sección de Header Dinámico */}
+        <div className="space-y-6 pt-6 border-t">
+          <div className="flex items-center gap-2 text-gray-700 mb-4">
+            <Layout className="w-5 h-5" />
+            <h3 className="text-lg font-semibold">Header Dinámico del Curso</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SelectInput
+              name="headerType"
+              labelText="Tipo de Header"
+              register={register}
+              error={errors["headerType"]?.message}
+              placeholder="Seleccione tipo de header"
+              options={[
+                { value: "default", label: "Por Defecto" },
+                { value: "programming", label: "Programación (Consola)" },
+                { value: "hacking", label: "Hacking" },
+                { value: "custom", label: "Personalizado (HTML/CSS/JS)" },
+                { value: "iframe", label: "Iframe" },
+              ]}
+            />
+
+            <CustomInput
+              name="headerTitle"
+              register={register}
+              type="text"
+              error={errors["headerTitle"]?.message}
+              labelText="Título del Header (opcional)"
+              placeholder="Si está vacío, usa el título del curso"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CustomInput
+              name="headerSubtitle"
+              register={register}
+              type="text"
+              error={errors["headerSubtitle"]?.message}
+              labelText="Subtítulo/Eslogan"
+              placeholder="Ej: From Zero to Hero"
+            />
+
+            <TextAreaInput
+              name="headerDescription"
+              labelText="Descripción del Header"
+              rows={3}
+              register={register}
+              error={errors["headerDescription"]?.message}
+              placeholder="Descripción que aparecerá en el header"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <CustomInput
+              name="headerButtonText"
+              register={register}
+              type="text"
+              error={errors["headerButtonText"]?.message}
+              labelText="Texto del Botón"
+              placeholder="Ej: Ver módulo"
+            />
+
+            <CustomInput
+              name="headerButtonLink"
+              register={register}
+              type="text"
+              error={errors["headerButtonLink"]?.message}
+              labelText="Link del Botón"
+              placeholder="URL o ruta del botón"
+            />
+          </div>
+
+          {/* Tech Stack */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Tech Stack (tecnologías)
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {watch("techStack")?.map((tech, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-lg"
+                >
+                  <span>{tech}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentStack = watch("techStack") || [];
+                      const newStack = currentStack.filter((_, i) => i !== index);
+                      reset({
+                        ...watch(),
+                        techStack: newStack,
+                      });
+                    }}
+                    className="text-blue-600 hover:text-blue-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Agregar tecnología (ej: React, Node, TS)"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    const input = e.currentTarget;
+                    const value = input.value.trim();
+                    if (value) {
+                      const currentStack = watch("techStack") || [];
+                      if (!currentStack.includes(value)) {
+                        reset({
+                          ...watch(),
+                          techStack: [...currentStack, value],
+                        });
+                        input.value = "";
+                      }
+                    }
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.querySelector(
+                    'input[placeholder*="Agregar tecnología"]'
+                  ) as HTMLInputElement;
+                  if (input?.value.trim()) {
+                    const value = input.value.trim();
+                    const currentStack = watch("techStack") || [];
+                    if (!currentStack.includes(value)) {
+                      reset({
+                        ...watch(),
+                        techStack: [...currentStack, value],
+                      });
+                      input.value = "";
+                    }
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Agregar
+              </button>
+            </div>
+          </div>
+
+          {/* Custom Header Content */}
+          {(watch("headerType") === "custom" || watch("headerType") === "iframe") && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {watch("headerType") === "iframe"
+                  ? "URL del Iframe"
+                  : "Contenido Personalizado (HTML/CSS/JS)"}
+              </label>
+              <TextAreaInput
+                name="customHeaderContent"
+                labelText=""
+                rows={8}
+                register={register}
+                error={errors["customHeaderContent"]?.message}
+                placeholder={
+                  watch("headerType") === "iframe"
+                    ? "https://ejemplo.com/iframe"
+                    : "<div>Tu código HTML/CSS/JS aquí</div>"
+                }
+              />
+            </div>
+          )}
+
+          {/* Curso Afiliado */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Curso Afiliado (opcional)
+            </label>
+            <CustomInput
+              name="affiliatedCourseId"
+              register={register}
+              type="text"
+              error={errors["affiliatedCourseId"]?.message}
+              labelText="ID del Curso Afiliado"
+              placeholder="ID numérico del curso relacionado"
+            />
+          </div>
         </div>
 
         {/* Sección de estado del curso */}

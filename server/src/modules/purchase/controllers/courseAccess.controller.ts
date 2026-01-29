@@ -27,7 +27,11 @@ export class CourseAccessController extends BaseController {
     const userCourses = await CourseAccess.findAll({
       where: {
         userId: parseInt(userId),
-        revokedAt: null // Solo cursos con acceso activo
+        revokedAt: null, // Solo cursos con acceso activo
+        [Op.or]: [
+          { expiresAt: null },
+          { expiresAt: { [Op.gt]: new Date() } }
+        ]
       },
       include: [
         {
@@ -56,7 +60,9 @@ export class CourseAccessController extends BaseController {
         progress: await this.calculateCourseProgress(parseInt(userId), access.course.id),
         accessToken: access.accessToken,
         grantedAt: access.grantedAt,
-        isActive: access.revokedAt === null,
+        expiresAt: access.expiresAt,
+        isPermanent: !access.expiresAt,
+        isActive: access.revokedAt === null && (!access.expiresAt || new Date(access.expiresAt) > new Date()),
         courseId: access.courseId
       }))
     );
@@ -73,12 +79,16 @@ export class CourseAccessController extends BaseController {
 
     const { userId, courseId } = req.params;
 
-    // Verificar que el usuario tiene acceso al curso
+    // Verificar que el usuario tiene acceso al curso (activo y no expirado)
     const courseAccess = await CourseAccess.findOne({
       where: {
         userId: parseInt(userId),
         courseId: parseInt(courseId),
-        revokedAt: null
+        revokedAt: null,
+        [Op.or]: [
+          { expiresAt: null },
+          { expiresAt: { [Op.gt]: new Date() } }
+        ]
       },
       include: [
         {
@@ -108,7 +118,9 @@ export class CourseAccessController extends BaseController {
       progress: await this.calculateCourseProgress(parseInt(userId), (courseAccess as any).course.id),
       accessToken: courseAccess.accessToken,
       grantedAt: courseAccess.grantedAt,
-      isActive: courseAccess.revokedAt === null
+      expiresAt: courseAccess.expiresAt,
+      isPermanent: !courseAccess.expiresAt,
+      isActive: courseAccess.revokedAt === null && (!courseAccess.expiresAt || new Date(courseAccess.expiresAt) > new Date())
     };
 
     this.sendSuccess(res, req, courseDetails, "Detalles del curso obtenidos exitosamente");
@@ -179,25 +191,42 @@ export class CourseAccessController extends BaseController {
   });
 
   /**
-   * Otorga acceso a un curso para un usuario (usado después de una compra exitosa)
+   * Otorga acceso a un curso para un usuario (usado después de una compra exitosa o manualmente por admin)
+   * Soporta acceso permanente o temporal con fecha de expiración
    */
   public static grantCourseAccess = this.asyncHandler(async (req: Request, res: Response) => {
     // Verificar errores de validación
     if (!this.handleValidationErrors(req, res)) return;
 
-    const { userId, courseId } = req.body;
+    const { userId, courseId, expiresAt } = req.body;
 
-    // Verificar si ya existe acceso
+    // Verificar si ya existe acceso activo (no revocado y no expirado)
     const existingAccess = await CourseAccess.findOne({
       where: {
         userId,
         courseId,
-        revokedAt: null
+        revokedAt: null,
+        [Op.or]: [
+          { expiresAt: null },
+          { expiresAt: { [Op.gt]: new Date() } }
+        ]
       }
     });
 
     if (existingAccess) {
-      return this.conflict(res, req, "El usuario ya tiene acceso a este curso");
+      return this.conflict(res, req, "El usuario ya tiene acceso activo a este curso");
+    }
+
+    // Validar fecha de expiración si se proporciona
+    let expiresDate: Date | null = null;
+    if (expiresAt) {
+      expiresDate = new Date(expiresAt);
+      if (isNaN(expiresDate.getTime())) {
+        return this.sendError(res, req, "Fecha de expiración inválida", 400);
+      }
+      if (expiresDate <= new Date()) {
+        return this.sendError(res, req, "La fecha de expiración debe ser futura", 400);
+      }
     }
 
     // Generar token de acceso único
@@ -208,16 +237,21 @@ export class CourseAccessController extends BaseController {
       userId,
       courseId,
       accessToken,
-      grantedAt: new Date()
+      grantedAt: new Date(),
+      expiresAt: expiresDate
     });
 
     this.created(res, req, {
       id: newAccess.id,
       accessToken: newAccess.accessToken,
       grantedAt: newAccess.grantedAt,
+      expiresAt: newAccess.expiresAt,
+      isPermanent: !newAccess.expiresAt,
       userId: newAccess.userId,
       courseId: newAccess.courseId
-    }, "Acceso al curso otorgado exitosamente");
+    }, expiresDate 
+      ? `Acceso al curso otorgado exitosamente hasta ${expiresDate.toLocaleDateString()}`
+      : "Acceso permanente al curso otorgado exitosamente");
   });
 
   /**
