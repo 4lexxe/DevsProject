@@ -60,6 +60,7 @@ import webhookRoute from './modules/webhook/webhook.route';
 // ==================================================
 import './infrastructure/passport/passport';
 import { GeoUtils } from './modules/auth/utils/geo.utils';
+import { setServerStartTime } from './modules/auth/services/session.service';
 
 // ==================================================
 // Extensiones de tipos para librerías externas
@@ -84,7 +85,15 @@ declare module 'geoip-lite' {
 // Configuración inicial de la aplicación
 // ==================================================
 const app = express();
-const PORT = /* process.env.PORT || */ 3000;
+const PORT = process.env.PORT || 3000;
+
+// Validar que las variables de entorno requeridas estén definidas
+if (!process.env.CLIENT_URL) {
+  console.warn('⚠️  ADVERTENCIA: CLIENT_URL no está definida. Usando valor por defecto.');
+}
+if (!process.env.ADMIN_CLIENT_URL) {
+  console.warn('⚠️  ADVERTENCIA: ADMIN_CLIENT_URL no está definida. Usando valor por defecto.');
+}
 
 // ==================================================
 // 1. Middlewares de seguridad básicos
@@ -92,13 +101,26 @@ const PORT = /* process.env.PORT || */ 3000;
 // ==================================================
 app.set('trust proxy', true);
 app.use(helmet()); // Seguridad de cabeceras HTTP
+// Construir array de orígenes permitidos desde variables de entorno
+const allowedOrigins: string[] = [];
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL);
+}
+if (process.env.ADMIN_CLIENT_URL) {
+  allowedOrigins.push(process.env.ADMIN_CLIENT_URL);
+}
+// Permitir orígenes adicionales desde variable de entorno separada por comas
+if (process.env.ADDITIONAL_CORS_ORIGINS) {
+  const additionalOrigins = process.env.ADDITIONAL_CORS_ORIGINS.split(',').map(origin => origin.trim());
+  allowedOrigins.push(...additionalOrigins);
+}
+
+if (allowedOrigins.length === 0) {
+  console.warn('⚠️  ADVERTENCIA: No hay orígenes CORS configurados. La aplicación puede no funcionar correctamente.');
+}
+
 app.use(cors({
-  origin: [
-    process.env.CLIENT_URL || 'http://localhost:5173',           // App principal de usuarios
-    'http://localhost:5174',                                     // App principal en puerto alternativo
-    process.env.ADMIN_CLIENT_URL || 'http://localhost:5175',     // App de dashboard admin
-    'http://localhost:3000'  // Para desarrollo local adicional
-  ],
+  origin: allowedOrigins.length > 0 ? allowedOrigins : false,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Forwarded-For', 'Range', 'Accept-Ranges'],
@@ -190,7 +212,7 @@ app.use((req: Request, res, next) => {
     }]);
     console.table([{
       'Zona Horaria': req.geo.timezone,
-      'Proxy': req.geo.proxy ? '✅ Sí' : '❌ No',
+      'Proxy': req.geo.proxy ? ' Sí' : ' No',
       'Método': req.method,
       'Endpoint': req.originalUrl
     }]);
@@ -200,7 +222,7 @@ app.use((req: Request, res, next) => {
     next();
     
   } catch (error) {
-    console.error('\n⚠️  Error en geolocalización:', error);
+    console.error('\n  Error en geolocalización:', error);
     next();
   }
 });
@@ -336,9 +358,9 @@ async function syncCourseModel() {
   try {
     // Usar alter: true para agregar nuevas columnas sin eliminar datos
     await Course.sync({ alter: true });
-    console.log('✅ Modelo Course sincronizado (nuevas columnas agregadas si es necesario)');
+    console.log(' Modelo Course sincronizado (nuevas columnas agregadas si es necesario)');
   } catch (error) {
-    console.error('⚠️  Error al sincronizar modelo Course:', error);
+    console.error('  Error al sincronizar modelo Course:', error);
     // No detener el servidor si hay error, solo mostrar advertencia
   }
 }
@@ -347,9 +369,9 @@ async function syncHeaderSectionModel() {
   try {
     // Usar alter: true para agregar nuevas columnas sin eliminar datos
     await HeaderSection.sync({ alter: true });
-    console.log('✅ Modelo HeaderSection sincronizado (nuevas columnas agregadas si es necesario)');
+    console.log(' Modelo HeaderSection sincronizado (nuevas columnas agregadas si es necesario)');
   } catch (error: any) {
-    console.error('⚠️  Error al sincronizar modelo HeaderSection:', error);
+    console.error('  Error al sincronizar modelo HeaderSection:', error);
     console.error('Detalles del error:', {
       message: error.message,
       name: error.name,
@@ -364,9 +386,12 @@ async function syncHeaderSectionModel() {
 // 10. Configuración del servidor web
 // ==================================================
 const server = app.listen(PORT, async () => {
-  console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`);
+  console.log(` Servidor ejecutándose en puerto ${PORT}`);
   console.log('Entorno:', process.env.NODE_ENV || 'development');
   console.log('Estado geolocalización:', GeoUtils.checkServiceStatus());
+  
+  // Establecer timestamp de inicio del servidor para invalidar tokens anteriores
+  setServerStartTime();
   
   // Sincronizar modelos al iniciar
   // Importante: Course primero porque HeaderSection puede depender de él indirectamente
@@ -380,7 +405,7 @@ const server = app.listen(PORT, async () => {
 // ==================================================
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : process.env.CLIENT_URL || '*',
     methods: ['GET', 'POST'],
   },
 });
@@ -388,7 +413,7 @@ const io = new Server(server, {
 const estadoMensajesBienvenida: Record<string, boolean> = {};
 
 io.on('connection', (socket: Socket) => {
-  console.log('🔌 Nuevo cliente conectado');
+  console.log(' Nuevo cliente conectado');
 
   socket.on('identify', ({ userId }) => {
     console.log(`🆔 Usuario identificado: ${userId}`);
@@ -399,12 +424,12 @@ io.on('connection', (socket: Socket) => {
   });
 
   socket.on('welcomeMessageShown', ({ userId }) => {
-    console.log(`✅ Mensaje visto por usuario: ${userId}`);
+    console.log(` Mensaje visto por usuario: ${userId}`);
     estadoMensajesBienvenida[userId] = true;
   });
 
   socket.on('disconnect', () => {
-    console.log(`❌ Cliente desconectado: ${socket.userId}`);
+    console.log(` Cliente desconectado: ${socket.userId}`);
   });
 });
 

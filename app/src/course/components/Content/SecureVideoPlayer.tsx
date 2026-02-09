@@ -61,8 +61,8 @@ function SecureVideoPlayer({
         // Debug: Analizar estrategia que se usará
         const analysis = await videoService.analyzeStrategy(contentFileId);
         if (analysis.success && analysis.strategy) {
-          console.log(`📋 Estrategia recomendada: ${analysis.strategy.recommended.toUpperCase()}`);
-          console.log(`📝 Razón: ${analysis.strategy.reason}`);
+          console.log(` Estrategia recomendada: ${analysis.strategy.recommended.toUpperCase()}`);
+          console.log(` Razón: ${analysis.strategy.reason}`);
           setStrategy({
             type: analysis.strategy.recommended,
             reason: analysis.strategy.reason
@@ -85,12 +85,12 @@ function SecureVideoPlayer({
   }, [contentFileId, onLoadStart, onLoadEnd, onError]);
 
   const handlePlayerError = (error: any) => {
-    console.error('❌ Error en React Player:', error);
+    console.error(' Error en React Player:', error);
     
     // Obtener más detalles del error del elemento video
     if (error?.target) {
       const videoElement = error.target;
-      console.error('📊 Estado del video:', {
+      console.error(' Estado del video:', {
         networkState: videoElement.networkState,
         readyState: videoElement.readyState,
         error: videoElement.error,
@@ -102,7 +102,7 @@ function SecureVideoPlayer({
       if (videoElement.error) {
         const errorCode = videoElement.error.code;
         const errorMessage = videoElement.error.message;
-        console.error(`📍 Error específico: Código ${errorCode} - ${errorMessage}`);
+        console.error(` Error específico: Código ${errorCode} - ${errorMessage}`);
         
         let userFriendlyError = 'Error al reproducir el video';
         switch (errorCode) {
@@ -154,7 +154,7 @@ function SecureVideoPlayer({
           <button
             onClick={() => {
               const debugUrl = videoService.getSecureStreamUrl(contentFileId);
-              console.log('🔗 URL de prueba:', debugUrl);
+              console.log(' URL de prueba:', debugUrl);
               window.open(debugUrl, '_blank');
             }}
             className="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"

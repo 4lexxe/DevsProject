@@ -13,7 +13,7 @@ export class LogoutController {
       const user = req.user as User;
       
       if (!user || !user.id) {
-        console.warn("⚠️ No se encontró usuario en la sesión durante el cierre de sesión");
+        console.warn(" No se encontró usuario en la sesión durante el cierre de sesión");
         res.status(401).json({ error: "No se encontró sesión" });
         return;
       }
@@ -44,7 +44,7 @@ export class LogoutController {
               }
             }
           );
-          console.log('🎮 Sesión de usuario de Discord desactivada explícitamente');
+          console.log(' Sesión de usuario de Discord desactivada explícitamente');
         } else if (user.authProvider === 'github') {
           // Actualizar estado de la sesión del usuario con manejo especial para usuarios de GitHub
           await User.update(
@@ -59,7 +59,7 @@ export class LogoutController {
               }
             }
           );
-          console.log('💻 Sesión de usuario de GitHub desactivada explícitamente');
+          console.log(' Sesión de usuario de GitHub desactivada explícitamente');
         } else {
           // Actualizar regularmente para otros usuarios
           await User.update(
@@ -71,33 +71,33 @@ export class LogoutController {
               where: { id: user.id }
             }
           );
-          console.log('📧 Sesión de usuario local desactivada');
+          console.log(' Sesión de usuario local desactivada');
         }
 
         // Registrar información de cierre de sesión del usuario con emojis
-        const providerEmoji = user.authProvider === 'discord' ? '🎮 Discord' : 
-                             user.authProvider === 'github' ? '💻 GitHub' : 
-                             '📧 Local';
+        const providerEmoji = user.authProvider === 'discord' ? ' Discord' : 
+                             user.authProvider === 'github' ? ' GitHub' : 
+                             ' Local';
 
         console.log(`
-🚪 Usuario cerró sesión:
-👤 Nombre de usuario: ${user.username}
-📝 Nombre para mostrar: ${user.displayName}
-🔑 Proveedor de autenticación: ${providerEmoji}
-⏰ Última actividad: ${new Date().toLocaleString()}
-📍 Última IP de inicio de sesión: ${user.lastLoginIp}
-🌍 Ubicación: ${user.lastLoginGeo?.city}, ${user.lastLoginGeo?.country}
-🔒 Estado de la sesión: Desactivada
+ Usuario cerró sesión:
+ Nombre de usuario: ${user.username}
+ Nombre para mostrar: ${user.displayName}
+ Proveedor de autenticación: ${providerEmoji}
+ Última actividad: ${new Date().toLocaleString()}
+ Última IP de inicio de sesión: ${user.lastLoginIp}
+ Ubicación: ${user.lastLoginGeo?.city}, ${user.lastLoginGeo?.country}
+ Estado de la sesión: Desactivada
         `);
 
       } catch (updateError) {
-        console.error("❌ Error al actualizar el estado de la sesión del usuario:", updateError);
+        console.error(" Error al actualizar el estado de la sesión del usuario:", updateError);
       }
 
       // Destruir sesión
       req.session.destroy((err) => {
         if (err) {
-          console.error("❌ Error al destruir la sesión:", err);
+          console.error(" Error al destruir la sesión:", err);
           return res.status(500).json({ error: "Error al cerrar sesión" });
         }
 
@@ -111,7 +111,7 @@ export class LogoutController {
         });
         
         res.json({
-          message: "✅ Sesión cerrada correctamente",
+          message: " Sesión cerrada correctamente",
           success: true,
           userInfo: {
             username: user.username,
@@ -123,7 +123,7 @@ export class LogoutController {
         });
       });
     } catch (error) {
-      console.error("❌ Error durante el cierre de sesión:", error);
+      console.error(" Error durante el cierre de sesión:", error);
       res.status(500).json({ error: "Error al cerrar sesión" });
     }
   }

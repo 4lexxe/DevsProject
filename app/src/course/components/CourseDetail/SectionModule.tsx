@@ -9,9 +9,17 @@ import { Section } from "@/course/interfaces/ViewnerCourse";
 
 interface SectionModuleProps {
   section: Section;
+  isPublicView?: boolean; // Indica si estamos en vista pública (sin acceso al contenido real)
+  isAuthenticatedNoAccess?: boolean; // Usuario logueado pero sin acceso (no ha comprado)
+  courseSlug?: string; // Slug del curso para generar URLs
 }
 
-const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
+const SectionModule: React.FC<SectionModuleProps> = ({ 
+  section, 
+  isPublicView = false, 
+  isAuthenticatedNoAccess = false,
+  courseSlug 
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -57,11 +65,13 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
             <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-700 mb-3">
               {section.moduleType}
             </span>
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            )}
+            <div className="flex items-center gap-2">
+              {isExpanded ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
           </div>
           {/* Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -79,7 +89,15 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
           <div className="space-y-4">
             {section.contents &&
               section.contents.map((content) => (
-                <ContentViewer courseId={section.courseId} key={content.id} content={content} />
+                <ContentViewer 
+                  courseId={section.courseId}
+                  courseSlug={courseSlug}
+                  sectionSlug={section.slug}
+                  key={content.id} 
+                  content={content}
+                  isPublicView={isPublicView}
+                  isAuthenticatedNoAccess={isAuthenticatedNoAccess}
+                />
               ))}
           </div>
         </div>

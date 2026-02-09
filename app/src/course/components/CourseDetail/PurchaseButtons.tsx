@@ -36,7 +36,7 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
   pricing,
   className = "" 
 }) => {
-  console.log('🎯 PurchaseButtons recibió props - courseId:', courseId, 'tipo:', typeof courseId, 'pricing:', pricing);
+  console.log(' PurchaseButtons recibió props - courseId:', courseId, 'tipo:', typeof courseId, 'pricing:', pricing);
   const [loading, setLoading] = useState(false);
   const [directPurchaseLoading, setDirectPurchaseLoading] = useState(false);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -55,8 +55,8 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
   } | null>(null);
 
   // Log para debugging del estado del modal
-  console.log('🔍 Estado modal - showPendingOrderModal:', showPendingOrderModal);
-  console.log('🔍 Estado modal - pendingOrderData:', pendingOrderData);
+  console.log(' Estado modal - showPendingOrderModal:', showPendingOrderModal);
+  console.log(' Estado modal - pendingOrderData:', pendingOrderData);
 
   // Verificar acceso al curso al cargar el componente
   useEffect(() => {
@@ -84,21 +84,21 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
   // Ahora el usuario debe hacer clic en "Obtener curso GRATIS" para obtener acceso
 
   const handleAddToCart = async () => {
-    console.log('🛒 handleAddToCart - courseId:', courseId, 'tipo:', typeof courseId);
+    console.log(' handleAddToCart - courseId:', courseId, 'tipo:', typeof courseId);
     
     try {
       setLoading(true);
       setError(null);
       
       if (!courseId || courseId === 'undefined') {
-        console.error('❌ courseId inválido en handleAddToCart:', courseId);
+        console.error(' courseId inválido en handleAddToCart:', courseId);
         setError('ID del curso no válido');
         return;
       }
       
-      console.log('📞 Llamando addCourseToCart con ID:', courseId);
+      console.log(' Llamando addCourseToCart con ID:', courseId);
       await addCourseToCart(parseInt(courseId));
-      console.log('✅ Curso agregado al carrito exitosamente');
+      console.log(' Curso agregado al carrito exitosamente');
       
       setAddedToCart(true);
       
@@ -106,15 +106,15 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
         setAddedToCart(false);
       }, 3000);
     } catch (error: any) {
-      console.error('❌ Error adding course to cart:', error);
+      console.error(' Error adding course to cart:', error);
       
       if (error.response?.status === 422) {
         const errorMessage = error.response?.data?.message;
         const errorData = error.response?.data?.errors; // Cambiar de 'data' a 'errors'
         
-        console.log('🔍 Error 422 carrito - errorMessage:', errorMessage);
-        console.log('🔍 Error 422 carrito - errorData (errors):', errorData);
-        console.log('🔍 Error 422 carrito - errorData.errorType:', errorData?.errorType);
+        console.log(' Error 422 carrito - errorMessage:', errorMessage);
+        console.log(' Error 422 carrito - errorData (errors):', errorData);
+        console.log(' Error 422 carrito - errorData.errorType:', errorData?.errorType);
         
         if (errorMessage?.includes('ya está en el carrito')) {
           setError('Ya está en tu carrito');
@@ -123,12 +123,12 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
           setError(null);
         } else if (errorData?.errorType === 'PENDING_ORDER') {
           // Detectar error de orden pendiente usando el campo específico también en carrito
-          console.log('🔍 Error de orden pendiente en carrito detectado por errorType');
+          console.log(' Error de orden pendiente en carrito detectado por errorType');
           
           if (errorData?.orderId || errorData?.orderDetails?.length > 0) {
             // Para carrito puede haber múltiples órdenes, tomar la primera
             const firstOrder = errorData?.orderDetails?.[0] || errorData;
-            console.log('🔍 Configurando modal carrito con firstOrder:', firstOrder);
+            console.log(' Configurando modal carrito con firstOrder:', firstOrder);
             setPendingOrderData({
               orderId: firstOrder.orderId || errorData.orderId,
               orderType: firstOrder.type || errorData.orderType || 'unknown',
@@ -159,41 +159,41 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
   };
 
   const handleDirectPurchase = async () => {
-    console.log('🔍 handleDirectPurchase - courseId:', courseId, 'tipo:', typeof courseId);
+    console.log(' handleDirectPurchase - courseId:', courseId, 'tipo:', typeof courseId);
     
     try {
       setDirectPurchaseLoading(true);
       setError(null);
       
       if (!courseId || courseId === 'undefined') {
-        console.error('❌ courseId inválido en handleDirectPurchase:', courseId);
+        console.error(' courseId inválido en handleDirectPurchase:', courseId);
         setError('ID del curso no válido');
         return;
       }
       
       if (isFree) {
-        console.log('📞 Llamando grantFreeCourseAccess con ID:', courseId);
+        console.log(' Llamando grantFreeCourseAccess con ID:', courseId);
         await grantFreeCourseAccess(courseId);
         setHasAccess(true);
       } else {
-        console.log('📞 Llamando directPurchaseCourse con ID:', courseId);
+        console.log(' Llamando directPurchaseCourse con ID:', courseId);
         const response = await directPurchaseCourse(courseId);
-        console.log('✅ Respuesta completa de directPurchaseCourse:', response);
-        console.log('🔍 initPoint recibido:', response.initPoint, 'tipo:', typeof response.initPoint);
+        console.log(' Respuesta completa de directPurchaseCourse:', response);
+        console.log(' initPoint recibido:', response.initPoint, 'tipo:', typeof response.initPoint);
         
         // Validar initPoint antes de redirigir
         if (!response.initPoint || response.initPoint === 'undefined' || response.initPoint.includes('undefined')) {
-          console.error('❌ initPoint inválido recibido:', response.initPoint);
+          console.error(' initPoint inválido recibido:', response.initPoint);
           setError('Error: URL de pago inválida');
           return;
         }
         
-        console.log('🚀 Redirigiendo a:', response.initPoint);
+        console.log(' Redirigiendo a:', response.initPoint);
         // Redirigir a MercadoPago igual que el carrito
         window.location.href = response.initPoint;
       }
     } catch (error: any) {
-      console.error('❌ Error in direct purchase:', error);
+      console.error(' Error in direct purchase:', error);
       
       if (error.response?.status === 401) {
         setError('Inicia sesión para continuar');
@@ -201,19 +201,19 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
         const errorMessage = error.response?.data?.message;
         const errorData = error.response?.data?.errors; // Cambiar de 'data' a 'errors'
         
-        console.log('🔍 Error 422 - errorMessage:', errorMessage);
-        console.log('🔍 Error 422 - errorData (errors):', errorData);
-        console.log('🔍 Error 422 - errorData.errorType:', errorData?.errorType);
+        console.log(' Error 422 - errorMessage:', errorMessage);
+        console.log(' Error 422 - errorData (errors):', errorData);
+        console.log(' Error 422 - errorData.errorType:', errorData?.errorType);
         
         if (errorMessage?.includes('Ya tienes acceso')) {
           setHasAccess(true);
           setError(null);
         } else if (errorData?.errorType === 'PENDING_ORDER') {
           // Detectar error de orden pendiente usando el campo específico
-          console.log('🔍 Error de orden pendiente detectado por errorType');
+          console.log(' Error de orden pendiente detectado por errorType');
           
           if (errorData?.orderId) {
-            console.log('🔍 Configurando modal con orderId:', errorData.orderId);
+            console.log(' Configurando modal con orderId:', errorData.orderId);
             setPendingOrderData({
               orderId: errorData.orderId,
               orderType: errorData.orderType || 'unknown',
@@ -224,7 +224,7 @@ const PurchaseButtons: React.FC<PurchaseButtonsProps> = ({
             setError(null); // Asegurar que no hay error de texto
           } else {
             // Solo mostrar error si no tenemos datos para el modal
-            console.log('🔍 No hay orderId, mostrando error normal');
+            console.log(' No hay orderId, mostrando error normal');
             setError(errorMessage);
           }
         } else {

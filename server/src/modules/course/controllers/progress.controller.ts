@@ -7,8 +7,10 @@ import Section from '../models/Section';
 import User from '../../user/User';
 import Role from '../../role/Role';
 import CourseAccess from '../../purchase/models/CourseAccess';
+import Admin from '../../admin/Admin';
 import { Op } from 'sequelize';
 import sequelize from '../../../infrastructure/database/db';
+import { checkCourseAccessAndPermissions, verifyUserPermissions } from '../utils/courseAccessHelper';
 
 /**
  * Controlador para gestionar el progreso del usuario en los cursos
@@ -21,23 +23,39 @@ export class ProgressController extends BaseController {
   public static accessContent = this.asyncHandler(async (req: Request, res: Response) => {
     const { courseId, contentId } = req.params;
     const { timeSpent } = req.body;
-    const userId = (req.user as User)?.id;
+    const user = req.user as User | undefined;
+    const userId = user?.id;
 
     if (!userId) {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
-    // Verificar que el usuario tiene acceso al curso
-    const courseAccess = await CourseAccess.findOne({
-      where: {
-        userId: userId,
-        courseId: parseInt(courseId),
-        revokedAt: null
-      }
+    // Obtener el curso para verificar acceso
+    const course = await Course.findByPk(parseInt(courseId), {
+      attributes: ["id", "title", "slug", "price", "adminId"],
+      include: [
+        {
+          model: Admin,
+          as: "admin",
+          attributes: ["id", "userId"]
+        }
+      ]
     });
 
-    if (!courseAccess) {
-      return this.forbidden(res, req, 'No tienes acceso a este curso');
+    if (!course) {
+      return this.notFound(res, req, 'Curso no encontrado');
+    }
+
+    // Verificar permisos básicos
+    if (!verifyUserPermissions(user, ["read:course_details", "access:course_content"])) {
+      return this.forbidden(res, req, "No tienes permisos para acceder a este recurso");
+    }
+
+    // Verificar acceso al curso (pago, etc.) usando la misma lógica que otros controladores
+    const accessCheck = await checkCourseAccessAndPermissions(req, res, course);
+    if (!accessCheck.allowed) {
+      res.status(403).json(accessCheck.errorResponse);
+      return;
     }
 
     // Verificar que el contenido existe y pertenece al curso
@@ -91,23 +109,39 @@ export class ProgressController extends BaseController {
    */
   public static markContentCompleted = this.asyncHandler(async (req: Request, res: Response) => {
     const { courseId, contentId } = req.params;
-    const userId = (req.user as User)?.id;
+    const user = req.user as User | undefined;
+    const userId = user?.id;
 
     if (!userId) {
       return this.unauthorized(res, req, 'Usuario no autenticado');
     }
 
-    // Verificar que el usuario tiene acceso al curso
-    const courseAccess = await CourseAccess.findOne({
-      where: {
-        userId: userId,
-        courseId: parseInt(courseId),
-        revokedAt: null
-      }
+    // Obtener el curso para verificar acceso
+    const course = await Course.findByPk(parseInt(courseId), {
+      attributes: ["id", "title", "slug", "price", "adminId"],
+      include: [
+        {
+          model: Admin,
+          as: "admin",
+          attributes: ["id", "userId"]
+        }
+      ]
     });
 
-    if (!courseAccess) {
-      return this.forbidden(res, req, 'No tienes acceso a este curso');
+    if (!course) {
+      return this.notFound(res, req, 'Curso no encontrado');
+    }
+
+    // Verificar permisos básicos
+    if (!verifyUserPermissions(user, ["read:course_details", "access:course_content"])) {
+      return this.forbidden(res, req, "No tienes permisos para acceder a este recurso");
+    }
+
+    // Verificar acceso al curso (pago, etc.) usando la misma lógica que otros controladores
+    const accessCheck = await checkCourseAccessAndPermissions(req, res, course);
+    if (!accessCheck.allowed) {
+      res.status(403).json(accessCheck.errorResponse);
+      return;
     }
 
     // Verificar que el contenido existe y pertenece al curso

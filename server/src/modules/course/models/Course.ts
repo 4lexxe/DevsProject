@@ -166,7 +166,7 @@ Course.init(
   {
     sequelize,
     modelName: "Course",
-    tableName: "Courses", // 🔹 Corrección del espacio extra
+    tableName: "Courses", //  Corrección del espacio extra
     timestamps: true,
     paranoid: true,
     indexes: [
@@ -176,7 +176,7 @@ Course.init(
   }
 );
 
-// 📌 Tabla intermedia para relación Muchos a Muchos (Course ↔ Category)
+//  Tabla intermedia para relación Muchos a Muchos (Course  Category)
 class CourseCategory extends Model {
   public courseId!: bigint;
   public categoryId!: bigint;
@@ -209,9 +209,9 @@ CourseCategory.init(
   }
 );
 
-// 📌 **Relaciones**
+//  **Relaciones**
 
-// 🔹 Muchos a Muchos (Course ↔ Category)
+//  Muchos a Muchos (Course  Category)
 Course.belongsToMany(Category, { 
   through: CourseCategory, 
   as: "categories", 
@@ -228,15 +228,15 @@ Category.belongsToMany(Course, {
 });
 
 
-// 🔹 Uno a Muchos (Course → CareerType)
+//  Uno a Muchos (Course → CareerType)
 Course.belongsTo(CareerType, { foreignKey: "careerTypeId", as: "careerType" });
 CareerType.hasMany(Course, { foreignKey: "careerTypeId", as: "courses" });
 
-// 🔹 Uno a Muchos (Course → Admin)
+//  Uno a Muchos (Course → Admin)
 Course.belongsTo(Admin, { foreignKey: "adminId", as: "admin" });
 Admin.hasMany(Course, { foreignKey: "adminId", as: "courses" });
 
-// 🔹 Relación con curso afiliado (auto-referencia)
+//  Relación con curso afiliado (auto-referencia)
 Course.belongsTo(Course, { foreignKey: "affiliatedCourseId", as: "affiliatedCourse" });
 Course.hasMany(Course, { foreignKey: "affiliatedCourseId", as: "affiliatedCourses" });
 

@@ -9,6 +9,7 @@ export interface HeaderSection {
   about: string;
   buttonName: string;
   buttonLink: string;
+  badgeText?: string;
   // Campos de personalización
   contentType?: 'default' | 'code' | 'iframe' | 'custom';
   customCode?: string;
@@ -37,7 +38,7 @@ export const getHeaderSections = async (): Promise<HeaderSection[]> => {
     }
     // Si la respuesta es directamente un array
     if (Array.isArray(response.data)) {
-      return response.data;
+    return response.data;
     }
     // Si no hay datos, retornar array vacío
     return [];

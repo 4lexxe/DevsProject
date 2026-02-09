@@ -35,7 +35,7 @@ export class VideoProxyService {
    */
   async validateVideoFile(fileId: string): Promise<VideoMetadata | null> {
     try {
-      console.log(`🔍 Validando archivo de video: ${fileId}`);
+      console.log(` Validando archivo de video: ${fileId}`);
 
       const response = await this.drive.files.get({
         fileId: fileId,
@@ -45,11 +45,11 @@ export class VideoProxyService {
       const file = response.data;
 
       if (!file.mimeType?.startsWith('video/')) {
-        console.log(`⚠️ El archivo ${fileId} no es un video: ${file.mimeType}`);
+        console.log(` El archivo ${fileId} no es un video: ${file.mimeType}`);
         return null;
       }
 
-      console.log(`✅ Video válido: ${file.name} (${file.mimeType})`);
+      console.log(` Video válido: ${file.name} (${file.mimeType})`);
 
       return {
         id: file.id!,
@@ -60,7 +60,7 @@ export class VideoProxyService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al validar archivo de video ${fileId}:`, error.message);
+      console.error(` Error al validar archivo de video ${fileId}:`, error.message);
       return null;
     }
   }
@@ -70,7 +70,7 @@ export class VideoProxyService {
    */
   async getVideoStream(fileId: string, totalSize: number, mimeType: string, rangeHeader?: string): Promise<VideoStreamResult> {
     try {
-      console.log(`📹 Obteniendo stream de video: ${fileId} (${totalSize} bytes)`);
+      console.log(` Obteniendo stream de video: ${fileId} (${totalSize} bytes)`);
 
       // Ya no necesitamos consultar metadatos - los recibimos como parámetros
       if (!mimeType.startsWith('video/')) {
@@ -92,7 +92,7 @@ export class VideoProxyService {
         end = parseInt(range[1], 10) || totalSize - 1;
         
         headers.Range = `bytes=${start}-${end}`;
-        console.log(`📊 Range solicitado: ${start}-${end} de ${totalSize}`);
+        console.log(` Range solicitado: ${start}-${end} de ${totalSize}`);
       }
 
       // Obtener el stream desde Google Drive
@@ -107,7 +107,7 @@ export class VideoProxyService {
       const contentLength = end - start + 1;
       const contentRange = rangeHeader ? `bytes ${start}-${end}/${totalSize}` : undefined;
 
-      console.log(`✅ Stream obtenido exitosamente para ${fileId}`);
+      console.log(` Stream obtenido exitosamente para ${fileId}`);
 
       return {
         success: true,
@@ -119,7 +119,7 @@ export class VideoProxyService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener stream de video ${fileId}:`, error.message);
+      console.error(` Error al obtener stream de video ${fileId}:`, error.message);
       return {
         success: false,
         error: error.message || 'Error al obtener el stream del video'
@@ -132,7 +132,7 @@ export class VideoProxyService {
    */
   async getVideoMetadata(fileId: string): Promise<VideoMetadata | null> {
     try {
-      console.log(`📋 Obteniendo metadatos de video: ${fileId}`);
+      console.log(` Obteniendo metadatos de video: ${fileId}`);
 
       const response = await this.drive.files.get({
         fileId: fileId,
@@ -154,7 +154,7 @@ export class VideoProxyService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener metadatos de video ${fileId}:`, error.message);
+      console.error(` Error al obtener metadatos de video ${fileId}:`, error.message);
       return null;
     }
   }
@@ -164,10 +164,10 @@ export class VideoProxyService {
    */
   async clearVideoCache(fileId: string): Promise<void> {
     try {
-      console.log(`🧹 Limpiando cache de video: ${fileId}`);
+      console.log(` Limpiando cache de video: ${fileId}`);
       // TODO: Implementar limpieza de cache si es necesario
     } catch (error: any) {
-      console.error(`❌ Error al limpiar cache de video ${fileId}:`, error.message);
+      console.error(` Error al limpiar cache de video ${fileId}:`, error.message);
     }
   }
 }

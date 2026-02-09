@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!API_BASE_URL) {
+  throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+}
 
 // Configurar axios con interceptores para incluir el token de autenticación
 const api = axios.create({
@@ -98,12 +102,12 @@ export const grantFreeCourseAccess = async (courseId: string): Promise<DirectPur
  */
 export const directPurchaseCourse = async (courseId: string): Promise<DirectPurchaseResponse> => {
   try {
-    console.log('🔍 Enviando request a:', `/direct/course/${courseId}/direct-purchase`);
+    console.log(' Enviando request a:', `/direct/course/${courseId}/direct-purchase`);
     const response = await api.post(`/direct/course/${courseId}/direct-purchase`);
-    console.log('🔍 Response completo del backend:', response);
-    console.log('🔍 Response.data:', response.data);
-    console.log('🔍 Response.data.data:', response.data.data);
-    console.log('🔍 Response.data.data.initPoint:', response.data.data?.initPoint);
+    console.log(' Response completo del backend:', response);
+    console.log(' Response.data:', response.data);
+    console.log(' Response.data.data:', response.data.data);
+    console.log(' Response.data.data.initPoint:', response.data.data?.initPoint);
     
     // El backend envía la respuesta con estructura BaseController: { data: { initPoint, course } }
     // Necesitamos acceder a response.data.data para obtener los datos reales

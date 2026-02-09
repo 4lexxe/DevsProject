@@ -263,6 +263,35 @@ const HeaderSectionForm: React.FC<HeaderSectionFormProps> = ({
           </div>
         </div>
 
+        {/* Badge Text */}
+        <div>
+          <label className="flex items-center text-sm font-medium text-gray-300 mb-2" htmlFor="badgeText">
+            <Type className="h-4 w-4 mr-2 text-gray-400" />
+            Texto del Badge
+          </label>
+          <input
+            type="text"
+            id="badgeText"
+            name="badgeText"
+            value={formData.badgeText || ''}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            className={getFieldClassName('badgeText')}
+            placeholder="Ej: Developer Path"
+            disabled={loading}
+            maxLength={30}
+          />
+          {touchedFields.badgeText && errors.badgeText && (
+            <div className="mt-2 flex items-center text-sm text-red-400">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              {errors.badgeText}
+            </div>
+          )}
+          <div className="mt-2 text-xs text-gray-500 flex justify-end">
+            {(formData.badgeText || '').length}/30 caracteres
+          </div>
+        </div>
+
         {/* URL de la Imagen */}
         <div>
           <label className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" htmlFor="image">

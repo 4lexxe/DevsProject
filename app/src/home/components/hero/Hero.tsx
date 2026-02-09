@@ -50,15 +50,6 @@ const Hero: React.FC = () => {
   const [headerSection, setHeaderSection] = useState<HeaderSection | null>(null);
   const [courseHeader, setCourseHeader] = useState<CourseHeader | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-
-  const animatedTexts = [
-    'Code. Learn. Build.',
-    'From Zero to Hero',
-    'Real Projects',
-    'Expert Mentorship'
-  ];
-
   useEffect(() => {
     const fetchHeroContent = async () => {
       try {
@@ -126,14 +117,6 @@ const Hero: React.FC = () => {
     fetchHeroContent();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextIndex((prev) => (prev + 1) % animatedTexts.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
-
   // Datos por defecto
   const defaultData = {
     title: "Build Your Code Journey",
@@ -141,7 +124,8 @@ const Hero: React.FC = () => {
     about: "Master modern web development with hands-on projects, expert guidance, and real-world experience.",
     buttonName: "Start Coding",
     buttonLink: "/courses",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
+    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80",
+    badgeText: "Developer Path"
   };
 
   // Priorizar curso con header dinámico, luego HeaderSection, luego datos por defecto
@@ -155,6 +139,7 @@ const Hero: React.FC = () => {
     techStack: courseHeader.techStack || [],
     headerType: courseHeader.headerType,
     customHeaderContent: courseHeader.customHeaderContent,
+    badgeText: defaultData.badgeText, // Los cursos usan el badge por defecto
   } : headerSection ? {
     title: headerSection.title || defaultData.title,
     slogan: headerSection.slogan || defaultData.slogan,
@@ -175,6 +160,7 @@ const Hero: React.FC = () => {
     textColor: headerSection.textColor,
     buttonColor: headerSection.buttonColor,
     buttonTextColor: headerSection.buttonTextColor,
+    badgeText: headerSection.badgeText,
   } : defaultData;
 
   if (loading) {
@@ -240,6 +226,7 @@ const Hero: React.FC = () => {
             className="space-y-8 text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
           >
             {/* Badge */}
+            {heroData.badgeText && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -247,9 +234,10 @@ const Hero: React.FC = () => {
               className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 text-gray-700 shadow-lg text-sm"
             >
               <GitBranch className="w-4 h-4" />
-              <span className="font-semibold">Developer Path</span>
+                <span className="font-semibold">{heroData.badgeText}</span>
               <Star className="w-4 h-4 text-yellow-500 fill-current" />
             </motion.div>
+            )}
 
             {/* Main Title */}
             <div className="space-y-6">
@@ -264,7 +252,7 @@ const Hero: React.FC = () => {
                 </span>
               </motion.h1>
               
-              {/* Animated Subtitle */}
+              {/* Subtitle */}
               <div className="text-xl sm:text-2xl lg:text-3xl text-gray-600 h-12 flex items-center justify-center lg:justify-start font-bold">
                 {courseHeader && courseHeader.headerSubtitle ? (
                   <motion.span
@@ -276,16 +264,14 @@ const Hero: React.FC = () => {
                     {courseHeader.headerSubtitle}
                   </motion.span>
                 ) : (
-                  <motion.span
-                    key={currentTextIndex}
-                    initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -20, scale: 1.2 }}
-                    transition={{ duration: 0.6, ease: "backOut" }}
-                    className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
-                  >
-                    {currentTextIndex === 0 ? heroData.slogan : animatedTexts[currentTextIndex]}
-                  </motion.span>
+                <motion.span
+                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.6, ease: "backOut" }}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
+                >
+                    {heroData.slogan}
+                </motion.span>
                 )}
               </div>
             </div>
@@ -334,28 +320,28 @@ const Hero: React.FC = () => {
 
             {/* Tech Stack Icons */}
             {(heroData.techStack && heroData.techStack.length > 0) && (
-              <motion.div 
-                className="flex flex-col sm:flex-row items-center gap-4 pt-8 justify-center lg:justify-start"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 }}
-              >
-                <span className="text-sm font-semibold text-gray-500">Tech Stack:</span>
-                <div className="flex gap-3">
+            <motion.div 
+              className="flex flex-col sm:flex-row items-center gap-4 pt-8 justify-center lg:justify-start"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              <span className="text-sm font-semibold text-gray-500">Tech Stack:</span>
+              <div className="flex gap-3">
                   {heroData.techStack.map((tech, i) => (
-                    <motion.div
-                      key={tech}
-                      className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-mono font-bold text-gray-700 shadow-md"
-                      whileHover={{ scale: 1.1, y: -2 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.8 + i * 0.1 }}
-                    >
-                      {tech}
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+                  <motion.div
+                    key={tech}
+                    className="px-4 py-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl text-sm font-mono font-bold text-gray-700 shadow-md"
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 + i * 0.1 }}
+                  >
+                    {tech}
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
             )}
           </motion.div>
 
@@ -459,37 +445,37 @@ const Hero: React.FC = () => {
                 />
               ) : (
                 <>
-                  {/* Code Editor Window */}
-                  <div className="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 backdrop-blur-sm">
-                    {/* Window Header */}
-                    <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex space-x-2">
-                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        </div>
+              {/* Code Editor Window */}
+              <div className="bg-gray-900 rounded-2xl shadow-2xl overflow-hidden border border-gray-200 backdrop-blur-sm">
+                {/* Window Header */}
+                <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
                         <div className="text-sm text-gray-300 font-mono">
                           {courseHeader?.slug ? `${courseHeader.slug}.tsx` : 'portfolio.tsx'}
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <GitBranch className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-400">main</span>
-                      </div>
-                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <GitBranch className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">main</span>
+                  </div>
+                </div>
 
-                    {/* Line Numbers & Code */}
-                    <div className="flex">
-                      <div className="bg-gray-800 px-4 py-6 border-r border-gray-700">
-                        {[1,2,3,4,5,6,7,8].map(num => (
-                          <div key={num} className="text-gray-500 text-sm font-mono leading-6 text-right">
-                            {num}
-                          </div>
-                        ))}
+                {/* Line Numbers & Code */}
+                <div className="flex">
+                  <div className="bg-gray-800 px-4 py-6 border-r border-gray-700">
+                    {[1,2,3,4,5,6,7,8].map(num => (
+                      <div key={num} className="text-gray-500 text-sm font-mono leading-6 text-right">
+                        {num}
                       </div>
-                      
-                      <div className="p-6 font-mono text-sm space-y-1 flex-1">
+                    ))}
+                  </div>
+                  
+                  <div className="p-6 font-mono text-sm space-y-1 flex-1">
                         {/* Si hay código personalizado y es tipo programming, mostrarlo */}
                         {courseHeader?.headerType === 'programming' && courseHeader?.customHeaderContent ? (
                           <div className="text-gray-300 whitespace-pre-wrap">
@@ -507,92 +493,92 @@ const Hero: React.FC = () => {
                           </div>
                         ) : (
                           <>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 1.0 }}
-                              className="text-pink-400"
-                            >
-                              <span className="text-purple-400">import</span> <span className="text-yellow-400">React</span> <span className="text-purple-400">from</span> <span className="text-green-400">'react'</span>
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 1.2 }}
-                              className="text-blue-400"
-                            >
-                              <span className="text-purple-400">const</span> <span className="text-yellow-400">App</span> <span className="text-gray-300">=</span> <span className="text-blue-400">{'() => {'}</span>
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 1.4 }}
-                              className="text-gray-300 ml-4"
-                            >
-                              <span className="text-purple-400">return</span> (
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 1.6 }}
-                              className="text-pink-400 ml-8"
-                            >
-                              &lt;<span className="text-blue-400">div</span> <span className="text-yellow-400">className</span>=<span className="text-green-400">"hero"</span>&gt;
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 1.8 }}
-                              className="text-gray-300 ml-12"
-                            >
-                              <span className="text-green-400">"Bienvenido!"</span>
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 2.0 }}
-                              className="text-pink-400 ml-8"
-                            >
-                              &lt;/<span className="text-blue-400">div</span>&gt;
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 2.2 }}
-                              className="text-gray-300 ml-4"
-                            >
-                              )
-                            </motion.div>
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ delay: 2.4 }}
-                              className="text-blue-400"
-                            >
-                              {'}'}
-                            </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.0 }}
+                      className="text-pink-400"
+                    >
+                      <span className="text-purple-400">import</span> <span className="text-yellow-400">React</span> <span className="text-purple-400">from</span> <span className="text-green-400">'react'</span>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.2 }}
+                      className="text-blue-400"
+                    >
+                      <span className="text-purple-400">const</span> <span className="text-yellow-400">App</span> <span className="text-gray-300">=</span> <span className="text-blue-400">{'() => {'}</span>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.4 }}
+                      className="text-gray-300 ml-4"
+                    >
+                      <span className="text-purple-400">return</span> (
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.6 }}
+                      className="text-pink-400 ml-8"
+                    >
+                      &lt;<span className="text-blue-400">div</span> <span className="text-yellow-400">className</span>=<span className="text-green-400">"hero"</span>&gt;
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.8 }}
+                      className="text-gray-300 ml-12"
+                    >
+                      <span className="text-green-400">"Bienvenido!"</span>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 2.0 }}
+                      className="text-pink-400 ml-8"
+                    >
+                      &lt;/<span className="text-blue-400">div</span>&gt;
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 2.2 }}
+                      className="text-gray-300 ml-4"
+                    >
+                      )
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 2.4 }}
+                      className="text-blue-400"
+                    >
+                      {'}'}
+                    </motion.div>
                           </>
                         )}
-                      </div>
-                    </div>
                   </div>
+                </div>
+              </div>
 
-                  {/* Floating Icons */}
-                  <motion.div
-                    animate={{ y: [-8, 8, -8], rotate: [0, 5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl shadow-lg"
-                  >
-                    <Code className="w-5 h-5 text-white" />
-                  </motion.div>
+              {/* Floating Icons */}
+              <motion.div
+                animate={{ y: [-8, 8, -8], rotate: [0, 5, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute -top-4 -right-4 bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl shadow-lg"
+              >
+                <Code className="w-5 h-5 text-white" />
+              </motion.div>
 
-                  <motion.div
-                    animate={{ y: [8, -8, 8], rotate: [0, -5, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, delay: 1 }}
-                    className="absolute -bottom-4 -left-4 bg-gradient-to-r from-pink-500 to-orange-500 p-3 rounded-xl shadow-lg"
-                  >
-                    <Zap className="w-5 h-5 text-white" />
-                  </motion.div>
+              <motion.div
+                animate={{ y: [8, -8, 8], rotate: [0, -5, 0] }}
+                transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                className="absolute -bottom-4 -left-4 bg-gradient-to-r from-pink-500 to-orange-500 p-3 rounded-xl shadow-lg"
+              >
+                <Zap className="w-5 h-5 text-white" />
+              </motion.div>
                 </>
               )}
             </div>

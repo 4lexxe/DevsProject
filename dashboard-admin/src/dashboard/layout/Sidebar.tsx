@@ -315,10 +315,7 @@ const menuSections: MenuSection[] = [
       { icon: 'icon-code', label: 'Headers de Cursos', path: '/courses/headers' },
       { icon: 'icon-folder', label: 'Categorías', path: '/courses/categories' },
       { icon: 'icon-briefcase', label: 'Tipos de Carrera', path: '/courses/career-types' },
-      { icon: 'icon-folder', label: 'Secciones', path: '/sections' },
       { icon: 'icon-picture', label: 'Secciones Hero', path: '/header-section' },
-      { icon: 'icon-doc-text', label: 'Contenidos', path: '/contents' },
-      { icon: 'icon-tag', label: 'Categorías', path: '/categories' },
     ]
   },
   {

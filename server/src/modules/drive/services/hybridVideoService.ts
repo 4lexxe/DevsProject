@@ -38,7 +38,7 @@ export class HybridVideoService {
       ...config
     };
 
-    console.log(`⚙️ Configuración de Video Cache:`);
+    console.log(` Configuración de Video Cache:`);
     console.log(`   - Cache máximo: ${maxCacheSizeMB} MB (${(this.config.maxCacheSize / 1024 / 1024).toFixed(1)} MB)`);
     console.log(`   - Archivo máximo: ${maxVideoSizeMB} MB (${(this.config.maxVideoSizeForCache / 1024 / 1024).toFixed(1)} MB)`);
     console.log(`   - Pre-carga activa: ${this.config.preloadPopularVideos}`);
@@ -55,7 +55,7 @@ export class HybridVideoService {
       const availableSpace = this.config.maxCacheSize - currentCacheSize;
       const utilization = (currentCacheSize / this.config.maxCacheSize) * 100;
 
-      console.log(`📊 Análisis de estrategia para video ${fileId}:`);
+      console.log(` Análisis de estrategia para video ${fileId}:`);
       console.log(`   - Tamaño del video: ${(videoSize / 1024 / 1024).toFixed(2)} MB`);
       console.log(`   - Cache actual: ${(currentCacheSize / 1024 / 1024).toFixed(2)} MB`);
       console.log(`   - Espacio disponible: ${(availableSpace / 1024 / 1024).toFixed(2)} MB`);
@@ -146,7 +146,7 @@ export class HybridVideoService {
       };
 
     } catch (error: any) {
-      console.error('❌ Error al determinar estrategia:', error);
+      console.error(' Error al determinar estrategia:', error);
       return {
         useCache: false,
         reason: `Error en análisis: ${error.message}`,
@@ -179,7 +179,7 @@ export class HybridVideoService {
    */
   private async cleanupCache(): Promise<void> {
     try {
-      console.log('🧹 Iniciando limpieza inteligente del cache...');
+      console.log(' Iniciando limpieza inteligente del cache...');
       
       const cacheInfo = await videoCacheService.getCacheInfo();
       const currentSize = cacheInfo.totalSize;
@@ -187,21 +187,21 @@ export class HybridVideoService {
       const bytesToFree = currentSize - targetSize;
 
       if (bytesToFree <= 0) {
-        console.log('✅ Cache no necesita limpieza');
+        console.log(' Cache no necesita limpieza');
         return;
       }
 
-      console.log(`🎯 Objetivo: liberar ${(bytesToFree / 1024 / 1024).toFixed(2)} MB`);
+      console.log(` Objetivo: liberar ${(bytesToFree / 1024 / 1024).toFixed(2)} MB`);
 
       // TODO: Implementar lógica LRU real
       // Por ahora, limpiar todo el cache como fallback
-      console.log('⚠️ Implementando limpieza simple - eliminar todo el cache');
+      console.log(' Implementando limpieza simple - eliminar todo el cache');
       await videoCacheService.clearAllCache();
       
-      console.log('✅ Cache limpiado completamente');
+      console.log(' Cache limpiado completamente');
 
     } catch (error: any) {
-      console.error('❌ Error en limpieza de cache:', error);
+      console.error(' Error en limpieza de cache:', error);
     }
   }
 
@@ -252,7 +252,7 @@ export class HybridVideoService {
    */
   updateConfig(newConfig: Partial<HybridVideoConfig>): void {
     this.config = { ...this.config, ...newConfig };
-    console.log('⚙️ Configuración híbrida actualizada:', this.config);
+    console.log(' Configuración híbrida actualizada:', this.config);
   }
 
   /**
@@ -275,16 +275,16 @@ export class HybridVideoService {
       const strategy = await this.determineStrategy(video.fileId, video.size, video.userCount);
       
       if (strategy.useCache) {
-        console.log(`📥 Pre-cargando video ${video.fileId} (prioridad: ${(video.priority * 100).toFixed(1)}%)`);
+        console.log(` Pre-cargando video ${video.fileId} (prioridad: ${(video.priority * 100).toFixed(1)}%)`);
         
         // Pre-cargar de forma asíncrona sin bloquear
         const metadata = await videoProxyService.getVideoMetadata(video.fileId);
         if (metadata) {
           videoCacheService.downloadVideoToCache(video.fileId, metadata.mimeType, video.size)
-            .catch(error => console.error(`❌ Error pre-cargando ${video.fileId}:`, error));
+            .catch(error => console.error(` Error pre-cargando ${video.fileId}:`, error));
         }
       } else {
-        console.log(`⏩ Saltando video ${video.fileId}: ${strategy.reason}`);
+        console.log(` Saltando video ${video.fileId}: ${strategy.reason}`);
       }
     }
   }

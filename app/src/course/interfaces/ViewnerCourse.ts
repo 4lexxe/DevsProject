@@ -76,6 +76,12 @@ export interface Course {
   customHeaderContent?: string;
   affiliatedCourse?: Course | null;
   affiliatedCourseId?: number | null;
+  creator?: {
+    id: number;
+    name: string;
+    username?: string;
+    avatar?: string;
+  } | null;
 }
 
 export interface Section {

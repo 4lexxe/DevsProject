@@ -19,6 +19,7 @@ const initialFormState: HeaderSection = {
   about: '',
   buttonName: '',
   buttonLink: '',
+  badgeText: '',
   contentType: 'default',
   techStack: [],
 };
@@ -204,7 +205,7 @@ const HeaderSectionCRUD: React.FC = () => {
               Nueva Sección
             </button>
           )}
-        </div>
+          </div>
         <div className="flex items-center space-x-3">
           {showPreview && currentHeaderSection && (
             <button
@@ -233,18 +234,18 @@ const HeaderSectionCRUD: React.FC = () => {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Mensaje de error */}
-      {error && (
+        </div>
+        
+        {/* Mensaje de error */}
+        {error && (
         <div className="bg-red-50 dark:bg-red-900/50 border-l-4 border-red-500 p-4 mx-8 mt-4 rounded-md shadow-sm">
-          <div className="flex items-center">
+            <div className="flex items-center">
             <AlertCircle className="h-5 w-5 text-red-500 dark:text-red-400 mr-3" />
             <p className="text-red-700 dark:text-red-200">{error}</p>
+            </div>
           </div>
-        </div>
-      )}
-
+        )}
+        
       {/* Contenido principal - Layout tipo VS Code */}
       {showPreview && currentHeaderSection ? (
         /* Vista única de previsualización */
@@ -261,8 +262,8 @@ const HeaderSectionCRUD: React.FC = () => {
                 <div className="max-w-5xl mx-auto">
                   <div className="mb-8">
                     <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                      {isEditing ? 'Editar Sección' : 'Crear Nueva Sección'}
-                    </h2>
+                    {isEditing ? 'Editar Sección' : 'Crear Nueva Sección'}
+                  </h2>
                     {isMobile && (
                       <button
                         onClick={toggleForm}
@@ -271,7 +272,7 @@ const HeaderSectionCRUD: React.FC = () => {
                         ← Volver a la lista
                       </button>
                     )}
-                  </div>
+                </div>
                   <HeaderSectionForm 
                     initialData={memoizedInitialData}
                     onSubmit={handleSubmit}
@@ -304,7 +305,7 @@ const HeaderSectionCRUD: React.FC = () => {
               )}
             </div>
           </div>
-
+          
           {/* Panel derecho - Lista de secciones */}
           {!showPreview && headerSections.length > 0 && (
             <div className="w-2/5 border-l border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto">
@@ -312,15 +313,15 @@ const HeaderSectionCRUD: React.FC = () => {
                 <div className="mb-8 flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Secciones Existentes</h2>
                   {loading && <Loader2 className="h-5 w-5 text-blue-500 dark:text-blue-400 animate-spin" />}
-                </div>
-                <HeaderSectionList 
-                  headerSections={headerSections}
-                  onEdit={editHeaderSection}
-                  onDelete={handleDelete}
-                  loading={loading}
-                />
-              </div>
             </div>
+              <HeaderSectionList 
+                headerSections={headerSections}
+                onEdit={editHeaderSection}
+                onDelete={handleDelete}
+                loading={loading}
+              />
+            </div>
+          </div>
           )}
         </div>
       )}

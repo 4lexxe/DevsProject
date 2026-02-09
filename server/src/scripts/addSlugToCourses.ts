@@ -11,7 +11,7 @@ import { generateSlug, generateUniqueSlug } from "../shared/utils/slugGenerator"
 async function addSlugToCourses() {
   try {
     await sequelize.authenticate();
-    console.log("✅ Conexión a la base de datos establecida");
+    console.log(" Conexión a la base de datos establecida");
 
     // Agregar la columna slug si no existe
     const queryInterface = sequelize.getQueryInterface();
@@ -22,10 +22,10 @@ async function addSlugToCourses() {
         allowNull: true,
         unique: true,
       });
-      console.log("✅ Columna 'slug' agregada a la tabla Courses");
+      console.log(" Columna 'slug' agregada a la tabla Courses");
     } catch (error: any) {
       if (error.name === "SequelizeDatabaseError" && error.message.includes("already exists")) {
-        console.log("ℹ️ La columna 'slug' ya existe en la tabla Courses");
+        console.log(" La columna 'slug' ya existe en la tabla Courses");
       } else {
         throw error;
       }
@@ -38,7 +38,7 @@ async function addSlugToCourses() {
       },
     });
 
-    console.log(`📝 Encontrados ${courses.length} cursos sin slug`);
+    console.log(` Encontrados ${courses.length} cursos sin slug`);
 
     for (const course of courses) {
       // Obtener todos los slugs existentes
@@ -55,7 +55,7 @@ async function addSlugToCourses() {
 
       // Actualizar el curso
       await course.update({ slug });
-      console.log(`✅ Slug generado para curso "${course.title}": ${slug}`);
+      console.log(` Slug generado para curso "${course.title}": ${slug}`);
     }
 
     // Ahora hacer que el campo sea NOT NULL (opcional, descomentar si quieres)
@@ -65,9 +65,9 @@ async function addSlugToCourses() {
     //   unique: true,
     // });
 
-    console.log("✅ Proceso completado exitosamente");
+    console.log(" Proceso completado exitosamente");
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error(" Error:", error);
     throw error;
   } finally {
     await sequelize.close();
@@ -77,10 +77,10 @@ async function addSlugToCourses() {
 // Ejecutar el script
 addSlugToCourses()
   .then(() => {
-    console.log("✅ Script ejecutado correctamente");
+    console.log(" Script ejecutado correctamente");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("❌ Error al ejecutar el script:", error);
+    console.error(" Error al ejecutar el script:", error);
     process.exit(1);
   });

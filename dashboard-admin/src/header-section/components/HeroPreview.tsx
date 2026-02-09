@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Code, GitBranch, Star, Zap } from 'lucide-react';
 import { type HeaderSection } from '../services/headerSectionServices';
@@ -8,21 +8,6 @@ interface HeroPreviewProps {
 }
 
 const HeroPreview: React.FC<HeroPreviewProps> = ({ headerSection }) => {
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-
-  const animatedTexts = [
-    'Code. Learn. Build.',
-    'From Zero to Hero',
-    'Real Projects',
-    'Expert Mentorship'
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTextIndex((prev) => (prev + 1) % animatedTexts.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Estilos personalizados basados en los colores del HeaderSection
   const sectionStyle = headerSection?.backgroundColor ? {
@@ -43,6 +28,7 @@ const HeroPreview: React.FC<HeroPreviewProps> = ({ headerSection }) => {
     customHtml: headerSection.customHtml,
     customCss: headerSection.customCss,
     customJs: headerSection.customJs,
+    badgeText: headerSection.badgeText || 'Developer Path',
   };
 
   return (
@@ -95,16 +81,18 @@ const HeroPreview: React.FC<HeroPreviewProps> = ({ headerSection }) => {
             className="space-y-8 text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
           >
             {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 text-gray-700 shadow-lg text-sm"
-            >
-              <GitBranch className="w-4 h-4" />
-              <span className="font-semibold">Developer Path</span>
-              <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            </motion.div>
+            {heroData.badgeText && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-4 py-2 text-gray-700 shadow-lg text-sm"
+              >
+                <GitBranch className="w-4 h-4" />
+                <span className="font-semibold">{heroData.badgeText}</span>
+                <Star className="w-4 h-4 text-yellow-500 fill-current" />
+              </motion.div>
+            )}
 
             {/* Main Title */}
             <div className="space-y-6">
@@ -124,18 +112,16 @@ const HeroPreview: React.FC<HeroPreviewProps> = ({ headerSection }) => {
                 )}
               </motion.h1>
               
-              {/* Animated Subtitle */}
+              {/* Subtitle */}
               <div className="text-xl sm:text-2xl lg:text-3xl text-gray-600 h-12 flex items-center justify-center lg:justify-start font-bold">
                 <motion.span
-                  key={currentTextIndex}
                   initial={{ opacity: 0, y: 20, scale: 0.8 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20, scale: 1.2 }}
                   transition={{ duration: 0.6, ease: "backOut" }}
                   style={headerSection?.sloganColor ? { color: headerSection.sloganColor } : {}}
                   className={headerSection?.sloganColor ? "" : "bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"}
                 >
-                  {currentTextIndex === 0 ? heroData.slogan : animatedTexts[currentTextIndex]}
+                  {heroData.slogan}
                 </motion.span>
               </div>
             </div>

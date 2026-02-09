@@ -10,7 +10,7 @@ export default function HeroSection() {
           </div>
         </div>
         <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-          🚀 Domina el Desarrollo Fullstack con PERN / Next.js
+           Domina el Desarrollo Fullstack con PERN / Next.js
         </h1>
         <p className="text-xl text-gray-600 leading-relaxed mb-8">
           Aprende paso a paso cómo construir aplicaciones web modernas, escalables y eficientes con tecnologías como

@@ -32,7 +32,9 @@ export const UserService = {
     try {
       // Usar una instancia de axios sin interceptores para rutas públicas
       const publicApi = axios.create({
-        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        baseURL: import.meta.env.VITE_API_URL || (() => {
+          throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+        })(),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -52,7 +54,9 @@ export const UserService = {
     try {
       // Usar una instancia de axios sin interceptores para rutas públicas
       const publicApi = axios.create({
-        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        baseURL: import.meta.env.VITE_API_URL || (() => {
+          throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+        })(),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -93,18 +97,18 @@ export const UserService = {
   async getUserByIdSafe(id: number): Promise<PublicUser | FullUser> {
     try {
       // CAMBIO: Usar público primero, luego intentar protegido si es necesario
-      console.log('🔍 Intentando obtener datos públicos del usuario:', id);
+      console.log(' Intentando obtener datos públicos del usuario:', id);
       const publicResponse = await this.getPublicUserById(id);
-      console.log('✅ Datos públicos obtenidos correctamente');
+      console.log(' Datos públicos obtenidos correctamente');
       return publicResponse.data;
     } catch (publicError) {
-      console.log('⚠️ Datos públicos fallaron, intentando con autenticación:', publicError);
+      console.log(' Datos públicos fallaron, intentando con autenticación:', publicError);
       try {
         // Solo si realmente necesitamos datos completos Y tenemos autenticación
         const response = await this.getUserById(id);
         return response.data;
       } catch (authError) {
-        console.error('❌ Ambos métodos fallaron:', authError);
+        console.error(' Ambos métodos fallaron:', authError);
         // Devolver datos básicos como último recurso
         return {
           id: id,
@@ -119,12 +123,12 @@ export const UserService = {
   // **NUEVO**: Método que garantiza usar solo endpoints públicos
   async getPublicUserByIdOnly(id: number): Promise<PublicUser> {
     try {
-      console.log('🔍 Obteniendo SOLO datos públicos del usuario:', id);
+      console.log(' Obteniendo SOLO datos públicos del usuario:', id);
       const response = await this.getPublicUserById(id);
-      console.log('✅ Datos públicos obtenidos:', response.data);
+      console.log(' Datos públicos obtenidos:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Error obteniendo datos públicos:', error);
+      console.error(' Error obteniendo datos públicos:', error);
       // Devolver datos básicos como fallback
       return {
         id: id,

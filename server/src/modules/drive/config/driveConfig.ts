@@ -16,7 +16,7 @@ const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID || '';
 
 // Logging de configuración (sin mostrar valores sensibles)
 const isDriveConfigured = !!(clientId && clientSecret && refreshToken);
-console.log('🔧 Configuración de Google Drive:', {
+console.log(' Configuración de Google Drive:', {
   clientIdConfigured: !!clientId,
   clientSecretConfigured: !!clientSecret,
   refreshTokenConfigured: !!refreshToken,
@@ -27,7 +27,7 @@ console.log('🔧 Configuración de Google Drive:', {
 });
 
 if (!isDriveConfigured) {
-  console.warn('⚠️  Google Drive no está configurado. Las funciones de Drive no estarán disponibles.');
+  console.warn('  Google Drive no está configurado. Las funciones de Drive no estarán disponibles.');
   console.warn('   Para habilitar Google Drive, configura las siguientes variables de entorno:');
   if (!clientId) console.warn('   - GOOGLE_DRIVE_CLIENT_ID');
   if (!clientSecret) console.warn('   - GOOGLE_DRIVE_CLIENT_SECRET');

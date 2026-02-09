@@ -78,11 +78,11 @@ export interface ISection {
 
 export interface ISectionState {
   section: ISection | null;
-  isAddingSection: boolean; // 🔹 Nueva propiedad: indica si se está agregando una nueva sección
-  isEditingSection: boolean; // 🔹 Indica si la sección está en edición
+  isAddingSection: boolean; //  Nueva propiedad: indica si se está agregando una nueva sección
+  isEditingSection: boolean; //  Indica si la sección está en edición
   editingContent: IContent | null;
   isAddingContent: boolean;
-  isEditingContent: boolean; // 🔹 Indica si un contenido está en edición
+  isEditingContent: boolean; //  Indica si un contenido está en edición
 }
 
 

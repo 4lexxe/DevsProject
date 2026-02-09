@@ -50,7 +50,7 @@ function QuizPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
+          <div className="text-red-500 text-6xl mb-4"></div>
           <div className="text-xl text-gray-800 mb-2">Error al cargar el quiz</div>
           <div className="text-gray-600 mb-4">{error}</div>
           <button
@@ -68,7 +68,7 @@ function QuizPageContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="text-center max-w-md mx-auto p-6">
-          <div className="text-gray-400 text-6xl mb-4">📝</div>
+          <div className="text-gray-400 text-6xl mb-4"></div>
           <div className="text-xl text-gray-600">No hay quiz disponible para este contenido</div>
           <div className="text-gray-500 mt-2">Este contenido no tiene preguntas asociadas.</div>
         </div>

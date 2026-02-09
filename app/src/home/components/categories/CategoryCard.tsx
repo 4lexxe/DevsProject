@@ -60,13 +60,13 @@ export default function CategoryCard({
       <div className="group relative bg-white rounded-xl border border-gray-200 p-6 transition-all duration-300 hover:border-gray-300 hover:shadow-sm flex flex-col items-center justify-between text-center h-full min-h-[200px]">
         {/* Icono */}
         <div className="flex-shrink-0 mb-4">
-          <FontelloIcon
-            name={iconName}
+        <FontelloIcon
+          name={iconName}
             className="text-5xl text-gray-700 group-hover:text-gray-900 transition-colors duration-300"
-            fallback={
+          fallback={
               <div className="w-12 h-12 bg-gray-300 rounded-lg"></div>
-            }
-          />
+          }
+        />
         </div>
 
         {/* Nombre de la categoría */}

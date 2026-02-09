@@ -38,10 +38,11 @@ Thumbs.db    # Windows
 # Archivos de variables de entorno
 .env
 
-# Ignorar npm lockfile en la raíz
+# Ignorar npm lockfile en la raíz (pero mantener package.json)
 /package-lock.json
 /app/package-lock.json
 /server/package-lock.json
+/dashboard-admin/package-lock.json
 
 # Ignorar los errores de instalación de npm
 npm-debug.log

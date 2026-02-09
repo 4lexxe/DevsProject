@@ -1,24 +1,49 @@
 // components/courses/SectionList.tsx
 import React, { useEffect, useState } from "react";
-import { getSectionsByCourse } from "../../services/sectionServices";
+import { getSectionsByCourse, getPublicCourseStructure } from "../../services/sectionServices";
 import SectionModule from "./SectionModule";
 import { Section } from "@/course/interfaces/ViewnerCourse";
+import { useAuth } from "@/user/contexts/AuthContext";
 
 interface SectionListProps {
   courseId: string;
+  courseSlug?: string; // Slug del curso para generar URLs
 }
 
-const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
+const SectionList: React.FC<SectionListProps> = ({ courseId, courseSlug }) => {
+  const { user } = useAuth(); // Obtener usuario para detectar si está logueado
   const [sections, setSections] = useState<Section[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isPublicView, setIsPublicView] = useState(false); // Indica si estamos mostrando vista pública
+  const [isAuthenticatedNoAccess, setIsAuthenticatedNoAccess] = useState(false); // Usuario logueado pero sin acceso
 
   useEffect(() => {
     const fetchSections = async () => {
       try {
         setLoading(true);
-        const response = await getSectionsByCourse(courseId);
-        setSections(response);
+        // Intentar obtener secciones completas (requiere autenticación y acceso)
+        try {
+          const response = await getSectionsByCourse(courseId);
+          setSections(response);
+          setIsPublicView(false);
+        } catch (authError: any) {
+          // Si falla con 403 (sin acceso) o 401 (no autenticado), usar vista pública
+          if (authError.response?.status === 403 || authError.response?.status === 401) {
+            console.log("Sin acceso al curso, mostrando estructura pública");
+            const publicStructure = await getPublicCourseStructure(courseId);
+            // La respuesta pública devuelve directamente las secciones
+            setSections(publicStructure || []);
+            setIsPublicView(true);
+            
+            // Si el usuario está logueado pero recibió 403, significa que no ha comprado el curso
+            if (authError.response?.status === 403 && user) {
+              setIsAuthenticatedNoAccess(true);
+            }
+          } else {
+            throw authError;
+          }
+        }
       } catch (err) {
         console.error("Error fetching sections:", err);
         setError("No se pudieron cargar las secciones del curso");
@@ -27,7 +52,7 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       }
     };
     fetchSections();
-  }, [courseId]);
+  }, [courseId, user]);
 
   if (loading) {
     return (
@@ -71,7 +96,12 @@ const SectionList: React.FC<SectionListProps> = ({ courseId }) => {
       <div className="grid grid-cols-1 gap-4">
         {sections.map((section) => (
           <div key={section.id}>
-            <SectionModule section={section} />
+            <SectionModule 
+              section={section} 
+              isPublicView={isPublicView}
+              isAuthenticatedNoAccess={isAuthenticatedNoAccess}
+              courseSlug={courseSlug}
+            />
           </div>
         ))}
       </div>

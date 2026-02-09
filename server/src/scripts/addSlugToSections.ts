@@ -11,7 +11,7 @@ import { generateSlug, generateUniqueSlug } from "../shared/utils/slugGenerator"
 async function addSlugToSections() {
   try {
     await sequelize.authenticate();
-    console.log("✅ Conexión a la base de datos establecida");
+    console.log(" Conexión a la base de datos establecida");
 
     // Agregar la columna slug si no existe
     const queryInterface = sequelize.getQueryInterface();
@@ -22,10 +22,10 @@ async function addSlugToSections() {
         allowNull: true,
         unique: true,
       });
-      console.log("✅ Columna 'slug' agregada a la tabla Sections");
+      console.log(" Columna 'slug' agregada a la tabla Sections");
     } catch (error: any) {
       if (error.name === "SequelizeDatabaseError" && error.message.includes("already exists")) {
-        console.log("ℹ️ La columna 'slug' ya existe en la tabla Sections");
+        console.log(" La columna 'slug' ya existe en la tabla Sections");
       } else {
         throw error;
       }
@@ -37,10 +37,10 @@ async function addSlugToSections() {
         unique: true,
         name: "Sections_slug_unique",
       });
-      console.log("✅ Índice único creado para 'slug' en la tabla Sections");
+      console.log(" Índice único creado para 'slug' en la tabla Sections");
     } catch (error: any) {
       if (error.name === "SequelizeDatabaseError" && error.message.includes("already exists")) {
-        console.log("ℹ️ El índice único para 'slug' ya existe");
+        console.log(" El índice único para 'slug' ya existe");
       } else {
         throw error;
       }
@@ -53,7 +53,7 @@ async function addSlugToSections() {
       },
     });
 
-    console.log(`📝 Encontradas ${sections.length} secciones sin slug`);
+    console.log(` Encontradas ${sections.length} secciones sin slug`);
 
     for (const section of sections) {
       // Obtener todos los slugs existentes
@@ -70,12 +70,12 @@ async function addSlugToSections() {
 
       // Actualizar la sección
       await section.update({ slug });
-      console.log(`✅ Slug generado para sección "${section.title}": ${slug}`);
+      console.log(` Slug generado para sección "${section.title}": ${slug}`);
     }
 
-    console.log("✅ Proceso completado exitosamente");
+    console.log(" Proceso completado exitosamente");
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error(" Error:", error);
     throw error;
   } finally {
     await sequelize.close();
@@ -85,10 +85,10 @@ async function addSlugToSections() {
 // Ejecutar el script
 addSlugToSections()
   .then(() => {
-    console.log("✅ Script ejecutado correctamente");
+    console.log(" Script ejecutado correctamente");
     process.exit(0);
   })
   .catch((error) => {
-    console.error("❌ Error al ejecutar el script:", error);
+    console.error(" Error al ejecutar el script:", error);
     process.exit(1);
   });

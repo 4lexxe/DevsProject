@@ -10,6 +10,7 @@ class HeaderSection extends Model {
   public about!: string; // Información resumida de la sección
   public buttonName!: string; // Nombre del botón
   public buttonLink!: string; // Enlace al producto o información adicional
+  public badgeText?: string; // Texto del badge (ej: "Developer Path")
   public adminId!: number; // Relación con el admin que creó la sección
   
   // Campos de personalización
@@ -65,6 +66,11 @@ HeaderSection.init(
     buttonLink: {
       type: DataTypes.STRING,
       allowNull: false, // Enlace al producto o información adicional
+    },
+    badgeText: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      comment: "Texto del badge (ej: Developer Path)",
     },
     adminId: {
       type: DataTypes.INTEGER,

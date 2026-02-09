@@ -310,15 +310,15 @@ async function createAdminCourses() {
     }
 
     await transaction.commit();
-    console.log("\n✅ Cursos del admin creados exitosamente.");
-    console.log(`📚 Total de cursos creados: ${cursosAdmin.length}`);
-    console.log(`👤 Instructor: ${adminUser.name}`);
-    console.log(`🔑 Accesos de curso creados para testing del progreso`);
+    console.log("\n Cursos del admin creados exitosamente.");
+    console.log(` Total de cursos creados: ${cursosAdmin.length}`);
+    console.log(` Instructor: ${adminUser.name}`);
+    console.log(` Accesos de curso creados para testing del progreso`);
     
     process.exit(0); // Finalizar el proceso con éxito
   } catch (error) {
     await transaction.rollback();
-    console.error("❌ Error al crear cursos del admin:", error);
+    console.error(" Error al crear cursos del admin:", error);
     process.exit(1); // Finalizar el proceso con error
   } finally {
     // Cerrar la conexión a la base de datos

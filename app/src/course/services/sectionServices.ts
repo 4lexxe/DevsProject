@@ -2,7 +2,19 @@ import api from '../../shared/api/axios';
 
 const SECTIONS_ENDPOINT = '/sections';
 
-// Obtener todas las secciones de un curso
+// Obtener estructura pública del curso (solo títulos y duraciones) - SIN AUTENTICACIÓN
+// Para mostrar preview a usuarios no logueados o sin acceso
+export const getPublicCourseStructure = async (courseId: string) => {
+  try {
+    const response = await api.get(`${SECTIONS_ENDPOINT}/course/${courseId}/public`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener la estructura pública del curso:', error);
+    throw error;
+  }
+};
+
+// Obtener todas las secciones de un curso (requiere autenticación y acceso)
 export const getSectionsByCourse = async (courseId: string) => {
   try {
     const response = await api.get(`${SECTIONS_ENDPOINT}/course/${courseId}`);
@@ -64,6 +76,17 @@ export const getSectionCount = async () => {
     return response.data.data;
   } catch (error) {
     console.error('Error al obtener el conteo de secciones:', error);
+    throw error;
+  }
+};
+
+// Obtener una sección por courseSlug y sectionSlug
+export const getSectionByCourseAndSectionSlug = async (courseSlug: string, sectionSlug: string) => {
+  try {
+    const response = await api.get(`${SECTIONS_ENDPOINT}/course/${courseSlug}/section/${sectionSlug}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener la sección:', error);
     throw error;
   }
 };

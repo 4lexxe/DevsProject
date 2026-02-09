@@ -6,7 +6,11 @@ const useSocket = () => {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL;
+    if (!backendUrl) {
+      console.error('VITE_BACKEND_URL o VITE_API_URL no están definidas. Socket.IO no se conectará.');
+      return;
+    }
     const newSocket = io(backendUrl, {
       autoConnect: true,
       reconnectionAttempts: 5,

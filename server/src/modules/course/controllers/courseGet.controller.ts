@@ -11,6 +11,7 @@ import CourseAccess from "../../purchase/models/CourseAccess";
 import { Op } from "sequelize";
 import { BaseController } from "./BaseController";
 import { generateSlug, generateUniqueSlug } from "../../../shared/utils/slugGenerator";
+import { checkCourseAccessAndPermissions, verifyUserPermissions } from "../utils/courseAccessHelper";
 // Importar asociaciones para asegurar que están cargadas
 import "../../purchase/models/Associations";
 
@@ -22,10 +23,46 @@ export default class CourseGetController extends BaseController {
         include: [
           { model: Category, as: "categories" },
           { model: CareerType, as: "careerType" },
+          {
+            model: Admin,
+            as: "admin",
+            include: [
+              {
+                model: User,
+                as: "adminUser",
+                attributes: ["id", "name", "username", "displayName", "avatar"],
+              },
+            ],
+            attributes: ["id", "name", "userId"],
+          },
         ],
         order: [["id", "ASC"]],
       });
-      CourseGetController.sendSuccess(res, req, courses, "Cursos obtenidos correctamente");
+
+      // Procesar cursos para incluir información del creador
+      const coursesWithCreator = courses.map(course => {
+        const courseData = course.toJSON() as any;
+        
+        // Extraer información del creador (Admin -> User)
+        const creator = courseData.admin?.adminUser ? {
+          id: courseData.admin.adminUser.id,
+          name: courseData.admin.adminUser.displayName || courseData.admin.adminUser.name || courseData.admin.name,
+          username: courseData.admin.adminUser.username,
+          avatar: courseData.admin.adminUser.avatar,
+        } : courseData.admin ? {
+          id: courseData.admin.userId,
+          name: courseData.admin.name,
+          username: undefined,
+          avatar: undefined,
+        } : null;
+
+        return {
+          ...courseData,
+          creator,
+        };
+      });
+
+      CourseGetController.sendSuccess(res, req, coursesWithCreator, "Cursos obtenidos correctamente");
     } catch (error) {
       CourseGetController.handleServerError(res, req, error, "Error al obtener los cursos");
     }
@@ -48,6 +85,18 @@ export default class CourseGetController extends BaseController {
               endDate: { [Op.gte]: new Date() },
             },
             required: false,
+          },
+          {
+            model: Admin,
+            as: "admin",
+            include: [
+              {
+                model: User,
+                as: "adminUser",
+                attributes: ["id", "name", "username", "displayName", "avatar"],
+              },
+            ],
+            attributes: ["id", "name", "userId"],
           },
         ],
         order: [["id", "ASC"]],
@@ -74,8 +123,22 @@ export default class CourseGetController extends BaseController {
         const isFree = originalPrice === 0 || discountValue >= 100 || finalPrice === 0;
         const priceDisplay = isFree ? "GRATIS" : `$${finalPrice.toFixed(2)}`;
 
+        // Extraer información del creador (Admin -> User)
+        const creator = courseData.admin?.adminUser ? {
+          id: courseData.admin.adminUser.id,
+          name: courseData.admin.adminUser.displayName || courseData.admin.adminUser.name || courseData.admin.name,
+          username: courseData.admin.adminUser.username,
+          avatar: courseData.admin.adminUser.avatar,
+        } : courseData.admin ? {
+          id: courseData.admin.userId,
+          name: courseData.admin.name,
+          username: undefined,
+          avatar: undefined,
+        } : null;
+
         return {
           ...courseData,
+          creator,
           pricing: {
             originalPrice,
             finalPrice: Math.round(finalPrice * 100) / 100,
@@ -171,6 +234,9 @@ export default class CourseGetController extends BaseController {
               {
                 model: Content,
                 as: "contents",
+                attributes: {
+                  exclude: [], // Incluir todos los atributos disponibles
+                },
                 order: [["position", "ASC"]]
               }
             ],
@@ -282,6 +348,7 @@ export default class CourseGetController extends BaseController {
   // Obtener un curso por ID o slug con secciones y contenidos para navegación
   static getCourseNavigation: RequestHandler = async (req, res) => {
     try {
+      const user = req.user as User | undefined;
       const { id } = req.params;
       const course = await CourseGetController.findCourseByIdentifier(id);
       
@@ -290,18 +357,59 @@ export default class CourseGetController extends BaseController {
         return;
       }
 
+      // Obtener el curso completo con información de precio y admin
+      const courseWithAccess = await Course.findByPk(course.id, {
+        attributes: ['id', 'title', 'slug', 'price', 'adminId'],
+        include: [
+          {
+            model: Admin,
+            as: "admin",
+            attributes: ["id", "userId"]
+          }
+        ]
+      });
+
+      if (!courseWithAccess) {
+        CourseGetController.notFound(res, req, "Curso");
+        return;
+      }
+
+      // Verificar permisos básicos
+      if (!verifyUserPermissions(user, ["read:course_details", "access:course_content"])) {
+        if (!user) {
+          res.status(403).json({
+            status: "error",
+            message: "Debes iniciar sesión para acceder a este recurso",
+            requiresAuth: true,
+            requiresAccess: false,
+          });
+          return;
+        }
+        CourseGetController.forbidden(res, req, "No tienes permisos para acceder a este recurso");
+        return;
+      }
+
+      // Verificar acceso al curso (pago, etc.)
+      const accessCheck = await checkCourseAccessAndPermissions(req, res, courseWithAccess);
+      if (!accessCheck.allowed) {
+        res.status(403).json(accessCheck.errorResponse);
+        return;
+      }
+
       const courseData = await Course.findByPk(course.id, {
-        attributes: ['id', 'title'],
+        attributes: ['id', 'title', 'slug'],
         include: [
           {
             model: Section,
             as: "sections",
-            attributes: ['id', 'title'],
+            attributes: ['id', 'title', 'slug'],
             include: [
               {
                 model: Content,
                 as: "contents",
-                attributes: ['id', 'title'],
+                attributes: {
+                  exclude: [], // Incluir todos los atributos disponibles (slug se incluirá si existe)
+                },
               },
             ],
           },
@@ -317,7 +425,9 @@ export default class CourseGetController extends BaseController {
         return;
       }
 
-      CourseGetController.sendSuccess(res, req, course, "Curso obtenido correctamente");
+      //  Devolver los datos completos del curso con secciones y contenidos,
+      // no solo el modelo base sin relaciones.
+      CourseGetController.sendSuccess(res, req, courseData, "Curso obtenido correctamente");
     } catch (error) {
       CourseGetController.handleServerError(res, req, error, "Error al obtener el curso para navegación");
     }

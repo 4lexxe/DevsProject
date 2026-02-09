@@ -160,9 +160,24 @@ export default function Sidebar({
                   : "max-h-0 opacity-0 pb-0"
               }`}
             >
-              {(section.contents || []).map((content) => (
+              {(section.contents || []).map((content) => {
+                // Usar slugs si están disponibles
+                const courseIdentifier = (navigate as any)?.slug || navigate?.id || '';
+                const sectionSlug = section.slug || section.id;
+                const contentSlug = (content as any)?.slug || content.id;
+                
+                // Generar URL con slugs si están disponibles
+                const contentUrl = sectionSlug && contentSlug && 
+                                  typeof sectionSlug === 'string' && 
+                                  typeof contentSlug === 'string' &&
+                                  !sectionSlug.match(/^\d+$/) && 
+                                  !contentSlug.match(/^\d+$/)
+                  ? `/course/${courseIdentifier}/section/${sectionSlug}/content/${contentSlug}`
+                  : `/course/${courseIdentifier}/section/content/${content.id}`;
+                
+                return (
                 <Link
-                  to={`/course/${navigate?.id || ''}/section/content/${content.id}`}
+                  to={contentUrl}
                   className="w-full"
                   key={content.id}
                 >
@@ -185,7 +200,8 @@ export default function Sidebar({
                     </span>
                   </div>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}

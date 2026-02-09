@@ -16,7 +16,21 @@ export const getContentBySection = async (sectionId: string) => {
   }
 };
 
-// Obtiene un contenido específico por ID y su navegacion
+// Obtiene un contenido específico por courseSlug, sectionSlug y contentSlug
+export const getContentBySlugs = async (courseSlug: string, sectionSlug: string, contentSlug: string) => {
+  try {
+    const response = await api.get(`${CONTENT}/course/${courseSlug}/section/${sectionSlug}/content/${contentSlug}`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error(
+      `Error al obtener el contenido (slugs: ${courseSlug}/${sectionSlug}/${contentSlug}):`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+// Obtiene un contenido específico por ID y su navegacion (fallback para rutas antiguas)
 export const getContentById = async (contentId: string) => {
   try {
     const response = await api.get(`${CONTENT}/navigate/${contentId}`);

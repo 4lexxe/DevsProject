@@ -14,5 +14,11 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+
+  /* Optimización de dependencias */
+  optimizeDeps: {
+    include: ['@uiw/react-md-editor'],
+    force: true // Forzar re-optimización si es necesario
   }
 })

@@ -7,13 +7,13 @@
  */
 export function explainDriveError500(): string {
   return `
-🔍 INFORMACIÓN SOBRE ERROR 500 DE GOOGLE DRIVE:
+ INFORMACIÓN SOBRE ERROR 500 DE GOOGLE DRIVE:
 
 Este es un problema conocido con la API de Google Drive donde:
-- ✅ Los archivos SÍ se suben correctamente a Google Drive
-- ❌ La API retorna un error 500 "Unknown Error" 
-- ✅ Nuestro sistema detecta automáticamente esta situación
-- ✅ Busca el archivo subido y continúa el proceso normalmente
+-  Los archivos SÍ se suben correctamente a Google Drive
+-  La API retorna un error 500 "Unknown Error" 
+-  Nuestro sistema detecta automáticamente esta situación
+-  Busca el archivo subido y continúa el proceso normalmente
 
 RESULTADO: El archivo se procesa exitosamente a pesar del error inicial.
 
@@ -29,14 +29,14 @@ export function showUploadStats(successful: number, failed: number, total: numbe
   const successRate = Math.round((successful / total) * 100);
   
   return `
-📊 RESUMEN DE SUBIDA:
+ RESUMEN DE SUBIDA:
 ├── Total de archivos: ${total}
 ├── Subidos exitosamente: ${successful} (${successRate}%)
 ├── Con errores reales: ${failed}
 └── Tasa de éxito: ${successRate}%
 
-${successful === total ? '🎉 ¡Todos los archivos se procesaron correctamente!' : ''}
-${failed > 0 ? '⚠️  Algunos archivos tuvieron errores reales y no se subieron.' : ''}
+${successful === total ? ' ¡Todos los archivos se procesaron correctamente!' : ''}
+${failed > 0 ? '  Algunos archivos tuvieron errores reales y no se subieron.' : ''}
 `.trim();
 }
 
@@ -46,31 +46,31 @@ ${failed > 0 ? '⚠️  Algunos archivos tuvieron errores reales y no se subiero
 export class DriveLogger {
   
   static uploadStart(fileName: string, size: number): void {
-    console.log(`📤 [DRIVE] Subiendo: ${fileName} (${this.formatBytes(size)})`);
+    console.log(` [DRIVE] Subiendo: ${fileName} (${this.formatBytes(size)})`);
   }
   
   static uploadSuccess(fileName: string, driveId: string): void {
-    console.log(`✅ [DRIVE] Éxito: ${fileName} -> ID: ${driveId}`);
+    console.log(` [DRIVE] Éxito: ${fileName} -> ID: ${driveId}`);
   }
   
   static uploadError500Detected(fileName: string): void {
-    console.log(`⚠️  [DRIVE] Error 500 detectado para: ${fileName} - Verificando subida...`);
+    console.log(`  [DRIVE] Error 500 detectado para: ${fileName} - Verificando subida...`);
   }
   
   static uploadError500Recovered(fileName: string, driveId: string): void {
-    console.log(`🔄 [DRIVE] Recuperado: ${fileName} -> ID: ${driveId} (Error 500 era falsa alarma)`);
+    console.log(` [DRIVE] Recuperado: ${fileName} -> ID: ${driveId} (Error 500 era falsa alarma)`);
   }
   
   static uploadRealError(fileName: string, error: string): void {
-    console.log(`❌ [DRIVE] Error real: ${fileName} - ${error}`);
+    console.log(` [DRIVE] Error real: ${fileName} - ${error}`);
   }
   
   static databaseSave(fileName: string, dbId: number, driveId: string): void {
-    console.log(`💾 [DB] Guardado: ${fileName} -> BD: ${dbId} | Drive: ${driveId}`);
+    console.log(` [DB] Guardado: ${fileName} -> BD: ${dbId} | Drive: ${driveId}`);
   }
   
   static processComplete(fileName: string, dbId: number): void {
-    console.log(`🎉 [COMPLETE] ${fileName} -> BD ID: ${dbId}`);
+    console.log(` [COMPLETE] ${fileName} -> BD ID: ${dbId}`);
   }
   
   static batchSummary(successful: number, failed: number, total: number): void {

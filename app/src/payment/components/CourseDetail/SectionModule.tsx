@@ -56,11 +56,13 @@ const SectionModule: React.FC<SectionModuleProps> = ({ section }) => {
             <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-700 mb-3">
               {section.moduleType}
             </span>
-            {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-gray-500" />
-            )}
+            <div className="flex items-center gap-2">
+              {isExpanded ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </div>
           </div>
           {/* Title */}
           <h3 className="text-xl font-bold text-gray-900 mb-2">

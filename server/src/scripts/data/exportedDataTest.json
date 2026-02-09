@@ -216,7 +216,7 @@
                   "type": "Single",
                   "order": 1,
                   "points": 10,
-                  "markdown": "## Conceptos Clave sobre Node.js\n\nNode.js es una **tecnología fundamental** en el desarrollo moderno. Considera estos puntos:\n\n- ✅ Basado en el motor **V8** de Google Chrome\n- ✅ Permite crear aplicaciones del lado del **servidor**\n- ✅ Utiliza un modelo de **E/O no bloqueante**\n- ❌ **NO** es un lenguaje de programación independiente",
+                  "markdown": "## Conceptos Clave sobre Node.js\n\nNode.js es una **tecnología fundamental** en el desarrollo moderno. Considera estos puntos:\n\n-  Basado en el motor **V8** de Google Chrome\n-  Permite crear aplicaciones del lado del **servidor**\n-  Utiliza un modelo de **E/O no bloqueante**\n-  **NO** es un lenguaje de programación independiente",
                   "explanation": "Node.js es un entorno de ejecución para JavaScript en el servidor, construido sobre el motor V8 de Chrome.",
                   "metadata": {
                     "difficulty": "beginner",
@@ -425,7 +425,7 @@
                   "type": "Single",
                   "order": 1,
                   "points": 10,
-                  "markdown": "## JSX - JavaScript XML\n\n**JSX** permite escribir elementos que parecen HTML dentro de JavaScript:\n\n### ✅ Con JSX:\n```jsx\nconst elemento = <h1>¡Hola, mundo!</h1>;\n```\n\n### ❌ Sin JSX (JavaScript puro):\n```javascript\nconst elemento = React.createElement('h1', null, '¡Hola, mundo!');\n```\n\n> **Nota**: JSX se transpila a JavaScript antes de ejecutarse en el navegador.",
+                  "markdown": "## JSX - JavaScript XML\n\n**JSX** permite escribir elementos que parecen HTML dentro de JavaScript:\n\n###  Con JSX:\n```jsx\nconst elemento = <h1>¡Hola, mundo!</h1>;\n```\n\n###  Sin JSX (JavaScript puro):\n```javascript\nconst elemento = React.createElement('h1', null, '¡Hola, mundo!');\n```\n\n> **Nota**: JSX se transpila a JavaScript antes de ejecutarse en el navegador.",
                   "explanation": "JSX es una extensión de sintaxis que permite escribir HTML dentro de JavaScript de manera más legible.",
                   "metadata": {
                     "difficulty": "beginner",

@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: devsproject_postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-devsproject}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/enable-pg-trgm.sql:/docker-entrypoint-initdb.d/enable-pg-trgm.sql
+    networks:
+      - devsproject_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Servidor Backend (Node.js/Express)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: devsproject_server
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-devsproject}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_DIALECT: postgres
+      SESSION_SECRET: ${SESSION_SECRET}
+      CLIENT_URL: ${CLIENT_URL}
+      ADMIN_CLIENT_URL: ${ADMIN_CLIENT_URL}
+      ADDITIONAL_CORS_ORIGINS: ${ADDITIONAL_CORS_ORIGINS:-}
+      # Agregar otras variables de entorno necesarias
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
+      # Variables de Google Cloud (si se usan)
+      GOOGLE_CLOUD_PROJECT_ID: ${GOOGLE_CLOUD_PROJECT_ID:-}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+    ports:
+      - "${SERVER_PORT:-3000}:${PORT:-3000}"
+    volumes:
+      - ./server/cache:/app/cache
+      - ./server/temp:/app/temp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - devsproject_network
+    restart: unless-stopped
+
+  # Aplicación Frontend Principal
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL:-${VITE_API_URL}}
+    container_name: devsproject_app
+    ports:
+      - "${APP_PORT:-5173}:80"
+    depends_on:
+      - server
+    networks:
+      - devsproject_network
+    restart: unless-stopped
+
+  # Dashboard Admin
+  dashboard-admin:
+    build:
+      context: ./dashboard-admin
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: devsproject_dashboard_admin
+    ports:
+      - "${ADMIN_PORT:-5175}:80"
+    depends_on:
+      - server
+    networks:
+      - devsproject_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  devsproject_network:
+    driver: bridge

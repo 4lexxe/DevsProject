@@ -24,8 +24,9 @@ import {
   FileUploadPage,
   FileManagementPage
 } from "@/course/index";
+import ContentEditPage from "./course/pages/ContentEditPage";
 
-
+import CourseLayout from "./course/layout/CourseLayout";
 import HeaderSectionAdminPage from "./header-section/page/HeaderSectionAdminPage";
 import RolesPage from "./role/pages/RolesPage";
 import PermissionsPage from "./permission/pages/PermissionsPage";
@@ -89,23 +90,28 @@ function App() {
                 {/* Area de cursos */}
                 <Route path="courses" element={<CoursesPage />} />
                 <Route path="courses/headers" element={<CourseHeaderEditorPage />} />
-                <Route path="courses/:slug" element={<CourseDetail />} />
-                <Route path="courses/:slug/edit" element={<CourseFormPage />} />
                 <Route path="courses/new" element={<CourseFormPage />} />
-                <Route
-                  path="courses/:courseId/section/form"
-                  element={<SectionFormPage />}
-                />
-                <Route
-                  path="courses/:courseId/section/:sectionId/edit"
-                  element={<SectionFormPage />}
-                />
                 
-                {/* Gestión de Secciones */}
+                {/* Rutas anidadas dentro de un curso específico con layout */}
+                <Route path="courses/:slug" element={<CourseLayout />}>
+                  <Route index element={<CourseDetail />} />
+                  <Route path="edit" element={<CourseFormPage />} />
+                  <Route path="sections" element={<SectionsPage />} />
+                  <Route path="section/:sectionSlug" element={<SectionPage />} />
+                  <Route path="section/:sectionSlug/edit" element={<SectionFormPage />} />
+                  <Route path="section/:sectionSlug/content/new" element={<ContentEditPage />} />
+                  <Route path="section/:sectionSlug/content/:contentId/edit" element={<ContentEditPage />} />
+                  <Route path="section/form" element={<SectionFormPage />} />
+                  <Route path="contents" element={<ContentsPage />} />
+                </Route>
+
+                {/* Rutas legacy para compatibilidad - redirigirán */}
+                <Route path="courses/:courseId/section/form" element={<SectionFormPage />} />
+                <Route path="courses/:courseId/section/:sectionId/edit" element={<SectionFormPage />} />
+                
+                {/* Rutas antiguas - mantener para redirección */}
                 <Route path="sections" element={<SectionsPage />} />
                 <Route path="sections/:id" element={<SectionPage />} />
-
-                {/* Gestión de Contenidos */}
                 <Route path="contents" element={<ContentsPage />} />
 
                 {/* Rutas para Quiz */}

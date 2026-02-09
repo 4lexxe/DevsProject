@@ -25,7 +25,7 @@ export class DiscordController {
   static async callback(req: Request, res: Response): Promise<void> {
     passport.authenticate("discord", async (err: any, user: User | undefined, info: any) => {
       if (err) {
-        console.error("❌ Error de autenticación con Discord:", err);
+        console.error(" Error de autenticación con Discord:", err);
         
         // Proporcionar información más detallada sobre el error
         if (err.code === 'invalid_client') {
@@ -33,16 +33,16 @@ export class DiscordController {
           const maxSnowflake = BigInt('9223372036854775807');
           const clientIdBigInt = clientId ? BigInt(clientId) : null;
           
-          console.error("🔍 Diagnóstico del error 'invalid_client':");
+          console.error(" Diagnóstico del error 'invalid_client':");
           console.error(`   Client ID actual: ${clientId} (${clientId.length} dígitos)`);
           
           if (clientIdBigInt && clientIdBigInt > maxSnowflake) {
-            console.error("   ❌ El Client ID es demasiado grande (máximo permitido: 19 dígitos)");
-            console.error("   💡 Posibles causas:");
+            console.error("    El Client ID es demasiado grande (máximo permitido: 19 dígitos)");
+            console.error("    Posibles causas:");
             console.error("      - Estás copiando el Application ID en lugar del Client ID");
             console.error("      - Hay un error al copiar (quizás un dígito extra)");
             console.error("      - Estás copiando dos números juntos");
-            console.error("   💡 Solución:");
+            console.error("    Solución:");
             console.error("      1. Ve a https://discord.com/developers/applications");
             console.error("      2. Selecciona tu aplicación > OAuth2 > General");
             console.error("      3. Copia SOLO el 'Client ID' (debe tener 17-19 dígitos)");
@@ -73,7 +73,7 @@ export class DiscordController {
       }
   
       if (!user) {
-        console.error("❌ No se encontró/creó usuario");
+        console.error(" No se encontró/creó usuario");
         console.error("   Info adicional:", info);
         return res.status(401).json({ 
           error: "No se pudo autenticar el usuario",
@@ -108,11 +108,11 @@ export class DiscordController {
         );
 
         console.log(`
-🎮 Usuario de Discord inició sesión:
-👤 Nombre de usuario: ${user.username}
-📝 Nombre para mostrar: ${user.displayName}
-⏰ Hora de inicio de sesión: ${new Date().toLocaleString()}
-✅ Estado de la sesión: Activa
+ Usuario de Discord inició sesión:
+ Nombre de usuario: ${user.username}
+ Nombre para mostrar: ${user.displayName}
+ Hora de inicio de sesión: ${new Date().toLocaleString()}
+ Estado de la sesión: Activa
         `);
 
         const isNewUser = user.createdAt === user.updatedAt;

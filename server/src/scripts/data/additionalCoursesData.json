@@ -3,35 +3,35 @@
     {
       "id": 6,
       "name": "Diseño Digital",
-      "icon": "🎨",
+      "icon": "",
       "description": "Diseño gráfico, UX/UI y multimedia",
       "isActive": true
     },
     {
       "id": 7,
       "name": "Desarrollo de Videojuegos",
-      "icon": "🎮",
+      "icon": "",
       "description": "Programación y diseño de videojuegos",
       "isActive": true
     },
     {
       "id": 8,
       "name": "Matemáticas y Ciencias",
-      "icon": "🔬",
+      "icon": "",
       "description": "Matemáticas, física y ciencias exactas",
       "isActive": true
     },
     {
       "id": 9,
       "name": "Idiomas",
-      "icon": "🌍",
+      "icon": "",
       "description": "Aprendizaje de idiomas extranjeros",
       "isActive": true
     },
     {
       "id": 10,
       "name": "Música y Audio",
-      "icon": "🎵",
+      "icon": "",
       "description": "Producción musical y audio digital",
       "isActive": true
     }
@@ -40,70 +40,70 @@
     {
       "id": 11,
       "name": "Unity",
-      "icon": "🎯",
+      "icon": "",
       "description": "Motor de videojuegos Unity",
       "isActive": true
     },
     {
       "id": 12,
       "name": "Unreal Engine",
-      "icon": "🚀",
+      "icon": "",
       "description": "Motor de videojuegos Unreal Engine",
       "isActive": true
     },
     {
       "id": 13,
       "name": "Photoshop",
-      "icon": "🖼️",
+      "icon": "",
       "description": "Edición de imágenes con Adobe Photoshop",
       "isActive": true
     },
     {
       "id": 14,
       "name": "Figma",
-      "icon": "📐",
+      "icon": "",
       "description": "Diseño de interfaces con Figma",
       "isActive": true
     },
     {
       "id": 15,
       "name": "Matemáticas",
-      "icon": "📊",
+      "icon": "",
       "description": "Matemáticas puras y aplicadas",
       "isActive": true
     },
     {
       "id": 16,
       "name": "Física",
-      "icon": "⚛️",
+      "icon": "",
       "description": "Física teórica y experimental",
       "isActive": true
     },
     {
       "id": 17,
       "name": "Inglés",
-      "icon": "🇺🇸",
+      "icon": "",
       "description": "Idioma inglés",
       "isActive": true
     },
     {
       "id": 18,
       "name": "Francés",
-      "icon": "🇫🇷",
+      "icon": "",
       "description": "Idioma francés",
       "isActive": true
     },
     {
       "id": 19,
       "name": "Música",
-      "icon": "🎼",
+      "icon": "",
       "description": "Teoría musical y composición",
       "isActive": true
     },
     {
       "id": 20,
       "name": "3D Modeling",
-      "icon": "🧊",
+      "icon": "",
       "description": "Modelado 3D y animación",
       "isActive": true
     }

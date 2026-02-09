@@ -201,7 +201,7 @@ export default function DiscountEventsPage() {
                     </select>
                     {errors.courseId && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
-                        <span className="text-red-500">⚠</span>
+                        <span className="text-red-500"></span>
                         {errors.courseId.message}
                       </p>
                     )}
@@ -222,7 +222,7 @@ export default function DiscountEventsPage() {
                     />
                     {errors.event && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
-                        <span className="text-red-500">⚠</span>
+                        <span className="text-red-500"></span>
                         {errors.event.message}
                       </p>
                     )}
@@ -243,7 +243,7 @@ export default function DiscountEventsPage() {
                     />
                     {errors.description && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
-                        <span className="text-red-500">⚠</span>
+                        <span className="text-red-500"></span>
                         {errors.description.message}
                       </p>
                     )}
@@ -266,7 +266,7 @@ export default function DiscountEventsPage() {
                     />
                     {errors.value && (
                       <p className="text-sm text-red-500 flex items-center gap-1">
-                        <span className="text-red-500">⚠</span>
+                        <span className="text-red-500"></span>
                         {errors.value.message}
                       </p>
                     )}
@@ -288,7 +288,7 @@ export default function DiscountEventsPage() {
                       />
                       {errors.startDate && (
                         <p className="text-sm text-red-500 flex items-center gap-1">
-                          <span className="text-red-500">⚠</span>
+                          <span className="text-red-500"></span>
                           {errors.startDate.message}
                         </p>
                       )}
@@ -308,7 +308,7 @@ export default function DiscountEventsPage() {
                       />
                       {errors.endDate && (
                         <p className="text-sm text-red-500 flex items-center gap-1">
-                          <span className="text-red-500">⚠</span>
+                          <span className="text-red-500"></span>
                           {errors.endDate.message}
                         </p>
                       )}
@@ -358,7 +358,7 @@ export default function DiscountEventsPage() {
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-2">
-                          <span>💾</span>
+                          <span></span>
                           {isEditing ? 'Actualizar Evento de Descuento' : 'Crear Evento de Descuento'}
                         </span>
                       )}
@@ -397,7 +397,7 @@ export default function DiscountEventsPage() {
                       className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
                       style={{ backgroundColor: "#02ffff", color: "#0c154c" }}
                     >
-                      <span className="mr-1">✨</span>
+                      <span className="mr-1"></span>
                       30% OFF
                     </div>
                   </div>

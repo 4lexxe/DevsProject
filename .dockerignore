@@ -1,0 +1,16 @@
+node_modules
+.git
+.gitignore
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+.history
+cache
+temp
+dist
+build

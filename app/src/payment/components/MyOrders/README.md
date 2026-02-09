@@ -4,7 +4,7 @@ Esta carpeta contiene los componentes modularizados para la página de órdenes 
 
 ## Estructura de Componentes
 
-### 📦 `OrderCard.tsx`
+###  `OrderCard.tsx`
 **Propósito**: Muestra la información completa de una orden individual
 - Información de la orden (ID, fechas, estado)
 - Lista de cursos incluidos
@@ -22,7 +22,7 @@ interface OrderCardProps {
 }
 ```
 
-### 💳 `PaymentCard.tsx`
+###  `PaymentCard.tsx`
 **Propósito**: Muestra la información de un pago individual
 - Detalles del pago (ID, monto, fecha)
 - Método de pago utilizado
@@ -36,7 +36,7 @@ interface PaymentCardProps {
 }
 ```
 
-### 🔍 `PaymentInfoModal.tsx`
+###  `PaymentInfoModal.tsx`
 **Propósito**: Modal detallado con información completa de un pago
 - Información completa del pago
 - Datos del comprador
@@ -52,7 +52,7 @@ interface PaymentInfoModalProps {
 }
 ```
 
-### 🔄 `TabNavigation.tsx`
+###  `TabNavigation.tsx`
 **Propósito**: Navegación entre las pestañas de órdenes y pagos
 - Diseño consistente con el sistema de diseño
 - Estados activo e inactivo
@@ -66,7 +66,7 @@ interface TabNavigationProps {
 }
 ```
 
-### 📄 `EmptyState.tsx`
+###  `EmptyState.tsx`
 **Propósito**: Estado vacío reutilizable para órdenes y pagos
 - Diseño consistente para ambos tipos
 - Call-to-action para explorar cursos
@@ -81,23 +81,23 @@ interface EmptyStateProps {
 
 ## Características Principales
 
-### 🎨 **Diseño Consistente**
+###  **Diseño Consistente**
 - Todos los componentes siguen el mismo sistema de colores
 - Responsive design para móviles y desktop
 - Animaciones y transiciones fluidas
 
-### ⚡ **Funcionalidad**
+###  **Funcionalidad**
 - **OrderCard**: Manejo completo del ciclo de vida de órdenes
 - **PaymentCard**: Visualización clara de información de pagos
 - **Alertas inteligentes**: Notificaciones de expiración y urgencia
 - **Estados de carga**: Indicadores visuales para acciones async
 
-### 🔧 **Reutilización**
+###  **Reutilización**
 - Componentes independientes y reutilizables
 - Props bien definidas y tipadas
 - Funciones utilitarias encapsuladas
 
-### 📱 **Responsive**
+###  **Responsive**
 - Layout adaptable a diferentes tamaños de pantalla
 - Optimización para móviles
 - Comportamiento táctil mejorado

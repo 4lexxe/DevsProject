@@ -88,3 +88,14 @@ export const getAllSections = async () => {
     throw error;
   }
 };
+
+// Obtener una sección por courseSlug y sectionSlug
+export const getSectionByCourseAndSectionSlug = async (courseSlug: string, sectionSlug: string) => {
+  try {
+    const response = await api.get(`${SECTIONS_ENDPOINT}/course/${courseSlug}/section/${sectionSlug}`);
+    return response.data.data;
+  } catch (error) {
+    console.error('Error al obtener la sección:', error);
+    throw error;
+  }
+};

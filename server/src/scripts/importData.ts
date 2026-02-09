@@ -31,24 +31,24 @@ async function importData() {
       // Insertar los usuarios
       if(data.users && data.users.length > 0) {
         await User.bulkCreate(data.users, { transaction });
-        console.log(`✅ ${data.users.length} usuarios importados`);
+        console.log(` ${data.users.length} usuarios importados`);
       }
       
       // Insertar los planes
       if(data.plans && data.plans.length > 0) {
         await Plan.bulkCreate(data.plans, { transaction });
-        console.log(`✅ ${data.plans.length} planes importados`);
+        console.log(` ${data.plans.length} planes importados`);
       }
 
       // Insertar los eventos de descuento
       if (data.discountEvents && data.discountEvents.length > 0) {
         await DiscountEvent.bulkCreate(data.discountEvents, { transaction });
-        console.log(`✅ ${data.discountEvents.length} eventos de descuento importados`);
+        console.log(` ${data.discountEvents.length} eventos de descuento importados`);
       }
 
       // Insertar los cursos con sus secciones y contenidos
       if (data.courses && data.courses.length > 0) {
-        console.log(`📚 Importando ${data.courses.length} cursos...`);
+        console.log(` Importando ${data.courses.length} cursos...`);
         
         for (const courseData of data.courses) {
           // Extraer categoryIds y sections antes de crear el curso
@@ -90,7 +90,7 @@ async function importData() {
             }
           }
         }
-        console.log(`✅ Todos los cursos importados exitosamente`);
+        console.log(` Todos los cursos importados exitosamente`);
       }
     });
 

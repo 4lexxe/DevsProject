@@ -14,7 +14,7 @@ import Home from "./home/home";
 
 import "@/shared/assets/styles/main.css";
 
-import { CoursesPage, CourseDetail, QuizPage, Profile, ContentPage, SearchResultsPage }from '@/course/index';
+import { CoursesPage, CourseDetail, SectionPage, QuizPage, Profile, ContentPage, SearchResultsPage }from '@/course/index';
 
 import { LoginPage, RegisterPage } from "./user/auth";
 import AboutUs from "./shared/components/navigation/AboutUs";
@@ -42,18 +42,18 @@ const DebugNavigationInterceptor = () => {
     const originalReplaceState = window.history.replaceState;
     
     window.history.pushState = function(state, title, url) {
-      console.log('🚨 NAVEGACIÓN DETECTADA - pushState:', url, 'Stack trace:', new Error().stack);
+      console.log(' NAVEGACIÓN DETECTADA - pushState:', url, 'Stack trace:', new Error().stack);
       if (url && url.toString().includes('undefined')) {
-        console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
+        console.error(' NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
         console.trace('Stack trace completo:');
       }
       return originalPushState.apply(this, arguments as any);
     };
     
     window.history.replaceState = function(state, title, url) {
-      console.log('🚨 NAVEGACIÓN DETECTADA - replaceState:', url, 'Stack trace:', new Error().stack);
+      console.log(' NAVEGACIÓN DETECTADA - replaceState:', url, 'Stack trace:', new Error().stack);
       if (url && url.toString().includes('undefined')) {
-        console.error('❌ NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
+        console.error(' NAVEGACIÓN CON UNDEFINED DETECTADA:', url);
         console.trace('Stack trace completo:');
       }
       return originalReplaceState.apply(this, arguments as any);
@@ -97,10 +97,17 @@ function App() {
               <Route path="cursos" element={<CoursesPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/course/:slug" element={<CourseDetail />} />
+              <Route path="/section/:courseSlug/:sectionSlug" element={<SectionPage />} />
+              {/* Mantener ruta antigua para compatibilidad */}
+              <Route path="/sections/:id" element={<SectionPage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
               <Route path="/ruta-aprendizaje" element={<LearnRoute />} />
               <Route path="/recursos" element={<ResourcePage />} />
+              {/* Ruta de contenido usando slugs del curso, sección y contenido */}
+              <Route path='/course/:courseSlug/section/:sectionSlug/content/:contentSlug' element={<ContentPage />} />
+              {/* Mantener rutas antiguas para compatibilidad */}
+              <Route path='/course/:courseSlug/section/content/:contentId' element={<ContentPage />} />
               <Route path='/course/:courseId/section/content/:contentId' element={<ContentPage />} />
               <Route path="/course/section/content/:contentId/quiz" element={<QuizPage />} />
               <Route path='/courses/category/:categoryId' element={<CoursesPage activeByCategory={true} />} />

@@ -216,7 +216,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
                   disabled={isSubmitting}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  ⚠️ Asegurate de ingresar tu nombre real tal como aparece en tu documento de identidad.
+                   Asegurate de ingresar tu nombre real tal como aparece en tu documento de identidad.
                 </p>
               </div>
 
@@ -233,7 +233,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
                   disabled={isSubmitting}
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  ⚠️ Asegurate de ingresar tu apellido real tal como aparece en tu documento de identidad.
+                   Asegurate de ingresar tu apellido real tal como aparece en tu documento de identidad.
                 </p>
               </div>
 
@@ -289,7 +289,7 @@ export default function SubscriptionFormPage({ userData, planData }: DetailFormP
             {/* Texto aclaratorio final */}
             <div className="mt-6 p-4 bg-[#f8f9fa] border border-[#dee2e6] rounded-md">
               <p className="text-sm text-gray-700">
-                <span className="font-medium">📋 Recordá:</span> Todos los datos ingresados deben ser reales y coincidir
+                <span className="font-medium"> Recordá:</span> Todos los datos ingresados deben ser reales y coincidir
                 con tu información en Mercado Pago para que la suscripción se procese correctamente. Una vez confirmada
                 la suscripción, estos datos no podrán modificarse.
               </p>

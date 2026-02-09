@@ -72,7 +72,7 @@ export const authMiddleware = async (
     const token = cookieToken || headerToken;
     
     // Debug: Log para verificar cookies
-    console.log('🍪 Debug Cookies:', {
+    console.log(' Debug Cookies:', {
       allCookies: req.cookies,
       authToken: cookieToken,
       hasAuthHeader: !!authHeader,

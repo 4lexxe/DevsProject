@@ -39,7 +39,7 @@ const ResourceListPage: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      console.log('🔍 Obteniendo recursos públicos...');
+      console.log(' Obteniendo recursos públicos...');
       const data = await ResourceService.getResources();
       
       // Los recursos ya incluyen la información del usuario del backend
@@ -81,10 +81,10 @@ const ResourceListPage: React.FC = () => {
       });
       setUsers(userInfoMap);
       
-      console.log('✅ Recursos y usuarios procesados correctamente');
+      console.log(' Recursos y usuarios procesados correctamente');
       setLoading(false);
     } catch (err) {
-      console.error("❌ Error fetching resources:", err);
+      console.error(" Error fetching resources:", err);
       setError("Error al cargar los recursos. Por favor, intenta nuevamente.");
       setLoading(false);
     }

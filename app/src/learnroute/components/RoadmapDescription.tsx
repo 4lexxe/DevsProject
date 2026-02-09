@@ -46,7 +46,7 @@ export default function RoadmapDescription() {
           <ul className="space-y-3">
             {audience.map((item, index) => (
               <li key={index} className="flex items-center gap-3">
-                <span className="text-blue-600">✔️</span>
+                <span className="text-blue-600"></span>
                 <span className="text-gray-600">{item}</span>
               </li>
             ))}
@@ -55,7 +55,7 @@ export default function RoadmapDescription() {
 
         <div className="text-center pt-8">
           <p className="text-xl font-semibold text-blue-600">
-            📌 ¡Empieza tu viaje hacia el desarrollo fullstack ahora!
+             ¡Empieza tu viaje hacia el desarrollo fullstack ahora!
           </p>
         </div>
       </div>

@@ -47,7 +47,9 @@ export const ResourceService = {
     try {
       // Usar una instancia de axios sin interceptores para rutas públicas
       const publicApi = axios.create({
-        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        baseURL: import.meta.env.VITE_API_URL || (() => {
+          throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+        })(),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -65,11 +67,13 @@ export const ResourceService = {
   // Obtener un recurso por ID (completamente público)
   async getResourceById(id: number) {
     try {
-      console.log('🌐 Obteniendo recurso por ID:', id);
+      console.log(' Obteniendo recurso por ID:', id);
       
       // Usar una instancia de axios sin interceptores para rutas públicas
       const publicApi = axios.create({
-        baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+        baseURL: import.meta.env.VITE_API_URL || (() => {
+          throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+        })(),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -77,11 +81,11 @@ export const ResourceService = {
       });
 
       const response = await publicApi.get(`/resources/${id}`);
-      console.log('📡 Respuesta del API:', response.data);
+      console.log(' Respuesta del API:', response.data);
       
       return response.data;
     } catch (error) {
-      console.error('❌ Error fetching resource by ID:', error);
+      console.error(' Error fetching resource by ID:', error);
       throw error;
     }
   },

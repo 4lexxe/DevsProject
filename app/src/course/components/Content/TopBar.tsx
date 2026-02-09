@@ -1,21 +1,26 @@
 import { MoveLeft, MoveRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getContentUrl } from "@/shared/utils/courseUrl";
 
 interface TopBarProps {
   reloadContent?: () => void;
   title?: string;
-  courseId: string;
+  courseSlug?: string;
+  courseId?: string;
   prev: string | null;
   next: string | null;
 }
 
 export default function TopBar({
+  courseSlug,
   courseId,
   prev,
   next,
   title,
   reloadContent,
 }: TopBarProps) {
+  const courseIdentifier = courseSlug || courseId || '';
+  
   return (
     <div
       className="flex items-center justify-between h-12 px-2 rounded-lg"
@@ -23,7 +28,7 @@ export default function TopBar({
     >
       {prev ? (
         <Link
-          to={`/course/${courseId}/section/content/${prev}`}
+          to={getContentUrl(courseIdentifier, prev)}
           className="p-2 rounded-md hover:bg-gray-300 transition-colors"
         >
           <MoveLeft />
@@ -38,7 +43,7 @@ export default function TopBar({
 
       {next ? (
         <Link
-          to={`/course/${courseId}/section/content/${next}`}
+          to={getContentUrl(courseIdentifier, next)}
           className="p-2 rounded-md hover:bg-gray-300 transition-colors"
         >
           <MoveRight />

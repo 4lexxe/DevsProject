@@ -43,7 +43,7 @@ export class SecureVideoController {
         'Pragma': 'no-cache',
         'Expires': '0',
         // Headers CORS para permitir acceso desde el frontend
-        'Access-Control-Allow-Origin': process.env.CLIENT_URL || 'http://localhost:5173',
+        'Access-Control-Allow-Origin': process.env.CLIENT_URL || '*',
         'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
         'Access-Control-Allow-Headers': 'Range, Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -68,14 +68,14 @@ export class SecureVideoController {
       streamResult.stream.pipe(res);
 
       streamResult.stream.on('error', (error: any) => {
-        console.error('❌ Error en el stream de video:', error);
+        console.error(' Error en el stream de video:', error);
         if (!res.headersSent) {
           res.status(500).json({ error: 'Error en el stream de video' });
         }
       });
 
     } catch (error: any) {
-      console.error('❌ Error en getVideoStream:', error);
+      console.error(' Error en getVideoStream:', error);
       if (!res.headersSent) {
         res.status(500).json({ 
           error: 'Error interno del servidor',
@@ -97,7 +97,7 @@ export class SecureVideoController {
         return;
       }
 
-      console.log(`📋 Obteniendo metadatos de video por ContentFile: ${contentFileId}`);
+      console.log(` Obteniendo metadatos de video por ContentFile: ${contentFileId}`);
 
       // Obtener metadatos del video
       const metadata = await contentFileService.getVideoMetadataByContentFileId(contentFileId);
@@ -128,7 +128,7 @@ export class SecureVideoController {
       });
 
     } catch (error: any) {
-      console.error('❌ Error en getVideoMetadata:', error);
+      console.error(' Error en getVideoMetadata:', error);
       res.status(500).json({ 
         error: 'Error al obtener metadatos del video',
         details: error.message 

@@ -126,7 +126,7 @@ export class ContentFilesController extends BaseController {
 
       return { success: true, folderId: contentFolderId };
     } catch (error: any) {
-      console.error('❌ Error en createFolders:', error);
+      console.error(' Error en createFolders:', error);
       return { success: false, error: error.message || 'Error desconocido al crear carpetas' };
     }
   }
@@ -220,7 +220,7 @@ export class ContentFilesController extends BaseController {
 
       try {
         console.log(
-          `📤 Procesando archivo ${i + 1}/${req.files.length}: ${
+          ` Procesando archivo ${i + 1}/${req.files.length}: ${
             file.originalname
           }`
         );
@@ -275,11 +275,11 @@ export class ContentFilesController extends BaseController {
 
         uploadedFiles.push(contentFile);
         console.log(
-          `✅ Archivo guardado en BD: ${file.originalname} (ID: ${contentFile.id})`
+          ` Archivo guardado en BD: ${file.originalname} (ID: ${contentFile.id})`
         );
       } catch (error) {
         console.error(
-          `❌ Error al procesar archivo ${file.originalname}:`,
+          ` Error al procesar archivo ${file.originalname}:`,
           error
         );
 
@@ -306,10 +306,10 @@ export class ContentFilesController extends BaseController {
         if (file.path && fs.existsSync(file.path)) {
           try {
             fs.unlinkSync(file.path);
-            console.log(`🧹 Archivo temporal limpiado: ${file.path}`);
+            console.log(` Archivo temporal limpiado: ${file.path}`);
           } catch (cleanupError) {
             console.warn(
-              `⚠️ No se pudo limpiar archivo temporal: ${file.path}`,
+              ` No se pudo limpiar archivo temporal: ${file.path}`,
               cleanupError
             );
           }

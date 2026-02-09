@@ -43,11 +43,11 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
     // Determinar estrategia óptima
     const strategy = await hybridVideoService.determineStrategy(fileId, videoSize, userCount);
     
-    console.log(`📋 Estrategia seleccionada: ${strategy.useCache ? 'CACHE COMPLETO' : 'STREAMING DIRECTO'}`);
-    console.log(`📝 Razón: ${strategy.reason}`);
+    console.log(` Estrategia seleccionada: ${strategy.useCache ? 'CACHE COMPLETO' : 'STREAMING DIRECTO'}`);
+    console.log(` Razón: ${strategy.reason}`);
     
     if (strategy.cacheInfo) {
-      console.log(`💾 Estado del cache: ${(strategy.cacheInfo.utilization).toFixed(1)}% utilizado (${(strategy.cacheInfo.currentSize / 1024 / 1024).toFixed(2)} MB / ${(strategy.cacheInfo.maxSize / 1024 / 1024).toFixed(2)} MB)`);
+      console.log(` Estado del cache: ${(strategy.cacheInfo.utilization).toFixed(1)}% utilizado (${(strategy.cacheInfo.currentSize / 1024 / 1024).toFixed(2)} MB / ${(strategy.cacheInfo.maxSize / 1024 / 1024).toFixed(2)} MB)`);
     }
 
     // Agregar headers informativos
@@ -68,14 +68,14 @@ export const getVideo = async (req: Request, res: Response): Promise<void> => {
     }
 
   } catch (error: any) {
-    console.error('❌ Error en controlador híbrido:', error);
+    console.error(' Error en controlador híbrido:', error);
     
     // Fallback a streaming directo en caso de error
-    console.log('🔄 Fallback a streaming directo...');
+    console.log(' Fallback a streaming directo...');
     try {
       await secureVideoController.getVideoStream(req, res);
     } catch (fallbackError: any) {
-      console.error('❌ Error en fallback:', fallbackError);
+      console.error(' Error en fallback:', fallbackError);
       if (!res.headersSent) {
         res.status(500).json({ 
           error: 'Error interno del servidor',
@@ -99,12 +99,12 @@ export const forceCache = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    console.log('🔒 Forzando uso de cache...');
+    console.log(' Forzando uso de cache...');
     // Agregar fileId a los params para el cache controller
     req.params.fileId = contentFile.driveFileId;
     await videoCacheController.getVideoFromCache(req, res);
   } catch (error: any) {
-    console.error('❌ Error forzando cache:', error);
+    console.error(' Error forzando cache:', error);
     res.status(500).json({ error: 'Error forzando cache', details: error.message });
   }
 };
@@ -113,7 +113,7 @@ export const forceCache = async (req: Request, res: Response): Promise<void> => 
  * Fuerza el uso de streaming directo para un video específico  
  */
 export const forceStreaming = async (req: Request, res: Response): Promise<void> => {
-  console.log('🌊 Forzando streaming directo...');
+  console.log(' Forzando streaming directo...');
   await secureVideoController.getVideoStream(req, res);
 };
 
@@ -140,7 +140,7 @@ export const getHybridStats = async (req: Request, res: Response): Promise<void>
     });
 
   } catch (error: any) {
-    console.error('❌ Error obteniendo estadísticas híbridas:', error);
+    console.error(' Error obteniendo estadísticas híbridas:', error);
     res.status(500).json({ 
       error: 'Error al obtener estadísticas',
       details: error.message 
@@ -182,7 +182,7 @@ export const updateConfig = async (req: Request, res: Response): Promise<void> =
     });
 
   } catch (error: any) {
-    console.error('❌ Error actualizando configuración:', error);
+    console.error(' Error actualizando configuración:', error);
     res.status(500).json({ 
       error: 'Error al actualizar configuración',
       details: error.message 
@@ -248,7 +248,7 @@ export const analyzeStrategy = async (req: Request, res: Response): Promise<void
     });
 
   } catch (error: any) {
-    console.error('❌ Error analizando estrategia:', error);
+    console.error(' Error analizando estrategia:', error);
     res.status(500).json({ 
       error: 'Error al analizar estrategia',
       details: error.message 
@@ -268,7 +268,7 @@ export const preloadPopularVideos = async (req: Request, res: Response): Promise
       return;
     }
 
-    console.log(`🔄 Iniciando pre-carga de ${videos.length} videos...`);
+    console.log(` Iniciando pre-carga de ${videos.length} videos...`);
 
     // Convertir contentFileIds a fileIds para el servicio híbrido
     const videosWithFileIds = [];
@@ -286,8 +286,8 @@ export const preloadPopularVideos = async (req: Request, res: Response): Promise
 
     // Iniciar pre-carga de forma asíncrona
     hybridVideoService.preloadPopularVideos(videosWithFileIds)
-      .then(() => console.log('✅ Pre-carga de videos populares completada'))
-      .catch(error => console.error('❌ Error en pre-carga:', error));
+      .then(() => console.log(' Pre-carga de videos populares completada'))
+      .catch(error => console.error(' Error en pre-carga:', error));
 
     res.json({
       success: true,
@@ -299,7 +299,7 @@ export const preloadPopularVideos = async (req: Request, res: Response): Promise
     });
 
   } catch (error: any) {
-    console.error('❌ Error en pre-carga de videos:', error);
+    console.error(' Error en pre-carga de videos:', error);
     res.status(500).json({ 
       error: 'Error al iniciar pre-carga',
       details: error.message 

@@ -35,7 +35,7 @@ class VideoService {
       
       return null;
     } catch (error: any) {
-      console.error('❌ Error al obtener metadatos del video:', error);
+      console.error(' Error al obtener metadatos del video:', error);
       return null;
     }
   }
@@ -49,7 +49,7 @@ class VideoService {
       const response = await api.get('/video/test');
       return response.data.success;
     } catch (error: any) {
-      console.error('❌ Error de conexión con el proxy:', error);
+      console.error(' Error de conexión con el proxy:', error);
       return false;
     }
   }
@@ -60,7 +60,10 @@ class VideoService {
    * @param userCount Número de usuarios viendo el video (opcional)
    */
   getHybridStreamUrl(contentFileId: string, userCount?: number): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const baseUrl = import.meta.env.VITE_API_URL;
+    if (!baseUrl) {
+      throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+    }
     const queryParams = userCount ? `?userCount=${userCount}` : '';
     const fullUrl = `${baseUrl}/video/hybrid/${contentFileId}${queryParams}`;
     
@@ -72,8 +75,10 @@ class VideoService {
    * @param contentFileId UUID del ContentFile
    */
   getSecureStreamUrl(contentFileId: string): string {
-    // Usar la URL base de la configuración de axios sin duplicar /api
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const baseUrl = import.meta.env.VITE_API_URL;
+    if (!baseUrl) {
+      throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+    }
     const fullUrl = `${baseUrl}/video/stream/${contentFileId}`;
     
     return fullUrl;
@@ -84,7 +89,10 @@ class VideoService {
    * @param contentFileId UUID del ContentFile
    */
   getCacheStreamUrl(contentFileId: string): string {
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const baseUrl = import.meta.env.VITE_API_URL;
+    if (!baseUrl) {
+      throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+    }
     const fullUrl = `${baseUrl}/video/cache/${contentFileId}`;
     
     return fullUrl;
@@ -110,7 +118,7 @@ class VideoService {
       const response = await api.get(`/video/analyze/${contentFileId}${queryParams}`);
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error al analizar estrategia:', error);
+      console.error(' Error al analizar estrategia:', error);
       return {
         success: false,
         error: error.message
@@ -130,7 +138,7 @@ class VideoService {
       const response = await api.get('/video/hybrid-stats');
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error al obtener estadísticas híbridas:', error);
+      console.error(' Error al obtener estadísticas híbridas:', error);
       return {
         success: false,
         error: error.message
@@ -151,7 +159,7 @@ class VideoService {
       const response = await api.post('/video/preload-popular', { videos });
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error al pre-cargar videos populares:', error);
+      console.error(' Error al pre-cargar videos populares:', error);
       return {
         success: false,
         error: error.message
@@ -171,7 +179,7 @@ class VideoService {
       const response = await api.get('/video/cache-info');
       return response.data;
     } catch (error: any) {
-      console.error('❌ Error al obtener info del cache:', error);
+      console.error(' Error al obtener info del cache:', error);
       return {
         success: false,
         error: error.message

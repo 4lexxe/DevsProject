@@ -168,7 +168,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             type="text"
             value={formData.icon}
             onChange={(e) => handleChange('icon', e.target.value)}
-            placeholder="Ej: 📚, 💻, 🎨 o código de icono"
+            placeholder="Ej: , ,  o código de icono"
             className="w-full px-4 py-2.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-100 bg-white dark:bg-gray-700/50 dark:text-white hover:border-gray-400 dark:hover:border-gray-500"
           />
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">

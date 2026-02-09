@@ -196,16 +196,16 @@ export const formatFileSize = (bytes: number): string => {
 // Helper function to get file type icon/color
 export const getFileTypeInfo = (fileType: ContentFile['fileType']) => {
   const typeMap = {
-    video: { icon: '🎥', color: 'text-red-600', bgColor: 'bg-red-100' },
-    audio: { icon: '🎵', color: 'text-purple-600', bgColor: 'bg-purple-100' },
-    image: { icon: '🖼️', color: 'text-green-600', bgColor: 'bg-green-100' },
-    pdf: { icon: '📄', color: 'text-red-600', bgColor: 'bg-red-100' },
-    document: { icon: '📝', color: 'text-blue-600', bgColor: 'bg-blue-100' },
-    presentation: { icon: '📊', color: 'text-orange-600', bgColor: 'bg-orange-100' },
-    spreadsheet: { icon: '📈', color: 'text-green-600', bgColor: 'bg-green-100' },
-    code: { icon: '💻', color: 'text-gray-600', bgColor: 'bg-gray-100' },
-    archive: { icon: '🗂️', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    other: { icon: '📎', color: 'text-gray-600', bgColor: 'bg-gray-100' }
+    video: { icon: '', color: 'text-red-600', bgColor: 'bg-red-100' },
+    audio: { icon: '', color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    image: { icon: '', color: 'text-green-600', bgColor: 'bg-green-100' },
+    pdf: { icon: '', color: 'text-red-600', bgColor: 'bg-red-100' },
+    document: { icon: '', color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    presentation: { icon: '', color: 'text-orange-600', bgColor: 'bg-orange-100' },
+    spreadsheet: { icon: '', color: 'text-green-600', bgColor: 'bg-green-100' },
+    code: { icon: '', color: 'text-gray-600', bgColor: 'bg-gray-100' },
+    archive: { icon: '', color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
+    other: { icon: '', color: 'text-gray-600', bgColor: 'bg-gray-100' }
   };
   
   return typeMap[fileType] || typeMap.other;

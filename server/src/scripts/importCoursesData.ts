@@ -46,7 +46,7 @@ interface ImportData {
 
 async function importCoursesData() {
   try {
-    console.log('🚀 Iniciando importación de datos de cursos...');
+    console.log(' Iniciando importación de datos de cursos...');
 
     // Leer el archivo JSON
     const dataPath = path.join(__dirname, 'data', 'coursesData.json');
@@ -55,23 +55,23 @@ async function importCoursesData() {
 
     // Sincronizar la base de datos
     await sequelize.sync({ force: false });
-    console.log('✅ Base de datos sincronizada');
+    console.log(' Base de datos sincronizada');
 
     // Verificar que existe al menos un admin
     let admin = await Admin.findByPk(1);
     if (!admin) {
-      console.log('⚠️  No se encontró admin con ID 1, creando admin por defecto...');
+      console.log('  No se encontró admin con ID 1, creando admin por defecto...');
       admin = await Admin.create({
         name: 'Admin',
         email: 'admin@example.com',
         password: 'hashedpassword', // En producción usar hash real
         isActive: true
       });
-      console.log('✅ Admin creado con ID:', admin.id);
+      console.log(' Admin creado con ID:', admin.id);
     }
 
     // Importar tipos de carrera
-    console.log('📚 Importando tipos de carrera...');
+    console.log(' Importando tipos de carrera...');
     for (const careerTypeData of data.careerTypes) {
       const [careerType, created] = await CareerType.findOrCreate({
         where: { id: careerTypeData.id },
@@ -84,14 +84,14 @@ async function importCoursesData() {
       });
       
       if (created) {
-        console.log(`  ✅ Tipo de carrera creado: ${careerType.name}`);
+        console.log(`   Tipo de carrera creado: ${careerType.name}`);
       } else {
-        console.log(`  ⚠️  Tipo de carrera ya existe: ${careerType.name}`);
+        console.log(`    Tipo de carrera ya existe: ${careerType.name}`);
       }
     }
 
     // Importar categorías
-    console.log('🏷️  Importando categorías...');
+    console.log('  Importando categorías...');
     for (const categoryData of data.categories) {
       const [category, created] = await Category.findOrCreate({
         where: { id: categoryData.id },
@@ -104,14 +104,14 @@ async function importCoursesData() {
       });
       
       if (created) {
-        console.log(`  ✅ Categoría creada: ${category.name}`);
+        console.log(`   Categoría creada: ${category.name}`);
       } else {
-        console.log(`  ⚠️  Categoría ya existe: ${category.name}`);
+        console.log(`    Categoría ya existe: ${category.name}`);
       }
     }
 
     // Importar cursos
-    console.log('📖 Importando cursos...');
+    console.log(' Importando cursos...');
     for (const courseData of data.courses) {
       const [course, created] = await Course.findOrCreate({
         where: { id: courseData.id },
@@ -131,7 +131,7 @@ async function importCoursesData() {
       });
       
       if (created) {
-        console.log(`  ✅ Curso creado: ${course.title}`);
+        console.log(`   Curso creado: ${course.title}`);
         
         // Crear relaciones con categorías
         if (courseData.categoryIds && courseData.categoryIds.length > 0) {
@@ -143,15 +143,15 @@ async function importCoursesData() {
               }
             });
           }
-          console.log(`    🔗 Relaciones con categorías creadas: ${courseData.categoryIds.join(', ')}`);
+          console.log(`     Relaciones con categorías creadas: ${courseData.categoryIds.join(', ')}`);
         }
       } else {
-        console.log(`  ⚠️  Curso ya existe: ${course.title}`);
+        console.log(`    Curso ya existe: ${course.title}`);
       }
     }
 
-    console.log('\n🎉 Importación completada exitosamente!');
-    console.log(`📊 Resumen:`);
+    console.log('\n Importación completada exitosamente!');
+    console.log(` Resumen:`);
     console.log(`   - Tipos de carrera: ${data.careerTypes.length}`);
     console.log(`   - Categorías: ${data.categories.length}`);
     console.log(`   - Cursos: ${data.courses.length}`);
@@ -162,14 +162,14 @@ async function importCoursesData() {
     const totalCareerTypes = await CareerType.count();
     const totalRelations = await CourseCategory.count();
 
-    console.log(`\n📈 Estado actual de la base de datos:`);
+    console.log(`\n Estado actual de la base de datos:`);
     console.log(`   - Total cursos: ${totalCourses}`);
     console.log(`   - Total categorías: ${totalCategories}`);
     console.log(`   - Total tipos de carrera: ${totalCareerTypes}`);
     console.log(`   - Total relaciones curso-categoría: ${totalRelations}`);
 
   } catch (error) {
-    console.error('❌ Error durante la importación:', error);
+    console.error(' Error durante la importación:', error);
     throw error;
   }
 }
@@ -178,11 +178,11 @@ async function importCoursesData() {
 if (require.main === module) {
   importCoursesData()
     .then(() => {
-      console.log('✅ Script completado');
+      console.log(' Script completado');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('❌ Error en el script:', error);
+      console.error(' Error en el script:', error);
       process.exit(1);
     });
 }

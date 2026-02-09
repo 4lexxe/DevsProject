@@ -6,7 +6,7 @@ import sequelize from '../infrastructure/database/db';
  */
 async function addHeaderFieldsToCourses() {
   try {
-    console.log('🔄 Iniciando agregado de columnas de header dinámico...');
+    console.log(' Iniciando agregado de columnas de header dinámico...');
 
     // Verificar si las columnas ya existen antes de agregarlas
     const queryInterface = sequelize.getQueryInterface();
@@ -87,11 +87,11 @@ async function addHeaderFieldsToCourses() {
 
     for (const column of columnsToAdd) {
       if (!tableDescription[column.name]) {
-        console.log(`  ➕ Agregando columna: ${column.name}`);
+        console.log(`   Agregando columna: ${column.name}`);
         await queryInterface.addColumn('Courses', column.name, column.definition);
-        console.log(`  ✅ Columna ${column.name} agregada exitosamente`);
+        console.log(`   Columna ${column.name} agregada exitosamente`);
       } else {
-        console.log(`  ⏭️  Columna ${column.name} ya existe, omitiendo...`);
+        console.log(`    Columna ${column.name} ya existe, omitiendo...`);
       }
     }
 
@@ -101,16 +101,16 @@ async function addHeaderFieldsToCourses() {
         name: 'courses_affiliated_course_id_idx',
         ifNotExists: true,
       });
-      console.log('  ✅ Índice para affiliatedCourseId agregado');
+      console.log('   Índice para affiliatedCourseId agregado');
     } catch (error: any) {
       if (!error.message.includes('already exists')) {
-        console.log('  ⚠️  No se pudo agregar el índice (puede que ya exista)');
+        console.log('    No se pudo agregar el índice (puede que ya exista)');
       }
     }
 
-    console.log('✅ Proceso completado exitosamente');
+    console.log(' Proceso completado exitosamente');
   } catch (error) {
-    console.error('❌ Error al agregar columnas:', error);
+    console.error(' Error al agregar columnas:', error);
     throw error;
   }
 }
@@ -119,11 +119,11 @@ async function addHeaderFieldsToCourses() {
 if (require.main === module) {
   addHeaderFieldsToCourses()
     .then(() => {
-      console.log('🎉 Script ejecutado correctamente');
+      console.log(' Script ejecutado correctamente');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('💥 Error fatal:', error);
+      console.error(' Error fatal:', error);
       process.exit(1);
     });
 }

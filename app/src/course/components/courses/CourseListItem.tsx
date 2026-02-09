@@ -17,9 +17,15 @@ interface CourseListItemProps {
     hasDiscount: boolean
     savings: number
   }
+  creator?: {
+    id: number
+    name: string
+    username?: string
+    avatar?: string
+  } | null
 }
 
-const CourseListItem: React.FC<CourseListItemProps> = ({ id, slug, title, summary, categories, image, careerType, pricing }) => {
+const CourseListItem: React.FC<CourseListItemProps> = ({ id, slug, title, summary, categories, image, careerType, pricing, creator }) => {
   return (
     <div
       className="group w-full flex gap-4 p-4 border-b border-gray-200 hover:bg-gray-50/80 transition-all duration-300 cursor-pointer"
@@ -95,6 +101,26 @@ const CourseListItem: React.FC<CourseListItemProps> = ({ id, slug, title, summar
                   ${pricing.finalPrice.toLocaleString()}
                 </span>
               )}
+            </div>
+          )}
+
+          {/* Creator section */}
+          {creator && (
+            <div className="mt-3 flex items-center gap-2">
+              {creator.avatar ? (
+                <img
+                  src={creator.avatar}
+                  alt={creator.name}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold border-2 border-gray-200">
+                  {creator.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <span className="text-sm text-gray-600 font-medium">
+                {creator.name}
+              </span>
             </div>
           )}
         </div>

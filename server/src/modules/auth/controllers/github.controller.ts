@@ -64,11 +64,11 @@ export class GitHubController {
         );
 
         console.log(`
-💻 Usuario de GitHub inició sesión:
-👤 Nombre de usuario: ${user.username}
-📝 Nombre para mostrar: ${user.displayName}
-⏰ Hora de inicio de sesión: ${new Date().toLocaleString()}
-✅ Estado de la sesión: Activa
+ Usuario de GitHub inició sesión:
+ Nombre de usuario: ${user.username}
+ Nombre para mostrar: ${user.displayName}
+ Hora de inicio de sesión: ${new Date().toLocaleString()}
+ Estado de la sesión: Activa
         `);
 
         const isNewUser = user.createdAt === user.updatedAt;

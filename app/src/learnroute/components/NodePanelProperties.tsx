@@ -142,7 +142,7 @@ export function NodeInfoPanel({ isOpen, onClose, node, onUpdateNode }: NodeInfoP
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold">Propiedades del nodo - {nodeType}</h2>
         <Button variant="ghost" size="icon" onClick={onClose}>
-          ✕
+          
         </Button>
       </div>
       <div className="space-y-4">

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 // Obtener la URL base del backend desde las variables de entorno
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+}
 
 // Configurar los valores predeterminados de Axios
 axios.defaults.withCredentials = true; // Importante para manejar cookies

@@ -23,7 +23,7 @@ class OrderController extends BaseController {
         return this.unauthorized(res, req, "Usuario no autenticado");
       }
 
-      console.log('🔍 Obteniendo órdenes para usuario:', userId);
+      console.log(' Obteniendo órdenes para usuario:', userId);
 
       try {
         const orders = await Order.findAll({
@@ -56,7 +56,7 @@ class OrderController extends BaseController {
           order: [["createdAt", "DESC"]],
         });
 
-        console.log('🔍 Órdenes encontradas:', orders.length);
+        console.log(' Órdenes encontradas:', orders.length);
 
         this.sendSuccess(
           res,
@@ -65,7 +65,7 @@ class OrderController extends BaseController {
           "Órdenes obtenidas exitosamente"
         );
       } catch (error) {
-        console.error('❌ Error obteniendo órdenes:', error);
+        console.error(' Error obteniendo órdenes:', error);
         this.handleServerError(res, req, error, "Error al obtener las órdenes");
       }
     }
@@ -130,7 +130,7 @@ class OrderController extends BaseController {
         return this.unauthorized(res, req, "Usuario no autenticado");
       }
 
-      console.log('🔍 Cancelando orden:', orderId, 'para usuario:', userId);
+      console.log(' Cancelando orden:', orderId, 'para usuario:', userId);
 
       const order = await Order.findOne({
         where: { 
@@ -150,8 +150,8 @@ class OrderController extends BaseController {
         return this.notFound(res, req, "Orden");
       }
 
-      console.log('🔍 Orden encontrada:', order.id, 'Status:', order.status);
-      console.log('🔍 Cart asociado:', (order as any).cart?.id || 'Sin cart');
+      console.log(' Orden encontrada:', order.id, 'Status:', order.status);
+      console.log(' Cart asociado:', (order as any).cart?.id || 'Sin cart');
 
       // Verificar si la orden puede ser cancelada
       if (order.status === "paid") {
@@ -177,11 +177,11 @@ class OrderController extends BaseController {
 
       // Si la orden tiene un carrito asociado, también cancelarlo
       if ((order as any).cart) {
-        console.log('🔍 Actualizando estado del cart:', (order as any).cart.id);
+        console.log(' Actualizando estado del cart:', (order as any).cart.id);
         await (order as any).cart.update({ status: "cancelled" });
       }
 
-      console.log('✅ Orden cancelada exitosamente');
+      console.log(' Orden cancelada exitosamente');
 
       this.sendSuccess(
         res,

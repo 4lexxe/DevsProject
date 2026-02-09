@@ -215,24 +215,24 @@ export default class CourseController extends BaseController {
         return;
       }
 
-      console.log('🗑️ Iniciando eliminación del curso:', course.title);
+      console.log(' Iniciando eliminación del curso:', course.title);
 
       // Solo eliminar la carpeta principal del curso en Drive
       // Esto eliminará automáticamente todas las subcarpetas y archivos
-      console.log(`🗑️ Eliminando carpeta principal del curso: ${course.title} de id ${course.driveFolderId}`);
+      console.log(` Eliminando carpeta principal del curso: ${course.title} de id ${course.driveFolderId}`);
       if (course.driveFolderId) {
         try {
           await CourseController.driveService.deleteFolder(course.driveFolderId);
-          console.log(`✅ Carpeta principal del curso eliminada (incluyendo subcarpetas): ${course.title}`);
+          console.log(` Carpeta principal del curso eliminada (incluyendo subcarpetas): ${course.title}`);
         } catch (error) {
-          console.error(`❌ Error eliminando carpeta principal del curso ${course.title}:`, error);
+          console.error(` Error eliminando carpeta principal del curso ${course.title}:`, error);
         }
       }
 
       // Eliminar el curso (la cascada en Sequelize se encarga del resto)
       await course.destroy();
       
-      console.log('✅ Curso eliminado completamente:', course.title);
+      console.log(' Curso eliminado completamente:', course.title);
       CourseController.deleted(res, req, "Curso eliminado correctamente");
     } catch (error) {
       CourseController.handleServerError(res, req, error, "Error al eliminar el curso");

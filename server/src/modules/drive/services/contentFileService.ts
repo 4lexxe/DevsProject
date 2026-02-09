@@ -24,7 +24,7 @@ export class ContentFileService {
       const contentFile = await ContentFiles.findByPk(contentFileId);
       
       if (!contentFile) {
-        console.log(`❌ Archivo de contenido no encontrado: ${contentFileId}`);
+        console.log(` Archivo de contenido no encontrado: ${contentFileId}`);
         return null;
       }
       
@@ -39,7 +39,7 @@ export class ContentFileService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener archivo de contenido ${contentFileId}:`, error.message);
+      console.error(` Error al obtener archivo de contenido ${contentFileId}:`, error.message);
       return null;
     }
   }
@@ -76,7 +76,7 @@ export class ContentFileService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener metadatos de video ${contentFileId}:`, error.message);
+      console.error(` Error al obtener metadatos de video ${contentFileId}:`, error.message);
       throw error;
     }
   }
@@ -108,7 +108,7 @@ export class ContentFileService {
       );
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener stream de video ${contentFileId}:`, error.message);
+      console.error(` Error al obtener stream de video ${contentFileId}:`, error.message);
       throw error;
     }
   }

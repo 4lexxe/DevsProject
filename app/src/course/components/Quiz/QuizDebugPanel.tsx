@@ -36,15 +36,15 @@ const QuizDebugPanel: React.FC<QuizDebugPanelProps> = ({ isVisible = false }) =>
 
   return (
     <div className="fixed bottom-4 left-4 bg-black bg-opacity-80 text-white text-xs p-4 rounded-lg max-w-sm z-50">
-      <div className="font-bold mb-2">🔧 Quiz Debug Panel</div>
+      <div className="font-bold mb-2"> Quiz Debug Panel</div>
       
       <div className="space-y-1">
-        <div>📝 <strong>Quiz ID:</strong> {quizData.id}</div>
-        <div>📊 <strong>Progreso:</strong> {questionNumber}/{totalQuestions} ({getProgressPercentage()}%)</div>
-        <div>✅ <strong>Respondidas:</strong> {getTotalAnsweredQuestions()}</div>
-        <div>🎯 <strong>Puntuación:</strong> {score} pts</div>
-        <div>🔄 <strong>Completado:</strong> {quizCompleted ? 'Sí' : 'No'}</div>
-        <div>💾 <strong>Progreso guardado:</strong> {hasAnyProgress() ? 'Sí' : 'No'}</div>
+        <div> <strong>Quiz ID:</strong> {quizData.id}</div>
+        <div> <strong>Progreso:</strong> {questionNumber}/{totalQuestions} ({getProgressPercentage()}%)</div>
+        <div> <strong>Respondidas:</strong> {getTotalAnsweredQuestions()}</div>
+        <div> <strong>Puntuación:</strong> {score} pts</div>
+        <div> <strong>Completado:</strong> {quizCompleted ? 'Sí' : 'No'}</div>
+        <div> <strong>Progreso guardado:</strong> {hasAnyProgress() ? 'Sí' : 'No'}</div>
       </div>
       
       <div className="mt-3 pt-2 border-t border-gray-600">

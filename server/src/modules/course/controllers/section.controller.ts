@@ -197,9 +197,9 @@ export default class SectionController extends BaseController {
         if (contentToDelete.driveFolderId) {
           try {
             await SectionController.driveService.deleteFolder(contentToDelete.driveFolderId);
-            console.log(`🗑️ Carpeta de Drive eliminada para contenido: ${contentToDelete.title}`);
+            console.log(` Carpeta de Drive eliminada para contenido: ${contentToDelete.title}`);
           } catch (error) {
-            console.warn(`⚠️ Error al eliminar carpeta de Drive para contenido ${contentToDelete.title}:`, error);
+            console.warn(` Error al eliminar carpeta de Drive para contenido ${contentToDelete.title}:`, error);
           }
         }
       }
@@ -241,12 +241,12 @@ export default class SectionController extends BaseController {
             );
             if (folderResponse.success && folderResponse.folderId) {
               contentFolderId = folderResponse.folderId;
-              console.log(`📁 Carpeta de Drive creada para contenido: ${contentData.title} (ID: ${contentFolderId})`);
+              console.log(` Carpeta de Drive creada para contenido: ${contentData.title} (ID: ${contentFolderId})`);
             } else {
-              console.warn(`⚠️ No se pudo crear carpeta de Drive para contenido: ${contentData.title}`);
+              console.warn(` No se pudo crear carpeta de Drive para contenido: ${contentData.title}`);
             }
           } catch (error) {
-            console.warn(`⚠️ Error al crear carpeta de Drive para contenido ${contentData.title}:`, error);
+            console.warn(` Error al crear carpeta de Drive para contenido ${contentData.title}:`, error);
           }
 
           await Content.create(

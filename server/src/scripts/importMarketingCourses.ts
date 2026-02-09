@@ -47,7 +47,7 @@ interface ImportData {
 
 async function importMarketingCourses() {
   try {
-    console.log('🚀 Iniciando importación de cursos de marketing y negocios...');
+    console.log(' Iniciando importación de cursos de marketing y negocios...');
 
     // Leer el archivo JSON
     const dataPath = path.join(__dirname, 'data', 'marketingCoursesData.json');
@@ -56,23 +56,23 @@ async function importMarketingCourses() {
 
     // Sincronizar la base de datos
     await sequelize.sync({ force: false });
-    console.log('✅ Base de datos sincronizada');
+    console.log(' Base de datos sincronizada');
 
     // Verificar que existe al menos un admin
     let admin = await Admin.findByPk(1);
     if (!admin) {
-      console.log('⚠️  No se encontró admin con ID 1, creando admin por defecto...');
+      console.log('  No se encontró admin con ID 1, creando admin por defecto...');
       admin = await Admin.create({
         name: 'Admin',
         email: 'admin@example.com',
         password: 'hashedpassword',
         isActive: true
       });
-      console.log('✅ Admin creado con ID:', admin.id);
+      console.log(' Admin creado con ID:', admin.id);
     }
 
     // Importar nuevos tipos de carrera
-    console.log('💰 Importando tipos de carrera de negocios...');
+    console.log(' Importando tipos de carrera de negocios...');
     for (const careerTypeData of data.careerTypes) {
       const [careerType, created] = await CareerType.findOrCreate({
         where: { id: careerTypeData.id },
@@ -85,14 +85,14 @@ async function importMarketingCourses() {
       });
       
       if (created) {
-        console.log(`  ✅ Nuevo tipo de carrera: ${careerType.name}`);
+        console.log(`   Nuevo tipo de carrera: ${careerType.name}`);
       } else {
-        console.log(`  ⚠️  Tipo de carrera ya existe: ${careerType.name}`);
+        console.log(`    Tipo de carrera ya existe: ${careerType.name}`);
       }
     }
 
     // Importar nuevas categorías
-    console.log('🏷️  Importando categorías de marketing...');
+    console.log('  Importando categorías de marketing...');
     for (const categoryData of data.categories) {
       const [category, created] = await Category.findOrCreate({
         where: { id: categoryData.id },
@@ -105,14 +105,14 @@ async function importMarketingCourses() {
       });
       
       if (created) {
-        console.log(`  ✅ Nueva categoría: ${category.name}`);
+        console.log(`   Nueva categoría: ${category.name}`);
       } else {
-        console.log(`  ⚠️  Categoría ya existe: ${category.name}`);
+        console.log(`    Categoría ya existe: ${category.name}`);
       }
     }
 
     // Importar cursos de marketing
-    console.log('📈 Importando cursos de marketing y negocios...');
+    console.log(' Importando cursos de marketing y negocios...');
     let newCoursesCount = 0;
     
     for (const courseData of data.courses) {
@@ -135,7 +135,7 @@ async function importMarketingCourses() {
       
       if (created) {
         newCoursesCount++;
-        console.log(`  ✅ Nuevo curso: ${course.title}`);
+        console.log(`   Nuevo curso: ${course.title}`);
         
         // Crear relaciones con categorías
         if (courseData.categoryIds && courseData.categoryIds.length > 0) {
@@ -147,15 +147,15 @@ async function importMarketingCourses() {
               }
             });
           }
-          console.log(`    🔗 Relaciones con categorías: ${courseData.categoryIds.join(', ')}`);
+          console.log(`     Relaciones con categorías: ${courseData.categoryIds.join(', ')}`);
         }
       } else {
-        console.log(`  ⚠️  Curso ya existe: ${course.title}`);
+        console.log(`    Curso ya existe: ${course.title}`);
       }
     }
 
-    console.log('\n🎉 Importación de cursos de marketing completada!');
-    console.log(`📊 Resumen de nuevos elementos:`);
+    console.log('\n Importación de cursos de marketing completada!');
+    console.log(` Resumen de nuevos elementos:`);
     console.log(`   - Nuevos tipos de carrera: ${data.careerTypes.length}`);
     console.log(`   - Nuevas categorías: ${data.categories.length}`);
     console.log(`   - Nuevos cursos: ${newCoursesCount}`);
@@ -166,14 +166,14 @@ async function importMarketingCourses() {
     const totalCareerTypes = await CareerType.count();
     const totalRelations = await CourseCategory.count();
 
-    console.log(`\n📈 Estado actual de la base de datos:`);
+    console.log(`\n Estado actual de la base de datos:`);
     console.log(`   - Total cursos: ${totalCourses}`);
     console.log(`   - Total categorías: ${totalCategories}`);
     console.log(`   - Total tipos de carrera: ${totalCareerTypes}`);
     console.log(`   - Total relaciones curso-categoría: ${totalRelations}`);
 
     // Mostrar cursos más caros (premium)
-    console.log(`\n💎 Cursos Premium (más de $200):`);
+    console.log(`\n Cursos Premium (más de $200):`);
     const premiumCourses = await Course.findAll({
       where: {
         price: {
@@ -189,7 +189,7 @@ async function importMarketingCourses() {
     }
 
     // Mostrar distribución por tipo de carrera
-    console.log(`\n📋 Distribución actualizada por área:`);
+    console.log(`\n Distribución actualizada por área:`);
     const careerTypes = await CareerType.findAll({
       include: [{
         model: Course,
@@ -204,7 +204,7 @@ async function importMarketingCourses() {
     }
 
   } catch (error) {
-    console.error('❌ Error durante la importación:', error);
+    console.error(' Error durante la importación:', error);
     throw error;
   }
 }
@@ -213,11 +213,11 @@ async function importMarketingCourses() {
 if (require.main === module) {
   importMarketingCourses()
     .then(() => {
-      console.log('✅ Script de cursos de marketing completado');
+      console.log(' Script de cursos de marketing completado');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('❌ Error en el script:', error);
+      console.error(' Error en el script:', error);
       process.exit(1);
     });
 }

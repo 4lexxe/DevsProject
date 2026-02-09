@@ -42,6 +42,7 @@ interface ContentItemDisplayProps {
   onDeleteQuiz: (contentId: string) => void;
   onManageFiles?: (contentId: string) => void;
   onUploadFiles?: (contentId: string) => void;
+  onEditContent?: (contentId: string) => void;
 }
 
 export default function ContentItemDisplay({
@@ -51,16 +52,27 @@ export default function ContentItemDisplay({
   onDeleteQuiz,
   onManageFiles,
   onUploadFiles,
+  onEditContent,
 }: ContentItemDisplayProps) {
   return (
     <div
       className="border rounded-lg p-4"
       style={{ backgroundColor: "#eff6ff", borderColor: "#42d7c7" }}
     >
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center justify-between mb-2">
         <h4 className="font-semibold text-lg" style={{ color: "#0c154c" }}>
           {content.position}. {content.title}
         </h4>
+        {onEditContent && (
+          <button
+            onClick={() => onEditContent(content.id)}
+            className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+            title="Editar contenido"
+          >
+            <Edit className="w-3.5 h-3.5" />
+            Editar Contenido
+          </button>
+        )}
       </div>
       <p className="text-gray-600 mb-3">{content.text}</p>
 

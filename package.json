@@ -1,0 +1,22 @@
+{
+  "name": "devsproject",
+  "version": "1.0.0",
+  "description": "DevsProject - Plataforma de aprendizaje",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:app\" \"npm run dev:admin\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:app": "cd app && npm run dev",
+    "dev:admin": "cd dashboard-admin && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../app && npm install && cd ../dashboard-admin && npm install",
+    "build:all": "cd server && npm run build && cd ../app && npm run build && cd ../dashboard-admin && npm run build",
+    "lint:all": "cd server && npm run lint 2>/dev/null || true && cd ../app && npm run lint && cd ../dashboard-admin && npm run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

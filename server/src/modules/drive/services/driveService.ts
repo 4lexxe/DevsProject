@@ -40,7 +40,7 @@ export default class DriveService {
    */
   async uploadFileFromPath(filePath: string, mimeType: string, options: UploadFileOptions): Promise<UploadResult> {
     try {
-      console.log(`📤 Subiendo archivo desde: ${filePath}`);
+      console.log(` Subiendo archivo desde: ${filePath}`);
       
       // Verificar que el archivo existe
       if (!fs.existsSync(filePath)) {
@@ -49,7 +49,7 @@ export default class DriveService {
 
       // Obtener información del archivo para debug
       const fileStats = fs.statSync(filePath);
-      console.log(`📋 Info del archivo: Tamaño: ${fileStats.size} bytes, Modificado: ${fileStats.mtime}`);
+      console.log(` Info del archivo: Tamaño: ${fileStats.size} bytes, Modificado: ${fileStats.mtime}`);
 
       // Preparar metadata del archivo
       const fileMetadata: drive_v3.Schema$File = {
@@ -59,7 +59,7 @@ export default class DriveService {
       };
 
       // Verificar configuración de Drive
-      console.log(`🔧 Drive Config: folderId=${driveConfig.folderId}, hasParents=${!!fileMetadata.parents}`);
+      console.log(` Drive Config: folderId=${driveConfig.folderId}, hasParents=${!!fileMetadata.parents}`);
 
       // Preparar el media con stream del archivo
       const media = {
@@ -67,7 +67,7 @@ export default class DriveService {
         body: fs.createReadStream(filePath)
       };
 
-      console.log(`📊 Subiendo a Drive: ${options.name} (${mimeType})`);
+      console.log(` Subiendo a Drive: ${options.name} (${mimeType})`);
 
       // Agregar timeout y verificación adicional
       const uploadPromise = this.drive.files.create({
@@ -84,14 +84,14 @@ export default class DriveService {
         throw new Error('No se pudo obtener el ID del archivo subido');
       }
 
-      console.log(`✅ Archivo subido exitosamente: ${driveFile.name} (ID: ${driveFile.id})`);
+      console.log(` Archivo subido exitosamente: ${driveFile.name} (ID: ${driveFile.id})`);
       let permission;
       try {
         const publicResult = await this.makeFilePublic(driveFile.id);
         permission = publicResult?.permission || 'reader'; // Asignar permiso por defecto si no se pudo hacer público
         
       } catch (publicError: any) {
-        console.warn(`⚠️ No se pudo hacer público el archivo ${driveFile.id}:`, publicError.message);
+        console.warn(` No se pudo hacer público el archivo ${driveFile.id}:`, publicError.message);
         // Continuar sin hacer público
       }
 
@@ -109,11 +109,11 @@ export default class DriveService {
       };
 
     } catch (error: any) {
-      console.log("⚠️ Error durante la subida, verificando si el archivo se subió:", error.message);
+      console.log(" Error durante la subida, verificando si el archivo se subió:", error.message);
       
       // Si el error es 500 pero el archivo podría haberse subido, intentar recuperarlo
       if (error.status === 500 || error.code === 500) {
-        console.log("🔍 Error 500 detectado, intentando recuperar archivo subido...");
+        console.log(" Error 500 detectado, intentando recuperar archivo subido...");
         
         try {
           // Buscar archivos recientes con el mismo nombre en la carpeta específica
@@ -131,7 +131,7 @@ export default class DriveService {
 
           if (searchResult.data.files && searchResult.data.files.length > 0) {
             const recoveredFile = searchResult.data.files[0];
-            console.log("✅ Archivo recuperado exitosamente:", recoveredFile);
+            console.log(" Archivo recuperado exitosamente:", recoveredFile);
             
             // Verificar que es un archivo reciente (último minuto)
             const fileTime = new Date(recoveredFile.createdTime || '');
@@ -139,7 +139,7 @@ export default class DriveService {
             const timeDiff = now.getTime() - fileTime.getTime();
             
             if (timeDiff < 60000) { // Menos de 1 minuto
-              console.log("✅ Archivo confirmado como recién subido");
+              console.log(" Archivo confirmado como recién subido");
               const makePublicResult = await this.makeFilePublic(recoveredFile.id!); // Hacerlo público automáticamente
 
               return {
@@ -155,17 +155,17 @@ export default class DriveService {
                 },
               };
             } else {
-              console.log("⚠️ El archivo encontrado es muy antiguo, no es el que acabamos de subir");
+              console.log(" El archivo encontrado es muy antiguo, no es el que acabamos de subir");
             }
           } else {
-            console.log("❌ No se encontró el archivo en Drive después del error 500");
+            console.log(" No se encontró el archivo en Drive después del error 500");
           }
         } catch (recoveryError: any) {
-          console.log("❌ Error al intentar recuperar archivo:", recoveryError.message);
+          console.log(" Error al intentar recuperar archivo:", recoveryError.message);
         }
       }
 
-      console.error(`❌ Error al subir archivo desde ${filePath}:`, {
+      console.error(` Error al subir archivo desde ${filePath}:`, {
         message: error.message,
         code: error.code,
         status: error.status,
@@ -200,7 +200,7 @@ export default class DriveService {
    */
   async makeFilePublic(fileId: string): Promise<{ success: boolean; permission?: string; error?: string }> {
     try {
-      console.log(`🌐 Haciendo público el archivo: ${fileId}`);
+      console.log(` Haciendo público el archivo: ${fileId}`);
 
       // Verificar si ya tiene permiso público
       const existingPermissions = await this.drive.permissions.list({
@@ -224,9 +224,9 @@ export default class DriveService {
           },
           fields: 'id'
         });
-        console.log(`✅ Permiso público creado para archivo: ${fileId}`);
+        console.log(` Permiso público creado para archivo: ${fileId}`);
       } else {
-        console.log(`ℹ️ El archivo ${fileId} ya es público`);
+        console.log(` El archivo ${fileId} ya es público`);
       }
 
       // Aplicar restricciones específicas para ocultar botón de descarga
@@ -251,7 +251,7 @@ export default class DriveService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al hacer público el archivo ${fileId}:`, error.message);
+      console.error(` Error al hacer público el archivo ${fileId}:`, error.message);
       
       // Manejo específico de errores comunes
       let errorMessage = error.message;
@@ -278,21 +278,21 @@ export default class DriveService {
    */
   async deleteFile(fileId: string): Promise<boolean> {
     try {
-      console.log(`🗑️ Eliminando archivo de Drive: ${fileId}`);
+      console.log(` Eliminando archivo de Drive: ${fileId}`);
       
       await this.drive.files.delete({
         fileId: fileId
       });
       
-      console.log(`✅ Archivo eliminado exitosamente: ${fileId}`);
+      console.log(` Archivo eliminado exitosamente: ${fileId}`);
       return true;
 
     } catch (error: any) {
-      console.error(`❌ Error al eliminar archivo ${fileId}:`, error.message);
+      console.error(` Error al eliminar archivo ${fileId}:`, error.message);
       
       // Si el archivo no existe, considerarlo como "eliminado exitosamente"
       if (error.code === 404) {
-        console.log(`ℹ️ Archivo ${fileId} no encontrado en Drive, considerado como eliminado`);
+        console.log(` Archivo ${fileId} no encontrado en Drive, considerado como eliminado`);
         return true;
       }
       
@@ -305,7 +305,7 @@ export default class DriveService {
    */
   async createFolder(name: string, parentFolderId?: string): Promise<{ success: boolean; folderId?: string; error?: string }> {
     try {
-      console.log(`📁 Creando carpeta: ${name}${parentFolderId ? ` en carpeta: ${parentFolderId}` : ''}`);
+      console.log(` Creando carpeta: ${name}${parentFolderId ? ` en carpeta: ${parentFolderId}` : ''}`);
       
       // Preparar metadata de la carpeta
       const folderMetadata: drive_v3.Schema$File = {
@@ -326,7 +326,7 @@ export default class DriveService {
         throw new Error('No se pudo obtener el ID de la carpeta creada');
       }
 
-      console.log(`✅ Carpeta creada exitosamente: ${folder.name} (ID: ${folder.id})`);
+      console.log(` Carpeta creada exitosamente: ${folder.name} (ID: ${folder.id})`);
       
       return {
         success: true,
@@ -334,7 +334,7 @@ export default class DriveService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al crear carpeta ${name}:`, error.message);
+      console.error(` Error al crear carpeta ${name}:`, error.message);
       
       return {
         success: false,
@@ -348,7 +348,7 @@ export default class DriveService {
    */
   async deleteFolder(folderId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      console.log(`🗑️ Eliminando carpeta de Drive: ${folderId}`);
+      console.log(` Eliminando carpeta de Drive: ${folderId}`);
       
       // Verificar que la carpeta existe y obtener su información
       try {
@@ -361,10 +361,10 @@ export default class DriveService {
           throw new Error('El ID proporcionado no corresponde a una carpeta');
         }
         
-        console.log(`📋 Eliminando carpeta: ${folderInfo.data.name} (ID: ${folderId})`);
+        console.log(` Eliminando carpeta: ${folderInfo.data.name} (ID: ${folderId})`);
       } catch (getError: any) {
         if (getError.code === 404) {
-          console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+          console.log(` Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
           return { success: true };
         }
         throw getError;
@@ -375,15 +375,15 @@ export default class DriveService {
         fileId: folderId
       });
       
-      console.log(`✅ Carpeta eliminada exitosamente: ${folderId}`);
+      console.log(` Carpeta eliminada exitosamente: ${folderId}`);
       return { success: true };
 
     } catch (error: any) {
-      console.error(`❌ Error al eliminar carpeta ${folderId}:`, error.message);
+      console.error(` Error al eliminar carpeta ${folderId}:`, error.message);
       
       // Si la carpeta no existe, considerarlo como "eliminado exitosamente"
       if (error.code === 404) {
-        console.log(`ℹ️ Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
+        console.log(` Carpeta ${folderId} no encontrada en Drive, considerada como eliminada`);
         return { success: true };
       }
       

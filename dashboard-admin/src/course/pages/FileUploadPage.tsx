@@ -277,12 +277,12 @@ export default function FileUploadPage() {
             <div className="mt-6 p-4 bg-gray-50 rounded-lg">
               {uploadedFiles.length > 0 && (
                 <p className="text-green-600 mb-2">
-                  ✓ {uploadedFiles.length} archivo(s) subido(s) exitosamente
+                   {uploadedFiles.length} archivo(s) subido(s) exitosamente
                 </p>
               )}
               {errorFiles.length > 0 && (
                 <p className="text-red-600">
-                  ✗ Error al subir {errorFiles.length} archivo(s)
+                   Error al subir {errorFiles.length} archivo(s)
                 </p>
               )}
             </div>

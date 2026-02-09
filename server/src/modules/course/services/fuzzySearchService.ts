@@ -480,7 +480,7 @@ export class FuzzySearchService {
   static async initializeSearchStructures(): Promise<void> {
     if (this.isInitialized) return;
     
-    console.log('🔍 Inicializando estructuras de búsqueda fuzzy...');
+    console.log(' Inicializando estructuras de búsqueda fuzzy...');
     const startTime = Date.now();
     
     try {
@@ -515,13 +515,13 @@ export class FuzzySearchService {
       
       this.isInitialized = true;
       const endTime = Date.now();
-      console.log(`✅ Estructuras inicializadas en ${endTime - startTime}ms`);
-      console.log(`📊 Estadísticas:`);
+      console.log(` Estructuras inicializadas en ${endTime - startTime}ms`);
+      console.log(` Estadísticas:`);
       console.log(`   - Cursos procesados: ${courses.length}`);
       console.log(`   - N-gramas en índice: ${Object.keys(this.invertedIndex).length}`);
       
     } catch (error) {
-      console.error('❌ Error inicializando estructuras de búsqueda:', error);
+      console.error(' Error inicializando estructuras de búsqueda:', error);
       throw error;
     }
   }

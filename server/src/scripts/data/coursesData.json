@@ -3,35 +3,35 @@
     {
       "id": 1,
       "name": "Desarrollo Web",
-      "icon": "🌐",
+      "icon": "",
       "description": "Especialización en desarrollo de aplicaciones web frontend y backend",
       "isActive": true
     },
     {
       "id": 2,
       "name": "Ciencia de Datos",
-      "icon": "📊",
+      "icon": "",
       "description": "Análisis de datos, machine learning e inteligencia artificial",
       "isActive": true
     },
     {
       "id": 3,
       "name": "Desarrollo Móvil",
-      "icon": "📱",
+      "icon": "",
       "description": "Desarrollo de aplicaciones para dispositivos móviles",
       "isActive": true
     },
     {
       "id": 4,
       "name": "DevOps",
-      "icon": "⚙️",
+      "icon": "",
       "description": "Automatización, infraestructura y despliegue continuo",
       "isActive": true
     },
     {
       "id": 5,
       "name": "Ciberseguridad",
-      "icon": "🔒",
+      "icon": "",
       "description": "Seguridad informática y protección de sistemas",
       "isActive": true
     }
@@ -40,70 +40,70 @@
     {
       "id": 1,
       "name": "JavaScript",
-      "icon": "⚡",
+      "icon": "",
       "description": "Lenguaje de programación para desarrollo web",
       "isActive": true
     },
     {
       "id": 2,
       "name": "Python",
-      "icon": "🐍",
+      "icon": "",
       "description": "Lenguaje versátil para desarrollo y ciencia de datos",
       "isActive": true
     },
     {
       "id": 3,
       "name": "React",
-      "icon": "⚛️",
+      "icon": "",
       "description": "Biblioteca para construir interfaces de usuario",
       "isActive": true
     },
     {
       "id": 4,
       "name": "Node.js",
-      "icon": "🟢",
+      "icon": "",
       "description": "Entorno de ejecución para JavaScript en el servidor",
       "isActive": true
     },
     {
       "id": 5,
       "name": "Machine Learning",
-      "icon": "🤖",
+      "icon": "",
       "description": "Algoritmos de aprendizaje automático",
       "isActive": true
     },
     {
       "id": 6,
       "name": "Blockchain",
-      "icon": "⛓️",
+      "icon": "",
       "description": "Tecnología de cadena de bloques y criptomonedas",
       "isActive": true
     },
     {
       "id": 7,
       "name": "Docker",
-      "icon": "🐳",
+      "icon": "",
       "description": "Containerización de aplicaciones",
       "isActive": true
     },
     {
       "id": 8,
       "name": "AWS",
-      "icon": "☁️",
+      "icon": "",
       "description": "Servicios en la nube de Amazon",
       "isActive": true
     },
     {
       "id": 9,
       "name": "Flutter",
-      "icon": "🦋",
+      "icon": "",
       "description": "Framework para desarrollo móvil multiplataforma",
       "isActive": true
     },
     {
       "id": 10,
       "name": "Inteligencia Artificial",
-      "icon": "🧠",
+      "icon": "",
       "description": "Sistemas inteligentes y redes neuronales",
       "isActive": true
     }

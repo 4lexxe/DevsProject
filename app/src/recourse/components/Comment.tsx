@@ -177,8 +177,8 @@ const Comment: React.FC<CommentProps> = ({ resourceId }) => {
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
           <p className="text-yellow-800 text-sm">
             {!user 
-              ? '🔒 Debes iniciar sesión para comentar.' 
-              : '⚠️ No tienes permisos para comentar en este recurso.'
+              ? ' Debes iniciar sesión para comentar.' 
+              : ' No tienes permisos para comentar en este recurso.'
             }
           </p>
           {!user && (

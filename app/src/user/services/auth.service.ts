@@ -99,7 +99,7 @@ class AuthService {
       // Solo guardamos los datos del usuario, el token se maneja automáticamente por cookies HttpOnly
       this.setUser(user);
 
-      console.log('🔐 Usuario autenticado:', {
+      console.log(' Usuario autenticado:', {
         id: user.id,
         name: user.name,
         role: user.role?.name,
@@ -122,7 +122,7 @@ class AuthService {
       // Solo guardamos los datos del usuario, el token se maneja automáticamente por cookies HttpOnly
       this.setUser(user);
 
-      console.log('🔐 Usuario registrado:', {
+      console.log(' Usuario registrado:', {
         id: user.id,
         name: user.name,
         role: user.role?.name,

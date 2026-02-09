@@ -327,11 +327,11 @@ export class DirectPurchaseController extends BaseController {
       );
 
       // Debug: Log de la respuesta de MercadoPago
-      console.log('🔍 Respuesta completa de MercadoPago:', JSON.stringify(result, null, 2));
+      console.log(' Respuesta completa de MercadoPago:', JSON.stringify(result, null, 2));
 
       // Validar que el init_point sea válido
       if (!result.init_point || result.init_point === 'undefined' || typeof result.init_point !== 'string') {
-        console.error('❌ init_point inválido de MercadoPago:', result.init_point);
+        console.error(' init_point inválido de MercadoPago:', result.init_point);
         return DirectPurchaseController.sendError(
           res,
           req,

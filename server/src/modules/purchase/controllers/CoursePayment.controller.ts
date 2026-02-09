@@ -33,10 +33,10 @@ class CoursePaymentController extends BaseController {
 
       // Debug: Log de la metadata para verificar estructura
       console.log(
-        "🔍 Metadata del pago:",
+        " Metadata del pago:",
         JSON.stringify(paymentData.metadata, null, 2)
       );
-      console.log("🔍 External reference:", paymentData.external_reference);
+      console.log(" External reference:", paymentData.external_reference);
 
       // Buscar la orden asociada al pago usando external_reference
       let order = null;
@@ -47,7 +47,7 @@ class CoursePaymentController extends BaseController {
         paymentData.external_reference?.startsWith("direct_");
       const isCartPurchase = paymentData.metadata?.type === "cart";
 
-      console.log("🔍 Tipo de compra detectado:", {
+      console.log(" Tipo de compra detectado:", {
         isDirectPurchase,
         isCartPurchase,
       });
@@ -57,20 +57,20 @@ class CoursePaymentController extends BaseController {
         order = await Order.findOne({
           where: { externalReference: paymentData.external_reference },
         });
-        console.log("🔍 Orden encontrada (directa):", order?.id);
+        console.log(" Orden encontrada (directa):", order?.id);
       } else if (isCartPurchase) {
         order = await Order.findOne({
           where: { externalReference: paymentData.external_reference },
         });
         console.log(
-          "🔍 Buscando orden para:",
+          " Buscando orden para:",
           paymentData.external_reference,
           "Orden encontrada:",
           order?.id
         );
       } else {
         console.warn(
-          "🔍 No se encontró cart_id en metadata para pago de carrito"
+          " No se encontró cart_id en metadata para pago de carrito"
         );
       }
 
@@ -165,7 +165,7 @@ class CoursePaymentController extends BaseController {
         );
       }
     } catch (error) {
-      console.error("❌ Error creando accesos a cursos:", error);
+      console.error(" Error creando accesos a cursos:", error);
       // No relanzar el error para no fallar el pago principal
     }
   }
@@ -218,17 +218,17 @@ class CoursePaymentController extends BaseController {
         });
 
         console.log(
-          `✅ Acceso directo creado para usuario ${userId} al curso ${courseId}`
+          ` Acceso directo creado para usuario ${userId} al curso ${courseId}`
         );
       } else {
         console.log(
-          `ℹ️ El usuario ${userId} ya tiene acceso al curso ${courseId}`
+          ` El usuario ${userId} ya tiene acceso al curso ${courseId}`
         );
       }
 
-      console.log(`🎉 Compra directa completada para curso ${courseId}`);
+      console.log(` Compra directa completada para curso ${courseId}`);
     } catch (error) {
-      console.error("❌ Error procesando compra directa:", error);
+      console.error(" Error procesando compra directa:", error);
     }
   }
 
@@ -280,20 +280,20 @@ class CoursePaymentController extends BaseController {
           });
 
           console.log(
-            `✅ Acceso creado para usuario ${cart.userId} al curso ${cartCourse.courseId}`
+            ` Acceso creado para usuario ${cart.userId} al curso ${cartCourse.courseId}`
           );
         } else {
           console.log(
-            `ℹ️ El usuario ${cart.userId} ya tiene acceso al curso ${cartCourse.courseId}`
+            ` El usuario ${cart.userId} ya tiene acceso al curso ${cartCourse.courseId}`
           );
         }
       }
 
       console.log(
-        `🎉 Proceso de creación de accesos completado para carrito ${cartId}`
+        ` Proceso de creación de accesos completado para carrito ${cartId}`
       );
     } catch (error) {
-      console.error("❌ Error procesando pago de carrito:", error);
+      console.error(" Error procesando pago de carrito:", error);
     }
   }
 

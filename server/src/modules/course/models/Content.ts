@@ -8,6 +8,7 @@ class Content extends Model {
   public id!: bigint;
   public sectionId!: bigint;
   public title!: string;
+  public slug!: string;
   public text!: string;
   public markdown?: string;
   public quiz?: Array<{
@@ -58,6 +59,12 @@ Content.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    slug: {
+      type: DataTypes.STRING,
+      allowNull: true, // Temporalmente permitir null hasta que se cree la migración
+      unique: true,
+      comment: "Slug único para URLs SEO-friendly",
+    },
     text: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -98,6 +105,10 @@ Content.init(
     sequelize,
     modelName: "Content",
     tableName: "Contents",
+    indexes: [
+      { fields: ["slug"], unique: true },
+      { fields: ["title"] },
+    ],
     paranoid: true,
     timestamps: true,
   }

@@ -54,4 +54,4 @@ const HeaderSectionAdminPage: React.FC = () => {
   );
 };
 
-export default HeaderSectionAdminPage;
+export default HeaderSectionAdminPage; 

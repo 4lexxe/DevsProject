@@ -102,7 +102,7 @@ const CourseDetails: React.FC = () => {
             }
           } catch {
             // Si hay error verificando acceso (ej: usuario no autenticado), continuar mostrando el curso
-            console.log('ℹ️ No se pudo verificar acceso (posiblemente usuario no autenticado), mostrando curso normal');
+            console.log(' No se pudo verificar acceso (posiblemente usuario no autenticado), mostrando curso normal');
           }
         } else {
           setError("Curso no encontrado.");

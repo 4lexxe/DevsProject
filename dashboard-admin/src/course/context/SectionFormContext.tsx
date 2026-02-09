@@ -33,7 +33,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
     isEditingContent: false,
   });
 
-  /*** 🔹 MÉTODOS PARA SECCIÓN ***/
+  /***  MÉTODOS PARA SECCIÓN ***/
   const setSection = useCallback((section: ISection) => {
     // Asegurar que cada contenido tenga un contentId temporal
     const sectionWithContentIds = {
@@ -74,7 +74,7 @@ export function SectionProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, section: null, isEditingSection: false }));
   }, []);
 
-  /*** 🔹 MÉTODOS PARA CONTENIDO ***/
+  /***  MÉTODOS PARA CONTENIDO ***/
   const addContent = useCallback(() => {
     setState((prev) => ({ ...prev, isAddingContent: true, isEditingContent: false }));
   }, []);

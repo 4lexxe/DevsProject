@@ -1,8 +1,15 @@
 import axios from 'axios'
 
+// Validar que VITE_API_URL esté definido
+const API_URL = import.meta.env.VITE_API_URL;
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL no está definida. Por favor, configura esta variable de entorno.');
+}
+
 // Crear instancia de axios con configuración base
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: API_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'

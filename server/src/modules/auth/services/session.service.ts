@@ -2,6 +2,21 @@ import Session from '../models/Session';
 import { TokenSession } from '../../../shared/middleware/authMiddleware';
 import { Op } from 'sequelize';
 
+// Timestamp de inicio del servidor - se actualiza cada vez que el servidor se reinicia
+// Esto invalida todos los tokens anteriores al reinicio
+let SERVER_START_TIME: Date = new Date();
+
+// Función para reiniciar el timestamp del servidor (llamar al iniciar el servidor)
+export function setServerStartTime(): void {
+  SERVER_START_TIME = new Date();
+  console.log(` Servidor iniciado a las ${SERVER_START_TIME.toISOString()}. Todos los tokens anteriores serán invalidados.`);
+}
+
+// Función para obtener el timestamp de inicio del servidor
+export function getServerStartTime(): Date {
+  return SERVER_START_TIME;
+}
+
 export class SessionService {
   /**
    * Registrar una nueva sesión en la base de datos
@@ -60,6 +75,7 @@ export class SessionService {
 
   /**
    * Verificar si un token existe y está activo
+   * También verifica que el token sea más reciente que el último reinicio del servidor
    */
   static async validateToken(userId: number, token: string): Promise<boolean> {
     try {
@@ -74,7 +90,23 @@ export class SessionService {
         },
       });
 
-      return !!session;
+      if (!session) {
+        return false;
+      }
+
+      // Verificar que el token sea más reciente que el último reinicio del servidor
+      // Si el token fue creado antes del reinicio, es inválido
+      if (session.createdAt < SERVER_START_TIME) {
+        console.log(` Token inválido: creado antes del reinicio del servidor (${session.createdAt.toISOString()} < ${SERVER_START_TIME.toISOString()})`);
+        // Marcar la sesión como inactiva
+        await Session.update(
+          { isActive: false },
+          { where: { id: session.id } }
+        );
+        return false;
+      }
+
+      return true;
     } catch (error) {
       console.error('Error validando token:', error);
       return false;
@@ -168,7 +200,7 @@ export class SessionService {
       });
 
       if (deletedCount > 0) {
-        console.log(`🧹 Limpieza de sesiones: ${deletedCount} sesiones eliminadas`);
+        console.log(` Limpieza de sesiones: ${deletedCount} sesiones eliminadas`);
       }
     } catch (error) {
       console.error('Error limpiando sesiones expiradas:', error);

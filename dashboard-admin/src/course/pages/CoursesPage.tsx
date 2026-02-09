@@ -38,6 +38,12 @@ interface Course {
   createdAt: string
   studentsCount?: number
   duration?: number
+  creator?: {
+    id: number
+    name: string
+    username?: string
+    avatar?: string
+  } | null
 }
 
 const CoursesPage = () => {
@@ -324,6 +330,26 @@ const CoursesPage = () => {
                           </span>
                         )}
                       </div>
+
+                      {/* Creator section */}
+                      {course.creator && (
+                        <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-100 dark:border-gray-700">
+                          {course.creator.avatar ? (
+                            <img
+                              src={course.creator.avatar}
+                              alt={course.creator.name}
+                              className="w-8 h-8 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold border-2 border-gray-200 dark:border-gray-600">
+                              {course.creator.name.charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                          <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                            {course.creator.name}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Minimal Actions */}
                       <div className="flex items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">

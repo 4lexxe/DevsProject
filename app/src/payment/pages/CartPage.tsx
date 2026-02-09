@@ -83,8 +83,8 @@ export default function CartPage() {
         const errorMessage = error.response?.data?.message;
         const errorData = error.response?.data?.errors; // Usar errors en lugar de data
         
-        console.log('🔍 Cart Error 422 - errorMessage:', errorMessage);
-        console.log('🔍 Cart Error 422 - errorData (errors):', errorData);
+        console.log(' Cart Error 422 - errorMessage:', errorMessage);
+        console.log(' Cart Error 422 - errorData (errors):', errorData);
         
         if (errorMessage?.includes('carrito pendiente') || errorMessage?.includes('Ya existe un carrito pendiente')) {
           setShowPendingModal(true);
@@ -102,7 +102,7 @@ export default function CartPage() {
         
         // Verificar si es error de órdenes pendientes usando errorType
         if (errorData?.errorType === 'PENDING_ORDER') {
-          console.log('🔍 Detectado error de orden pendiente en carrito');
+          console.log(' Detectado error de orden pendiente en carrito');
           
           // Tomar la primera orden pendiente
           const firstOrder = errorData.orderDetails?.[0];

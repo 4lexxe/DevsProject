@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler, useFieldArray } from "react-hook-form";
 import { type IContentFormData } from "@/course/interfaces/Content";
 
-import MarkdownPreview from "./MarkdownPreview";
+import MarkdownEditor from "./MarkdownEditor";
 
 import CustomInput from "@/shared/components/inputs/CustomInput";
 import TextAreaInput from "@/shared/components/inputs/TextAreaInput";
@@ -19,6 +19,7 @@ export default function ContentForm() {
     handleSubmit,
     watch,
     control,
+    setValue,
     formState: { errors },
   } = useForm<IContentFormData>({
     resolver: zodResolver(contentSchema),
@@ -66,16 +67,33 @@ export default function ContentForm() {
             register={register}
             error={errors.text?.message}
           />
+        </div>
 
-          <TextAreaInput
-            name="markdown"
-            labelText="Texto en markdown"
-            rows={4}
-            register={register}
+        {/* Editor de Markdown con Preview */}
+        <div className="w-full">
+          <MarkdownEditor
+            value={markdown || ""}
+            onChange={(value) => setValue("markdown", value || "")}
+            placeholder="Escribe tu contenido en Markdown aquí...
+
+## Ejemplos de sintaxis:
+
+**Texto en negrita**
+*Texto en cursiva*
+[Enlace](https://ejemplo.com)
+
+### Listas:
+- Item 1
+- Item 2
+
+### Código:
+\`\`\`javascript
+const ejemplo = 'código';
+\`\`\`"
+            height="600px"
+            label="Contenido Markdown"
             error={errors.markdown?.message}
           />
-
-          <MarkdownPreview markdown={markdown || ""} />
         </div>
 
         <div className="space-y-4">
@@ -90,7 +108,7 @@ export default function ContentForm() {
                 className="p-4 border rounded-md space-y-4 shadow-sm"
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* 🔹 Campo de título del recurso */}
+                  {/*  Campo de título del recurso */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Resource Title
@@ -112,7 +130,7 @@ export default function ContentForm() {
                     )}
                   </div>
 
-                  {/* 🔹 Campo de URL del recurso */}
+                  {/*  Campo de URL del recurso */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Resource URL
@@ -135,7 +153,7 @@ export default function ContentForm() {
                   </div>
                 </div>
 
-                {/* 🔹 Botón para eliminar recurso */}
+                {/*  Botón para eliminar recurso */}
                 <button
                   type="button"
                   className="flex items-center px-3 py-1 text-sm text-red-600 bg-red-100 rounded-md hover:bg-red-200"
@@ -148,7 +166,7 @@ export default function ContentForm() {
             );
           })}
 
-          {/* 🔹 Botón para agregar nuevo recurso */}
+          {/*  Botón para agregar nuevo recurso */}
           <button
             type="button"
             className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200"

@@ -9,6 +9,13 @@ interface Course {
   image: string;
   categories: Category[];
   careerType: CareerType;
+  creator?: {
+    id: number;
+    name: string;
+    username?: string;
+    displayName?: string;
+    avatar?: string;
+  };
   pricing?: {
     originalPrice: number;
     finalPrice: number;
@@ -39,6 +46,7 @@ export default function CoursesList({ courses }: { courses: Course[] }) {
                   key={course.id}
                   {...course}
                   categories={course.categories}
+                  creator={course.creator}
                   pricing={course.pricing}
                 />
               ))

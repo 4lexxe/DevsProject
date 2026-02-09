@@ -124,7 +124,7 @@ export default function DiscountEventsListPage() {
         {/* Events List */}
         {discountEvents.length === 0 ? (
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📅</div>
+            <div className="text-6xl mb-4"></div>
             <h3 className="text-xl font-semibold mb-2" style={{ color: "#0c154c" }}>
               No hay eventos de descuento
             </h3>
@@ -157,21 +157,21 @@ export default function DiscountEventsListPage() {
                             className="px-3 py-1 rounded-full text-sm font-medium"
                             style={{ backgroundColor: "#02ffff", color: "#0c154c" }}
                           >
-                            ✨ Activo
+                             Activo
                           </span>
                         ) : event.isActive ? (
                           <span
                             className="px-3 py-1 rounded-full text-sm font-medium"
                             style={{ backgroundColor: "#fbbf24", color: "#0c154c" }}
                           >
-                            ⏳ Programado
+                             Programado
                           </span>
                         ) : (
                           <span
                             className="px-3 py-1 rounded-full text-sm font-medium"
                             style={{ backgroundColor: "#f87171", color: "white" }}
                           >
-                            ❌ Inactivo
+                             Inactivo
                           </span>
                         )}
                       </div>
@@ -202,7 +202,7 @@ export default function DiscountEventsListPage() {
                         style={{ borderColor: "#42d7c7", color: "#42d7c7" }}
                         title="Editar"
                       >
-                        ✏️
+                        
                       </button>
                       <button
                         onClick={() => handleToggleActive(event.id, event.isActive)}
@@ -217,7 +217,7 @@ export default function DiscountEventsListPage() {
                         }}
                         title={event.isActive ? "Desactivar" : "Activar"}
                       >
-                        {event.isActive ? "⏸️" : "▶️"}
+                        {event.isActive ? "" : ""}
                       </button>
                       <button
                         onClick={() => setDeleteConfirm(event.id)}
@@ -225,7 +225,7 @@ export default function DiscountEventsListPage() {
                         style={{ borderColor: "#ef4444", color: "#ef4444" }}
                         title="Eliminar"
                       >
-                        🗑️
+                        
                       </button>
                     </div>
                   </div>

@@ -8,7 +8,7 @@ import { validateUploadedFile, validateMultipleFiles, sanitizeFileName } from '.
 
 async function uploadToDrive(filePath: string, fileName: string, mimeType: string, makePublic: boolean = false) {
   try {
-    console.log(`📤 Iniciando subida a Drive: ${fileName} (${mimeType})`);
+    console.log(` Iniciando subida a Drive: ${fileName} (${mimeType})`);
     
     // Verificar que el archivo existe
     if (!fs.existsSync(filePath)) {
@@ -17,7 +17,7 @@ async function uploadToDrive(filePath: string, fileName: string, mimeType: strin
     
     // Obtener información del archivo
     const stats = fs.statSync(filePath);
-    console.log(`📊 Tamaño del archivo: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
+    console.log(` Tamaño del archivo: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
     
     // Crear cliente de Drive
     const drive = createDriveClient();
@@ -39,7 +39,7 @@ async function uploadToDrive(filePath: string, fileName: string, mimeType: strin
       fields: 'id, name, size, mimeType, createdTime, webViewLink, thumbnailLink'
     }, requestOptions);
     
-    console.log(`✅ Archivo subido exitosamente a Drive: ${response.data.id}`);
+    console.log(` Archivo subido exitosamente a Drive: ${response.data.id}`);
     
     if (!response.data.id) {
       throw new Error("No se pudo obtener el ID del archivo subido");
@@ -58,9 +58,9 @@ async function uploadToDrive(filePath: string, fileName: string, mimeType: strin
           },
         });
         shareableLink = response.data.webViewLink || undefined;
-        console.log(`🌐 Archivo configurado como público: ${response.data.id}`);
+        console.log(` Archivo configurado como público: ${response.data.id}`);
       } catch (permError) {
-        console.warn(`⚠️ No se pudo hacer público el archivo:`, permError);
+        console.warn(` No se pudo hacer público el archivo:`, permError);
       }
     }
     
@@ -83,7 +83,7 @@ async function uploadToDrive(filePath: string, fileName: string, mimeType: strin
     };
     
   } catch (error: any) {
-    console.error('❌ Error uploading to Drive:', error);
+    console.error(' Error uploading to Drive:', error);
     
     // Proporcionar mensajes de error más específicos
     if (error.code === 'ENOTFOUND') {
@@ -303,7 +303,7 @@ export const processAndUploadSingleFile = async (req: FileUploadRequest, res: Re
   }
 
   try {
-    console.log(`📤 Iniciando subida a Drive: ${req.file.originalname} (${req.file.mimetype})`);
+    console.log(` Iniciando subida a Drive: ${req.file.originalname} (${req.file.mimetype})`);
     
     // Verificar que el archivo temporal existe
     if (!req.file.path || !fs.existsSync(req.file.path)) {
@@ -312,7 +312,7 @@ export const processAndUploadSingleFile = async (req: FileUploadRequest, res: Re
     
     // Obtener información del archivo
     const stats = fs.statSync(req.file.path);
-    console.log(`📊 Tamaño del archivo: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
+    console.log(` Tamaño del archivo: ${(stats.size / (1024 * 1024)).toFixed(2)} MB`);
     
     // Preparar opciones básicas
     const { makePublic = false } = req.body;
@@ -342,11 +342,11 @@ export const processAndUploadSingleFile = async (req: FileUploadRequest, res: Re
     // Agregar ruta del archivo temporal para limpieza posterior
     req.tempFilePaths = [req.file.path];
     
-    console.log(`✅ Upload exitoso: ${req.file.originalname}`);
+    console.log(` Upload exitoso: ${req.file.originalname}`);
     next();
 
   } catch (error: any) {
-    console.error(`❌ Error en upload de ${req.file.originalname}:`, error.message);
+    console.error(` Error en upload de ${req.file.originalname}:`, error.message);
     
     // Limpiar archivo temporal en caso de error
     if (req.file.path && fs.existsSync(req.file.path)) {
@@ -409,7 +409,7 @@ export const processAndUploadMultipleFiles = async (req: FileUploadRequest, res:
     tempPaths.push(file.path);
 
     try {
-      console.log(`📤 Procesando archivo ${i + 1}/${req.files.length}: ${file.originalname}`);
+      console.log(` Procesando archivo ${i + 1}/${req.files.length}: ${file.originalname}`);
       
       // Verificar que el archivo temporal existe
       if (!file.path || !fs.existsSync(file.path)) {
@@ -437,10 +437,10 @@ export const processAndUploadMultipleFiles = async (req: FileUploadRequest, res:
         }
       });
       
-      console.log(`✅ Archivo ${i + 1} procesado: ${file.originalname}`);
+      console.log(` Archivo ${i + 1} procesado: ${file.originalname}`);
 
     } catch (error: any) {
-      console.error(`❌ Error en archivo ${i + 1} (${file.originalname}):`, error.message);
+      console.error(` Error en archivo ${i + 1} (${file.originalname}):`, error.message);
       
       // Agregar archivo con error
       processedFiles.push({
@@ -498,10 +498,10 @@ export const cleanupTempFiles = (req: FileUploadRequest, res: Response, next: Ne
         try {
           if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
-            console.log(`🗑️ Archivo temporal eliminado: ${filePath}`);
+            console.log(` Archivo temporal eliminado: ${filePath}`);
           }
         } catch (error) {
-          console.warn(`⚠️ No se pudo eliminar archivo temporal: ${filePath}`, error);
+          console.warn(` No se pudo eliminar archivo temporal: ${filePath}`, error);
         }
       });
     }
@@ -517,10 +517,10 @@ export const checkUserQuota = async (req: FileUploadRequest, res: Response, next
   try {
     // TODO: Implementar verificación de cuota con API directa de Drive
     // Por ahora pasamos sin verificación para evitar errores
-    console.log('ℹ️ Verificación de cuota temporalmente deshabilitada');
+    console.log(' Verificación de cuota temporalmente deshabilitada');
     next();
   } catch (error: any) {
-    console.error('❌ Error en verificación de cuota:', error.message);
+    console.error(' Error en verificación de cuota:', error.message);
     next(); // Continuar sin bloquear por errores de cuota
   }
 };

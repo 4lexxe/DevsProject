@@ -31,7 +31,7 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (headerSections.length === 0) return; // 🔹 Evita cálculos si no hay datos
+    if (headerSections.length === 0) return; //  Evita cálculos si no hay datos
   
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % headerSections.length);

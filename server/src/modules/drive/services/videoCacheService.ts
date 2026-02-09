@@ -33,7 +33,7 @@ export class VideoCacheService {
    */
   private setupCleanupHandlers(): void {
     const cleanup = async () => {
-      console.log('🧹 Limpiando cache antes de cerrar el servidor...');
+      console.log(' Limpiando cache antes de cerrar el servidor...');
       await this.clearAllCache();
       process.exit(0);
     };
@@ -45,9 +45,9 @@ export class VideoCacheService {
     
     // Limpiar cache al iniciar el servidor
     this.clearAllCache().then(() => {
-      console.log('🔄 Cache limpiado al iniciar el servidor');
+      console.log(' Cache limpiado al iniciar el servidor');
     }).catch((error) => {
-      console.error('❌ Error al limpiar cache inicial:', error);
+      console.error(' Error al limpiar cache inicial:', error);
     });
   }
 
@@ -125,7 +125,7 @@ export class VideoCacheService {
       if (await this.isVideoCached(fileId, mimeType)) {
         const cachedSize = await this.getCachedVideoSize(fileId, mimeType);
         if (cachedSize === totalSize) {
-          console.log(`✅ Video ya en cache: ${fileId}`);
+          console.log(` Video ya en cache: ${fileId}`);
           return {
             success: true,
             filePath: cachePath,
@@ -135,7 +135,7 @@ export class VideoCacheService {
         } else {
           // Archivo corrupto o incompleto, borrar y re-descargar
           fs.unlinkSync(cachePath);
-          console.log(`🗑️ Archivo corrupto eliminado: ${fileId}`);
+          console.log(` Archivo corrupto eliminado: ${fileId}`);
         }
       }
 
@@ -164,7 +164,7 @@ export class VideoCacheService {
         });
 
         driveStream.on('error', (error) => {
-          console.error(`❌ Error en descarga de ${fileId}:`, error);
+          console.error(` Error en descarga de ${fileId}:`, error);
           // Limpiar archivo parcial
           if (fs.existsSync(cachePath)) {
             fs.unlinkSync(cachePath);
@@ -173,12 +173,12 @@ export class VideoCacheService {
         });
 
         writeStream.on('error', (error) => {
-          console.error(`❌ Error escribiendo ${fileId}:`, error);
+          console.error(` Error escribiendo ${fileId}:`, error);
           reject(error);
         });
 
         writeStream.on('finish', () => {
-          console.log(`✅ Descarga completa: ${fileId}`);
+          console.log(` Descarga completa: ${fileId}`);
           resolve();
         });
 
@@ -193,7 +193,7 @@ export class VideoCacheService {
         throw new Error(`Tamaño incorrecto: esperado ${totalSize}, obtenido ${finalSize}`);
       }
 
-      console.log(`🎉 Video cacheado exitosamente: ${fileId} (${(finalSize / 1024 / 1024).toFixed(2)} MB)`);
+      console.log(` Video cacheado exitosamente: ${fileId} (${(finalSize / 1024 / 1024).toFixed(2)} MB)`);
 
       return {
         success: true,
@@ -203,7 +203,7 @@ export class VideoCacheService {
       };
 
     } catch (error: any) {
-      console.error(`❌ Error al descargar video ${fileId}:`, error.message);
+      console.error(` Error al descargar video ${fileId}:`, error.message);
       return {
         success: false,
         error: error.message
@@ -238,7 +238,7 @@ export class VideoCacheService {
       return await this.downloadVideoToCache(fileId, mimeType, totalSize);
 
     } catch (error: any) {
-      console.error(`❌ Error al obtener video cacheado ${fileId}:`, error.message);
+      console.error(` Error al obtener video cacheado ${fileId}:`, error.message);
       return {
         success: false,
         error: error.message
@@ -254,12 +254,12 @@ export class VideoCacheService {
       const cachePath = this.getCachePath(fileId, mimeType);
       if (fs.existsSync(cachePath)) {
         fs.unlinkSync(cachePath);
-        console.log(`🗑️ Video eliminado del cache: ${fileId}`);
+        console.log(` Video eliminado del cache: ${fileId}`);
         return true;
       }
       return false;
     } catch (error: any) {
-      console.error(`❌ Error al eliminar video del cache ${fileId}:`, error.message);
+      console.error(` Error al eliminar video del cache ${fileId}:`, error.message);
       return false;
     }
   }
@@ -284,7 +284,7 @@ export class VideoCacheService {
         files
       };
     } catch (error: any) {
-      console.error('❌ Error al obtener info del cache:', error.message);
+      console.error(' Error al obtener info del cache:', error.message);
       return { totalFiles: 0, totalSize: 0, files: [] };
     }
   }
@@ -299,10 +299,10 @@ export class VideoCacheService {
         const filePath = path.join(this.cacheDir, file);
         fs.unlinkSync(filePath);
       }
-      console.log(`🧹 Cache completo limpiado: ${files.length} archivos eliminados`);
+      console.log(` Cache completo limpiado: ${files.length} archivos eliminados`);
       return true;
     } catch (error: any) {
-      console.error('❌ Error al limpiar cache:', error.message);
+      console.error(' Error al limpiar cache:', error.message);
       return false;
     }
   }

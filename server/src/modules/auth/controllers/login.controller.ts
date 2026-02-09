@@ -62,7 +62,7 @@ export class LoginController {
         res.cookie('auth_token', authResponse.token, cookieOptions);
         
         // Debug: Log para verificar configuración de cookie
-        console.log('🍪 Setting Cookie:', {
+        console.log(' Setting Cookie:', {
           tokenLength: authResponse.token.length,
           cookieOptions,
           userAgent: req.get('User-Agent'),

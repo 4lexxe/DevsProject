@@ -46,6 +46,12 @@ export interface Course {
     };
     savings: number;
   };
+  creator?: {
+    id: number;
+    name: string;
+    username?: string;
+    avatar?: string;
+  } | null;
 }
 
 export interface Section {

@@ -73,7 +73,15 @@ export default function SectionList({
       contents: sectionState.section.contents,
     };
 
-    const dataToSend = { section: sectionData, courseId };
+    // Convertir courseId a número para que el validador del backend lo acepte
+    const courseIdNumber = parseInt(courseId, 10);
+    if (isNaN(courseIdNumber)) {
+      setStatus("error");
+      setMessage("El ID del curso no es válido");
+      return;
+    }
+
+    const dataToSend = { section: sectionData, courseId: courseIdNumber };
     handleCreateSection(dataToSend);
   };
 

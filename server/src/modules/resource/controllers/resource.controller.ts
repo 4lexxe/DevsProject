@@ -33,7 +33,7 @@ export class ResourceController {
       const canModerateAll = userPermissions.includes('moderate:all_resources') || user.Role?.name === 'superadmin';
       const canManageOwn = userPermissions.includes('manage:own_resources');
 
-      console.log('🔐 Verificando permisos para resource:', {
+      console.log(' Verificando permisos para resource:', {
         resourceId: resource.id,
         resourceUserId: resource.userId,
         currentUserId: user.id,
@@ -163,16 +163,16 @@ export class ResourceController {
   // Actualizar un recurso (requiere ser propietario o tener permisos de moderador)
   static async updateResource(req: Request, res: Response): Promise<void> {
     try {
-      console.log('📝 Iniciando actualización de recurso');
+      console.log(' Iniciando actualización de recurso');
       
       const user = req.user as User;
       if (!user) {
-        console.log('❌ Usuario no autenticado');
+        console.log(' Usuario no autenticado');
         res.status(401).json({ error: 'Usuario no autenticado' });
         return;
       }
 
-      console.log('👤 Usuario autenticado:', {
+      console.log(' Usuario autenticado:', {
         id: user.id,
         roleId: user.roleId,
         roleName: user.Role?.name
@@ -180,7 +180,7 @@ export class ResourceController {
 
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.log('❌ Errores de validación:', errors.array());
+        console.log(' Errores de validación:', errors.array());
         res.status(400).json({ errors: errors.array() });
         return;
       }
@@ -188,7 +188,7 @@ export class ResourceController {
       const { id } = req.params;
       const { title, description, url, type, isVisible, coverImage } = req.body;
 
-      console.log('📊 Datos de actualización:', {
+      console.log(' Datos de actualización:', {
         resourceId: id,
         title,
         description: description?.substring(0, 50) + '...',
@@ -220,12 +220,12 @@ export class ResourceController {
       });
 
       if (!resource) {
-        console.log('❌ Recurso no encontrado:', id);
+        console.log(' Recurso no encontrado:', id);
         res.status(404).json({ error: 'Recurso no encontrado' });
         return;
       }
 
-      console.log('📦 Recurso encontrado:', {
+      console.log(' Recurso encontrado:', {
         id: resource.id,
         userId: resource.userId,
         title: resource.title
@@ -242,7 +242,7 @@ export class ResourceController {
       });
 
       if (!userWithRole) {
-        console.log('❌ Error cargando información del usuario');
+        console.log(' Error cargando información del usuario');
         res.status(401).json({ error: 'Error de autenticación' });
         return;
       }
@@ -250,12 +250,12 @@ export class ResourceController {
       // Verificar permisos usando la función helper
       const { canModify, reason } = ResourceController.canModifyResource(userWithRole, resource);
       if (!canModify) {
-        console.log('❌ Sin permisos:', reason);
+        console.log(' Sin permisos:', reason);
         res.status(403).json({ error: reason });
         return;
       }
 
-      console.log('✅ Permisos verificados correctamente');
+      console.log(' Permisos verificados correctamente');
 
       // Preparar campos para actualizar (solo los que no son undefined)
       const updatedFields: UpdatableResourceFields = {};
@@ -267,12 +267,12 @@ export class ResourceController {
       if (isVisible !== undefined) updatedFields.isVisible = isVisible;
       if (coverImage !== undefined) updatedFields.coverImage = coverImage;
 
-      console.log('🔄 Campos a actualizar:', updatedFields);
+      console.log(' Campos a actualizar:', updatedFields);
 
       // Actualizar el recurso
       await resource.update(updatedFields);
 
-      console.log('✅ Recurso actualizado correctamente');
+      console.log(' Recurso actualizado correctamente');
 
       // Obtener el recurso actualizado con información del usuario
       const updatedResource = await Resource.findByPk(id, {
@@ -288,7 +288,7 @@ export class ResourceController {
       res.json(updatedResource);
       
     } catch (error) {
-      console.error('❌ Error updating resource:', error);
+      console.error(' Error updating resource:', error);
       
       // Log detallado del error
       if (error instanceof Error) {

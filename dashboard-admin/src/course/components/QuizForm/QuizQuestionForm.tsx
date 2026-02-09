@@ -56,35 +56,35 @@ function QuizTypeDescription({ questionIndex, control }: QuizTypeDescriptionProp
         return {
           title: "Opción Múltiple",
           description: "Los estudiantes pueden seleccionar múltiples respuestas correctas de una lista de opciones. Ideal para preguntas que tienen varias respuestas válidas.",
-          icon: "☑️",
+          icon: "",
           color: "bg-blue-50 border-blue-200 text-blue-800"
         };
       case "Single":
         return {
           title: "Selección Única", 
           description: "Los estudiantes deben seleccionar exactamente una respuesta correcta de las opciones disponibles. Perfecto para preguntas con una sola respuesta válida.",
-          icon: "⚫",
+          icon: "",
           color: "bg-green-50 border-green-200 text-green-800"
         };
       case "TrueOrFalse":
         return {
           title: "Verdadero o Falso",
           description: "Pregunta simple con solo dos opciones: Verdadero o Falso. Debe tener exactamente 2 respuestas y solo una puede ser correcta.",
-          icon: "✓/✗",
+          icon: "/",
           color: "bg-purple-50 border-purple-200 text-purple-800"
         };
       case "ShortAnswer":
         return {
           title: "Respuesta Corta",
           description: "Los estudiantes escriben una respuesta breve en texto libre. Las respuestas no se marcan como correctas/incorrectas automáticamente.",
-          icon: "✏️", 
+          icon: "", 
           color: "bg-orange-50 border-orange-200 text-orange-800"
         };
       default:
         return {
           title: "Tipo de Quiz",
           description: "Selecciona un tipo de quiz para ver su descripción.",
-          icon: "❓",
+          icon: "",
           color: "bg-gray-50 border-gray-200 text-gray-800"
         };
     }

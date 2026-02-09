@@ -21,7 +21,7 @@ export class VideoCacheController {
         return;
       }
 
-      console.log(`🎥 Solicitando video desde cache: ${fileId}`);
+      console.log(` Solicitando video desde cache: ${fileId}`);
 
       // Obtener metadatos del video
       const metadata = await videoProxyService.getVideoMetadata(fileId);
@@ -61,7 +61,7 @@ export class VideoCacheController {
       await this.serveVideoFromLocalFile(res, cacheResult.filePath, metadata.mimeType, range as string);
 
     } catch (error: any) {
-      console.error('❌ Error en getVideoFromCache:', error);
+      console.error(' Error en getVideoFromCache:', error);
       res.status(500).json({ 
         error: 'Error interno del servidor',
         details: error.message 
@@ -96,7 +96,7 @@ export class VideoCacheController {
         'Content-Type': mimeType,
         'Cache-Control': 'public, max-age=3600', // Cache por 1 hora
         // CORS headers
-        'Access-Control-Allow-Origin': process.env.CLIENT_URL || 'http://localhost:5173',
+        'Access-Control-Allow-Origin': process.env.CLIENT_URL || '*',
         'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
         'Access-Control-Allow-Headers': 'Range, Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -106,7 +106,7 @@ export class VideoCacheController {
       const fileStream = fs.createReadStream(filePath, { start, end });
       fileStream.pipe(res);
 
-      console.log(`📤 Sirviendo chunk ${start}-${end} de ${fileSize} bytes desde cache`);
+      console.log(` Sirviendo chunk ${start}-${end} de ${fileSize} bytes desde cache`);
 
     } else {
       // Servir archivo completo
@@ -116,7 +116,7 @@ export class VideoCacheController {
         'Accept-Ranges': 'bytes',
         'Cache-Control': 'public, max-age=3600',
         // CORS headers
-        'Access-Control-Allow-Origin': process.env.CLIENT_URL || 'http://localhost:5173',
+        'Access-Control-Allow-Origin': process.env.CLIENT_URL || '*',
         'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS',
         'Access-Control-Allow-Headers': 'Range, Content-Type, Authorization',
         'Access-Control-Allow-Credentials': 'true',
@@ -126,7 +126,7 @@ export class VideoCacheController {
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
 
-      console.log(`📤 Sirviendo archivo completo desde cache: ${fileSize} bytes`);
+      console.log(` Sirviendo archivo completo desde cache: ${fileSize} bytes`);
     }
   }
 
@@ -155,9 +155,9 @@ export class VideoCacheController {
       videoCacheService.downloadVideoToCache(fileId, metadata.mimeType, totalSize)
         .then((result) => {
           if (result.success) {
-            console.log(`✅ Pre-carga completada: ${fileId}`);
+            console.log(` Pre-carga completada: ${fileId}`);
           } else {
-            console.error(`❌ Error en pre-carga: ${fileId}`, result.error);
+            console.error(` Error en pre-carga: ${fileId}`, result.error);
           }
         });
 
@@ -169,7 +169,7 @@ export class VideoCacheController {
       });
 
     } catch (error: any) {
-      console.error('❌ Error en preloadVideoToCache:', error);
+      console.error(' Error en preloadVideoToCache:', error);
       res.status(500).json({ 
         error: 'Error al iniciar pre-carga',
         details: error.message 
@@ -194,7 +194,7 @@ export class VideoCacheController {
         }
       });
     } catch (error: any) {
-      console.error('❌ Error en getCacheInfo:', error);
+      console.error(' Error en getCacheInfo:', error);
       res.status(500).json({ 
         error: 'Error al obtener información del cache',
         details: error.message 
@@ -221,7 +221,7 @@ export class VideoCacheController {
         });
       }
     } catch (error: any) {
-      console.error('❌ Error en clearCache:', error);
+      console.error(' Error en clearCache:', error);
       res.status(500).json({ 
         error: 'Error al limpiar cache',
         details: error.message 

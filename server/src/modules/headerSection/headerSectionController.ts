@@ -30,7 +30,7 @@ const handleServerError = (res: Response, req: Request, error: any, message: str
 export const createHeaderSection: RequestHandler = async (req, res): Promise<void> => {
   try {
     const { 
-      image, title, slogan, about, buttonName, buttonLink,
+      image, title, slogan, about, buttonName, buttonLink, badgeText,
       contentType, customCode, iframeUrl, customHtml, customCss, customJs,
       backgroundColor, titleColor, sloganColor, textColor, buttonColor, buttonTextColor,
       techStack
@@ -115,6 +115,11 @@ export const createHeaderSection: RequestHandler = async (req, res): Promise<voi
       adminId: admin.id,
     };
 
+    // Agregar badgeText si está definido
+    if (badgeText !== undefined && badgeText !== null && badgeText !== '') {
+      createData.badgeText = badgeText.trim();
+    }
+
     // Agregar campos de personalización solo si están definidos
     // Esto evita errores si las columnas aún no existen en la BD
     if (contentType !== undefined) createData.contentType = contentType || 'default';
@@ -132,7 +137,7 @@ export const createHeaderSection: RequestHandler = async (req, res): Promise<voi
           // Si no se puede extraer la URL, guardar el HTML completo en customHtml
           createData.customHtml = iframeUrl;
           createData.contentType = 'custom';
-        }
+    }
       } else {
         // Es solo una URL, guardarla normalmente
         createData.iframeUrl = iframeUrl;
@@ -274,7 +279,7 @@ export const updateHeaderSection: RequestHandler = async (req, res): Promise<voi
   try {
     const { id } = req.params;
     const { 
-      image, title, slogan, about, buttonName, buttonLink,
+      image, title, slogan, about, buttonName, buttonLink, badgeText,
       contentType, customCode, iframeUrl, customHtml, customCss, customJs,
       backgroundColor, titleColor, sloganColor, textColor, buttonColor, buttonTextColor,
       techStack
@@ -304,7 +309,7 @@ export const updateHeaderSection: RequestHandler = async (req, res): Promise<voi
 
     // Obtener o crear el Admin asociado al usuario autenticado
     let admin = await Admin.findOne({ where: { userId: user.id } });
-    if (!admin) {
+      if (!admin) {
       // Si el usuario tiene permisos pero no tiene Admin, crear uno automáticamente
       const userRole = user.Role?.name || '';
       const isSuperAdmin = userRole === 'superadmin';
@@ -352,6 +357,11 @@ export const updateHeaderSection: RequestHandler = async (req, res): Promise<voi
       adminId: admin.id,
     };
 
+    // Agregar badgeText si está definido
+    if (badgeText !== undefined) {
+      updateData.badgeText = badgeText ? badgeText.trim() : null;
+    }
+
     // Agregar campos de personalización solo si están definidos o si existen en el modelo
     if (contentType !== undefined) updateData.contentType = contentType;
     if (customCode !== undefined) updateData.customCode = customCode || null;
@@ -370,7 +380,7 @@ export const updateHeaderSection: RequestHandler = async (req, res): Promise<voi
             updateData.customHtml = iframeUrl;
             updateData.contentType = 'custom';
             updateData.iframeUrl = null;
-          }
+      }
         } else {
           // Es solo una URL, guardarla normalmente
           updateData.iframeUrl = iframeUrl;

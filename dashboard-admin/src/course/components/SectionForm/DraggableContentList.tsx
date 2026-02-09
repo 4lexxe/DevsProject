@@ -32,14 +32,14 @@ export default function DraggableContentList() {
   const [items, setItems] = useState<IContent[]>([]);
   const [pendingUpdates, setPendingUpdates] = useState<{ contentId: string; position: number }[]>([]);
   
-  // 🔹 Sincronizar `items` cuando cambie la sección
+  //  Sincronizar `items` cuando cambie la sección
   useEffect(() => {
     if (courseState.section) {
-      setItems([...courseState.section.contents].sort((a, b) => a.position - b.position)); // 🔥 Siempre ordenado
+      setItems([...courseState.section.contents].sort((a, b) => a.position - b.position)); //  Siempre ordenado
     }
   }, [courseState.section]);
 
-  // 🔹 Ejecutar actualizaciones de posición de forma asíncrona
+  //  Ejecutar actualizaciones de posición de forma asíncrona
   useEffect(() => {
     if (pendingUpdates.length > 0) {
       const timer = setTimeout(() => {
@@ -67,12 +67,12 @@ export default function DraggableContentList() {
   
     const updatedItems = arrayMove(items, oldIndex, newIndex).map((item, index) => ({
       ...item,
-      position: index + 1, // 🔥 Actualiza `position`
+      position: index + 1, //  Actualiza `position`
     }));
   
     setItems(updatedItems);
     
-    // 🔹 Programa las actualizaciones para ejecutarse de forma asíncrona
+    //  Programa las actualizaciones para ejecutarse de forma asíncrona
     const updates = updatedItems.map(item => ({ contentId: item.contentId, position: item.position }));
     setPendingUpdates(updates);
   };
@@ -91,7 +91,7 @@ export default function DraggableContentList() {
         position: index + 1, // Nueva posición basada en el índice
       }));
       
-      // 🔹 Programa las actualizaciones para ejecutarse de forma asíncrona
+      //  Programa las actualizaciones para ejecutarse de forma asíncrona
       const updates = reorderedItems.map(item => ({ contentId: item.contentId, position: item.position }));
       setPendingUpdates(updates);
       
