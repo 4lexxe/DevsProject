@@ -8,6 +8,7 @@ import Section from "../../course/models/Section";
 import { Op } from "sequelize";
 // Importar asociaciones para asegurar que están cargadas
 import "../models/Associations";
+import { User } from "../models/Associations";
 
 /**
  * Controlador para gestionar el acceso a cursos pagados
@@ -22,11 +23,11 @@ export class CourseAccessController extends BaseController {
     // Verificar errores de validación
     if (!this.handleValidationErrors(req, res)) return;
 
-    const { userId } = req.params;
+    const userId = (req.user as User)?.id;
 
     const userCourses = await CourseAccess.findAll({
       where: {
-        userId: parseInt(userId),
+        userId: userId.toString(),
         revokedAt: null // Solo cursos con acceso activo
       },
       include: [
@@ -53,7 +54,7 @@ export class CourseAccessController extends BaseController {
         description: access.course.summary,
         imageUrl: access.course.image,
         price: access.course.price,
-        progress: await this.calculateCourseProgress(parseInt(userId), access.course.id),
+        progress: await this.calculateCourseProgress(userId, access.course.id),
         accessToken: access.accessToken,
         grantedAt: access.grantedAt,
         isActive: access.revokedAt === null,
@@ -71,7 +72,8 @@ export class CourseAccessController extends BaseController {
     // Verificar errores de validación
     if (!this.handleValidationErrors(req, res)) return;
 
-    const { userId, courseId } = req.params;
+    const userId = (req.user as User)?.id.toString();
+    const { courseId } = req.params;
 
     // Verificar que el usuario tiene acceso al curso
     const courseAccess = await CourseAccess.findOne({

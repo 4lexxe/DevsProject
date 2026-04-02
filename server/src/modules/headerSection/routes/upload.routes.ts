@@ -3,11 +3,14 @@ import express from 'express';
 import multer from 'multer';
 import { uploadToImgBB } from '../services/imgBB.service';
 
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { requireAnyPermission } from '../../../shared/middleware/permissionsMiddleware';
+
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // Endpoint para subir archivos al backend
-router.post('/', upload.single('file'), async (req, res): Promise<void> => {
+router.post('/', authMiddleware, requireAnyPermission('header_section:create', 'header_section:update'), upload.single('file'), async (req, res): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No se proporcionó ningún archivo' });

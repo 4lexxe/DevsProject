@@ -1,34 +1,39 @@
 import { Router } from 'express';
 import { CourseAccessController } from '../controllers/courseAccess.controller';
-import { 
-  validateUserId, 
-  validateUserIdAndCourseId, 
-  validateGrantAccess, 
-  validateRevokeAccess 
+import {
+  validateUserId,
+  validateUserIdAndCourseId,
+  validateGrantAccess,
+  validateRevokeAccess
 } from '../validators/courseAccessValidation';
 
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { requirePermission } from '../../../shared/middleware/permissionsMiddleware';
+
 const router = Router();
+
+// Rutas auht sin permisos
 
 /**
  * @route GET /course-access/:userId/courses
  * @desc Obtiene todos los cursos a los que el usuario tiene acceso
  * @access Private
  */
-router.get('/:userId/courses', validateUserId, CourseAccessController.getUserCourses);
+router.get('/user/courses', authMiddleware, validateUserId, CourseAccessController.getUserCourses);
 
 /**
  * @route GET /course-access/:userId/courses/:courseId
  * @desc Obtiene los detalles de un curso específico al que el usuario tiene acceso
  * @access Private
  */
-router.get('/:userId/courses/:courseId', validateUserIdAndCourseId, CourseAccessController.getCourseDetails);
+router.get('/:userId/courses/:courseId', authMiddleware, validateUserIdAndCourseId, CourseAccessController.getCourseDetails);
 
 /**
  * @route GET /course-access/:userId/courses/:courseId/check
  * @desc Verifica si el usuario tiene acceso a un curso específico
  * @access Private
  */
-router.get('/:userId/courses/:courseId/check', validateUserIdAndCourseId, CourseAccessController.checkCourseAccess);
+router.get('/:userId/courses/:courseId/check', authMiddleware, validateUserIdAndCourseId, CourseAccessController.checkCourseAccess);
 
 /**
  * @route GET /course-access/:userId/stats
@@ -44,19 +49,21 @@ router.get('/:userId/stats', validateUserId, CourseAccessController.getUserCours
  */
 router.get('/course/:courseId/users', CourseAccessController.getCourseUsers);
 
+
+
 /**
  * @route POST /course-access/grant
  * @desc Otorga acceso a un curso para un usuario (usado después de una compra exitosa)
  * @access Private - Admin only
  */
-router.post('/grant', validateGrantAccess, CourseAccessController.grantCourseAccess);
+router.post('/grant', authMiddleware, requirePermission('course_access:grant'), validateGrantAccess, CourseAccessController.grantCourseAccess);
 
 /**
  * @route PUT /course-access/:userId/courses/:courseId/revoke
  * @desc Revoca el acceso a un curso (solo para administradores)
  * @access Private - Admin only
  */
-router.put('/:userId/courses/:courseId/revoke', validateRevokeAccess, CourseAccessController.revokeCourseAccess);
+router.put('/:userId/courses/:courseId/revoke', authMiddleware, requirePermission('course_access:revoke'), validateRevokeAccess, CourseAccessController.revokeCourseAccess);
 
 /**
  * @route GET /course-access/:userId/history

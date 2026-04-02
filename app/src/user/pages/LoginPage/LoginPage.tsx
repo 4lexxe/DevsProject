@@ -1,6 +1,6 @@
 import type React from "react";
-import LoginForm from "../components/login/LoginForm";
-import withAuthCheck from "../hoc/WithAuthCheck";
+import LoginForm from "./LoginForm";
+import withAuthCheck from "../../hoc/WithAuthCheck";
 import { Link } from "react-router-dom";
 
 function LoginPage() {

@@ -16,35 +16,40 @@ import {
   assignRoleToUserValidation
 } from '../validators/role.validators';
 
+import { requirePermission } from '../../../shared/middleware/permissionsMiddleware';
+
 const router = Router();
 
-// Rutas públicas (solo lectura básica para algunos casos)
-router.get('/', 
+router.get('/',
   authMiddleware,
+  requirePermission('role:view'),
   getRoles
 );
 
-router.get('/:id', 
+router.get('/:id',
   authMiddleware,
+  requirePermission('role:view'),
   getRoleByIdValidation,
   getRoleById
 );
 
-// Rutas protegidas (requieren permisos administrativos)
 router.post('/',
   authMiddleware,
+  requirePermission('role:create'),
   createRoleValidation,
   createRole
 );
 
 router.put('/:id',
   authMiddleware,
+  requirePermission('role:update'),
   updateRoleValidation,
   updateRole
 );
 
 router.delete('/:id',
   authMiddleware,
+  requirePermission('role:delete'),
   deleteRoleValidation,
   deleteRole
 );
@@ -52,6 +57,7 @@ router.delete('/:id',
 // Asignar rol a usuario
 router.put('/assign-user/:userId',
   authMiddleware,
+  requirePermission('role:assign'),
   assignRoleToUserValidation,
   assignRoleToUser
 );

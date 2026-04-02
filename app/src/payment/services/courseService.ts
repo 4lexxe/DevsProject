@@ -56,24 +56,11 @@ class CourseService {
   private baseUrl = '/courses';
 
   /**
-   * Obtiene los cursos a los que el usuario tiene acceso
-   */
-  async getMyCourses(): Promise<MyCourse[]> {
-    try {
-      const response = await axiosInstance.get(`${this.baseUrl}/my-courses`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error obteniendo mis cursos:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Obtiene los cursos del usuario con progreso y detalles de acceso
    */
   async getUserCourses(userId: string): Promise<UserCourse[]> {
     try {
-      const response = await axiosInstance.get(`/course-access/${userId}/courses`);
+      const response = await axiosInstance.get(`/course-access/user/courses`);
       return response.data.data;
     } catch (error) {
       console.error('Error obteniendo cursos del usuario:', error);

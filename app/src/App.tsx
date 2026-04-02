@@ -14,9 +14,9 @@ import Home from "./home/home";
 
 import "@/shared/assets/styles/main.css";
 
-import { CoursesPage, CourseDetail, QuizPage, Profile, ContentPage, SearchResultsPage }from '@/course/index';
+import { CoursesPage, CourseDetail, QuizPage, ContentPage, SearchResultsPage }from '@/course/index';
 
-import { LoginPage, RegisterPage } from "./user/auth";
+import { LoginPage, RegisterPage, Profile } from "@/user/pages";
 import AboutUs from "./shared/components/navigation/AboutUs";
 
 import LearnRoute from './learnroute/pages/LearnRoute';
@@ -69,8 +69,6 @@ const DebugNavigationInterceptor = () => {
 };
 import MyOrdersAndPayments from "./payment/pages/MyOrdersAndPayments";
 import MyCoursesPage from "./payment/pages/MyCourses";
-import CourseDiscountEvent from "./payment/pages/CourseDiscountEvent";
-import DiscountEventsList from "./payment/pages/DiscountEventsList";
 import MyCourse from "./payment/pages/MyCourse";
 
 const queryClient = new QueryClient({
@@ -120,9 +118,6 @@ function App() {
               <Route path="/cart" element={<CartPage />} />
               <Route path="/user/orders" element={<MyOrdersAndPayments />} />
               <Route path="/my-courses" element={<MyCoursesPage />} />
-              <Route path="/discount-events" element={<DiscountEventsList />} />
-              <Route path="/discount-events/create" element={<CourseDiscountEvent />} />
-              <Route path="/discount-events/edit" element={<CourseDiscountEvent />} />
               <Route path="/my-course/:id" element={<MyCourse />} />
               {/* Rutas públicas */}
 

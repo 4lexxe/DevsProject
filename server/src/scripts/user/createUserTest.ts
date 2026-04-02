@@ -48,7 +48,7 @@ async function createTestUsers() {
     for (const role of roles) {
       const testEmail = `test.${role.name}@example.com`;
       const testUsername = `test_${role.name}`;
-      
+
       try {
         // Verificar si el usuario ya existe
         const existingUser = await User.findOne({
@@ -107,7 +107,7 @@ async function createTestUsers() {
 
     // Mostrar resultados
     console.log('═══════════════════════════════════════════════════════\n');
-    
+
     if (createdUsers.length > 0) {
       console.log(`✅ Usuarios creados exitosamente: ${createdUsers.length}\n`);
       createdUsers.forEach(user => {

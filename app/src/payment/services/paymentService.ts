@@ -34,19 +34,6 @@ class PaymentService {
     }
   }
 
-  /**
-   * Obtiene un pago específico por ID
-   */
-  async getPaymentById(paymentId: string): Promise<Payment> {
-    try {
-      const response = await axiosInstance.get(`/payments/${paymentId}`);
-      return response.data.data;
-    } catch (error) {
-      console.error('Error obteniendo pago:', error);
-      throw error;
-    }
-  }
-
   async cancelOrder(orderId: string): Promise<Payment> {
     try {
       const response = await axiosInstance.delete(`/orders/${orderId}/cancel`);

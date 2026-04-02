@@ -1,7 +1,7 @@
 
 // Re-exportar componentes
 export { default as LoginPage } from './pages/LoginPage'; 
-export {default as RegisterPage} from './pages/RegisterPage';
+export {default as RegisterPage} from './pages/register/RegisterPage';
 
 // Re-exportar hooks
 /* export { useLogin } from './hooks/useLogin';

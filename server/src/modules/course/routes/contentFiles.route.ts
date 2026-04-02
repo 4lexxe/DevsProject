@@ -1,17 +1,18 @@
 import { Router } from 'express';
 import { ContentFilesController } from '../controllers/contentFiles.controller';
-import { 
-  validateContentId, 
-  validateFileId, 
+import {
+  validateContentId,
+  validateFileId,
   validateMultipleFiles
 } from '../validators/contentFilesValidator';
 
-import { 
+import {
   uploadMultipleFiles,
   validateFileSize
 } from '../../drive/middlewares/driveMiddleware';
 
 import { authMiddleware } from "../../../shared/middleware/authMiddleware";
+import { requirePermission } from "../../../shared/middleware/permissionsMiddleware";
 import { auth } from 'googleapis/build/src/apis/abusiveexperiencereport';
 
 // Middleware para validar archivos subidos
@@ -25,7 +26,7 @@ const validateUploadedFilesMiddleware = (req: any, res: any, next: any) => {
 
   // Validar múltiples archivos
   const validation = validateMultipleFiles(req.files);
-  
+
   if (!validation.isValid) {
     return res.status(400).json({
       success: false,
@@ -71,6 +72,7 @@ router.get(
 router.put(
   '/contents/:contentId/files/reorder',
   authMiddleware,
+  requirePermission('content_file:update'),
   validateContentId,
   // TODO: Agregar validación específica para reorder cuando se necesite
   ContentFilesController.reorderFilesEndpoint
@@ -85,6 +87,7 @@ router.put(
 router.post(
   '/contents/:contentId/files/upload',
   authMiddleware,
+  requirePermission('content_file:create'),
   validateContentId,
   uploadMultipleFiles,
   validateFileSize,
@@ -100,6 +103,7 @@ router.post(
 router.delete(
   '/content-files/:fileId',
   authMiddleware,
+  requirePermission('content_file:delete'),
   validateFileId,
   ContentFilesController.deleteFile
 );

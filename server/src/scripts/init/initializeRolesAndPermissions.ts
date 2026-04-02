@@ -19,7 +19,7 @@ const permissions = [
   'course:create',
   'course:update',
   'course:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: SECCIONES
   // ═══════════════════════════════════════
@@ -27,7 +27,7 @@ const permissions = [
   'section:create',
   'section:update',
   'section:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: CONTENIDO
   // ═══════════════════════════════════════
@@ -35,7 +35,7 @@ const permissions = [
   'content:create',
   'content:update',
   'content:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: ARCHIVOS DE CONTENIDO
   // ═══════════════════════════════════════
@@ -43,7 +43,7 @@ const permissions = [
   'content_file:create',
   'content_file:update',
   'content_file:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: TIPO DE CARRERA
   // ═══════════════════════════════════════
@@ -51,7 +51,7 @@ const permissions = [
   'career_type:create',
   'career_type:update',
   'career_type:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: CATEGORÍAS
   // ═══════════════════════════════════════
@@ -59,7 +59,7 @@ const permissions = [
   'category:create',
   'category:update',
   'category:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: HEADER SECTION
   // ═══════════════════════════════════════
@@ -67,7 +67,7 @@ const permissions = [
   'header_section:create',
   'header_section:update',
   'header_section:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: DESCUENTOS DE CURSOS
   // ═══════════════════════════════════════
@@ -75,7 +75,7 @@ const permissions = [
   'course_discount:create',
   'course_discount:update',
   'course_discount:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: ACCESO A CURSOS
   // ═══════════════════════════════════════
@@ -83,7 +83,7 @@ const permissions = [
   'course_access:grant',
   'course_access:revoke',
   'course_access:history',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: ÓRDENES
   // ═══════════════════════════════════════
@@ -91,7 +91,7 @@ const permissions = [
   'order:create',
   'order:update',
   'order:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: USUARIOS
   // ═══════════════════════════════════════
@@ -99,7 +99,7 @@ const permissions = [
   'user:create',
   'user:update',
   'user:delete',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: ROLES
   // ═══════════════════════════════════════
@@ -108,7 +108,7 @@ const permissions = [
   'role:update',
   'role:delete',
   'role:assign',
-  
+
   // ═══════════════════════════════════════
   // MÓDULO: PERMISOS
   // ═══════════════════════════════════════
@@ -116,10 +116,19 @@ const permissions = [
   'permission:create',
   'permission:update',
   'permission:delete',
+
+  // ═══════════════════════════════════════
+  // MÓDULO: ADMINISTRADORES
+  // ═══════════════════════════════════════
+  'admin:view',
+  'admin:create',
+  'admin:update',
+  'admin:delete',
 ];
 
 // 2. ROLES: Definición de roles del sistema
 const roles = [
+  { name: 'user', description: 'Usuario registrado estándar sin permisos administrativos' },
   { name: 'instructor', description: 'Instructor con permisos de gestión de cursos' },
   { name: 'user_moderator', description: 'Moderador de usuarios con permisos RBAC' },
   { name: 'manager', description: 'Gestor con permisos de compras y promociones' },
@@ -128,6 +137,12 @@ const roles = [
 
 // 3. RELACIONES: Permisos asignados a cada rol
 const rolePermissions: Record<string, string[]> = {
+  // ═══════════════════════════════════════
+  // USER (Usuario estándar)
+  // Sin permisos administrativos
+  // ═══════════════════════════════════════
+  user: [],
+
   // ═══════════════════════════════════════
   // INSTRUCTOR
   // Permisos completos del área de cursos
@@ -264,6 +279,11 @@ const rolePermissions: Record<string, string[]> = {
     'permission:create',
     'permission:update',
     'permission:delete',
+    // Administradores
+    'admin:view',
+    'admin:create',
+    'admin:update',
+    'admin:delete',
   ],
 };
 
@@ -343,7 +363,7 @@ async function buildRelations() {
 
 function generatePermissionDescription(permissionName: string): string {
   const [resource, action] = permissionName.split(':');
-  
+
   const actions: Record<string, string> = {
     view: 'Ver',
     create: 'Crear',
@@ -369,6 +389,7 @@ function generatePermissionDescription(permissionName: string): string {
     user: 'usuarios',
     role: 'roles',
     permission: 'permisos',
+    admin: 'administradores',
   };
 
   return `${actions[action] || action} ${resources[resource] || resource}`;

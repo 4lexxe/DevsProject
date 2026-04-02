@@ -88,10 +88,6 @@ class CartController extends BaseController {
       const userId = (req.user as User)?.id;
       const { courseId } = req.body;
 
-      if (!userId) {
-        return this.unauthorized(res, req, "Usuario no autenticado");
-      }
-
       // Verificar que el curso existe
       const course = await Course.findOne({
         where: { id: courseId },
@@ -231,10 +227,6 @@ class CartController extends BaseController {
 
       const userId = (req.user as User)?.id;
       const { courseId } = req.params;
-
-      if (!userId) {
-        return this.unauthorized(res, req, "Usuario no autenticado");
-      }
 
       const cart = await Cart.findOne({
         where: { userId, status: "active" },

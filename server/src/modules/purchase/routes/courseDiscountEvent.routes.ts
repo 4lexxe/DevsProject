@@ -9,6 +9,9 @@ import {
   getActiveDiscountForCourseValidation,
 } from "../validators/courseDiscountEvent.validators";
 
+import { authMiddleware } from '../../../shared/middleware/authMiddleware';
+import { requirePermission } from '../../../shared/middleware/permissionsMiddleware';
+
 const router = Router();
 
 // ==================== RUTAS CRUD ====================
@@ -19,8 +22,8 @@ const router = Router();
  * @access  Public/Private (dependiendo de los requerimientos)
  * @query   page, limit, courseId, isActive
  */
-router.get('/', 
-  getCourseDiscountEventsValidation, 
+router.get('/',
+  getCourseDiscountEventsValidation,
   CourseDiscountController.getAllDiscounts
 );
 
@@ -29,7 +32,7 @@ router.get('/',
  * @desc    Obtener un evento de descuento por ID
  * @access  Public/Private
  */
-router.get('/:id', 
+router.get('/:id',
   getCourseDiscountEventByIdValidation,
   CourseDiscountController.getDiscountById
 );
@@ -40,6 +43,8 @@ router.get('/:id',
  * @access  Private (Admin/Content Manager)
  */
 router.post('/',
+  authMiddleware,
+  requirePermission('course_discount:create'),
   createCourseDiscountEventValidation,
   CourseDiscountController.createDiscount
 );
@@ -50,6 +55,8 @@ router.post('/',
  * @access  Private (Admin/Content Manager)
  */
 router.put('/:id',
+  authMiddleware,
+  requirePermission('course_discount:update'),
   updateCourseDiscountEventValidation,
   CourseDiscountController.updateDiscount
 );
@@ -60,6 +67,8 @@ router.put('/:id',
  * @access  Private (Admin)
  */
 router.delete('/:id',
+  authMiddleware,
+  requirePermission('course_discount:delete'),
   deleteCourseDiscountEventValidation,
   CourseDiscountController.deleteDiscount
 );

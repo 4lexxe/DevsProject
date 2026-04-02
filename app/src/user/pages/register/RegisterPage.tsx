@@ -1,7 +1,7 @@
 import type React from "react";
 import { Link } from "react-router-dom";
-import RegisterForm from "../components/register/RegisterForm";
-import withAuthCheck from "../hoc/WithAuthCheck";
+import RegisterForm from "./RegisterForm";
+import withAuthCheck from "../../hoc/WithAuthCheck";
 
 function RegisterPage() {
   return (

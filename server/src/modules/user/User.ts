@@ -22,7 +22,7 @@ class User extends Model {
   public surname!: string;
   public email!: string | null;
   public password!: string | null;
-  
+
   //Estos campos se le pedira cuando se quiera suscribir o hacer algun pago
   public identificationNumber!: string | null; // Numero de identificación del usuario
   public identificationType!: string | null;    // Tipo de identificación del usuario (DNI, CUIT, CUIL)
@@ -216,7 +216,7 @@ User.init(
       { fields: ["registrationIp"] },
       { fields: ["lastLoginIp"] },
       { fields: ["suspiciousActivities"] },
-      { fields: ["identificationNumber"] }, 
+      { fields: ["identificationNumber"] },
       { fields: ["identificationType"] },
     ],
   }

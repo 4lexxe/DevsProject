@@ -1,20 +1,17 @@
 import { Router } from "express"
 import { AdminController } from "../admin/adminController"
 import { authMiddleware } from "../../shared/middleware/authMiddleware"
-import { checkRole } from "../../shared/middleware/checkRole"
+import { requirePermission } from "../../shared/middleware/permissionsMiddleware"
 
 const router = Router()
 
 // Todas las rutas de admin requieren autenticación
 router.use(authMiddleware)
 
-// Todas las rutas de admin requieren rol de superadmin
-router.use(checkRole(["superadmin"]))
-
-router.post("/", AdminController.createAdminValidations, AdminController.createAdmin)
-router.get("/admins", AdminController.getAllAdmins)
-router.get("/:adminId", AdminController.getAdminById)
-router.put("/:adminId", AdminController.updateAdminValidations, AdminController.updateAdmin)
-router.delete("/:adminId", AdminController.deleteAdmin)
+router.post("/", requirePermission("admin:create"), AdminController.createAdminValidations, AdminController.createAdmin)
+router.get("/admins", requirePermission("admin:view"), AdminController.getAllAdmins)
+router.get("/:adminId", requirePermission("admin:view"), AdminController.getAdminById)
+router.put("/:adminId", requirePermission("admin:update"), AdminController.updateAdminValidations, AdminController.updateAdmin)
+router.delete("/:adminId", requirePermission("admin:delete"), AdminController.deleteAdmin)
 
 export default router

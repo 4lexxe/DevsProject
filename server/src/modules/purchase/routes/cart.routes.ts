@@ -5,6 +5,8 @@ import {
   removeCourseFromCartValidation,
 } from "../validators/cart.validators";
 
+import { authMiddleware } from "../../../shared/middleware/authMiddleware";
+
 const router = Router();
 
 // ==================== RUTAS DEL CARRITO ====================
@@ -29,14 +31,14 @@ router.get("/summary", CartController.getCartSummary);
  * @access  Private
  * @body    { courseId: number }
  */
-router.post("/courses", addCourseToCartValidation, CartController.addCourseToCart);
+router.post("/courses", authMiddleware, addCourseToCartValidation, CartController.addCourseToCart);
 
 /**
  * @route   DELETE /api/cart/courses/:courseId
  * @desc    Eliminar un curso del carrito
  * @access  Private
  */
-router.delete("/courses/:courseId", removeCourseFromCartValidation, CartController.removeCourseFromCart);
+router.delete("/courses/:courseId", authMiddleware, removeCourseFromCartValidation, CartController.removeCourseFromCart);
 
 /**
  * @route   GET /api/cart/count
